@@ -5,9 +5,9 @@ import yaml
 from fundamentals import utKit, cl_utils
 from fundamentals.utKit import utKit
 
-from dryxPython.projectsetup import setup_main_clutil
+from fundamentals import tools, times
 
-su = setup_main_clutil(
+su = tools(
     arguments={},
     docString=__doc__,
     logLevel="DEBUG",

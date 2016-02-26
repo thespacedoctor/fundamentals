@@ -2,10 +2,10 @@ import os
 import nose
 import shutil
 import yaml
-from fundamentals import logs, cl_utils
+from fundamentals import times, cl_utils
 from fundamentals.utKit import utKit
 
-from fundamentals import tools, times
+from fundamentals import tools
 
 su = tools(
     arguments={},
@@ -30,15 +30,15 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_logs():
+class test_times():
 
-    def test_logs_function(self):
+    def test_times_function(self):
         kwargs = {}
         kwargs["log"] = log
         kwargs["settings"] = settings
         # xt-kwarg_key_and_value
 
-        testObject = logs(**kwargs)
+        testObject = times(**kwargs)
         testObject.get()
 
         # x-print-testpage-for-pessto-marshall-web-object

@@ -29,7 +29,8 @@ setup(
     install_requires=[
         'pyyaml',
         'docopt',
-        'MySQL-python'
+        'MySQL-python',
+        'python-dateutil'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],

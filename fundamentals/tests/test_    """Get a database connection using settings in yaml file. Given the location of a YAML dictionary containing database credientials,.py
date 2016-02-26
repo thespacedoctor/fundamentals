@@ -2,12 +2,13 @@ import os
 import nose
 import shutil
 import yaml
-from def set_db_connection(pathToYamlFile): import     """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials,, cl_utils
+from def set_db_connection(pathToYamlFile):
+    import     """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials,, cl_utils
 from def set_db_connection(pathToYamlFile):.utKit import utKit
 
-from dryxPython.projectsetup import setup_main_clutil
+from fundamentals import tools, times
 
-su = setup_main_clutil(
+su = tools(
     arguments={},
     docString=__doc__,
     logLevel="DEBUG",
@@ -30,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_    """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials,():
+class test_    """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials, ():
 
     def test_    """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials,_function(self):
         kwargs = {}
@@ -38,7 +39,7 @@ class test_    """Get a database connection using settings in yaml file. Given t
         kwargs["settings"] = settings
         # xt-kwarg_key_and_value
 
-        testObject =     """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials,(**kwargs)
+        testObject =     """Get a database connection using settings in yaml file. Given the location of a YAML dictionary containing database credientials, (**kwargs)
         testObject.get()
 
         # x-print-testpage-for-pessto-marshall-web-object
