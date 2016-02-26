@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version_num = __import__('fundamentals').__version__
+exec(open('fundamentals/__version__.py').read())
 
 
 def readme():
@@ -9,7 +9,7 @@ def readme():
 
 setup(
     name='fundamentals',
-    version=version_num,
+    version=__version__,
     description='Some project setup tools including logging, settings and database connections',
     long_description=readme(),
     classifiers=[
@@ -20,14 +20,14 @@ setup(
     ],
     keywords=['logging', 'database'],
     url='https://github.com/thespacedoctor/fundamentals',
-    download_url='https://github.com/thespacedoctor/fundamentals/tarball/v%(version_num)s' % locals(
+    download_url='https://github.com/thespacedoctor/fundamentals/archive/v%(__version__)s.zip' % locals(
     ),
     author='David Young',
     author_email='davidrobertyoung@gmail.com',
     license='MIT',
     packages=['fundamentals'],
     install_requires=[
-        'pyyaml',
+        'pyyaml'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
