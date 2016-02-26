@@ -27,7 +27,9 @@ setup(
     license='MIT',
     packages=['fundamentals'],
     install_requires=[
-        'pyyaml'
+        'pyyaml',
+        'docopt',
+        'MySQL-python'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],

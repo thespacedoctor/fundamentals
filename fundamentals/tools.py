@@ -16,7 +16,7 @@ tools.py
     - ``_someObject`` = a 'private' object that should only be changed for debugging
 
 :Notes:
-    - If you have any questions requiring this script/module please email me: d.r.young@qub.ac.uk
+    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com
 """
 ################# GLOBAL IMPORTS ####################
 import sys
@@ -27,6 +27,7 @@ import shutil
 import MySQLdb as ms
 import logs as dl
 import time
+from docopt import docopt
 
 
 ###################################################################
