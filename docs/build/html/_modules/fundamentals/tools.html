@@ -1,0 +1,541 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fundamentals.tools &mdash; fundamentals 0.1.4 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="fundamentals 0.1.4 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> fundamentals
+          
+
+          
+            
+            <img src="../../_static/thespacedoctor_icon_white_circle.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">fundamentals</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>fundamentals.tools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fundamentals.tools</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">tools.py</span>
+<span class="sd">=========</span>
+<span class="sd">:Summary:</span>
+<span class="sd">    Toolset to setup the main function for a cl-util</span>
+
+<span class="sd">:Author:</span>
+<span class="sd">    David Young</span>
+
+<span class="sd">:Date Created:</span>
+<span class="sd">    April 16, 2014</span>
+
+<span class="sd">:dryx syntax:</span>
+<span class="sd">    - ``_someObject`` = a &#39;private&#39; object that should only be changed for debugging</span>
+
+<span class="sd">:Notes:</span>
+<span class="sd">    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">################# GLOBAL IMPORTS ####################</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">MySQLdb</span> <span class="kn">as</span> <span class="nn">ms</span>
+<span class="kn">import</span> <span class="nn">logs</span> <span class="kn">as</span> <span class="nn">dl</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">docopt</span> <span class="kn">import</span> <span class="n">docopt</span>
+
+
+<span class="c1">###################################################################</span>
+<span class="c1"># CLASSES                                                         #</span>
+<span class="c1">###################################################################</span>
+
+
+<div class="viewcode-block" id="tools"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.tools">[docs]</a><span class="k">class</span> <span class="nc">tools</span><span class="p">():</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    common setup methods &amp; attributes of the main function in cl-util</span>
+
+<span class="sd">    **Key Arguments:**</span>
+<span class="sd">        - ``dbConn`` -- mysql database connection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialisation</span>
+
+<div class="viewcode-block" id="tools.__init__"><a class="viewcode-back" href="../../_autosummary/fundamentals.tools.tools.html#fundamentals.tools.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">arguments</span><span class="p">,</span>
+            <span class="n">docString</span><span class="p">,</span>
+            <span class="n">logLevel</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+            <span class="n">options_first</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">projectName</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">orderedSettings</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">tunnel</span><span class="o">=</span><span class="bp">False</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="n">arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">docString</span> <span class="o">=</span> <span class="n">docString</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logLevel</span> <span class="o">=</span> <span class="n">logLevel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tunnel</span> <span class="o">=</span> <span class="n">tunnel</span>
+
+        <span class="c1">## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##</span>
+        <span class="c1"># PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED</span>
+        <span class="k">if</span> <span class="n">arguments</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">arguments</span> <span class="o">=</span> <span class="n">docopt</span><span class="p">(</span><span class="n">docString</span><span class="p">,</span> <span class="n">options_first</span><span class="o">=</span><span class="n">options_first</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="n">arguments</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;tests.test&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># UNPACK SETTINGS</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="s2">&quot;&lt;settingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">]:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;--settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--settingsFile&quot;</span><span class="p">]:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--settingsFile&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;pathToSettingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;pathToSettingsFile&quot;</span><span class="p">]:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;pathToSettingsFile&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s2">&quot;settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">projectName</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">)</span>
+                <span class="n">projectDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+                    <span class="s2">&quot;HOME&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/.config/</span><span class="si">%(projectName)s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+                <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">projectDir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">:</span>
+                    <span class="c1"># Recursively create missing directories</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">projectDir</span><span class="p">):</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">projectDir</span><span class="p">)</span>
+                <span class="n">settingsFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+                    <span class="s2">&quot;HOME&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/.config/</span><span class="si">%(projectName)s</span><span class="s2">/</span><span class="si">%(projectName)s</span><span class="s2">.yaml&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+                <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">settingsFile</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">codecs</span>
+                    <span class="n">writeFile</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                        <span class="n">settingsFile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+                <span class="kn">import</span> <span class="nn">yaml</span>
+                <span class="n">astream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">settingsFile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">orderedSettings</span><span class="p">:</span>
+                    <span class="n">this</span> <span class="o">=</span> <span class="n">ordered_load</span><span class="p">(</span><span class="n">astream</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">this</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">astream</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">this</span><span class="p">:</span>
+                    <span class="n">settings</span> <span class="o">=</span> <span class="n">this</span>
+                    <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">settingsFile</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">inspect</span>
+                    <span class="n">ds</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+                                  <span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;/default_settings.yaml&quot;</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">settingsFile</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">settingsFile</span><span class="p">)</span>
+                        <span class="k">print</span> <span class="s2">&quot;default settings have been added to &#39;</span><span class="si">%(settingsFile)s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s2">&quot;please add settings to file &#39;</span><span class="si">%(settingsFile)s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">yaml</span>
+            <span class="k">if</span> <span class="n">orderedSettings</span><span class="p">:</span>
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">ordered_load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+        <span class="c1"># SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN</span>
+        <span class="c1"># SETTINGS</span>
+        <span class="k">if</span> <span class="s1">&#39;settings&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;logging settings&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;&lt;settingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+                    <span class="n">yaml_file</span><span class="o">=</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+                    <span class="n">yaml_file</span><span class="o">=</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;--settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+                    <span class="n">yaml_file</span><span class="o">=</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--settingsFile&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;pathToSettingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+                    <span class="n">yaml_file</span><span class="o">=</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;pathToSettingsFile&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="s2">&quot;settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+                    <span class="n">yaml_file</span><span class="o">=</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s2">&quot;--logger&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">or</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--logger&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">log</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">console_logger</span><span class="p">(</span>
+                <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logLevel</span>
+            <span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;logger setup&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+
+        <span class="c1"># unpack remaining cl arguments using `exec` to setup the variable names</span>
+        <span class="c1"># automatically</span>
+        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                <span class="n">varname</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;Flag&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">varname</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                <span class="k">exec</span><span class="p">(</span><span class="n">varname</span> <span class="o">+</span> <span class="s2">&quot; = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">val</span><span class="p">,))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">exec</span><span class="p">(</span><span class="n">varname</span> <span class="o">+</span> <span class="s2">&quot; = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">val</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="o">==</span> <span class="s2">&quot;--dbConn&quot;</span><span class="p">:</span>
+                <span class="n">dbConn</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">val</span><span class="p">,))</span>
+
+        <span class="c1"># SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED</span>
+        <span class="n">dbConn</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="s1">&#39;settings&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;database settings&quot;</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="s2">&quot;host&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">]:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;host&quot;</span><span class="p">]</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;user&quot;</span><span class="p">]</span>
+            <span class="n">passwd</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
+            <span class="n">dbName</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;db&quot;</span><span class="p">]</span>
+            <span class="n">dbConn</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="s2">&quot;hostFlag&quot;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;dbNameFlag&quot;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="c1"># SETUP DB CONNECTION</span>
+            <span class="n">dbConn</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--host&quot;</span><span class="p">]</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--user&quot;</span><span class="p">]</span>
+            <span class="n">passwd</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--passwd&quot;</span><span class="p">]</span>
+            <span class="n">dbName</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;--dbName&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">dbConn</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">MySQLdb</span> <span class="kn">as</span> <span class="nn">ms</span>
+            <span class="n">dbConn</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                <span class="n">passwd</span><span class="o">=</span><span class="n">passwd</span><span class="p">,</span>
+                <span class="n">db</span><span class="o">=</span><span class="n">dbName</span><span class="p">,</span>
+                <span class="n">use_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">charset</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span>
+            <span class="p">)</span>
+            <span class="n">dbConn</span><span class="o">.</span><span class="n">autocommit</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;dbConn: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dbConn</span><span class="p">,))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span> <span class="o">=</span> <span class="n">dbConn</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;settings&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+
+        <span class="k">if</span> <span class="n">tunnel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_tunnel</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="tools.setup"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.tools.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;setup the attributes and return</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tunnel</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remoteDBConn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span></div>
+
+    <span class="k">def</span> <span class="nf">_setup_tunnel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; setup ssh tunnel if required</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;starting the ``_setup_tunnel`` method&#39;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">STDOUT</span>
+
+        <span class="c1"># SETUP TUNNEL IF REQUIRED</span>
+        <span class="k">if</span> <span class="s2">&quot;ssh tunnel&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="ow">and</span> <span class="s2">&quot;use tunnel&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">][</span><span class="s2">&quot;use tunnel&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="c1"># TEST TUNNEL DOES NOT ALREADY EXIST</span>
+            <span class="n">sshPort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">][</span><span class="s2">&quot;port&quot;</span><span class="p">]</span>
+            <span class="n">connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkServer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">sshPort</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">connected</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;ssh tunnel already exists - moving on&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># GRAB TUNNEL SETTINGS FROM SETTINGS FILE</span>
+                <span class="n">ru</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">][</span><span class="s2">&quot;remote user&quot;</span><span class="p">]</span>
+                <span class="n">rip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">][</span><span class="s2">&quot;remote ip&quot;</span><span class="p">]</span>
+                <span class="n">rh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;ssh tunnel&quot;</span><span class="p">][</span><span class="s2">&quot;remote datbase host&quot;</span><span class="p">]</span>
+
+                <span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;ssh -fnN </span><span class="si">%(ru)s</span><span class="s2">@</span><span class="si">%(rip)s</span><span class="s2"> -L </span><span class="si">%(sshPort)s</span><span class="s2">:</span><span class="si">%(rh)s</span><span class="s2">:3306&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">close_fds</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;output: </span><span class="si">%(output)s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">())</span>
+
+                <span class="c1"># TEST CONNECTION - QUIT AFTER SO MANY TRIES</span>
+                <span class="n">connected</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="n">connected</span><span class="p">:</span>
+                    <span class="n">connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkServer</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;host&quot;</span><span class="p">],</span> <span class="n">sshPort</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="s1">&#39;cound not setup tunnel to remote datbase&#39;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">())</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># SETUP A DATABASE CONNECTION FOR THE remote database</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;host&quot;</span><span class="p">]</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;user&quot;</span><span class="p">]</span>
+        <span class="n">passwd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span>
+            <span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
+        <span class="n">dbName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;database settings&quot;</span><span class="p">][</span><span class="s2">&quot;remote database&quot;</span><span class="p">][</span><span class="s2">&quot;db&quot;</span><span class="p">]</span>
+        <span class="n">thisConn</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+            <span class="n">passwd</span><span class="o">=</span><span class="n">passwd</span><span class="p">,</span>
+            <span class="n">db</span><span class="o">=</span><span class="n">dbName</span><span class="p">,</span>
+            <span class="n">port</span><span class="o">=</span><span class="n">sshPort</span><span class="p">,</span>
+            <span class="n">use_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">charset</span><span class="o">=</span><span class="s1">&#39;utf8&#39;</span>
+        <span class="p">)</span>
+        <span class="n">thisConn</span><span class="o">.</span><span class="n">autocommit</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;cataloguesDbConn: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">thisConn</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remoteDBConn</span> <span class="o">=</span> <span class="n">thisConn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;completed the ``_setup_tunnel`` method&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_checkServer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the TCP Port we&#39;ve decided to use for tunnelling is available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;starting the ``_checkServer`` method&#39;</span><span class="p">)</span>
+
+        <span class="c1"># CREATE A TCP SOCKET</span>
+        <span class="kn">import</span> <span class="nn">socket</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sd">&quot;&quot;&quot;Attempting to connect to `%(address)s` on port `%(port)s`&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">address</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;Connected to `%(address)s` on port `%(port)s`&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s&quot;&quot;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">())</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+    <span class="c1"># use the tab-trigger below for new method</span>
+    <span class="c1"># xt-class-method</span>
+
+
+<span class="c1">###################################################################</span>
+<span class="c1"># PUBLIC FUNCTIONS                                                #</span>
+<span class="c1">###################################################################</span>
+<div class="viewcode-block" id="ordered_load"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.ordered_load">[docs]</a><span class="k">def</span> <span class="nf">ordered_load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">OrderedLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">construct_mapping</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">flatten_mapping</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">object_pairs_hook</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">construct_pairs</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+    <span class="n">OrderedLoader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">BaseResolver</span><span class="o">.</span><span class="n">DEFAULT_MAPPING_TAG</span><span class="p">,</span>
+        <span class="n">construct_mapping</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">OrderedLoader</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Dave Young.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.4',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

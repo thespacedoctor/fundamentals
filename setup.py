@@ -1,10 +1,12 @@
 from setuptools import setup
+import os
 
-exec(open('fundamentals/__version__.py').read())
+moduleDirectory = os.path.dirname(os.path.realpath(__file__))
+exec(open(moduleDirectory + "/fundamentals/__version__.py").read())
 
 
 def readme():
-    with open('README.md') as f:
+    with open(moduleDirectory + '/README.md') as f:
         return f.read()
 
 setup(

@@ -101,6 +101,23 @@ class utKit():
 
         return log, dbConn, self.pathToInputDir, self.pathToOutputDir
 
+    def tearDownModule(
+            self):
+        """The tearDownModule method
+
+        **Key Arguments:**
+            # -
+
+        **Return:**
+            - None
+
+        **Todo**
+            - @review: when complete, clean tearDownModule method
+            - @review: when complete add logging
+        """
+
+        return None
+
     # use the tab-trigger below for new method
     # method-tmpx
 

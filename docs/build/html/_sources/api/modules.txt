@@ -1,0 +1,7 @@
+fundamentals
+============
+
+.. toctree::
+   :maxdepth: 100
+
+   fundamentals

@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fundamentals Package &mdash; fundamentals 0.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="fundamentals 0.1.4 documentation" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">fundamentals 0.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fundamentals-package">
+<h1>fundamentals Package<a class="headerlink" href="#fundamentals-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><a class="reference internal" href="#module-fundamentals" title="fundamentals"><code class="xref py py-mod docutils literal"><span class="pre">fundamentals</span></code></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fundamentals"></span></div>
+<div class="section" id="module-fundamentals.__version__">
+<span id="version-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">__version__</span></code> Module<a class="headerlink" href="#module-fundamentals.__version__" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fundamentals.logs">
+<span id="logs-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">logs</span></code> Module<a class="headerlink" href="#module-fundamentals.logs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="logs-py">
+<h3>logs.py<a class="headerlink" href="#logs-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Summary:</th><td class="field-body"><p class="first">Logger setup for python projects</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Author:</th><td class="field-body"><p class="first">David Young</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Date Created:</th><td class="field-body"><p class="first">October 10, 2012</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">dryx syntax:</th><td class="field-body"><ul class="first simple">
+<li><code class="docutils literal"><span class="pre">_someObject</span></code> = a &#8216;private&#8217; object that should only be changed for debugging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Notes:</th><td class="field-body"><ul class="first last simple">
+<li>If you have any questions requiring this script/module please email me: <a class="reference external" href="mailto:davidrobertyoung&#37;&#52;&#48;gmail&#46;com">davidrobertyoung<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="fundamentals.logs.GroupWriteRotatingFileHandler">
+<em class="property">class </em><code class="descclassname">fundamentals.logs.</code><code class="descname">GroupWriteRotatingFileHandler</code><span class="sig-paren">(</span><em>filename</em>, <em>mode='a'</em>, <em>maxBytes=0</em>, <em>backupCount=0</em>, <em>encoding=None</em>, <em>delay=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/logs.html#GroupWriteRotatingFileHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.logs.GroupWriteRotatingFileHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.handlers.RotatingFileHandler</span></code></p>
+<p>rotating file handler for logging</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fundamentals.logs.console_logger">
+<code class="descclassname">fundamentals.logs.</code><code class="descname">console_logger</code><span class="sig-paren">(</span><em>level='INFO'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/logs.html#console_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.logs.console_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup and return a console logger only.</p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">level</span></code> &#8211; the level of logging required</li>
+</ul>
+</dd>
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">logger</span></code> &#8211; the console logger</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fundamentals.logs.setup_dryx_logging">
+<code class="descclassname">fundamentals.logs.</code><code class="descname">setup_dryx_logging</code><span class="sig-paren">(</span><em>yaml_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/logs.html#setup_dryx_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.logs.setup_dryx_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>setup dryx style python logging</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-fundamentals.times">
+<span id="times-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">times</span></code> Module<a class="headerlink" href="#module-fundamentals.times" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="times-py">
+<h3>times.py<a class="headerlink" href="#times-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Summary:</th><td class="field-body"><p class="first">Some time functions to be used with logging etc</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Author:</th><td class="field-body"><p class="first">David Young</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Date Created:</th><td class="field-body"><p class="first">February 26, 2016</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">dryx syntax:</th><td class="field-body"><ul class="first simple">
+<li><code class="docutils literal"><span class="pre">_someObject</span></code> = a &#8216;private&#8217; object that should only be changed for debugging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Notes:</th><td class="field-body"><ul class="first last simple">
+<li>If you have any questions requiring this script/module please email me: <a class="reference external" href="mailto:davidrobertyoung&#37;&#52;&#48;gmail&#46;com">davidrobertyoung<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="fundamentals.times.calculate_time_difference">
+<code class="descclassname">fundamentals.times.</code><code class="descname">calculate_time_difference</code><span class="sig-paren">(</span><em>startDate</em>, <em>endDate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/times.html#calculate_time_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.times.calculate_time_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the time difference between two dates</p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">startDate</span></code> &#8211; the first date in YYYY-MM-DDTHH:MM:SS format</li>
+<li><code class="docutils literal"><span class="pre">endDate</span></code> &#8211; the final date YYYY-MM-DDTHH:MM:SS format</li>
+</ul>
+</dd>
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">diffDate</span></code> &#8211; the difference between the two dates in Y,M,D,h,m,s (string)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="fundamentals.times.get_now_sql_datetime">
+<code class="descclassname">fundamentals.times.</code><code class="descname">get_now_sql_datetime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/times.html#get_now_sql_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.times.get_now_sql_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>A datetime stamp in MySQL format:
+<code class="docutils literal"><span class="pre">YYYY-MM-DDTHH:MM:SS</span></code></p>
+<dl class="docutils">
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">now</span></code> &#8211; current time and date in MySQL format</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-fundamentals.tools">
+<span id="tools-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">tools</span></code> Module<a class="headerlink" href="#module-fundamentals.tools" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tools-py">
+<h3>tools.py<a class="headerlink" href="#tools-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Summary:</th><td class="field-body"><p class="first">Toolset to setup the main function for a cl-util</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Author:</th><td class="field-body"><p class="first">David Young</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Date Created:</th><td class="field-body"><p class="first">April 16, 2014</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">dryx syntax:</th><td class="field-body"><ul class="first simple">
+<li><code class="docutils literal"><span class="pre">_someObject</span></code> = a &#8216;private&#8217; object that should only be changed for debugging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Notes:</th><td class="field-body"><ul class="first last simple">
+<li>If you have any questions requiring this script/module please email me: <a class="reference external" href="mailto:davidrobertyoung&#37;&#52;&#48;gmail&#46;com">davidrobertyoung<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="fundamentals.tools.ordered_load">
+<code class="descclassname">fundamentals.tools.</code><code class="descname">ordered_load</code><span class="sig-paren">(</span><em>stream</em>, <em>Loader=&lt;class 'yaml.loader.Loader'&gt;</em>, <em>object_pairs_hook=&lt;class 'collections.OrderedDict'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/tools.html#ordered_load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.tools.ordered_load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fundamentals.tools.tools">
+<em class="property">class </em><code class="descclassname">fundamentals.tools.</code><code class="descname">tools</code><span class="sig-paren">(</span><em>arguments</em>, <em>docString</em>, <em>logLevel='DEBUG'</em>, <em>options_first=False</em>, <em>projectName=False</em>, <em>orderedSettings=False</em>, <em>tunnel=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/tools.html#tools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.tools.tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>common setup methods &amp; attributes of the main function in cl-util</p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">dbConn</span></code> &#8211; mysql database connection</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fundamentals.tools.tools.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/tools.html#tools.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.tools.tools.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>setup the attributes and return</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-fundamentals.utKit">
+<span id="utkit-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">utKit</span></code> Module<a class="headerlink" href="#module-fundamentals.utKit" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="utkit-py">
+<h3>utKit.py<a class="headerlink" href="#utkit-py" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Summary:</th><td class="field-body"><p class="first">A unit-testing kit to simplify my unit-tests</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Author:</th><td class="field-body"><p class="first">David Young</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Date Created:</th><td class="field-body"><p class="first">April 16, 2014</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">dryx syntax:</th><td class="field-body"><ul class="first simple">
+<li><code class="docutils literal"><span class="pre">_someObject</span></code> = a &#8216;private&#8217; object that should only be changed for debugging</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Notes:</th><td class="field-body"><ul class="first last simple">
+<li>If you have any questions requiring this script/module please email me: <a class="reference external" href="mailto:davidrobertyoung&#37;&#52;&#48;gmail&#46;com">davidrobertyoung<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="fundamentals.utKit.utKit">
+<em class="property">class </em><code class="descclassname">fundamentals.utKit.</code><code class="descname">utKit</code><span class="sig-paren">(</span><em>moduleDirectory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/utKit.html#utKit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.utKit" title="Permalink to this definition">¶</a></dt>
+<dd><p>My unit-testing kit</p>
+<dl class="method">
+<dt id="fundamentals.utKit.utKit.setupModule">
+<code class="descname">setupModule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fundamentals/utKit.html#utKit.setupModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.utKit.setupModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>The setupModule method</p>
+<dl class="docutils">
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li>log, dbConn, pathToInputDir, pathToOutputDir</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fundamentals.commonutils.html">commonutils Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.commonutils.html#module-fundamentals.commonutils.getpackagepath"><code class="docutils literal"><span class="pre">getpackagepath</span></code> Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fundamentals.commonutils.html#getpackagepath-py">getpackagepath.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">fundamentals Package</a><ul>
+<li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">fundamentals</span></code> Package</a></li>
+<li><a class="reference internal" href="#module-fundamentals.__version__"><code class="docutils literal"><span class="pre">__version__</span></code> Module</a></li>
+<li><a class="reference internal" href="#module-fundamentals.logs"><code class="docutils literal"><span class="pre">logs</span></code> Module</a><ul>
+<li><a class="reference internal" href="#logs-py">logs.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-fundamentals.times"><code class="docutils literal"><span class="pre">times</span></code> Module</a><ul>
+<li><a class="reference internal" href="#times-py">times.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-fundamentals.tools"><code class="docutils literal"><span class="pre">tools</span></code> Module</a><ul>
+<li><a class="reference internal" href="#tools-py">tools.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-fundamentals.utKit"><code class="docutils literal"><span class="pre">utKit</span></code> Module</a><ul>
+<li><a class="reference internal" href="#utkit-py">utKit.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/fundamentals.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">fundamentals 0.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Dave Young.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

@@ -85,7 +85,6 @@ class tools():
         elif "settingsFile" in arguments and arguments["settingsFile"]:
             stream = file(arguments["settingsFile"], 'r')
         elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None):
-
             if projectName != False:
                 os.getenv("HOME")
                 projectDir = os.getenv(
@@ -114,8 +113,15 @@ class tools():
                     arguments["<settingsFile>"] = settingsFile
                 else:
                     import inspect
-                    ds = "/".join(inspect.stack()
-                                  [1][1].split("/")[:-2]) + "/default_settings.yaml"
+                    ds = "ds"
+                    level = -1
+                    exists = False
+                    while not exists and len(ds):
+                        ds = "/".join(inspect.stack()
+                                      [1][1].split("/")[:level]) + "/default_settings.yaml"
+                        level -= 1
+                        exists = os.path.exists(ds)
+
                     shutil.copyfile(ds, settingsFile)
                     try:
                         shutil.copyfile(ds, settingsFile)
@@ -124,6 +130,7 @@ class tools():
                         print "please add settings to file '%(settingsFile)s'" % locals()
                     sys.exit(0)
         else:
+
             pass
 
         if stream is not False:
@@ -165,6 +172,7 @@ class tools():
             log.debug('logger setup')
 
         self.log = log
+        print self.log.level
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically

@@ -1,0 +1,11 @@
+commonutils Package
+===================
+
+:mod:`getpackagepath` Module
+----------------------------
+
+.. automodule:: fundamentals.commonutils.getpackagepath
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
