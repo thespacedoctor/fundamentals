@@ -172,7 +172,6 @@ class tools():
             log.debug('logger setup')
 
         self.log = log
-        print self.log.level
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically
