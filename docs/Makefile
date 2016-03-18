@@ -53,6 +53,8 @@ html:
 	@echo "" >> $(READMERST)
 	@cat $(INDIR)/usage.rst >> $(READMERST)
 	@echo "" >> $(READMERST)
+	@cat $(INDIR)/documentation.rst >> $(READMERST)
+	@echo "" >> $(READMERST)
 	@cat $(INDIR)/installation.rst >> $(READMERST)
 	@echo "" >> $(READMERST)
 	@cat $(INDIR)/development.rst >> $(READMERST)
