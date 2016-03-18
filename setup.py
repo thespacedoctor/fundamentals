@@ -33,7 +33,8 @@ setup(
         'docopt',
         'MySQL-python',
         'python-dateutil',
-        'eventlet'
+        'eventlet',
+        'fundmentals'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
