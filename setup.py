@@ -34,7 +34,7 @@ setup(
         'MySQL-python',
         'python-dateutil',
         'eventlet',
-        'MySQL-python'
+        'MySQL-python',
         'fundamentals'
     ],
     test_suite='nose.collector',
