@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 
 moduleDirectory = os.path.dirname(os.path.realpath(__file__))
@@ -27,15 +27,14 @@ setup(
     author='David Young',
     author_email='davidrobertyoung@gmail.com',
     license='MIT',
-    packages=['fundamentals'],
+    packages=find_packages(),
     install_requires=[
         'pyyaml',
         'docopt',
         'MySQL-python',
         'python-dateutil',
         'eventlet',
-        'MySQL-python',
-        'fundamentals'
+        'MySQL-python'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],

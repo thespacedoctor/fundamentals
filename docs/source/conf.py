@@ -275,31 +275,13 @@ trim_footnote_reference_space = True
 
 def generateAutosummaryIndex():
 
-    # FIND ALL SUBPACKAGES
-
     import fundamentals
     import inspect
-
-    allModules = {}
-    allClasses = {}
-
-    for name, obj in inspect.getmembers(fundamentals):
-        if inspect.ismodule(obj):
-            allModules[name] = obj
-
-    for name, obj in inspect.getmembers(fundamentals):
-        if inspect.isclass(obj):
-            allClasses[obj.__module__ + "." + obj.__name__] = obj
-
-    for k, v in allModules.iteritems():
-        for name, obj in inspect.getmembers(v):
-            if inspect.isclass(obj):
-                allClasses[obj.__module__ + "." + obj.__name__] = obj
+    import os.path
+    import time
 
     # CHECK FOR LAST MODIFIED TIME - DON'T UPDATE IF < 5 SEC
     # autobuild GOES INTO INFINITE LOOP OTHERWISE
-    import os.path
-    import time
     moduleDirectory = os.path.dirname(__file__)
     file = moduleDirectory + "/autosummary.rst"
     now = time.time()
@@ -307,22 +289,13 @@ def generateAutosummaryIndex():
     if delta < 5:
         return None
 
+    # GET ALL SUBPACKAGES
     allSubpackages = ["fundamentals"]
     allSubpackages += findAllSubpackges(
         pathToPackage="fundamentals"
     )
 
-    print "\n\nMODULES"
-    for k, v in allModules.iteritems():
-        print k, v
-    print "\n\nCLASSES"
-    for k, v in allClasses.iteritems():
-        print k, v
-    print "\n\nallSubpackages"
-    for k in allSubpackages:
-        print k
-    print "\n\n"
-
+    # INSPECT TO FIND ALL MODULES, CLASSES AND FUNCTIONS
     allModules = []
     allClasses = []
     allFunctions = []
@@ -330,7 +303,7 @@ def generateAutosummaryIndex():
         for name, obj in inspect.getmembers(__import__(sp, fromlist=[''])):
             if inspect.ismodule(obj):
                 thisMod = sp + "." + name
-                if thisMod not in allSubpackages and name[0] != "_":
+                if thisMod not in allSubpackages and name[0] != "_" and name[-5:] != "tests":
                     allModules.append(sp + "." + name)
 
     for spm in allSubpackages + allModules:
@@ -409,42 +382,15 @@ def findAllSubpackges(
     import sys
     from traceback import print_tb
 
-    def onerror(name):
-        print("Error importing module %s" % name)
-        type, value, traceback = sys.exc_info()
-        print_tb(traceback)
+    print importedPackage.__path__
 
-    pkgutil.walk_packages(importedPackage.__path__,
-                          importedPackage.__name__ + '.', onerror=onerror)
-
-    for importer, modname, ispkg in pkgutil.walk_packages(importedPackage.__path__):
-        print importer, modname, ispkg
-        if ispkg and "tests" != modname:
-            thisSP = pathToPackage + "." + modname
-            subPackages.append(thisSP)
-            subSubPackages = findAllSubpackges(
-                pathToPackage=thisSP
-            )
-            if len(subSubPackages):
-                subPackages += subSubPackages
+    for importer, modname, ispkg in pkgutil.walk_packages(importedPackage.__path__, prefix=importedPackage.__name__ + '.',
+                                                          onerror=lambda x: None):
+        print modname
+        if ispkg and "tests" != modname[-5:] and "._" not in modname and ".tests." not in modname:
+            subPackages.append(modname)
 
     return subPackages
-
-
-def findAllModules(
-    pathToPackage
-):
-    import pkgutil
-    importedPackage = __import__(
-        pathToPackage, fromlist=[''])
-    modules = []
-
-    for importer, modname, ispkg in pkgutil.walk_packages(importedPackage.__path__):
-        if not ispkg and "tests" != modname and modname[-2:] != "__":
-            thisMod = pathToPackage + "." + modname
-            modules.append(thisMod)
-
-    return modules
 
 
 autosummaryText = generateAutosummaryIndex()
