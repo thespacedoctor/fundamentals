@@ -1,4 +1,0 @@
-.. automodule:: fundamentals.download.tests.test_mutliobject_download
-    :members:
-    :undoc-members:
-    :show-inheritance:

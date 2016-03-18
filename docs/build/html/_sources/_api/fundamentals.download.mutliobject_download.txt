@@ -1,4 +1,0 @@
-.. automodule:: fundamentals.download.mutliobject_download
-    :members:
-    :undoc-members:
-    :show-inheritance:
