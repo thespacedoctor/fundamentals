@@ -379,14 +379,8 @@ def findAllSubpackges(
         pathToPackage, fromlist=[''])
     subPackages = []
 
-    import sys
-    from traceback import print_tb
-
-    print importedPackage.__path__
-
     for importer, modname, ispkg in pkgutil.walk_packages(importedPackage.__path__, prefix=importedPackage.__name__ + '.',
                                                           onerror=lambda x: None):
-        print modname
         if ispkg and "tests" != modname[-5:] and "._" not in modname and ".tests." not in modname:
             subPackages.append(modname)
 
