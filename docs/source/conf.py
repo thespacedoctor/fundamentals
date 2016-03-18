@@ -327,8 +327,6 @@ def generateAutosummaryIndex():
     allClasses = []
     allFunctions = []
     for sp in allSubpackages:
-        print inspect.getmembers(__import__(sp, fromlist=['']))
-        print "--------"
         for name, obj in inspect.getmembers(__import__(sp, fromlist=[''])):
             if inspect.ismodule(obj):
                 thisMod = sp + "." + name
@@ -407,6 +405,17 @@ def findAllSubpackges(
     importedPackage = __import__(
         pathToPackage, fromlist=[''])
     subPackages = []
+
+    import sys
+    from traceback import print_tb
+
+    def onerror(name):
+        print("Error importing module %s" % name)
+        type, value, traceback = sys.exc_info()
+        print_tb(traceback)
+
+    pkgutil.walk_packages(importedPackage.__path__,
+                          importedPackage.__name__ + '.', onerror=onerror)
 
     for importer, modname, ispkg in pkgutil.walk_packages(importedPackage.__path__):
         print importer, modname, ispkg
