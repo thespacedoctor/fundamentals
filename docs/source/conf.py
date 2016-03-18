@@ -319,18 +319,18 @@ def generateAutosummaryIndex():
         for name, obj in inspect.getmembers(__import__(sp, fromlist=[''])):
             if inspect.ismodule(obj):
                 thisMod = sp + "." + name
-                if thisMod not in allSubpackages and name[0] != "_":
+                if thisMod not in allSubpackages and len(name) and name[0] != "_":
                     allModules.append(sp + "." + name)
 
     for spm in allSubpackages + allModules:
         for name, obj in inspect.getmembers(__import__(spm, fromlist=[''])):
             if inspect.isclass(obj):
                 thisClass = spm + "." + name
-                if (thisClass == obj.__module__ or spm == obj.__module__) and name[0] != "_":
+                if (thisClass == obj.__module__ or spm == obj.__module__) and len(name) and name[0] != "_":
                     allClasses.append(thisClass)
             if inspect.isfunction(obj):
                 thisFunction = spm + "." + name
-                if (spm == obj.__module__ or obj.__module__ == thisFunction) and name != "main" and name[0] != "_":
+                if (spm == obj.__module__ or obj.__module__ == thisFunction) and name != "main" and len(name) and name[0] != "_":
                     allFunctions.append(thisFunction)
 
     allSubpackages = ("\n   ").join(allSubpackages)
