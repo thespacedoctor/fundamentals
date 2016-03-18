@@ -13,6 +13,7 @@
 
 import sys
 import os
+import fundamentals
 
 # -- Allow Markdown -----------------------------------------------------
 # source_suffix = ['.rst', '.md']
