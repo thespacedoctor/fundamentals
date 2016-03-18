@@ -1,4 +1,11 @@
+
+
 div[class^='highlight'] pre {
+    background-color: #49483e;
+    color: #f8f8f2 !important; 
+}
+
+div.highlight' pre {
     background-color: #49483e;
     color: #f8f8f2;
 }
