@@ -408,7 +408,12 @@ def findAllSubpackges(
         pathToPackage, fromlist=[''])
     subPackages = []
 
+    print "pkgutil.iter_modules(importedPackage.__path__)"
+    print pkgutil.iter_modules(importedPackage.__path__)
+    print ""
+
     for importer, modname, ispkg in pkgutil.iter_modules(importedPackage.__path__):
+        print importer, modname, ispkg
         if ispkg and "tests" != modname:
             thisSP = pathToPackage + "." + modname
             subPackages.append(thisSP)
