@@ -312,6 +312,17 @@ def generateAutosummaryIndex():
         pathToPackage="fundamentals"
     )
 
+    print "\n\nMODULES"
+    for k, v in allModules.iteritems():
+        print k, v
+    print "\n\nCLASSES"
+    for k, v in allClasses.iteritems():
+        print k, v
+    print "\n\nallSubpackages"
+    for k in allSubpackages:
+        print k
+    print "\n\n"
+
     allModules = []
     allClasses = []
     allFunctions = []
