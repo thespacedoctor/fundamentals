@@ -18,7 +18,8 @@ Modules
    :toctree: _autosummary
    :nosignatures:
 
-   fundamentals.logs 
+   fundamentals.logs
+   fundamentals.times 
 
 Classes
 -----------
@@ -43,4 +44,6 @@ Functions
    fundamentals.download.get_now_datetime_filestamp
    fundamentals.download.multiobject_download
    fundamentals.logs.console_logger
-   fundamentals.logs.setup_dryx_logging 
+   fundamentals.logs.setup_dryx_logging
+   fundamentals.times.calculate_time_difference
+   fundamentals.times.get_now_sql_datetime 
