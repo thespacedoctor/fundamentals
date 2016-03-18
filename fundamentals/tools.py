@@ -1,22 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-tools.py
-=========
-:Summary:
-    Toolset to setup the main function for a cl-util
+*Toolset to setup the main function for a cl-util*
 
 :Author:
     David Young
 
 :Date Created:
     April 16, 2014
-
-:dryx syntax:
-    - ``_someObject`` = a 'private' object that should only be changed for debugging
-
-:Notes:
-    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com
 """
 ################# GLOBAL IMPORTS ####################
 import sys
@@ -36,12 +27,86 @@ from docopt import docopt
 
 
 class tools():
-
     """
-    common setup methods & attributes of the main function in cl-util
+    *common setup methods & attributes of the main function in cl-util*
 
     **Key Arguments:**
         - ``dbConn`` -- mysql database connection
+        - ``arguments`` -- the arguments read in from the command-line
+        - ``docString`` -- pass the docstring from the host module so that docopt can work on the usage text to generate the required arguments
+        - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]
+        - ``options_first`` -- options come before commands in CL usage. Default *False*.
+        - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
+        - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
+
+    **Usage:**
+
+        Add this to the ``__main__`` function of your command-line module
+
+        .. code-block:: python 
+
+            # setup the command-line util settings
+            from fundamentals import tools
+            su = tools(
+                arguments=arguments,
+                docString=__doc__,
+                logLevel="DEBUG",
+                options_first=False,
+                projectName="myprojectName",
+                tunnel=False
+            )
+            arguments, settings, log, dbConn = su.setup()
+
+        Here is a template settings file content you could use:
+
+        .. code-block:: yaml
+
+            version: 1
+            database settings:
+                db: dryx_unit_testing
+                host: localhost
+                user: unittesting
+                password: utpass
+                sshPort: True
+
+            # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
+            # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
+            # code, static catalogue database and transient database are all on seperate machines.
+            ssh tunnel:
+                use tunnel: True   # True | False
+                remote user: username
+                remote ip: mydomain.co.uk
+                remote datbase host: mydatabaseName
+                port: 9002
+
+            logging settings:
+                formatters:
+                    file_style:
+                        format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
+                        datefmt: '%Y/%m/%d %H:%M:%S'
+                    console_style:
+                        format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
+                        datefmt: '%H:%M:%S'
+                    html_style:
+                        format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
+                        datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
+                handlers:
+                    console:
+                        class: logging.StreamHandler
+                        level: DEBUG
+                        formatter: console_style
+                        stream: ext://sys.stdout
+                    file:
+                        class: logging.handlers.GroupWriteRotatingFileHandler
+                        level: WARNING
+                        formatter: file_style
+                        filename: /Users/Dave/.config/myprojectName/myprojectName.log
+                        mode: w+
+                        maxBytes: 102400
+                        backupCount: 1
+                root:
+                    level: WARNING
+                    handlers: [file,console]
     """
     # Initialisation
 
@@ -74,6 +139,7 @@ class tools():
 
         # UNPACK SETTINGS
         stream = False
+
         if "<settingsFile>" in arguments and arguments["<settingsFile>"]:
             stream = file(arguments["<settingsFile>"], 'r')
         elif "<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"]:
@@ -109,6 +175,7 @@ class tools():
                 else:
                     this = yaml.load(astream)
                 if this:
+
                     settings = this
                     arguments["<settingsFile>"] = settingsFile
                 else:
@@ -116,7 +183,9 @@ class tools():
                     ds = "ds"
                     level = -1
                     exists = False
-                    while not exists and len(ds):
+                    count = 1
+                    while not exists and len(ds) and count < 10:
+                        count += 1
                         ds = "/".join(inspect.stack()
                                       [1][1].split("/")[:level]) + "/default_settings.yaml"
                         level -= 1
@@ -232,7 +301,9 @@ class tools():
 
     def setup(
             self):
-        """setup the attributes and return
+        """
+        **Summary:**
+            *setup the attributes and return*
         """
         if self.tunnel:
             return self.arguments, self.settings, self.log, self.dbConn, self.remoteDBConn
@@ -241,7 +312,8 @@ class tools():
 
     def _setup_tunnel(
             self):
-        """ setup ssh tunnel if required
+        """
+        *setup ssh tunnel if required*
         """
         self.log.debug('starting the ``_setup_tunnel`` method')
 
@@ -302,7 +374,8 @@ class tools():
         return None
 
     def _checkServer(self, address, port):
-        """Check that the TCP Port we've decided to use for tunnelling is available
+        """
+        *Check that the TCP Port we've decided to use for tunnelling is available*
         """
         self.log.debug('starting the ``_checkServer`` method')
 

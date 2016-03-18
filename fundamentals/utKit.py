@@ -1,22 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-utKit.py
-========
-:Summary:
-    A unit-testing kit to simplify my unit-tests
+*A unit-testing kit to simplify my unit-tests*
 
 :Author:
     David Young
 
 :Date Created:
     April 16, 2014
-
-:dryx syntax:
-    - ``_someObject`` = a 'private' object that should only be changed for debugging
-
-:Notes:
-    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com
 """
 ################# GLOBAL IMPORTS ####################
 import sys
@@ -30,7 +21,22 @@ import yaml
 class utKit():
 
     """
-    My unit-testing kit
+    *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*
+
+    **Key Arguments:**
+        - ``moduleDirectory`` -- the directory to the unit-testing test file
+
+    **Usage:**
+        To use this kit within any of your unit-test modules add the following code before your test methods:
+
+        .. code-block:: python 
+
+            from fundamentals.utKit import utKit
+            # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
+            moduleDirectory = os.path.dirname(__file__)
+            utKit = utKit(moduleDirectory)
+            log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
+            utKit.tearDownModule() 
     """
     # Initialisation
 
@@ -80,10 +86,14 @@ class utKit():
 
     def setupModule(
             self):
-        """The setupModule method
+        """
+        *The setupModule method*
 
         **Return:**
-            - log, dbConn, pathToInputDir, pathToOutputDir
+            - ``log`` -- a logger
+            - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
+            - ``pathToInputDir`` -- path to modules own test input directory
+            - ``pathToOutputDir`` -- path to modules own test output directory
         """
         ## VARIABLES ##
         logging.config.dictConfig(yaml.load(self.loggerConfig))
@@ -103,23 +113,17 @@ class utKit():
 
     def tearDownModule(
             self):
-        """The tearDownModule method
+        """
+        *The tearDownModule method*
 
         **Key Arguments:**
             # -
 
         **Return:**
             - None
-
-        **Todo**
-            - @review: when complete, clean tearDownModule method
-            - @review: when complete add logging
         """
 
         return None
-
-    # use the tab-trigger below for new method
-    # method-tmpx
 
 
 if __name__ == '__main__':

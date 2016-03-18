@@ -1,17 +1,15 @@
 
-Fundamentals Documentation
-==========================
-
 Subpackages
 -----------
 
 .. autosummary::
    :toctree: _autosummary
    :nosignatures:
+   :template: autosummary/subpackage.rst
 
    fundamentals
    fundamentals.commonutils
-   fundamentals.commonutils.farts 
+   fundamentals.download 
 
 Modules
 -----------
@@ -21,8 +19,7 @@ Modules
    :nosignatures:
 
    fundamentals.logs
-   fundamentals.times
-   fundamentals.commonutils.farts.mice 
+   fundamentals.times 
 
 Classes
 -----------
@@ -42,8 +39,11 @@ Functions
    :toctree: _autosummary
    :nosignatures:
 
+   fundamentals.download.append_now_datestamp_to_filename
+   fundamentals.download.extract_filename_from_url
+   fundamentals.download.get_now_datetime_filestamp
+   fundamentals.download.multiobject_download
    fundamentals.logs.console_logger
    fundamentals.logs.setup_dryx_logging
    fundamentals.times.calculate_time_difference
-   fundamentals.times.get_now_sql_datetime
-   fundamentals.commonutils.farts.mice.tab_complete 
+   fundamentals.times.get_now_sql_datetime 

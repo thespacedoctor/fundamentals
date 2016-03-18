@@ -1,4 +1,4 @@
-fundamentals.tools
+fundamentals.tools (*class*)
 ==================
 
 .. currentmodule:: fundamentals

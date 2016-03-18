@@ -4,7 +4,18 @@ database settings:
     host: localhost
     user: unittesting
     password: utpass
+    sshPort: True
 
+
+# SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
+# Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
+# code, static catalogue database and transient database are all on seperate machines.
+ssh tunnel:
+    use tunnel: True   # True | False
+    remote user: dry
+    remote ip: starbase.mp.qub.ac.uk
+    remote datbase host: pesstovm02
+    port: 9002
 
 logging settings:
     formatters:

@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.tools &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.tools &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../../index.html"/>
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -89,9 +89,17 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#functions">Functions</a></li>
 </ul>
 
             
@@ -140,22 +148,13 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># encoding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">tools.py</span>
-<span class="sd">=========</span>
-<span class="sd">:Summary:</span>
-<span class="sd">    Toolset to setup the main function for a cl-util</span>
+<span class="sd">*Toolset to setup the main function for a cl-util*</span>
 
 <span class="sd">:Author:</span>
 <span class="sd">    David Young</span>
 
 <span class="sd">:Date Created:</span>
 <span class="sd">    April 16, 2014</span>
-
-<span class="sd">:dryx syntax:</span>
-<span class="sd">    - ``_someObject`` = a &#39;private&#39; object that should only be changed for debugging</span>
-
-<span class="sd">:Notes:</span>
-<span class="sd">    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1">################# GLOBAL IMPORTS ####################</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -174,17 +173,91 @@
 <span class="c1">###################################################################</span>
 
 
-<div class="viewcode-block" id="tools"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.tools">[docs]</a><span class="k">class</span> <span class="nc">tools</span><span class="p">():</span>
-
+<div class="viewcode-block" id="tools"><a class="viewcode-back" href="../../_autosummary/fundamentals.tools.html#fundamentals.tools">[docs]</a><span class="k">class</span> <span class="nc">tools</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    common setup methods &amp; attributes of the main function in cl-util</span>
+<span class="sd">    *common setup methods &amp; attributes of the main function in cl-util*</span>
 
 <span class="sd">    **Key Arguments:**</span>
 <span class="sd">        - ``dbConn`` -- mysql database connection</span>
+<span class="sd">        - ``arguments`` -- the arguments read in from the command-line</span>
+<span class="sd">        - ``docString`` -- pass the docstring from the host module so that docopt can work on the usage text to generate the required arguments</span>
+<span class="sd">        - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]</span>
+<span class="sd">        - ``options_first`` -- options come before commands in CL usage. Default *False*.</span>
+<span class="sd">        - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.</span>
+<span class="sd">        - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.</span>
+
+<span class="sd">    **Usage:**</span>
+
+<span class="sd">        Add this to the ``__main__`` function of your command-line module</span>
+
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            # setup the command-line util settings</span>
+<span class="sd">            from fundamentals import tools</span>
+<span class="sd">            su = tools(</span>
+<span class="sd">                arguments=arguments,</span>
+<span class="sd">                docString=__doc__,</span>
+<span class="sd">                logLevel=&quot;DEBUG&quot;,</span>
+<span class="sd">                options_first=False,</span>
+<span class="sd">                projectName=&quot;myprojectName&quot;,</span>
+<span class="sd">                tunnel=False</span>
+<span class="sd">            )</span>
+<span class="sd">            arguments, settings, log, dbConn = su.setup()</span>
+
+<span class="sd">        Here is a template settings file content you could use:</span>
+
+<span class="sd">        .. code-block:: yaml</span>
+
+<span class="sd">            version: 1</span>
+<span class="sd">            database settings:</span>
+<span class="sd">                db: dryx_unit_testing</span>
+<span class="sd">                host: localhost</span>
+<span class="sd">                user: unittesting</span>
+<span class="sd">                password: utpass</span>
+<span class="sd">                sshPort: True</span>
+
+<span class="sd">            # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here</span>
+<span class="sd">            # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if </span>
+<span class="sd">            # code, static catalogue database and transient database are all on seperate machines.</span>
+<span class="sd">            ssh tunnel:</span>
+<span class="sd">                use tunnel: True   # True | False</span>
+<span class="sd">                remote user: username</span>
+<span class="sd">                remote ip: mydomain.co.uk</span>
+<span class="sd">                remote datbase host: mydatabaseName</span>
+<span class="sd">                port: 9002</span>
+
+<span class="sd">            logging settings:</span>
+<span class="sd">                formatters:</span>
+<span class="sd">                    file_style:</span>
+<span class="sd">                        format: &#39;* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s &gt; %(funcName)s &gt; %(lineno)d) - %(message)s  &#39;</span>
+<span class="sd">                        datefmt: &#39;%Y/%m/%d %H:%M:%S&#39;</span>
+<span class="sd">                    console_style:</span>
+<span class="sd">                        format: &#39;* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d &gt; %(message)s&#39;</span>
+<span class="sd">                        datefmt: &#39;%H:%M:%S&#39;</span>
+<span class="sd">                    html_style:</span>
+<span class="sd">                        format: &#39;&lt;div id=&quot;row&quot; class=&quot;%(levelname)s&quot;&gt;&lt;span class=&quot;date&quot;&gt;%(asctime)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;file:&lt;/span&gt;&lt;span class=&quot;filename&quot;&gt;%(filename)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;method:&lt;/span&gt;&lt;span class=&quot;funcName&quot;&gt;%(funcName)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;line#:&lt;/span&gt;&lt;span class=&quot;lineno&quot;&gt;%(lineno)d&lt;/span&gt; &lt;span class=&quot;pathname&quot;&gt;%(pathname)s&lt;/span&gt;  &lt;div class=&quot;right&quot;&gt;&lt;span class=&quot;message&quot;&gt;%(message)s&lt;/span&gt;&lt;span class=&quot;levelname&quot;&gt;%(levelname)s&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span>
+<span class="sd">                        datefmt: &#39;%Y-%m-%d &lt;span class= &quot;time&quot;&gt;%H:%M &lt;span class= &quot;seconds&quot;&gt;%Ss&lt;/span&gt;&lt;/span&gt;&#39;</span>
+<span class="sd">                handlers:</span>
+<span class="sd">                    console:</span>
+<span class="sd">                        class: logging.StreamHandler</span>
+<span class="sd">                        level: DEBUG</span>
+<span class="sd">                        formatter: console_style</span>
+<span class="sd">                        stream: ext://sys.stdout</span>
+<span class="sd">                    file:</span>
+<span class="sd">                        class: logging.handlers.GroupWriteRotatingFileHandler</span>
+<span class="sd">                        level: WARNING</span>
+<span class="sd">                        formatter: file_style</span>
+<span class="sd">                        filename: /Users/Dave/.config/myprojectName/myprojectName.log</span>
+<span class="sd">                        mode: w+</span>
+<span class="sd">                        maxBytes: 102400</span>
+<span class="sd">                        backupCount: 1</span>
+<span class="sd">                root:</span>
+<span class="sd">                    level: WARNING</span>
+<span class="sd">                    handlers: [file,console]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialisation</span>
 
-<div class="viewcode-block" id="tools.__init__"><a class="viewcode-back" href="../../_autosummary/fundamentals.tools.tools.html#fundamentals.tools.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="tools.__init__"><a class="viewcode-back" href="../../_autosummary/fundamentals.tools.html#fundamentals.tools.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">arguments</span><span class="p">,</span>
             <span class="n">docString</span><span class="p">,</span>
@@ -213,6 +286,7 @@
 
         <span class="c1"># UNPACK SETTINGS</span>
         <span class="n">stream</span> <span class="o">=</span> <span class="bp">False</span>
+
         <span class="k">if</span> <span class="s2">&quot;&lt;settingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">]:</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]:</span>
@@ -224,7 +298,6 @@
         <span class="k">elif</span> <span class="s2">&quot;settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]:</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="p">(</span><span class="s2">&quot;settingsFile&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;settingsFile&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span> <span class="ow">in</span> <span class="n">arguments</span> <span class="ow">and</span> <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;pathToSettingsFile&gt;&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span><span class="p">):</span>
-
             <span class="k">if</span> <span class="n">projectName</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">)</span>
                 <span class="n">projectDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
@@ -249,12 +322,22 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">this</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">astream</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">this</span><span class="p">:</span>
+
                     <span class="n">settings</span> <span class="o">=</span> <span class="n">this</span>
                     <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;&lt;settingsFile&gt;&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">settingsFile</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="kn">import</span> <span class="nn">inspect</span>
-                    <span class="n">ds</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
-                                  <span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;/default_settings.yaml&quot;</span>
+                    <span class="n">ds</span> <span class="o">=</span> <span class="s2">&quot;ds&quot;</span>
+                    <span class="n">level</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                    <span class="n">exists</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">exists</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">ds</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
+                                      <span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[:</span><span class="n">level</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;/default_settings.yaml&quot;</span>
+                        <span class="n">level</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
                     <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">settingsFile</span><span class="p">)</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">settingsFile</span><span class="p">)</span>
@@ -263,6 +346,7 @@
                         <span class="k">print</span> <span class="s2">&quot;please add settings to file &#39;</span><span class="si">%(settingsFile)s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">locals</span><span class="p">()</span>
                     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+
             <span class="k">pass</span>
 
         <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">False</span><span class="p">:</span>
@@ -362,18 +446,21 @@
 
         <span class="k">return</span> <span class="bp">None</span></div>
 
-<div class="viewcode-block" id="tools.setup"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.tools.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;setup the attributes and return</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        **Summary:**</span>
+<span class="sd">            *setup the attributes and return*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tunnel</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remoteDBConn</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbConn</span>
 
     <span class="k">def</span> <span class="nf">_setup_tunnel</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; setup ssh tunnel if required</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        *setup ssh tunnel if required*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;starting the ``_setup_tunnel`` method&#39;</span><span class="p">)</span>
 
@@ -434,7 +521,8 @@
         <span class="k">return</span> <span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">_checkServer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check that the TCP Port we&#39;ve decided to use for tunnelling is available</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        *Check that the TCP Port we&#39;ve decided to use for tunnelling is available*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;starting the ``_checkServer`` method&#39;</span><span class="p">)</span>
 
@@ -462,7 +550,7 @@
 <span class="c1">###################################################################</span>
 <span class="c1"># PUBLIC FUNCTIONS                                                #</span>
 <span class="c1">###################################################################</span>
-<div class="viewcode-block" id="ordered_load"><a class="viewcode-back" href="../../api/fundamentals.tools.html#fundamentals.ordered_load">[docs]</a><span class="k">def</span> <span class="nf">ordered_load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">ordered_load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">Loader</span><span class="p">,</span> <span class="n">object_pairs_hook</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">):</span>
     <span class="k">class</span> <span class="nc">OrderedLoader</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
         <span class="k">pass</span>
 
@@ -472,7 +560,7 @@
     <span class="n">OrderedLoader</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span>
         <span class="n">yaml</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">BaseResolver</span><span class="o">.</span><span class="n">DEFAULT_MAPPING_TAG</span><span class="p">,</span>
         <span class="n">construct_mapping</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">OrderedLoader</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">OrderedLoader</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -510,7 +598,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.logs.setup_dryx_logging &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.logs.setup_dryx_logging (function) &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,10 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../index.html"/> 
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../index.html"/>
+        <link rel="up" title="Subpackages" href="../autosummary.html"/>
+        <link rel="next" title="fundamentals.times.calculate_time_difference (function)" href="fundamentals.times.calculate_time_difference.html"/>
+        <link rel="prev" title="fundamentals.logs.console_logger (function)" href="fundamentals.logs.console_logger.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -67,7 +70,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -88,9 +91,27 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../autosummary.html#functions">Functions</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.append_now_datestamp_to_filename.html">fundamentals.download.append_now_datestamp_to_filename (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.extract_filename_from_url.html">fundamentals.download.extract_filename_from_url (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.get_now_datetime_filestamp.html">fundamentals.download.get_now_datetime_filestamp (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.multiobject_download.html">fundamentals.download.multiobject_download (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.logs.console_logger.html">fundamentals.logs.console_logger (<em>function</em>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">fundamentals.logs.setup_dryx_logging (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.times.calculate_time_difference.html">fundamentals.times.calculate_time_difference (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.times.get_now_sql_datetime.html">fundamentals.times.get_now_sql_datetime (<em>function</em>)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -121,7 +142,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>fundamentals.logs.setup_dryx_logging</li>
+          <li><a href="../autosummary.html">Subpackages</a> &raquo;</li>
+      
+    <li>fundamentals.logs.setup_dryx_logging (<em>function</em>)</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -135,12 +158,66 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="fundamentals-logs-setup-dryx-logging">
-<h1>fundamentals.logs.setup_dryx_logging<a class="headerlink" href="#fundamentals-logs-setup-dryx-logging" title="Permalink to this headline">  ∞</a></h1>
+  <div class="section" id="fundamentals-logs-setup-dryx-logging-function">
+<h1>fundamentals.logs.setup_dryx_logging (<em>function</em>)<a class="headerlink" href="#fundamentals-logs-setup-dryx-logging-function" title="Permalink to this headline">  ∞</a></h1>
 <dl class="function">
 <dt id="fundamentals.logs.setup_dryx_logging">
 <code class="descclassname">fundamentals.logs.</code><code class="descname">setup_dryx_logging</code><span class="sig-paren">(</span><em>yaml_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/logs.html#setup_dryx_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.logs.setup_dryx_logging" title="Permalink to this definition">  ∞</a></dt>
-<dd><p>setup dryx style python logging</p>
+<dd><p><em>setup dryx style python logging</em></p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">level</span></code> &#8211; the level of logging required</li>
+</ul>
+</dd>
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">logger</span></code> &#8211; the console logger</li>
+</ul>
+</dd>
+<dt><strong>Usage:</strong></dt>
+<dd><div class="first highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fundamentals</span> <span class="kn">import</span> <span class="n">logs</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logs</span><span class="o">.</span><span class="n">setup_dryx_logging</span><span class="p">(</span>
+    <span class="n">yaml_file</span><span class="o">=</span><span class="s2">&quot;/Users/Dave/.config/fundamentals/fundamentals.yaml&quot;</span>
+<span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;test error&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is an example of the settings in the yaml file:</p>
+<div class="last highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">version</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+
+<span class="l l-Scalar l-Scalar-Plain">logging settings</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">formatters</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">file_style</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">format</span><span class="p p-Indicator">:</span> <span class="s">&#39;*</span><span class="nv"> </span><span class="s">%(asctime)s</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">%(name)s</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">%(levelname)s</span><span class="nv"> </span><span class="s">(%(pathname)s</span><span class="nv"> </span><span class="s">&gt;</span><span class="nv"> </span><span class="s">%(funcName)s</span><span class="nv"> </span><span class="s">&gt;</span><span class="nv"> </span><span class="s">%(lineno)d)</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">%(message)s</span><span class="nv">  </span><span class="s">&#39;</span>
+            <span class="l l-Scalar l-Scalar-Plain">datefmt</span><span class="p p-Indicator">:</span> <span class="s">&#39;%Y/%m/%d</span><span class="nv"> </span><span class="s">%H:%M:%S&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">console_style</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">format</span><span class="p p-Indicator">:</span> <span class="s">&#39;*</span><span class="nv"> </span><span class="s">%(asctime)s</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">%(levelname)s:</span><span class="nv"> </span><span class="s">%(pathname)s:%(funcName)s:%(lineno)d</span><span class="nv"> </span><span class="s">&gt;</span><span class="nv"> </span><span class="s">%(message)s&#39;</span>
+            <span class="l l-Scalar l-Scalar-Plain">datefmt</span><span class="p p-Indicator">:</span> <span class="s">&#39;%H:%M:%S&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">html_style</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">format</span><span class="p p-Indicator">:</span> <span class="s">&#39;&lt;div</span><span class="nv"> </span><span class="s">id=&quot;row&quot;</span><span class="nv"> </span><span class="s">class=&quot;%(levelname)s&quot;&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;date&quot;&gt;%(asctime)s&lt;/span&gt;</span><span class="nv">   </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=&quot;label&quot;&gt;file:&lt;/span&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;filename&quot;&gt;%(filename)s&lt;/span&gt;</span><span class="nv">   </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=&quot;label&quot;&gt;method:&lt;/span&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;funcName&quot;&gt;%(funcName)s&lt;/span&gt;</span><span class="nv">   </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=&quot;label&quot;&gt;line#:&lt;/span&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;lineno&quot;&gt;%(lineno)d&lt;/span&gt;</span><span class="nv"> </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=&quot;pathname&quot;&gt;%(pathname)s&lt;/span&gt;</span><span class="nv">  </span><span class="s">&lt;div</span><span class="nv"> </span><span class="s">class=&quot;right&quot;&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;message&quot;&gt;%(message)s&lt;/span&gt;&lt;span</span><span class="nv"> </span><span class="s">class=&quot;levelname&quot;&gt;%(levelname)s&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span>
+            <span class="l l-Scalar l-Scalar-Plain">datefmt</span><span class="p p-Indicator">:</span> <span class="s">&#39;%Y-%m-%d</span><span class="nv"> </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=</span><span class="nv"> </span><span class="s">&quot;time&quot;&gt;%H:%M</span><span class="nv"> </span><span class="s">&lt;span</span><span class="nv"> </span><span class="s">class=</span><span class="nv"> </span><span class="s">&quot;seconds&quot;&gt;%Ss&lt;/span&gt;&lt;/span&gt;&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">handlers</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">console</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">logging.StreamHandler</span>
+            <span class="l l-Scalar l-Scalar-Plain">level</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">DEBUG</span>
+            <span class="l l-Scalar l-Scalar-Plain">formatter</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">console_style</span>
+            <span class="l l-Scalar l-Scalar-Plain">stream</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ext://sys.stdout</span>
+        <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">class</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">logging.handlers.GroupWriteRotatingFileHandler</span>
+            <span class="l l-Scalar l-Scalar-Plain">level</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">WARNING</span>
+            <span class="l l-Scalar l-Scalar-Plain">formatter</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">file_style</span>
+            <span class="l l-Scalar l-Scalar-Plain">filename</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/Users/Dave/.config/fundamentals/fundamentals.log</span>
+            <span class="l l-Scalar l-Scalar-Plain">mode</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">w+</span>
+            <span class="l l-Scalar l-Scalar-Plain">maxBytes</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">102400</span>
+            <span class="l l-Scalar l-Scalar-Plain">backupCount</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="l l-Scalar l-Scalar-Plain">root</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">level</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">WARNING</span>
+        <span class="l l-Scalar l-Scalar-Plain">handlers</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">file</span><span class="p p-Indicator">,</span><span class="nv">console</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -149,6 +226,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="fundamentals.times.calculate_time_difference.html" class="btn btn-neutral float-right" title="fundamentals.times.calculate_time_difference (function)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fundamentals.logs.console_logger.html" class="btn btn-neutral" title="fundamentals.logs.console_logger (function)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -177,7 +263,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

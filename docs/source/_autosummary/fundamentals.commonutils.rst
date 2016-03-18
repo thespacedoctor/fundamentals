@@ -1,6 +1,7 @@
-fundamentals.commonutils
+fundamentals.commonutils (*subpackage*)
 ========================
 
 
 .. automodule:: fundamentals.commonutils
     :members:
+

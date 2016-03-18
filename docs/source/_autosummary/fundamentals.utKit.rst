@@ -1,4 +1,4 @@
-fundamentals.utKit
+fundamentals.utKit (*class*)
 ==================
 
 .. currentmodule:: fundamentals
@@ -15,6 +15,7 @@ fundamentals.utKit
    
       ~utKit.__init__
       ~utKit.setupModule
+      ~utKit.tearDownModule
    
    
 

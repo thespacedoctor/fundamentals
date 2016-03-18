@@ -1,6 +1,7 @@
-fundamentals.times
+fundamentals.times (*module*)
 ==================
 
 
 .. automodule:: fundamentals.times
     :members:
+

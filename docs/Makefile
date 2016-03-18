@@ -6,6 +6,9 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = build
+SOURCEDIR     = source
+ASDIR         = source/_autosummary
+APIDIR         = source/_api
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -42,6 +45,8 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 html:
+	rm -rf $(BUILDDIR)/html/todo.html
+	rm -rf $(ASDIR)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -153,7 +158,8 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 buildapi:
-	sphinx-apidoc -fMeET -o source/api ../ ../setup.py ../fundamentals/__version__.py
+	rm -rf $(APIDIR)
+	#sphinx-apidoc -fMeET --full -o source/_api ../ ../setup.py ../fundamentals/__version__.py
 	@echo "Auto-generation of API documentation finished. " \
-		"The generated files are in 'api/'"
+		"The generated files are in '_api/'"
 

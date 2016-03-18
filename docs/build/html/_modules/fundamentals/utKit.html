@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.utKit &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.utKit &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../../index.html"/>
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -89,9 +89,17 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#functions">Functions</a></li>
 </ul>
 
             
@@ -140,22 +148,13 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># encoding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">utKit.py</span>
-<span class="sd">========</span>
-<span class="sd">:Summary:</span>
-<span class="sd">    A unit-testing kit to simplify my unit-tests</span>
+<span class="sd">*A unit-testing kit to simplify my unit-tests*</span>
 
 <span class="sd">:Author:</span>
 <span class="sd">    David Young</span>
 
 <span class="sd">:Date Created:</span>
 <span class="sd">    April 16, 2014</span>
-
-<span class="sd">:dryx syntax:</span>
-<span class="sd">    - ``_someObject`` = a &#39;private&#39; object that should only be changed for debugging</span>
-
-<span class="sd">:Notes:</span>
-<span class="sd">    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1">################# GLOBAL IMPORTS ####################</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -166,14 +165,29 @@
 <span class="kn">import</span> <span class="nn">yaml</span>
 
 
-<div class="viewcode-block" id="utKit"><a class="viewcode-back" href="../../api/fundamentals.utKit.html#fundamentals.utKit">[docs]</a><span class="k">class</span> <span class="nc">utKit</span><span class="p">():</span>
+<div class="viewcode-block" id="utKit"><a class="viewcode-back" href="../../_autosummary/fundamentals.utKit.html#fundamentals.utKit.utKit">[docs]</a><span class="k">class</span> <span class="nc">utKit</span><span class="p">():</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    My unit-testing kit</span>
+<span class="sd">    *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*</span>
+
+<span class="sd">    **Key Arguments:**</span>
+<span class="sd">        - ``moduleDirectory`` -- the directory to the unit-testing test file</span>
+
+<span class="sd">    **Usage:**</span>
+<span class="sd">        To use this kit within any of your unit-test modules add the following code before your test methods:</span>
+
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            from fundamentals.utKit import utKit</span>
+<span class="sd">            # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE</span>
+<span class="sd">            moduleDirectory = os.path.dirname(__file__)</span>
+<span class="sd">            utKit = utKit(moduleDirectory)</span>
+<span class="sd">            log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()</span>
+<span class="sd">            utKit.tearDownModule() </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialisation</span>
 
-<div class="viewcode-block" id="utKit.__init__"><a class="viewcode-back" href="../../_autosummary/fundamentals.utKit.html#fundamentals.utKit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="utKit.__init__"><a class="viewcode-back" href="../../_autosummary/fundamentals.utKit.html#fundamentals.utKit.utKit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">moduleDirectory</span>
     <span class="p">):</span>
@@ -217,12 +231,16 @@
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="utKit.setupModule"><a class="viewcode-back" href="../../api/fundamentals.utKit.html#fundamentals.utKit.setupModule">[docs]</a>    <span class="k">def</span> <span class="nf">setupModule</span><span class="p">(</span>
+<div class="viewcode-block" id="utKit.setupModule"><a class="viewcode-back" href="../../_api/fundamentals.utKit.html#fundamentals.utKit.utKit.setupModule">[docs]</a>    <span class="k">def</span> <span class="nf">setupModule</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The setupModule method</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        *The setupModule method*</span>
 
 <span class="sd">        **Return:**</span>
-<span class="sd">            - log, dbConn, pathToInputDir, pathToOutputDir</span>
+<span class="sd">            - ``log`` -- a logger</span>
+<span class="sd">            - ``dbConn`` -- a database connection to a test database (details from yaml settings file)</span>
+<span class="sd">            - ``pathToInputDir`` -- path to modules own test input directory</span>
+<span class="sd">            - ``pathToOutputDir`` -- path to modules own test output directory</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">## VARIABLES ##</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loggerConfig</span><span class="p">))</span>
@@ -238,10 +256,21 @@
         <span class="p">)</span>
         <span class="n">dbConn</span><span class="o">.</span><span class="n">autocommit</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">log</span><span class="p">,</span> <span class="n">dbConn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathToInputDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathToOutputDir</span></div></div>
+        <span class="k">return</span> <span class="n">log</span><span class="p">,</span> <span class="n">dbConn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathToInputDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pathToOutputDir</span></div>
 
-    <span class="c1"># use the tab-trigger below for new method</span>
-    <span class="c1"># method-tmpx</span>
+<div class="viewcode-block" id="utKit.tearDownModule"><a class="viewcode-back" href="../../_api/fundamentals.utKit.html#fundamentals.utKit.utKit.tearDownModule">[docs]</a>    <span class="k">def</span> <span class="nf">tearDownModule</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        *The tearDownModule method*</span>
+
+<span class="sd">        **Key Arguments:**</span>
+<span class="sd">            # -</span>
+
+<span class="sd">        **Return:**</span>
+<span class="sd">            - None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div></div>
 
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -279,7 +308,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

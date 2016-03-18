@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.utKit &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.utKit (class) &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,10 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../index.html"/> 
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../index.html"/>
+        <link rel="up" title="Subpackages" href="../autosummary.html"/>
+        <link rel="next" title="fundamentals.logs.GroupWriteRotatingFileHandler (class)" href="fundamentals.logs.GroupWriteRotatingFileHandler.html"/>
+        <link rel="prev" title="fundamentals.tools (class)" href="fundamentals.tools.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -67,7 +70,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -88,9 +91,22 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../autosummary.html#classes">Classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.tools.html">fundamentals.tools (<em>class</em>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">fundamentals.utKit (<em>class</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.logs.GroupWriteRotatingFileHandler.html">fundamentals.logs.GroupWriteRotatingFileHandler (<em>class</em>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#functions">Functions</a></li>
 </ul>
 
             
@@ -121,7 +137,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>fundamentals.utKit</li>
+          <li><a href="../autosummary.html">Subpackages</a> &raquo;</li>
+      
+    <li>fundamentals.utKit (<em>class</em>)</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -135,12 +153,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="fundamentals-utkit">
-<h1>fundamentals.utKit<a class="headerlink" href="#fundamentals-utkit" title="Permalink to this headline">  ∞</a></h1>
+  <div class="section" id="fundamentals-utkit-class">
+<h1>fundamentals.utKit (<em>class</em>)<a class="headerlink" href="#fundamentals-utkit-class" title="Permalink to this headline">  ∞</a></h1>
 <dl class="class">
 <dt id="fundamentals.utKit">
 <em class="property">class </em><code class="descclassname">fundamentals.</code><code class="descname">utKit</code><span class="sig-paren">(</span><em>moduleDirectory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/utKit.html#utKit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit" title="Permalink to this definition">  ∞</a></dt>
-<dd><p>My unit-testing kit</p>
+<dd><p><em>Default setup for fundamentals style unit-testing workflow (all tests base on nose module)</em></p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">moduleDirectory</span></code> &#8211; the directory to the unit-testing test file</li>
+</ul>
+</dd>
+<dt><strong>Usage:</strong></dt>
+<dd><p class="first">To use this kit within any of your unit-test modules add the following code before your test methods:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fundamentals.utKit</span> <span class="kn">import</span> <span class="n">utKit</span>
+<span class="c1"># SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE</span>
+<span class="n">moduleDirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+<span class="n">utKit</span> <span class="o">=</span> <span class="n">utKit</span><span class="p">(</span><span class="n">moduleDirectory</span><span class="p">)</span>
+<span class="n">log</span><span class="p">,</span> <span class="n">dbConn</span><span class="p">,</span> <span class="n">pathToInputDir</span><span class="p">,</span> <span class="n">pathToOutputDir</span> <span class="o">=</span> <span class="n">utKit</span><span class="o">.</span><span class="n">setupModule</span><span class="p">()</span>
+<span class="n">utKit</span><span class="o">.</span><span class="n">tearDownModule</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd>
+</dl>
 <dl class="method">
 <dt id="fundamentals.utKit.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>moduleDirectory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/utKit.html#utKit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.__init__" title="Permalink to this definition">  ∞</a></dt>
@@ -156,8 +192,11 @@
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code>(moduleDirectory)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/fundamentals.utKit.html#fundamentals.utKit.utKit.setupModule" title="fundamentals.utKit.utKit.setupModule"><code class="xref py py-obj docutils literal"><span class="pre">setupModule</span></code></a>()</td>
-<td>The setupModule method</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">setupModule</span></code>()</td>
+<td><em>The setupModule method</em></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">tearDownModule</span></code>()</td>
+<td><em>The tearDownModule method</em></td>
 </tr>
 </tbody>
 </table>
@@ -169,6 +208,15 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="fundamentals.logs.GroupWriteRotatingFileHandler.html" class="btn btn-neutral float-right" title="fundamentals.logs.GroupWriteRotatingFileHandler (class)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fundamentals.tools.html" class="btn btn-neutral" title="fundamentals.tools (class)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -197,7 +245,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

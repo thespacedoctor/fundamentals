@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.times &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.times &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../../index.html"/>
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -89,9 +89,17 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#functions">Functions</a></li>
 </ul>
 
             
@@ -140,22 +148,13 @@
 <span></span><span class="ch">#!/usr/local/bin/python</span>
 <span class="c1"># encoding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">times.py</span>
-<span class="sd">==================</span>
-<span class="sd">:Summary:</span>
-<span class="sd">    Some time functions to be used with logging etc</span>
+<span class="sd">*Some time functions to be used with logging etc*</span>
 
 <span class="sd">:Author:</span>
 <span class="sd">    David Young</span>
 
 <span class="sd">:Date Created:</span>
 <span class="sd">    February 26, 2016</span>
-
-<span class="sd">:dryx syntax:</span>
-<span class="sd">    - ``_someObject`` = a &#39;private&#39; object that should only be changed for debugging</span>
-
-<span class="sd">:Notes:</span>
-<span class="sd">    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1">################# GLOBAL IMPORTS ####################</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -164,11 +163,20 @@
 
 
 <div class="viewcode-block" id="get_now_sql_datetime"><a class="viewcode-back" href="../../_autosummary/fundamentals.times.get_now_sql_datetime.html#fundamentals.times.get_now_sql_datetime">[docs]</a><span class="k">def</span> <span class="nf">get_now_sql_datetime</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;A datetime stamp in MySQL format:</span>
-<span class="sd">        ``YYYY-MM-DDTHH:MM:SS``</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    *A datetime stamp in MySQL format: ``YYYY-MM-DDTHH:MM:SS``*</span>
 
-<span class="sd">        **Return:**</span>
-<span class="sd">            - ``now`` -- current time and date in MySQL format</span>
+<span class="sd">    **Return:**</span>
+<span class="sd">        - ``now`` -- current time and date in MySQL format</span>
+
+<span class="sd">    **Usage:**</span>
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            from fundamentals import times</span>
+<span class="sd">            now = times.get_now_sql_datetime()</span>
+<span class="sd">            print now</span>
+
+<span class="sd">            # OUT: 2016-03-18T11:08:23 </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">## &gt; IMPORTS ##</span>
     <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span>
@@ -179,14 +187,24 @@
 
 
 <div class="viewcode-block" id="calculate_time_difference"><a class="viewcode-back" href="../../_autosummary/fundamentals.times.calculate_time_difference.html#fundamentals.times.calculate_time_difference">[docs]</a><span class="k">def</span> <span class="nf">calculate_time_difference</span><span class="p">(</span><span class="n">startDate</span><span class="p">,</span> <span class="n">endDate</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return the time difference between two dates</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    *Return the time difference between two dates as a string*</span>
 
 <span class="sd">    **Key Arguments:**</span>
 <span class="sd">        - ``startDate`` -- the first date in YYYY-MM-DDTHH:MM:SS format</span>
 <span class="sd">        - ``endDate`` -- the final date YYYY-MM-DDTHH:MM:SS format</span>
 
 <span class="sd">    **Return:**</span>
-<span class="sd">        - ``diffDate`` -- the difference between the two dates in Y,M,D,h,m,s (string)</span>
+<span class="sd">        - ``relTime`` -- the difference between the two dates in Y,M,D,h,m,s (string)</span>
+
+<span class="sd">    **Usage:**</span>
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            from fundamentals import times</span>
+<span class="sd">            diff = times.calculate_time_difference(startDate=&quot;2015-10-13 10:02:12&quot;, endDate=&quot;2017-11-04 16:47:05&quot;)</span>
+<span class="sd">            print diff</span>
+
+<span class="sd">            # OUT: 2yrs 22dys 6h 44m 53s</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">################ &gt; IMPORTS ################</span>
     <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
@@ -195,6 +213,10 @@
     <span class="c1">################ &gt; VARIABLE SETTINGS ######</span>
 
     <span class="c1">################ &gt;ACTION(S) ################</span>
+    <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">startDate</span><span class="p">:</span>
+        <span class="n">startDate</span> <span class="o">=</span> <span class="n">startDate</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">endDate</span><span class="p">:</span>
+        <span class="n">endDate</span> <span class="o">=</span> <span class="n">endDate</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span>
     <span class="n">startDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">startDate</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S&#39;</span><span class="p">)</span>
     <span class="n">endDate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">endDate</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S&#39;</span><span class="p">)</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">relativedelta</span><span class="o">.</span><span class="n">relativedelta</span><span class="p">(</span><span class="n">endDate</span><span class="p">,</span> <span class="n">startDate</span><span class="p">)</span>
@@ -251,7 +273,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

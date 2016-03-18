@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.logs &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.logs &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../../index.html"/>
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -89,9 +89,17 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autosummary.html#functions">Functions</a></li>
 </ul>
 
             
@@ -140,22 +148,13 @@
 <span></span><span class="ch">#!/usr/local/bin/python</span>
 <span class="c1"># encoding: utf-8</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">logs.py</span>
-<span class="sd">=======</span>
-<span class="sd">:Summary:</span>
-<span class="sd">    Logger setup for python projects</span>
+<span class="sd">*Logger setup for python projects*</span>
 
 <span class="sd">:Author:</span>
 <span class="sd">    David Young</span>
 
 <span class="sd">:Date Created:</span>
 <span class="sd">    October 10, 2012</span>
-
-<span class="sd">:dryx syntax:</span>
-<span class="sd">    - ``_someObject`` = a &#39;private&#39; object that should only be changed for debugging</span>
-
-<span class="sd">:Notes:</span>
-<span class="sd">    - If you have any questions requiring this script/module please email me: davidrobertyoung@gmail.com</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -166,13 +165,23 @@
 <div class="viewcode-block" id="console_logger"><a class="viewcode-back" href="../../_autosummary/fundamentals.logs.console_logger.html#fundamentals.logs.console_logger">[docs]</a><span class="k">def</span> <span class="nf">console_logger</span><span class="p">(</span>
     <span class="n">level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Setup and return a console logger only.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    *Setup and return a console logger*</span>
 
 <span class="sd">    **Key Arguments:**</span>
 <span class="sd">        - ``level`` -- the level of logging required</span>
 
 <span class="sd">    **Return:**</span>
 <span class="sd">        - ``logger`` -- the console logger</span>
+
+<span class="sd">    **Usage:**</span>
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            from fundamentals import logs</span>
+<span class="sd">            log = logs.console_logger(</span>
+<span class="sd">                level=&quot;DEBUG&quot;</span>
+<span class="sd">            )</span>
+<span class="sd">            log.debug(&quot;Testing console logger&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">################ &gt; IMPORTS ################</span>
     <span class="c1">## STANDARD LIB ##</span>
@@ -206,7 +215,58 @@
 
 
 <div class="viewcode-block" id="setup_dryx_logging"><a class="viewcode-back" href="../../_autosummary/fundamentals.logs.setup_dryx_logging.html#fundamentals.logs.setup_dryx_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_dryx_logging</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;setup dryx style python logging</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    *setup dryx style python logging*</span>
+
+<span class="sd">    **Key Arguments:**</span>
+<span class="sd">        - ``level`` -- the level of logging required</span>
+
+<span class="sd">    **Return:**</span>
+<span class="sd">        - ``logger`` -- the console logger</span>
+
+<span class="sd">    **Usage:**</span>
+<span class="sd">        .. code-block:: python </span>
+
+<span class="sd">            from fundamentals import logs</span>
+<span class="sd">            log = logs.setup_dryx_logging(</span>
+<span class="sd">                yaml_file=&quot;/Users/Dave/.config/fundamentals/fundamentals.yaml&quot;</span>
+<span class="sd">            )</span>
+<span class="sd">            log.error(&quot;test error&quot;)</span>
+
+<span class="sd">        Here is an example of the settings in the yaml file:</span>
+
+<span class="sd">        .. code-block:: yaml</span>
+
+<span class="sd">            version: 1</span>
+
+<span class="sd">            logging settings:</span>
+<span class="sd">                formatters:</span>
+<span class="sd">                    file_style:</span>
+<span class="sd">                        format: &#39;* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s &gt; %(funcName)s &gt; %(lineno)d) - %(message)s  &#39;</span>
+<span class="sd">                        datefmt: &#39;%Y/%m/%d %H:%M:%S&#39;</span>
+<span class="sd">                    console_style:</span>
+<span class="sd">                        format: &#39;* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d &gt; %(message)s&#39;</span>
+<span class="sd">                        datefmt: &#39;%H:%M:%S&#39;</span>
+<span class="sd">                    html_style:</span>
+<span class="sd">                        format: &#39;&lt;div id=&quot;row&quot; class=&quot;%(levelname)s&quot;&gt;&lt;span class=&quot;date&quot;&gt;%(asctime)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;file:&lt;/span&gt;&lt;span class=&quot;filename&quot;&gt;%(filename)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;method:&lt;/span&gt;&lt;span class=&quot;funcName&quot;&gt;%(funcName)s&lt;/span&gt;   &lt;span class=&quot;label&quot;&gt;line#:&lt;/span&gt;&lt;span class=&quot;lineno&quot;&gt;%(lineno)d&lt;/span&gt; &lt;span class=&quot;pathname&quot;&gt;%(pathname)s&lt;/span&gt;  &lt;div class=&quot;right&quot;&gt;&lt;span class=&quot;message&quot;&gt;%(message)s&lt;/span&gt;&lt;span class=&quot;levelname&quot;&gt;%(levelname)s&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span>
+<span class="sd">                        datefmt: &#39;%Y-%m-%d &lt;span class= &quot;time&quot;&gt;%H:%M &lt;span class= &quot;seconds&quot;&gt;%Ss&lt;/span&gt;&lt;/span&gt;&#39;</span>
+<span class="sd">                handlers:</span>
+<span class="sd">                    console:</span>
+<span class="sd">                        class: logging.StreamHandler</span>
+<span class="sd">                        level: DEBUG</span>
+<span class="sd">                        formatter: console_style</span>
+<span class="sd">                        stream: ext://sys.stdout</span>
+<span class="sd">                    file:</span>
+<span class="sd">                        class: logging.handlers.GroupWriteRotatingFileHandler</span>
+<span class="sd">                        level: WARNING</span>
+<span class="sd">                        formatter: file_style</span>
+<span class="sd">                        filename: /Users/Dave/.config/fundamentals/fundamentals.log</span>
+<span class="sd">                        mode: w+</span>
+<span class="sd">                        maxBytes: 102400</span>
+<span class="sd">                        backupCount: 1</span>
+<span class="sd">                root:</span>
+<span class="sd">                    level: WARNING</span>
+<span class="sd">                    handlers: [file,console]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">logging</span>
@@ -239,12 +299,12 @@
 <span class="k">class</span> <span class="nc">GroupWriteRotatingFileHandler</span><span class="p">(</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    rotating file handler for logging</span>
+<span class="sd">    *rotating file handler for logging*</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">doRollover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Override base class method to make the new log file group writable.</span>
+<span class="sd">        *Override base class method to make the new log file group writable.*</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Rotate the file first.</span>
         <span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="o">.</span><span class="n">doRollover</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -258,7 +318,7 @@
 <div class="viewcode-block" id="GroupWriteRotatingFileHandler"><a class="viewcode-back" href="../../_autosummary/fundamentals.logs.GroupWriteRotatingFileHandler.html#fundamentals.logs.GroupWriteRotatingFileHandler">[docs]</a><span class="k">class</span> <span class="nc">GroupWriteRotatingFileHandler</span><span class="p">(</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    rotating file handler for logging</span>
+<span class="sd">    *rotating file handler for logging*</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -299,7 +359,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

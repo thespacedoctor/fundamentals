@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fundamentals.times.get_now_sql_datetime &mdash; fundamentals 0.1.4 documentation</title>
+  <title>fundamentals.times.get_now_sql_datetime (function) &mdash; fundamentals 0.1.1 documentation</title>
   
 
   
@@ -36,7 +36,9 @@
   
 
   
-    <link rel="top" title="fundamentals 0.1.4 documentation" href="../index.html"/> 
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../index.html"/>
+        <link rel="up" title="Subpackages" href="../autosummary.html"/>
+        <link rel="prev" title="fundamentals.times.calculate_time_difference (function)" href="fundamentals.times.calculate_time_difference.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.1
               </div>
             
           
@@ -88,9 +90,27 @@
           
             
             
-                <p class="caption"><span class="caption-text">API</span></p>
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../autosummary.html#functions">Functions</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.append_now_datestamp_to_filename.html">fundamentals.download.append_now_datestamp_to_filename (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.extract_filename_from_url.html">fundamentals.download.extract_filename_from_url (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.get_now_datetime_filestamp.html">fundamentals.download.get_now_datetime_filestamp (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.download.multiobject_download.html">fundamentals.download.multiobject_download (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.logs.console_logger.html">fundamentals.logs.console_logger (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.logs.setup_dryx_logging.html">fundamentals.logs.setup_dryx_logging (<em>function</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fundamentals.times.calculate_time_difference.html">fundamentals.times.calculate_time_difference (<em>function</em>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">fundamentals.times.get_now_sql_datetime (<em>function</em>)</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -121,7 +141,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>fundamentals.times.get_now_sql_datetime</li>
+          <li><a href="../autosummary.html">Subpackages</a> &raquo;</li>
+      
+    <li>fundamentals.times.get_now_sql_datetime (<em>function</em>)</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -135,18 +157,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="fundamentals-times-get-now-sql-datetime">
-<h1>fundamentals.times.get_now_sql_datetime<a class="headerlink" href="#fundamentals-times-get-now-sql-datetime" title="Permalink to this headline">  ∞</a></h1>
+  <div class="section" id="fundamentals-times-get-now-sql-datetime-function">
+<h1>fundamentals.times.get_now_sql_datetime (<em>function</em>)<a class="headerlink" href="#fundamentals-times-get-now-sql-datetime-function" title="Permalink to this headline">  ∞</a></h1>
 <dl class="function">
 <dt id="fundamentals.times.get_now_sql_datetime">
 <code class="descclassname">fundamentals.times.</code><code class="descname">get_now_sql_datetime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/times.html#get_now_sql_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.times.get_now_sql_datetime" title="Permalink to this definition">  ∞</a></dt>
-<dd><p>A datetime stamp in MySQL format:
-<code class="docutils literal"><span class="pre">YYYY-MM-DDTHH:MM:SS</span></code></p>
+<dd><p><em>A datetime stamp in MySQL format: ``YYYY-MM-DDTHH:MM:SS``</em></p>
 <dl class="docutils">
 <dt><strong>Return:</strong></dt>
 <dd><ul class="first last simple">
 <li><code class="docutils literal"><span class="pre">now</span></code> &#8211; current time and date in MySQL format</li>
 </ul>
+</dd>
+<dt><strong>Usage:</strong></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fundamentals</span> <span class="kn">import</span> <span class="n">times</span>
+<span class="n">now</span> <span class="o">=</span> <span class="n">times</span><span class="o">.</span><span class="n">get_now_sql_datetime</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">now</span>
+
+<span class="c1"># OUT: 2016-03-18T11:08:23 </span>
+</pre></div>
+</div>
 </dd>
 </dl>
 </dd></dl>
@@ -157,6 +187,13 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="fundamentals.times.calculate_time_difference.html" class="btn btn-neutral" title="fundamentals.times.calculate_time_difference (function)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -185,7 +222,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.1.4',
+            VERSION:'0.1.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

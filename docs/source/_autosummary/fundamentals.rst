@@ -1,10 +1,7 @@
-fundamentals
+fundamentals (*subpackage*)
 ============
 
 
 .. automodule:: fundamentals
     :members:
 
-
-fundamentals
-============

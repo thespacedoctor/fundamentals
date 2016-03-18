@@ -1,6 +1,7 @@
-fundamentals.logs
+fundamentals.logs (*module*)
 =================
 
 
 .. automodule:: fundamentals.logs
     :members:
+

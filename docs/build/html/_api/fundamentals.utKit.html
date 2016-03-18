@@ -1,0 +1,274 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>&lt;no title&gt; &mdash; fundamentals 0.1.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="fundamentals 0.1.1 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> fundamentals
+          
+
+          
+            
+            <img src="../_static/thespacedoctor_icon_white_circle.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_includes/index.html#tutorial">Tutorial</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html">Subpackages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#modules">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autosummary.html#functions">Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">fundamentals</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_api/fundamentals.utKit.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-fundamentals.utKit"></span><p><em>A unit-testing kit to simplify my unit-tests</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">David Young</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date Created:</th><td class="field-body">April 16, 2014</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="fundamentals.utKit.utKit">
+<em class="property">class </em><code class="descclassname">fundamentals.utKit.</code><code class="descname">utKit</code><span class="sig-paren">(</span><em>moduleDirectory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/utKit.html#utKit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.utKit" title="Permalink to this definition">  ∞</a></dt>
+<dd><p><em>Default setup for fundamentals style unit-testing workflow (all tests base on nose module)</em></p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">moduleDirectory</span></code> &#8211; the directory to the unit-testing test file</li>
+</ul>
+</dd>
+<dt><strong>Usage:</strong></dt>
+<dd><p class="first">To use this kit within any of your unit-test modules add the following code before your test methods:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fundamentals.utKit</span> <span class="kn">import</span> <span class="n">utKit</span>
+<span class="c1"># SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE</span>
+<span class="n">moduleDirectory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+<span class="n">utKit</span> <span class="o">=</span> <span class="n">utKit</span><span class="p">(</span><span class="n">moduleDirectory</span><span class="p">)</span>
+<span class="n">log</span><span class="p">,</span> <span class="n">dbConn</span><span class="p">,</span> <span class="n">pathToInputDir</span><span class="p">,</span> <span class="n">pathToOutputDir</span> <span class="o">=</span> <span class="n">utKit</span><span class="o">.</span><span class="n">setupModule</span><span class="p">()</span>
+<span class="n">utKit</span><span class="o">.</span><span class="n">tearDownModule</span><span class="p">()</span> 
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fundamentals.utKit.utKit.setupModule">
+<code class="descname">setupModule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/utKit.html#utKit.setupModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.utKit.setupModule" title="Permalink to this definition">  ∞</a></dt>
+<dd><p><em>The setupModule method</em></p>
+<dl class="docutils">
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">log</span></code> &#8211; a logger</li>
+<li><code class="docutils literal"><span class="pre">dbConn</span></code> &#8211; a database connection to a test database (details from yaml settings file)</li>
+<li><code class="docutils literal"><span class="pre">pathToInputDir</span></code> &#8211; path to modules own test input directory</li>
+<li><code class="docutils literal"><span class="pre">pathToOutputDir</span></code> &#8211; path to modules own test output directory</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fundamentals.utKit.utKit.tearDownModule">
+<code class="descname">tearDownModule</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fundamentals/utKit.html#utKit.tearDownModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fundamentals.utKit.utKit.tearDownModule" title="Permalink to this definition">  ∞</a></dt>
+<dd><p><em>The tearDownModule method</em></p>
+<dl class="docutils">
+<dt><strong>Key Arguments:</strong></dt>
+<dd># -</dd>
+<dt><strong>Return:</strong></dt>
+<dd><ul class="first last simple">
+<li>None</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Dave Young.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
