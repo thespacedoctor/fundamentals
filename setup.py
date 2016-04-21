@@ -34,8 +34,7 @@ setup(
         'MySQL-python',
         'python-dateutil',
         'eventlet',
-        'MySQL-python',
-        'times'
+        'MySQL-python'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
