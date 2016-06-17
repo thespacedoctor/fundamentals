@@ -30,17 +30,17 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_multiobject_download():
+# class test_multiobject_download():
 
-    def test_multiobject_download_function(self):
-        kwargs = {}
-        kwargs["log"] = log
-        kwargs["settings"] = settings
-        # xt-kwarg_key_and_value
+#     def test_multiobject_download_function(self):
+#         kwargs = {}
+#         kwargs["log"] = log
+#         kwargs["settings"] = settings
+#         # xt-kwarg_key_and_value
 
-        testObject = multiobject_download(**kwargs)
-        testObject.get()
+#         testObject = multiobject_download(**kwargs)
+#         testObject.get()
 
-        # x-print-testpage-for-pessto-marshall-web-object
+#         # x-print-testpage-for-pessto-marshall-web-object
 
-    # x-class-to-test-named-worker-function
+#     # x-class-to-test-named-worker-function

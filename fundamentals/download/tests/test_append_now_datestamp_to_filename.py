@@ -2,7 +2,7 @@ import os
 import nose
 import shutil
 import yaml
-from fundamentals import append_now_datestamp_to_filename, cl_utils
+from fundamentals.download import append_now_datestamp_to_filename
 from fundamentals.utKit import utKit
 
 from fundamentals import tools
@@ -30,17 +30,17 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_append_now_datestamp_to_filename():
+# class test_append_now_datestamp_to_filename():
 
-    def test_append_now_datestamp_to_filename_function(self):
-        kwargs = {}
-        kwargs["log"] = log
-        kwargs["settings"] = settings
-        # xt-kwarg_key_and_value
+#     def test_append_now_datestamp_to_filename_function(self):
+#         kwargs = {}
+#         kwargs["log"] = log
+#         kwargs["settings"] = settings
+#         # xt-kwarg_key_and_value
 
-        testObject = append_now_datestamp_to_filename(**kwargs)
-        testObject.get()
+#         testObject = append_now_datestamp_to_filename(**kwargs)
+#         testObject.get()
 
-        # x-print-testpage-for-pessto-marshall-web-object
+#         # x-print-testpage-for-pessto-marshall-web-object
 
-    # x-class-to-test-named-worker-function
+#     # x-class-to-test-named-worker-function
