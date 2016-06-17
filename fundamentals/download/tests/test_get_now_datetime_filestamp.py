@@ -2,7 +2,7 @@ import os
 import nose
 import shutil
 import yaml
-from fundamentals import get_now_datetime_filestamp, cl_utils
+from fundamentals.download import get_now_datetime_filestamp
 from fundamentals.utKit import utKit
 
 from fundamentals import tools
@@ -30,17 +30,17 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_get_now_datetime_filestamp():
+# class test_get_now_datetime_filestamp():
 
-    def test_get_now_datetime_filestamp_function(self):
-        kwargs = {}
-        kwargs["log"] = log
-        kwargs["settings"] = settings
-        # xt-kwarg_key_and_value
+#     def test_get_now_datetime_filestamp_function(self):
+#         kwargs = {}
+#         kwargs["log"] = log
+#         kwargs["settings"] = settings
+#         # xt-kwarg_key_and_value
 
-        testObject = get_now_datetime_filestamp(**kwargs)
-        testObject.get()
+#         testObject = get_now_datetime_filestamp(**kwargs)
+#         testObject.get()
 
-        # x-print-testpage-for-pessto-marshall-web-object
+#         # x-print-testpage-for-pessto-marshall-web-object
 
-    # x-class-to-test-named-worker-function
+#     # x-class-to-test-named-worker-function

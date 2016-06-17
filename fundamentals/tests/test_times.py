@@ -2,7 +2,7 @@ import os
 import nose
 import shutil
 import yaml
-from fundamentals import times, cl_utils
+from fundamentals import times
 from fundamentals.utKit import utKit
 
 from fundamentals import tools
@@ -30,17 +30,17 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_times():
+# class test_times():
 
-    def test_times_function(self):
-        kwargs = {}
-        kwargs["log"] = log
-        kwargs["settings"] = settings
-        # xt-kwarg_key_and_value
+#     def test_times_function(self):
+#         kwargs = {}
+#         kwargs["log"] = log
+#         kwargs["settings"] = settings
+#         # xt-kwarg_key_and_value
 
-        testObject = times(**kwargs)
-        testObject.get()
+#         testObject = times(**kwargs)
+#         testObject.get()
 
-        # x-print-testpage-for-pessto-marshall-web-object
+#         # x-print-testpage-for-pessto-marshall-web-object
 
-    # x-class-to-test-named-worker-function
+#     # x-class-to-test-named-worker-function
