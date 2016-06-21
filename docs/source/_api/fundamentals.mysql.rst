@@ -6,13 +6,6 @@ fundamentals.mysql package
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-    fundamentals.mysql.tests
-
 Submodules
 ----------
 
