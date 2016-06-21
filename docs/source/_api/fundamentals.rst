@@ -14,6 +14,7 @@ Subpackages
     fundamentals.commonutils
     fundamentals.download
     fundamentals.files
+    fundamentals.mysql
 
 Submodules
 ----------
