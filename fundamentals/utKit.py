@@ -76,10 +76,10 @@ class utKit():
 
         self.dbConfig = """
         version: 1
-        db: pessto_marshall_sandbox
+        db: dryx_unit_testing
         host: localhost
-        user: root
-        password: root
+        user: unittesting
+        password: utpass
         """
 
         return
