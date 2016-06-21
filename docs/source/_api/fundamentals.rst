@@ -13,6 +13,7 @@ Subpackages
 
     fundamentals.commonutils
     fundamentals.download
+    fundamentals.files
 
 Submodules
 ----------

@@ -9,7 +9,8 @@ Subpackages
 
    fundamentals
    fundamentals.commonutils
-   fundamentals.download 
+   fundamentals.download
+   fundamentals.files 
 
 Modules
 -----------
@@ -43,6 +44,7 @@ Functions
    fundamentals.download.extract_filename_from_url
    fundamentals.download.get_now_datetime_filestamp
    fundamentals.download.multiobject_download
+   fundamentals.files.recursive_directory_listing
    fundamentals.logs.console_logger
    fundamentals.logs.setup_dryx_logging
    fundamentals.times.calculate_time_difference
