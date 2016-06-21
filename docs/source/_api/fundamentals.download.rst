@@ -6,13 +6,6 @@ fundamentals.download package
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-    fundamentals.download.tests
-
 Submodules
 ----------
 

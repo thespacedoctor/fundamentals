@@ -1,4 +1,4 @@
-.. automodule:: fundamentals.download.tests.test__fetch
+.. automodule:: fundamentals.mysql.tests.test_writequery
     :members:
     :undoc-members:
     :show-inheritance:
