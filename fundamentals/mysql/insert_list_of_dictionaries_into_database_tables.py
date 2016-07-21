@@ -119,7 +119,7 @@ def insert_list_of_dictionaries_into_database_tables(
                 log=log,
                 sqlQuery=insertCommand,
                 dbConn=dbConn,
-                Force=False,
+                Force=True,
                 manyValueList=theseInserts
             )
 

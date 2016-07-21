@@ -191,10 +191,33 @@ class tools():
                         level -= 1
                         exists = os.path.exists(ds)
 
-                    shutil.copyfile(ds, settingsFile)
                     try:
                         shutil.copyfile(ds, settingsFile)
-                        print "default settings have been added to '%(settingsFile)s'" % locals()
+                        import codecs
+                        pathToReadFile = settingsFile
+                        try:
+                            readFile = codecs.open(
+                                pathToReadFile, encoding='utf-8', mode='r')
+                            thisData = readFile.read()
+                            readFile.close()
+                        except IOError, e:
+                            message = 'could not open the file %s' % (
+                                pathToReadFile,)
+                            raise IOError(message)
+                        thisData = thisData.replace(
+                            "/Users/Dave", os.getenv("HOME"))
+
+                        pathToWriteFile = pathToReadFile
+                        try:
+                            writeFile = codecs.open(
+                                pathToWriteFile, encoding='utf-8', mode='w')
+                        except IOError, e:
+                            message = 'could not open the file %s' % (
+                                pathToWriteFile,)
+                            raise IOError(message)
+                        writeFile.write(thisData)
+                        writeFile.close()
+                        print "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals()
                     except:
                         print "please add settings to file '%(settingsFile)s'" % locals()
                     sys.exit(0)
