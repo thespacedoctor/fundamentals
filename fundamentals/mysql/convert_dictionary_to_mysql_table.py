@@ -30,7 +30,8 @@ def convert_dictionary_to_mysql_table(
         uniqueKeyList=[],
         createHelperTables=False,
         dateModified=False,
-        returnInsertOnly=False):
+        returnInsertOnly=False,
+        replace=False):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -42,6 +43,7 @@ def convert_dictionary_to_mysql_table(
         - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
         - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
         - ``dateModified`` -- add a modification date to the mysql table
+        - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -63,7 +65,8 @@ def convert_dictionary_to_mysql_table(
                 dbTableName="testing_table",
                 uniqueKeyList=["uniquekey1", "uniqueKey2"],
                 dateModified=False,
-                returnInsertOnly=False
+                returnInsertOnly=False,
+                replace=True
             )
 
         Or to just return the insert statement and not execute the command on the database:
@@ -75,7 +78,8 @@ def convert_dictionary_to_mysql_table(
                 dbTableName="testing_table",
                 uniqueKeyList=["uniquekey1", "uniqueKey2"],
                 dateModified=False,
-                returnInsertOnly=True
+                returnInsertOnly=True,
+                replace=False
             )
 
             print insertCommand, valueTuple
@@ -91,6 +95,11 @@ def convert_dictionary_to_mysql_table(
     import collections as c
 
     log.debug('starting convert_dictionary_to_mysql_table')
+
+    if replace:
+        insertVerb = "REPLACE"
+    else:
+        insertVerb = "INSERT IGNORE"
 
     if returnInsertOnly == False:
         # TEST THE ARGUMENTS
@@ -351,7 +360,7 @@ def convert_dictionary_to_mysql_table(
     if returnInsertOnly == True:
         myKeys = ','.join(formattedKeyList)
         valueString = ("%s, " * len(myValues))[:-2]
-        insertCommand = """INSERT IGNORE INTO `""" + dbTableName + \
+        insertCommand = insertVerb + """ INTO `""" + dbTableName + \
             """` (""" + myKeys + """) VALUES (""" + valueString + """)"""
         mv = []
         mv[:] = [None if m == "None" else m for m in myValues]
@@ -380,7 +389,7 @@ def convert_dictionary_to_mysql_table(
         myValues += '"'
 
     # log.debug(myValues+" ------ POSTSTRIP")
-    addValue = """INSERT IGNORE INTO `""" + dbTableName + \
+    addValue = insertVerb + """ INTO `""" + dbTableName + \
         """` (""" + myKeys + """) VALUES (\"""" + myValues + """)"""
     # log.debug(addValue)
 
