@@ -298,6 +298,14 @@ class tools():
             dbName = arguments["--dbName"]
         else:
             pass
+
+        if not 'settings' in locals():
+            settings = False
+        self.settings = settings
+
+        if tunnel:
+            self._setup_tunnel()
+
         if dbConn:
             import MySQLdb as ms
             dbConn = ms.connect(
@@ -312,13 +320,6 @@ class tools():
             log.debug('dbConn: %s' % (dbConn,))
 
         self.dbConn = dbConn
-
-        if not 'settings' in locals():
-            settings = False
-        self.settings = settings
-
-        if tunnel:
-            self._setup_tunnel()
 
         return None
 

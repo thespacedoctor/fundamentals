@@ -97,7 +97,7 @@ def convert_dictionary_to_mysql_table(
     log.debug('starting convert_dictionary_to_mysql_table')
 
     if replace:
-        insertVerb = "REPLACE"
+        insertVerb = "INSERT"
     else:
         insertVerb = "INSERT IGNORE"
 
@@ -366,6 +366,15 @@ def convert_dictionary_to_mysql_table(
         mv[:] = [None if m == "None" else m for m in myValues]
         valueTuple = tuple(mv)
 
+        dup = ""
+        if replace:
+            dup = " ON DUPLICATE KEY UPDATE "
+            for k, v in zip(formattedKeyList, mv):
+                dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
+        dup = dup[:-1]
+
+        insertCommand = insertCommand + dup
+
         return insertCommand, valueTuple
 
     # GENERATE THE INSERT COMMAND - IGNORE DUPLICATE ENTRIES
@@ -388,9 +397,20 @@ def convert_dictionary_to_mysql_table(
     if myValues[-4:] != 'null':
         myValues += '"'
 
+    dup = ""
+    if replace:
+        dup = " ON DUPLICATE KEY UPDATE "
+        dupValues = ('"' + myValues).split(" ,")
+        dupKeys = myKeys.split(",")
+
+        for k, v in zip(dupKeys, dupValues):
+            dup = """%(dup)s %(k)s=%(v)s,""" % locals()
+    dup = dup[:-1]
+
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
-        """` (""" + myKeys + """) VALUES (\"""" + myValues + """)"""
+        """` (""" + myKeys + """) VALUES (\"""" + \
+        myValues + """) %(dup)s """ % locals()
     # log.debug(addValue)
 
     message = ""
