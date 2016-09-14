@@ -23,15 +23,16 @@ from fundamentals.mysql import writequery, table_exists, readquery
 
 
 def convert_dictionary_to_mysql_table(
-        dbConn,
         log,
         dictionary,
         dbTableName,
         uniqueKeyList=[],
+        dbConn=False,
         createHelperTables=False,
         dateModified=False,
         returnInsertOnly=False,
-        replace=False):
+        replace=False,
+        batchInserts=True):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -44,6 +45,7 @@ def convert_dictionary_to_mysql_table(
         - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
         - ``dateModified`` -- add a modification date to the mysql table
         - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
+        - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -52,7 +54,7 @@ def convert_dictionary_to_mysql_table(
 
         To add a python dictionary to a database table, creating the table and/or columns if they don't yet exist:
 
-        .. code-block:: python 
+        .. code-block:: python
 
             from fundamentals.mysql import convert_dictionary_to_mysql_table
             dictionary = {"a newKey": "cool", "and another": "super cool",
@@ -69,7 +71,7 @@ def convert_dictionary_to_mysql_table(
                 replace=True
             )
 
-        Or to just return the insert statement and not execute the command on the database:
+        Or just return the insert statement with a list of value tuples, i.e. do not execute the command on the database:
 
             insertCommand, valueTuple = convert_dictionary_to_mysql_table(
                 dbConn=dbConn,
@@ -79,14 +81,36 @@ def convert_dictionary_to_mysql_table(
                 uniqueKeyList=["uniquekey1", "uniqueKey2"],
                 dateModified=False,
                 returnInsertOnly=True,
-                replace=False
+                replace=False,
+                batchInserts=True
             )
 
             print insertCommand, valueTuple
 
-            # OUT: 'INSERT IGNORE INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES (%s, %s, %s, %s, %s)', ('cool', 'super cool', '2016-06-21T12:08:59', 'burgers', 'cheese')
+            # OUT: 'INSERT IGNORE INTO `testing_table`
+            # (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES
+            # (%s, %s, %s, %s, %s)', ('cool', 'super cool',
+            # '2016-06-21T12:08:59', 'burgers', 'cheese')
 
+        You can also return a list of single insert statements using ``batchInserts = False``. Using ``replace = True`` will also add instructions about how to replace duplicate entries in the database table if found:
 
+            inserts = convert_dictionary_to_mysql_table(
+                dbConn=dbConn,
+                log=log,
+                dictionary=dictionary,
+                dbTableName="testing_table",
+                uniqueKeyList=["uniquekey1", "uniqueKey2"],
+                dateModified=False,
+                returnInsertOnly=True,
+                replace=True,
+                batchInserts=False
+            )
+
+            print inserts
+
+            # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) 
+            # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")  
+            # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers", uniquekey1="cheese"
     """
     log.info('starting the ``convert_dictionary_to_mysql_table`` function')
 
@@ -357,7 +381,7 @@ def convert_dictionary_to_mysql_table(
                     dbConn=dbConn
                 )
 
-    if returnInsertOnly == True:
+    if returnInsertOnly == True and batchInserts == True:
         myKeys = ','.join(formattedKeyList)
         valueString = ("%s, " * len(myValues))[:-2]
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
@@ -412,6 +436,9 @@ def convert_dictionary_to_mysql_table(
         """` (""" + myKeys + """) VALUES (\"""" + \
         myValues + """) %(dup)s """ % locals()
     # log.debug(addValue)
+
+    if returnInsertOnly == True:
+        return addValue
 
     message = ""
     try:
