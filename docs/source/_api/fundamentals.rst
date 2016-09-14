@@ -15,6 +15,7 @@ Subpackages
     fundamentals.download
     fundamentals.files
     fundamentals.mysql
+    fundamentals.renderer
 
 Submodules
 ----------

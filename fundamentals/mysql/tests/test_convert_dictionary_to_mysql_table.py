@@ -64,6 +64,24 @@ class test_convert_dictionary_to_mysql_table():
 
         print message
 
+    def test_return_inserts_non_batch(self):
+        dictionary = {"a newKey": "cool", "and another": "super cool",
+                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+        inserts = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            dateModified=False,
+            returnInsertOnly=True,
+            replace=True,
+            batchInserts=False
+        )
+
+        print inserts
+
     # def test_convert_dictionary_to_mysql_table_function_exception(self):
 
     #     from fundamentals import convert_dictionary_to_mysql_table
