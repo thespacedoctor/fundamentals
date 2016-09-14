@@ -11,7 +11,8 @@ Subpackages
    fundamentals.commonutils
    fundamentals.download
    fundamentals.files
-   fundamentals.mysql 
+   fundamentals.mysql
+   fundamentals.renderer 
 
 Modules
 -----------
@@ -32,6 +33,7 @@ Classes
 
    fundamentals.tools
    fundamentals.utKit
+   fundamentals.renderer.list_of_dictionaries
    fundamentals.logs.GroupWriteRotatingFileHandler 
 
 Functions
