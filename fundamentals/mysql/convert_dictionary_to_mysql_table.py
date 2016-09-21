@@ -395,7 +395,7 @@ def convert_dictionary_to_mysql_table(
             dup = " ON DUPLICATE KEY UPDATE "
             for k, v in zip(formattedKeyList, mv):
                 dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-        dup = dup[:-1]
+            dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
 
         insertCommand = insertCommand + dup
 
@@ -429,7 +429,7 @@ def convert_dictionary_to_mysql_table(
 
         for k, v in zip(dupKeys, dupValues):
             dup = """%(dup)s %(k)s=%(v)s,""" % locals()
-    dup = dup[:-1]
+        dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
