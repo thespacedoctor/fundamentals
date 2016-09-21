@@ -416,7 +416,7 @@ def convert_dictionary_to_mysql_table(
     myValues = myValues.replace('!!python/unicode:', '')
     myValues = myValues.replace('!!python/unicode', '')
     myValues = myValues.replace('"None"', 'null')
-    myValues = myValues.replace('"None', 'null')
+    # myValues = myValues.replace('"None', 'null')
 
     if myValues[-4:] != 'null':
         myValues += '"'
