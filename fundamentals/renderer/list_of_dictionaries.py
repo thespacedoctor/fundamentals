@@ -113,7 +113,7 @@ class list_of_dictionaries():
 
         renderedData = self._list_of_dictionaries_to_csv("machine")
 
-        if filepath:
+        if filepath and renderedData != "NO MATCH":
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -163,7 +163,7 @@ class list_of_dictionaries():
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("human")
 
-        if filepath:
+        if filepath and len(self.listOfDictionaries):
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -211,7 +211,7 @@ class list_of_dictionaries():
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("markdown")
 
-        if filepath:
+        if filepath and len(self.listOfDictionaries):
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -276,7 +276,7 @@ class list_of_dictionaries():
             indent=4
         )
 
-        if filepath:
+        if filepath and len(self.listOfDictionaries):
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -325,10 +325,11 @@ class list_of_dictionaries():
         """
         self.log.info('starting the ``yaml`` method')
 
-        dataCopy = copy.deepcopy(self.listOfDictionaries)
+        dataCopy = []
+        dataCopy[:] = [dict(l) for l in self.listOfDictionaries]
         renderedData = yaml.dump(dataCopy, default_flow_style=False)
 
-        if filepath:
+        if filepath and len(self.listOfDictionaries):
 
             stream = file(filepath, 'w')
             yaml.dump(dataCopy, stream, default_flow_style=False)
@@ -340,13 +341,15 @@ class list_of_dictionaries():
     def mysql(
         self,
         tableName,
-        filepath=None
+        filepath=None,
+        createStatement=None
     ):
         """*Render the dataset as a series of mysql insert statements*
 
         **Key Arguments:**
             - ``tableName`` -- the name of the mysql db table to assign the insert statements to.
             - ``filepath`` -- path to the file to write the mysql inserts content to. Default *None*
+            createStatement
 
         **Return:**
             - ``renderedData`` -- the data rendered mysql insert statements (string format)
@@ -374,11 +377,18 @@ class list_of_dictionaries():
         """
         self.log.info('starting the ``csv`` method')
 
+        import re
+        if createStatement and "create table if not exists" not in createStatement.lower():
+            regex = re.compile(r'^\s*CREATE TABLE ', re.I | re.S)
+            createStatement = regex.sub(
+                "CREATE TABLE IF NOT EXISTS ", createStatement)
+
         renderedData = self._list_of_dictionaries_to_mysql_inserts(
-            tableName=tableName
+            tableName=tableName,
+            createStatement=createStatement
         )
 
-        if filepath:
+        if filepath and len(self.listOfDictionaries):
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -454,6 +464,8 @@ class list_of_dictionaries():
 
             for i, c in enumerate(tableColumnNames):
                 if csvType in ["human", "markdown"]:
+                    if row[c] == None:
+                        row[c] = ""
                     row[c] = str(str(row[c]).ljust(columnWidths[i] + 2)
                                  .rjust(columnWidths[i] + 3))
                 thisRow.append(row[c])
@@ -509,11 +521,13 @@ class list_of_dictionaries():
 
     def _list_of_dictionaries_to_mysql_inserts(
             self,
-            tableName):
+            tableName,
+            createStatement=None):
         """Convert a python list of dictionaries to pretty csv output
 
         **Key Arguments:**
             - ``tableName`` -- the name of the table to create the insert statements for
+            - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
 
         **Return:**
             - ``output`` -- the mysql insert statements (as a string)
@@ -526,13 +540,16 @@ class list_of_dictionaries():
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
 
-        output = ""
+        if createStatement:
+            output = createStatement + "\n"
+        else:
+            output = ""
 
         for d in dataCopy:
             insertCommand = convert_dictionary_to_mysql_table(
                 log=self.log,
                 dictionary=d,
-                dbTableName="testing_table",
+                dbTableName=tableName,
                 uniqueKeyList=[],
                 dateModified=False,
                 returnInsertOnly=True,

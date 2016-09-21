@@ -24,7 +24,8 @@ def insert_list_of_dictionaries_into_database_tables(
         dbTableName,
         uniqueKeyList=[],
         dateModified=False,
-        batchSize=2500):
+        batchSize=2500,
+        replace=False):
     """insert list of dictionaries into database tables
 
     **Key Arguments:**
@@ -35,6 +36,7 @@ def insert_list_of_dictionaries_into_database_tables(
         - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
         - ``dateModified`` -- add the modification date as a column in the database
         - ``batchSize`` -- batch the insert commands into *batchSize* batches
+        - ``replace`` -- repalce row if a duplicate is found
 
     **Return:**
         - None
@@ -70,7 +72,8 @@ def insert_list_of_dictionaries_into_database_tables(
             dictionary=dictList[0],
             dbTableName=dbTableName,
             uniqueKeyList=uniqueKeyList,
-            dateModified=dateModified)
+            dateModified=dateModified,
+            replace=replace)
 
     total = len(dictList[1:])
     batches = int(total / batchSize)
@@ -108,7 +111,8 @@ def insert_list_of_dictionaries_into_database_tables(
                     dbTableName=dbTableName,
                     uniqueKeyList=uniqueKeyList,
                     dateModified=dateModified,
-                    returnInsertOnly=True
+                    returnInsertOnly=True,
+                    replace=replace
                 )
                 theseInserts.append(valueTuple)
 
@@ -132,7 +136,8 @@ def insert_list_of_dictionaries_into_database_tables(
                         dictionary=aDict,
                         dbTableName=dbTableName,
                         uniqueKeyList=uniqueKeyList,
-                        dateModified=dateModified
+                        dateModified=dateModified,
+                        replace=replace
                     )
             else:
                 inserted = True
