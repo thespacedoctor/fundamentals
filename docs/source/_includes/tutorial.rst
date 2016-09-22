@@ -166,7 +166,60 @@ I now have the following objects I can pass to the rest of my package:
 
 .. note:: There are other usful trinkets within the code - read the docs to find out how to use them.
 
+Command-Line Tools
+==================
 
+mysqlSucker
+-----------
+
+Given a directory of MySQL scripts, `mysqlSucker` can execute the script files and process them according to their success or failure status.
+
+Before you begin you will need to run the following code once to set a login-path for your mysql server:
+
+.. code-block:: bash 
+
+    mysql_config_editor set --login-path=<uniqueLoginName> --host=localhost --user=<myUsername> --password
+
+This stores your credentials in an encrypted file located at '~/.mylogin.cnf'.
+Use `mysql_config_editor print --all` to see all of the login-paths set.
+
+Usage
+*****
+
+.. code-block:: bash 
+     
+    Usage:
+        mysqlSucker <pathToDirectory> <loginPath> <databaseName> [-s successRule -f failureRule]
+
+        pathToDirectory       path to the directory containing the sql scripts to run (scripts must have `.sql` extension)
+        loginPath             the local-path as set with `mysql_config_editor` (`mysqlSucker -h` for more details)
+        databaseName          the name of the database to execute the scripts within
+
+    Options:
+        -h, --help                                  show this help message
+        -s successRule, --success successRule       what to do if script succeeds. Default *None* [None|delete|subFolderName]
+        -f failureRule, --failure failureRule       what to do if script fails. Default *None* [None|delete|subFolderName]
+
+Examples
+********
+
+To simply execute the scripts in a directory run:
+
+.. code-block:: bash 
+
+    mysqlSucker /path/to/scriptdir myLoginPath myDatabaseName
+
+To delete script after thay have executed successfully:
+
+.. code-block:: bash 
+
+    mysqlSucker /path/to/scriptdir myLoginPath myDatabaseName -s delete
+
+To move successful script to a `passed` sub-directory of `/path/to/scriptdir` and failed scripts to a `failed` sub-directory
+
+.. code-block:: bash 
+
+    mysqlSucker /path/to/scriptdir myLoginPath myDatabaseName -s pass -f failed
 
 
 

@@ -561,9 +561,3 @@ class list_of_dictionaries():
         self.log.info(
             'completed the ``_list_of_dictionaries_to_mysql_inserts`` function')
         return output
-
-    # xt-class-method
-
-    # 5. @flagged: what actions of the base class(es) need ammending? ammend them here
-    # Override Method Attributes
-    # method-override-tmpx
