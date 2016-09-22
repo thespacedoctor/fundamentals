@@ -38,7 +38,7 @@ class test_list_of_dictionaries_to_mysql():
 
     def test_list_of_dictionaries_to_mysql_function(self):
 
-        from fundamentals.files import list_of_dictionaries_to_mysql_inserts
+        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import list_of_dictionaries_to_mysql_inserts
         mysqlInserts = list_of_dictionaries_to_mysql_inserts(
             log=log,
             datalist=listOfDictionaries,
@@ -48,7 +48,7 @@ class test_list_of_dictionaries_to_mysql():
 
     def test_list_of_dictionaries_to_mysql_function_exception(self):
 
-        from fundamentals.files import list_of_dictionaries_to_mysql_inserts
+        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import list_of_dictionaries_to_mysql_inserts
         try:
             this = list_of_dictionaries_to_mysql_inserts(
                 log=log,
