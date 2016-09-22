@@ -34,13 +34,12 @@ setup(
         'docopt',
         'MySQL-python',
         'python-dateutil',
-        'eventlet',
-        'MySQL-python'
+        'eventlet'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
-    # entry_points={
-    #     'console_scripts': ['fundamentals=fundamentals.cl_utils:main'],
-    # },
+    entry_points={
+        'console_scripts': ['mysqlSucker=fundamentals.mysql.directory_script_runner:main'],
+    },
     zip_safe=False
 )
