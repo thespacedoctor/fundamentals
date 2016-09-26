@@ -119,11 +119,12 @@ def directory_script_runner(
     scriptList = {}
     for d in os.listdir(pathToScriptDirectory):
         filePath = os.path.join(pathToScriptDirectory, d)
+        filename = os.path.basename(filePath)
         extension = filePath.split(".")[-1]
         if os.path.isfile(filePath) and extension == "sql":
             modified = datetime.datetime.strptime(time.ctime(
                 os.path.getmtime(filePath)), "%a %b %d %H:%M:%S %Y")
-            scriptList[modified] = filePath
+            scriptList[modified + filename] = filePath
 
     # ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
