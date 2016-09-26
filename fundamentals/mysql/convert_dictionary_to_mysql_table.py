@@ -441,10 +441,10 @@ def convert_dictionary_to_mysql_table(
         """` (""" + myKeys + """) VALUES (\"""" + \
         myValues + """) %(dup)s """ % locals()
 
-    myValues = myValues.replace('""', "null")
-    myValues = myValues.replace('!!python/unicode:', '')
-    myValues = myValues.replace('!!python/unicode', '')
-    myValues = myValues.replace('"None"', 'null')
+    addValue = addValue.replace('""', "null")
+    addValue = addValue.replace('!!python/unicode:', '')
+    addValue = addValue.replace('!!python/unicode', '')
+    addValue = addValue.replace('"None"', 'null')
     # log.debug(addValue)
 
     if returnInsertOnly == True:
