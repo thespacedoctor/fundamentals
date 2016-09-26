@@ -400,6 +400,9 @@ def convert_dictionary_to_mysql_table(
         insertCommand = insertCommand + dup
 
         insertCommand = insertCommand.replace('""', "null")
+        insertCommand = insertCommand.replace('!!python/unicode:', '')
+        insertCommand = insertCommand.replace('!!python/unicode', '')
+        insertCommand = insertCommand.replace('"None"', 'null')
 
         return insertCommand, valueTuple
 
@@ -439,6 +442,9 @@ def convert_dictionary_to_mysql_table(
         myValues + """) %(dup)s """ % locals()
 
     myValues = myValues.replace('""', "null")
+    myValues = myValues.replace('!!python/unicode:', '')
+    myValues = myValues.replace('!!python/unicode', '')
+    myValues = myValues.replace('"None"', 'null')
     # log.debug(addValue)
 
     if returnInsertOnly == True:
