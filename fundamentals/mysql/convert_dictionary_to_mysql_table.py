@@ -399,6 +399,8 @@ def convert_dictionary_to_mysql_table(
 
         insertCommand = insertCommand + dup
 
+        insertCommand = insertCommand.replace('""', "null")
+
         return insertCommand, valueTuple
 
     # GENERATE THE INSERT COMMAND - IGNORE DUPLICATE ENTRIES
@@ -435,6 +437,8 @@ def convert_dictionary_to_mysql_table(
     addValue = insertVerb + """ INTO `""" + dbTableName + \
         """` (""" + myKeys + """) VALUES (\"""" + \
         myValues + """) %(dup)s """ % locals()
+
+    myValues = myValues.replace('""', "null")
     # log.debug(addValue)
 
     if returnInsertOnly == True:
