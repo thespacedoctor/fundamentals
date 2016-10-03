@@ -108,9 +108,11 @@ def convert_dictionary_to_mysql_table(
 
             print inserts
 
-            # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) 
-            # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")  
-            # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers", uniquekey1="cheese"
+            # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1)
+            # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")
+            # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super
+            # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
+            # uniquekey1="cheese"
     """
     log.info('starting the ``convert_dictionary_to_mysql_table`` function')
 
@@ -206,9 +208,6 @@ def convert_dictionary_to_mysql_table(
     myValues = []
 
     # ADD EXTRA COLUMNS TO THE DICTIONARY
-
-    dictionary['dateCreated'] = [
-        str(times.get_now_sql_datetime()), "date row was created"]
     if dateModified:
         dictionary['dateModified'] = [
             str(times.get_now_sql_datetime()), "date row was modified"]
@@ -336,7 +335,8 @@ def convert_dictionary_to_mysql_table(
                             )
 
                         except Exception as e:
-                            # log.debug('qCreateColumn: %s' % (qCreateColumn, ))
+                            # log.debug('qCreateColumn: %s' % (qCreateColumn,
+                            # ))
                             log.error('could not create the ' + formattedKey + ' column in the ' + dbTableName
                                       + ' table -- ' + str(e) + '\n')
 
@@ -428,13 +428,25 @@ def convert_dictionary_to_mysql_table(
 
     dup = ""
     if replace:
-        dup = " ON DUPLICATE KEY UPDATE "
         dupValues = ('"' + myValues).split(" ,")
         dupKeys = myKeys.split(",")
-
+        dup = dup + " ON DUPLICATE KEY UPDATE "
         for k, v in zip(dupKeys, dupValues):
             dup = """%(dup)s %(k)s=%(v)s,""" % locals()
-        dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
+
+        dup = """%(dup)s updated=IF(""" % locals()
+        for k, v in zip(dupKeys, dupValues):
+            if v == "null":
+                dup = """%(dup)s %(k)s is %(v)s AND """ % locals()
+            else:
+                dup = """%(dup)s %(k)s=%(v)s AND """ % locals()
+        dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
+        for k, v in zip(dupKeys, dupValues):
+            if v == "null":
+                dup = """%(dup)s %(k)s is %(v)s AND """ % locals()
+            else:
+                dup = """%(dup)s %(k)s=%(v)s AND """ % locals()
+        dup = dup[:-5] + ", dateLastModified, NOW())"
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \

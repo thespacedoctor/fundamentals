@@ -139,7 +139,7 @@ def directory_script_runner(
         if len(stderr):
             log.error(
                 "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals())
-            if failureRule == None:
+            if failureRule == None or failureRule == False:
                 pass
             elif failureRule == "delete":
                 os.remove(v)
@@ -157,7 +157,7 @@ def directory_script_runner(
                     log.error(
                         "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
         else:
-            if successRule == None:
+            if successRule == None or successRule == False:
                 pass
             elif successRule == "delete":
                 os.remove(v)
