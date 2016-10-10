@@ -258,6 +258,10 @@ class tools():
                 log = dl.setup_dryx_logging(
                     yaml_file=arguments["settingsFile"]
                 )
+            elif "--settings" in arguments:
+                log = dl.setup_dryx_logging(
+                    yaml_file=arguments["--settings"]
+                )
 
         elif "--logger" not in arguments or arguments["--logger"] is None:
             log = dl.console_logger(
