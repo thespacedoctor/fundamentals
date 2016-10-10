@@ -76,6 +76,17 @@ class list_of_dictionaries():
 
         return None
 
+    @property
+    def list(
+            self):
+        """*Returns the original list of dictionaries*
+
+        **Usage:**
+
+            dataSet.list
+        """
+        return self.listOfDictionaries
+
     def csv(
         self,
         filepath=None
@@ -269,6 +280,11 @@ class list_of_dictionaries():
         self.log.info('starting the ``json`` method')
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
+        for d in dataCopy:
+            for k, v in d.iteritems():
+                if isinstance(v,  datetime):
+                    d[k] = v.strftime("%Y%m%dt%H%M%S")
+
         renderedData = json.dumps(
             dataCopy,
             separators=(',', ': '),
@@ -443,7 +459,7 @@ class list_of_dictionaries():
         # clean up data
         for row in dataCopy:
             for c in tableColumnNames:
-                if isinstance(row[c], float) or isinstance(row[c], long) or isinstance(row[c], Decimal):
+                if isinstance(row[c], float) or isinstance(row[c], Decimal):
                     row[c] = "%0.4f" % row[c]
                 elif isinstance(row[c], datetime):
                     thisDate = str(row[c])[:10]

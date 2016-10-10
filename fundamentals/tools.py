@@ -289,19 +289,19 @@ class tools():
 
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
-        if 'settings' in locals() and "database settings" in settings and "host" in settings["database settings"]:
-            host = settings["database settings"]["host"]
-            user = settings["database settings"]["user"]
-            passwd = settings["database settings"]["password"]
-            dbName = settings["database settings"]["db"]
-            dbConn = True
-        elif "hostFlag" in locals() and "dbNameFlag" in locals():
+        if ("hostFlag" in locals() and "dbNameFlag" in locals() and hostFlag):
             # SETUP DB CONNECTION
             dbConn = True
             host = arguments["--host"]
             user = arguments["--user"]
             passwd = arguments["--passwd"]
             dbName = arguments["--dbName"]
+        elif 'settings' in locals() and "database settings" in settings and "host" in settings["database settings"]:
+            host = settings["database settings"]["host"]
+            user = settings["database settings"]["user"]
+            passwd = settings["database settings"]["password"]
+            dbName = settings["database settings"]["db"]
+            dbConn = True
         else:
             pass
 
