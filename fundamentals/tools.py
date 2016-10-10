@@ -139,18 +139,20 @@ class tools():
 
         # UNPACK SETTINGS
         stream = False
-
         if "<settingsFile>" in arguments and arguments["<settingsFile>"]:
             stream = file(arguments["<settingsFile>"], 'r')
         elif "<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"]:
             stream = file(arguments["<pathToSettingsFile>"], 'r')
         elif "--settingsFile" in arguments and arguments["--settingsFile"]:
             stream = file(arguments["--settingsFile"], 'r')
+        elif "--settings" in arguments and arguments["--settings"]:
+            stream = file(arguments["--settings"], 'r')
         elif "pathToSettingsFile" in arguments and arguments["pathToSettingsFile"]:
             stream = file(arguments["pathToSettingsFile"], 'r')
         elif "settingsFile" in arguments and arguments["settingsFile"]:
             stream = file(arguments["settingsFile"], 'r')
-        elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None):
+        elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None):
+
             if projectName != False:
                 os.getenv("HOME")
                 projectDir = os.getenv(
