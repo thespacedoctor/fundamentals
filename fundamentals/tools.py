@@ -117,13 +117,11 @@ class tools():
             logLevel="DEBUG",
             options_first=False,
             projectName=False,
-            orderedSettings=False,
-            tunnel=False
+            orderedSettings=False
     ):
         self.arguments = arguments
         self.docString = docString
         self.logLevel = logLevel
-        self.tunnel = tunnel
 
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
@@ -289,6 +287,7 @@ class tools():
 
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
+        tunnel = False
         if ("hostFlag" in locals() and "dbNameFlag" in locals() and hostFlag):
             # SETUP DB CONNECTION
             dbConn = True
@@ -301,6 +300,8 @@ class tools():
             user = settings["database settings"]["user"]
             passwd = settings["database settings"]["password"]
             dbName = settings["database settings"]["db"]
+            if "tunnel" in settings["database settings"] and settings["database settings"]["tunnel"]:
+                tunnel = True
             dbConn = True
         else:
             pass
@@ -311,6 +312,8 @@ class tools():
 
         if tunnel:
             self._setup_tunnel()
+            self.dbConn = self.remoteDBConn
+            return None
 
         if dbConn:
             import MySQLdb as ms
@@ -335,10 +338,7 @@ class tools():
         **Summary:**
             *setup the attributes and return*
         """
-        if self.tunnel:
-            return self.arguments, self.settings, self.log, self.dbConn, self.remoteDBConn
-        else:
-            return self.arguments, self.settings, self.log, self.dbConn
+        return self.arguments, self.settings, self.log, self.dbConn
 
     def _setup_tunnel(
             self):
@@ -350,11 +350,11 @@ class tools():
         from subprocess import Popen, PIPE, STDOUT
 
         # SETUP TUNNEL IF REQUIRED
-        if "ssh tunnel" in self.settings and "use tunnel" in self.settings["ssh tunnel"] and self.settings["ssh tunnel"]["use tunnel"] is True:
+        if "ssh tunnel" in self.settings:
             # TEST TUNNEL DOES NOT ALREADY EXIST
             sshPort = self.settings["ssh tunnel"]["port"]
             connected = self._checkServer(
-                self.settings["database settings"]["remote database"]["host"], sshPort)
+                self.settings["database settings"]["host"], sshPort)
             if connected:
                 self.log.debug('ssh tunnel already exists - moving on')
             else:
@@ -373,7 +373,7 @@ class tools():
                 count = 0
                 while not connected:
                     connected = self._checkServer(
-                        self.settings["database settings"]["remote database"]["host"], sshPort)
+                        self.settings["database settings"]["host"], sshPort)
                     time.sleep(1)
                     count += 1
                     if count == 5:
@@ -382,11 +382,10 @@ class tools():
                         sys.exit(0)
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
-        host = self.settings["database settings"]["remote database"]["host"]
-        user = self.settings["database settings"]["remote database"]["user"]
-        passwd = self.settings["database settings"][
-            "remote database"]["password"]
-        dbName = self.settings["database settings"]["remote database"]["db"]
+        host = self.settings["database settings"]["host"]
+        user = self.settings["database settings"]["user"]
+        passwd = self.settings["database settings"]["password"]
+        dbName = self.settings["database settings"]["db"]
         thisConn = ms.connect(
             host=host,
             user=user,
