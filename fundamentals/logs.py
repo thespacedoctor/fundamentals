@@ -179,3 +179,31 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         rtv = logging.handlers.RotatingFileHandler._open(self)
         os.umask(prevumask)
         return rtv
+
+
+class emptyLogger:
+    """
+    *A fake logger object so user can set ``log=False`` if required*
+
+    **Usage:**
+        .. code-block:: python 
+
+            if log == False:
+                from fundamentals.logs import emptyLogger
+                log = emptyLogger()
+    """
+
+    def info(self, argu):
+        pass
+
+    def error(self, argu):
+        pass
+
+    def debug(self, argu):
+        pass
+
+    def critical(self, argu):
+        pass
+
+    def warning(self, argu):
+        pass
