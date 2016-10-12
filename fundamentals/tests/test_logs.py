@@ -12,8 +12,7 @@ su = tools(
     docString=__doc__,
     logLevel="DEBUG",
     options_first=False,
-    projectName="fundamentals",
-    tunnel=False
+    projectName="fundamentals"
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -28,6 +27,18 @@ moduleDirectory = os.path.dirname(__file__)
 utKit = utKit(moduleDirectory)
 log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
+
+
+class test_logs():
+
+    def test_logs_function(self):
+        from fundamentals.logs import emptyLogger
+        log = emptyLogger()
+        log.error("crap")
+
+        # x-print-testpage-for-pessto-marshall-web-object
+
+    # x-class-to-test-named-worker-function
 
 
 # class test_logs():

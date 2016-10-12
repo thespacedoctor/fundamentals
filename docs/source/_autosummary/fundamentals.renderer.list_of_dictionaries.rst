@@ -25,4 +25,10 @@ fundamentals.renderer.list_of_dictionaries (*class*)
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~list_of_dictionaries.list
+   
    
