@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # fundamentals documentation build configuration file, created by
-# sphinx-quickstart on Mon Oct  3 10:47:49 2016.
+# sphinx-quickstart on Wed Oct 12 14:22:59 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.

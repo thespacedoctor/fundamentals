@@ -34,7 +34,8 @@ Classes
    fundamentals.tools
    fundamentals.utKit
    fundamentals.renderer.list_of_dictionaries
-   fundamentals.logs.GroupWriteRotatingFileHandler 
+   fundamentals.logs.GroupWriteRotatingFileHandler
+   fundamentals.logs.emptyLogger 
 
 Functions
 -----------
