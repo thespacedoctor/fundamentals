@@ -52,8 +52,7 @@ class tools():
                 docString=__doc__,
                 logLevel="DEBUG",
                 options_first=False,
-                projectName="myprojectName",
-                tunnel=False
+                projectName="myprojectName"
             )
             arguments, settings, log, dbConn = su.setup()
 
@@ -67,13 +66,12 @@ class tools():
                 host: localhost
                 user: unittesting
                 password: utpass
-                sshPort: True
+                tunnel: True
 
             # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
             # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
             # code, static catalogue database and transient database are all on seperate machines.
             ssh tunnel:
-                use tunnel: True   # True | False
                 remote user: username
                 remote ip: mydomain.co.uk
                 remote datbase host: mydatabaseName

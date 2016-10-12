@@ -190,8 +190,7 @@ def main(arguments=None):
         docString=__doc__,
         logLevel="WARNING",
         options_first=False,
-        projectName="fundmentals",
-        tunnel=False
+        projectName="fundmentals"
     )
     arguments, settings, log, dbConn = su.setup()
 
