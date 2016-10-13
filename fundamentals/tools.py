@@ -112,7 +112,7 @@ class tools():
             self,
             arguments,
             docString,
-            logLevel="DEBUG",
+            logLevel="WARNING",
             options_first=False,
             projectName=False,
             orderedSettings=False
