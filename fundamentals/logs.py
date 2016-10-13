@@ -16,7 +16,7 @@ from logging import handlers
 
 
 def console_logger(
-    level="INFO"
+    level="WARNING"
 ):
     """
     *Setup and return a console logger*
