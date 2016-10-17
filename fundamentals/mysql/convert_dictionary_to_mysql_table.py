@@ -382,10 +382,10 @@ def convert_dictionary_to_mysql_table(
                 )
 
     if returnInsertOnly == True and batchInserts == True:
-        myKeys = ','.join(formattedKeyList)
+        myKeys = '`,`'.join(formattedKeyList)
         valueString = ("%s, " * len(myValues))[:-2]
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
-            """` (""" + myKeys + """) VALUES (""" + valueString + """)"""
+            """` (`""" + myKeys + """`) VALUES (""" + valueString + """)"""
         mv = []
         mv[:] = [None if m == "None" else m for m in myValues]
         valueTuple = tuple(mv)
@@ -407,7 +407,7 @@ def convert_dictionary_to_mysql_table(
         return insertCommand, valueTuple
 
     # GENERATE THE INSERT COMMAND - IGNORE DUPLICATE ENTRIES
-    myKeys = ','.join(formattedKeyList)
+    myKeys = '`,`'.join(formattedKeyList)
     myValues = '" ,"'.join(myValues)
     # log.debug(myValues+" ------ PRESTRIP")
     # REMOVE SOME CONVERSION NOISE
@@ -429,28 +429,28 @@ def convert_dictionary_to_mysql_table(
     dup = ""
     if replace:
         dupValues = ('"' + myValues).split(" ,")
-        dupKeys = myKeys.split(",")
+        dupKeys = formattedKeyList
         dup = dup + " ON DUPLICATE KEY UPDATE "
         for k, v in zip(dupKeys, dupValues):
-            dup = """%(dup)s %(k)s=%(v)s,""" % locals()
+            dup = """%(dup)s `%(k)s`=%(v)s,""" % locals()
 
         dup = """%(dup)s updated=IF(""" % locals()
         for k, v in zip(dupKeys, dupValues):
             if v == "null":
-                dup = """%(dup)s %(k)s is %(v)s AND """ % locals()
+                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
             else:
-                dup = """%(dup)s %(k)s=%(v)s AND """ % locals()
+                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
         dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
         for k, v in zip(dupKeys, dupValues):
             if v == "null":
-                dup = """%(dup)s %(k)s is %(v)s AND """ % locals()
+                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
             else:
-                dup = """%(dup)s %(k)s=%(v)s AND """ % locals()
+                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
         dup = dup[:-5] + ", dateLastModified, NOW())"
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
-        """` (""" + myKeys + """) VALUES (\"""" + \
+        """` (`""" + myKeys + """`) VALUES (\"""" + \
         myValues + """) %(dup)s """ % locals()
 
     addValue = addValue.replace('""', "null")
