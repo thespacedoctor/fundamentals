@@ -283,34 +283,34 @@ def convert_dictionary_to_mysql_table(
 
                 # IF COLUMN DOESN'T EXIT - GENERATE IT
                 if len(rows) == 0:
-                    qCreateColumn = """ALTER TABLE %s ADD %s""" % (
+                    qCreateColumn = """ALTER TABLE %s ADD `%s""" % (
                         dbTableName, formattedKey)
                     if not isinstance(value, list):
                         value = [value]
                     if reDatetime.search(str(value[0])):
                         # log.debug('Ok - a datetime string was found')
-                        qCreateColumn += ' datetime DEFAULT NULL'
+                        qCreateColumn += '` datetime DEFAULT NULL'
                     elif formattedKey == 'updated_parsed' or formattedKey == 'published_parsed' or formattedKey \
                             == 'feedName' or formattedKey == 'title':
-                        qCreateColumn += ' varchar(100) DEFAULT NULL'
+                        qCreateColumn += '` varchar(100) DEFAULT NULL'
                     elif (isinstance(value[0], str) or isinstance(value[0], unicode)) and len(value[0]) < 30:
-                        qCreateColumn += ' varchar(100) DEFAULT NULL'
+                        qCreateColumn += '` varchar(100) DEFAULT NULL'
                     elif (isinstance(value[0], str) or isinstance(value[0], unicode)) and len(value[0]) >= 30 and len(value[0]) < 80:
-                        qCreateColumn += ' varchar(100) DEFAULT NULL'
+                        qCreateColumn += '` varchar(100) DEFAULT NULL'
                     elif isinstance(value[0], str) or isinstance(value[0], unicode):
                         columnLength = 450 + len(value[0]) * 2
-                        qCreateColumn += ' varchar(' + str(
+                        qCreateColumn += '` varchar(' + str(
                             columnLength) + ') DEFAULT NULL'
                     elif isinstance(value[0], int) and abs(value[0]) <= 9:
-                        qCreateColumn += ' tinyint DEFAULT NULL'
+                        qCreateColumn += '` tinyint DEFAULT NULL'
                     elif isinstance(value[0], int):
-                        qCreateColumn += ' int DEFAULT NULL'
+                        qCreateColumn += '` int DEFAULT NULL'
                     elif isinstance(value[0], float) or isinstance(value[0], long):
-                        qCreateColumn += ' double DEFAULT NULL'
+                        qCreateColumn += '` double DEFAULT NULL'
                     elif isinstance(value[0], bool):
-                        qCreateColumn += ' tinyint DEFAULT NULL'
+                        qCreateColumn += '` tinyint DEFAULT NULL'
                     elif isinstance(value[0], list):
-                        qCreateColumn += ' varchar(1024) DEFAULT NULL'
+                        qCreateColumn += '` varchar(1024) DEFAULT NULL'
                     else:
                         # log.debug('Do not know what format to add this key in
                         # MySQL - removing from dictionary: %s, %s'
