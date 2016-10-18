@@ -54,6 +54,6 @@ def extract_filename_from_url(log, url):
     except Exception as e:
         filename = None
         # print url
-        log.error("could not extracting filename from url : " + str(e) + "\n")
+        log.warning("could not extracting filename from url : " + str(e) + "\n")
 
     return filename
