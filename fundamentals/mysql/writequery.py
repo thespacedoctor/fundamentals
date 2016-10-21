@@ -105,6 +105,9 @@ def writequery(
                            # Duplicate Key error
             log.debug('index already exists: %s' % (str(e), ))
             message = "index already exists"
+        elif "Duplicate entry" in str(e):
+            log.debug('Duplicate Key error: %s' % (str(e), ))
+            message = "duplicate key error"
         else:
             sqlQueryTrim = sqlQuery[:1000]
             message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s ' % (sqlQuery,
