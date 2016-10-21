@@ -96,7 +96,6 @@ def multiobject_download(
     requestList = []
 
     totalCount = len(urlList)
-
     # IF ONLY ONE DOWNLOAD DIRECORY
     if isinstance(downloadDirectory, str):
         for i, url in enumerate(urlList):
@@ -109,7 +108,9 @@ def multiobject_download(
                     filename = """%(i)03d_%(filename)s""" % locals()
 
             if not filename:
-                continue
+                from datetime import datetime, date, time
+                now = datetime.now()
+                filename = now.strftime("%Y%m%dt%H%M%S%f")
 
             if(timeStamp):
                 # APPEND TIMESTAMP TO THE FILENAME
@@ -191,7 +192,7 @@ def multiobject_download(
                 bodies = []
                 theseUrls = []
             i += 1
-    except eventlet.Timeout, e:
+    except Exception, e:
         log.error(
             "something went wrong with the mutli-threaded download : " + str(e) + "\n")
 
