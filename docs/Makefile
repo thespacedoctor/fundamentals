@@ -65,6 +65,7 @@ html:
 	@echo "" >> $(READMERST)
 	@cat $(INDIR)/license.rst >> $(READMERST)
 	@echo "" >> $(READMERST)
+	sed -i -e 's/.. include:: \/classes_and_functions.rst/.. include:: \/docs\/classes_and_function.rst/g' $(READMERST)
 
 	@cat $(INDIR)/description.rst > $(BLOGRST)
 	@echo "" >> $(BLOGRST)
@@ -76,6 +77,7 @@ html:
 	@echo "" >> $(BLOGRST)
 	@cat $(INDIR)/tutorial.rst >> $(BLOGRST)
 	@echo "" >> $(BLOGRST)
+	sed -i -e 's/.. include:: \/classes_and_functions.rst/.. include:: \/docs\/classes_and_function.rst/g' $(BLOGRST)
 
 	pandoc -s --columns=3000 --smart --wrap=preserve -f rst -t  markdown_mmd+yaml_metadata_block+tex_math_dollars+mmd_link_attributes+raw_html+backtick_code_blocks --output=$(BLOGMD) $(BLOGRST)
 
