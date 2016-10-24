@@ -399,6 +399,7 @@ def convert_dictionary_to_mysql_table(
 
         insertCommand = insertCommand + dup
 
+        insertCommand = insertCommand.replace('\\""', '\\" "')
         insertCommand = insertCommand.replace('""', "null")
         insertCommand = insertCommand.replace('!!python/unicode:', '')
         insertCommand = insertCommand.replace('!!python/unicode', '')
@@ -453,6 +454,7 @@ def convert_dictionary_to_mysql_table(
         """` (`""" + myKeys + """`) VALUES (\"""" + \
         myValues + """) %(dup)s """ % locals()
 
+    addValue = addValue.replace('\\""', '\\" "')
     addValue = addValue.replace('""', "null")
     addValue = addValue.replace('!!python/unicode:', '')
     addValue = addValue.replace('!!python/unicode', '')

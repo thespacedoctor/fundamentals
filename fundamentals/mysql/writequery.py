@@ -123,6 +123,9 @@ def writequery(
             log.error('%s\n Here is the sqlquery:\n%s' % (str(e), sqlQuery))
             if manyValueList:
                 log.error('... and the values:\n%s' % (thisList, ))
+        elif "Duplicate entry" in str(e):
+            log.debug('Duplicate Key error: %s' % (str(e), ))
+            message = "duplicate key error"
         else:
             sqlQuery = sqlQuery[:2000]
             log.error(
