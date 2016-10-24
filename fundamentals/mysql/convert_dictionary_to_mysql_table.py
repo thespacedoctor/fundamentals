@@ -122,7 +122,7 @@ def convert_dictionary_to_mysql_table(
 
     log.debug('starting convert_dictionary_to_mysql_table')
 
-    if replace:
+    if not replace:
         insertVerb = "INSERT"
     else:
         insertVerb = "INSERT IGNORE"
