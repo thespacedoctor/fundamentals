@@ -14,6 +14,7 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
+import time
 import MySQLdb
 import warnings
 warnings.filterwarnings('error', category=MySQLdb.Warning)
