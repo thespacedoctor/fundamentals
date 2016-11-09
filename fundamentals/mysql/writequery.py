@@ -15,9 +15,6 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import time
-import MySQLdb
-import warnings
-warnings.filterwarnings('error', category=MySQLdb.Warning)
 
 
 def writequery(
@@ -71,7 +68,9 @@ def writequery(
 
     """
     log.info('starting the ``writequery`` function')
-
+    import MySQLdb
+    import warnings
+    warnings.filterwarnings('error', category=MySQLdb.Warning)
     message = ""
     try:
         cursor = dbConn.cursor(MySQLdb.cursors.DictCursor)

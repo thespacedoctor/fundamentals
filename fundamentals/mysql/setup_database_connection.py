@@ -13,7 +13,6 @@
 import sys
 import os
 import yaml
-import MySQLdb as ms
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
@@ -52,6 +51,7 @@ def setup_database_connection(
     """
     import sys
     import logging
+    import MySQLdb as ms
 
     # IMPORT THE YAML CONNECTION DICTIONARY
     try:

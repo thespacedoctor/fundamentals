@@ -13,7 +13,6 @@
 import sys
 import os
 os.environ['TERM'] = 'vt100'
-import MySQLdb as mdb
 import re
 import yaml
 import time
@@ -114,6 +113,7 @@ def convert_dictionary_to_mysql_table(
             # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
             # uniquekey1="cheese"
     """
+    import MySQLdb as mdb
     log.info('starting the ``convert_dictionary_to_mysql_table`` function')
 
     # # >IMPORTS #
