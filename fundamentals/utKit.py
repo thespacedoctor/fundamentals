@@ -14,7 +14,6 @@ import sys
 import os
 import logging
 import logging.config
-import MySQLdb as ms
 import yaml
 
 
@@ -95,6 +94,7 @@ class utKit():
             - ``pathToInputDir`` -- path to modules own test input directory
             - ``pathToOutputDir`` -- path to modules own test output directory
         """
+        import MySQLdb as ms
         ## VARIABLES ##
         logging.config.dictConfig(yaml.load(self.loggerConfig))
         log = logging.getLogger(__name__)

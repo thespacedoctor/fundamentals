@@ -442,12 +442,17 @@ class list_of_dictionaries():
             delimiter = ","
         elif csvType in ["human", "markdown"]:
             delimiter = "|"
-        writer = csv.writer(output, dialect='excel', delimiter=delimiter,
-                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        if csvType in ["markdown"]:
+            writer = csv.writer(output, delimiter=delimiter,
+                                quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
+        else:
+            print "HERE"
+            writer = csv.writer(output, dialect='excel', delimiter=delimiter,
+                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         if csvType in ["markdown"]:
-            dividerWriter = csv.writer(output, dialect='excel', delimiter="|",
-                                       quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            dividerWriter = csv.writer(
+                output, delimiter="|", quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
         else:
             dividerWriter = csv.writer(output, dialect='excel', delimiter="+",
                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)

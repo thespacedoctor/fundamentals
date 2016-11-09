@@ -12,9 +12,6 @@
 ################# GLOBAL IMPORTS ####################
 import sys
 import os
-import MySQLdb
-import warnings
-warnings.filterwarnings('error', category=MySQLdb.Warning)
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
@@ -48,6 +45,9 @@ def readquery(
             )
     """
     log.info('starting the ``readquery`` function')
+    import MySQLdb
+    import warnings
+    warnings.filterwarnings('error', category=MySQLdb.Warning)
 
     rows = []
 

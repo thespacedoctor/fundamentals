@@ -15,7 +15,7 @@ import os
 import yaml
 from collections import OrderedDict
 import shutil
-import MySQLdb as ms
+
 import logs as dl
 import time
 from docopt import docopt
@@ -178,16 +178,17 @@ class tools():
                     arguments["<settingsFile>"] = settingsFile
                 else:
                     import inspect
-                    ds = "ds"
+                    ds = os.getcwd() + "/default_settings.yaml"
                     level = -1
                     exists = False
                     count = 1
                     while not exists and len(ds) and count < 10:
                         count += 1
-                        ds = "/".join(inspect.stack()
-                                      [1][1].split("/")[:level]) + "/default_settings.yaml"
                         level -= 1
                         exists = os.path.exists(ds)
+                        if not exists:
+                            ds = "/".join(inspect.stack()
+                                          [1][1].split("/")[:level]) + "/default_settings.yaml"
 
                     try:
                         shutil.copyfile(ds, settingsFile)
@@ -346,6 +347,7 @@ class tools():
         self.log.debug('starting the ``_setup_tunnel`` method')
 
         from subprocess import Popen, PIPE, STDOUT
+        import MySQLdb as ms
 
         # SETUP TUNNEL IF REQUIRED
         if "ssh tunnel" in self.settings:
