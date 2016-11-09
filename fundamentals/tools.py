@@ -161,6 +161,7 @@ class tools():
                 settingsFile = os.getenv(
                     "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
                 exists = os.path.exists(settingsFile)
+
                 if not exists:
                     import codecs
                     writeFile = codecs.open(
@@ -178,14 +179,15 @@ class tools():
                     arguments["<settingsFile>"] = settingsFile
                 else:
                     import inspect
-                    ds = os.getcwd() + "/default_settings.yaml"
-                    level = -1
+                    ds = os.getcwd() + "/rubbish.yaml"
+                    level = 0
                     exists = False
                     count = 1
                     while not exists and len(ds) and count < 10:
                         count += 1
                         level -= 1
                         exists = os.path.exists(ds)
+                        print ds
                         if not exists:
                             ds = "/".join(inspect.stack()
                                           [1][1].split("/")[:level]) + "/default_settings.yaml"
