@@ -187,7 +187,6 @@ class tools():
                         count += 1
                         level -= 1
                         exists = os.path.exists(ds)
-                        print ds
                         if not exists:
                             ds = "/".join(inspect.stack()
                                           [1][1].split("/")[:level]) + "/default_settings.yaml"
