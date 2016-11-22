@@ -59,13 +59,15 @@ def readquery(
     # EXECUTE THE SQL COMMAND
     try:
         cursor.execute(sqlQuery)
-        rows = cursor.fetchall()
+
     except Exception as e:
         sqlQuery = sqlQuery[:1000]
         if quiet == False:
             log.error(
                 'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
             raise e
+
+    rows = cursor.fetchall()
     # CLOSE THE CURSOR
     try:
         cursor.close()
