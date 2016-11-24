@@ -276,6 +276,8 @@ class tools():
                 varname = arg.replace("-", "") + "Flag"
             else:
                 varname = arg.replace("<", "").replace(">", "")
+            if varname == "import":
+                varname = "iimport"
             if isinstance(val, str) or isinstance(val, unicode):
                 val = val.replace("'", "\\'")
                 exec(varname + " = '%s'" % (val,))
