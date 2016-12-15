@@ -118,6 +118,8 @@ def writequery(
             else:
                 log.warning(message)
                 return -1
+    except MySQLdb.Warning as e:
+        log.info(str(e))
     except Exception as e:
         if "truncated" in str(e):
             log.error('%s\n Here is the sqlquery:\n%s' % (str(e), sqlQuery))
