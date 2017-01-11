@@ -1,0 +1,5 @@
+title: "The bank lent me $2m so I spent it on strippers and cars - BBC News"
+url: "http://ift.tt/2gFGgmz"
+subtype: "article"
+kind: "webpage"
+table: "reading-list"
