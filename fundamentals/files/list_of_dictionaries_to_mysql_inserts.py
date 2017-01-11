@@ -60,7 +60,7 @@ def list_of_dictionaries_to_mysql_inserts(
     if not len(datalist):
         return "NO MATCH"
 
-    output = ""
+    inserts = []
 
     for d in datalist:
         insertCommand = convert_dictionary_to_mysql_table(
@@ -73,7 +73,9 @@ def list_of_dictionaries_to_mysql_inserts(
             replace=True,
             batchInserts=False
         )
-        output += insertCommand + ";\n"
+        inserts.append(insertCommand)
+
+    output = ";\n".join(inserts) + ";"
 
     log.info('completed the ``list_of_dictionaries_to_mysql_inserts`` function')
     return output
