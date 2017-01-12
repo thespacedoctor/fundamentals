@@ -1,5 +1,0 @@
-title: "Hacking: Truth or treason? - BBC News"
-url: "http://ift.tt/2gQqiV5"
-subtype: "article"
-kind: "webpage"
-table: "reading-list"

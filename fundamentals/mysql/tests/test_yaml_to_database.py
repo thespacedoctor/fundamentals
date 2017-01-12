@@ -15,11 +15,6 @@ su = tools(
 )
 arguments, settings, log, dbConn = su.setup()
 
-# # load settings
-# stream = file(
-#     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
-# settings = yaml.load(stream)
-# stream.close()
 
 # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
 moduleDirectory = os.path.dirname(__file__)
@@ -56,6 +51,7 @@ class test_yaml_to_database():
         yaml2db = yaml_to_database(
             log=log,
             settings=settings,
+            dbConn=dbConn,
             pathToInputDir=pathToOutputDir + "/yaml"
         )
         yaml2db.add_yaml_file_content_to_database(
@@ -65,12 +61,13 @@ class test_yaml_to_database():
     def test_yaml_to_database_function(self):
 
         from fundamentals.mysql import yaml_to_database
-        this = yaml_to_database(
+        yaml2db = yaml_to_database(
             log=log,
             settings=settings,
+            dbConn=dbConn,
             pathToInputDir=pathToOutputDir + "/yaml"
         )
-        this.get()
+        yaml2db.ingest()
 
     def test_yaml_to_database_function_exception(self):
 
@@ -79,6 +76,7 @@ class test_yaml_to_database():
             this = yaml_to_database(
                 log=log,
                 settings=settings,
+                dbConn=dbConn,
                 fakeKey="break the code"
             )
             this.get()

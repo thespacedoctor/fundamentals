@@ -446,7 +446,6 @@ class list_of_dictionaries():
             writer = csv.writer(output, delimiter=delimiter,
                                 quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
         else:
-            print "HERE"
             writer = csv.writer(output, dialect='excel', delimiter=delimiter,
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
 

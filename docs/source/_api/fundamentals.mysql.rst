@@ -19,4 +19,5 @@ Submodules
    fundamentals.mysql.setup_database_connection
    fundamentals.mysql.table_exists
    fundamentals.mysql.writequery
+   fundamentals.mysql.yaml_to_database
 

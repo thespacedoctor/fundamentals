@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # fundamentals documentation build configuration file, created by
-# sphinx-quickstart on Mon Dec 12 10:53:02 2016.
+# sphinx-quickstart on Thu Jan 12 08:22:27 2017.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'fundamentals'
-copyright = u'2016, Author'
+copyright = u'2017, Author'
 author = u'Author'
 
 # The version info for the project you're documenting, acts as replacement for

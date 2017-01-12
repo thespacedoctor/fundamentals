@@ -1,151 +1,267 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 """
-*Take key-values from a yaml file including a tablename and add them to a mysql table*
+*Take key-values from a yaml file including a tablename(s) and add them to a mysql database table*
 
-:Author:
-    David Young
+Usage:
+    yaml2db [-d] -s <pathToSettingsFile> <pathToYaml>
+    yaml2db [-d] --host=<host> --user=<user> --passwd=<passwd> --dbName=<dbName> <pathToYaml>
 
-:Date Created:
-    January 10, 2017
+Options:
+
+    pathToYaml            path to a single yaml file or directory of yaml files
+    pathToSettingsFile    path to a settings file with logging and database information (yaml file)
+    --host=<host>         the database host
+    --user=<user>         database user
+    --passwd=<passwd>     database user password
+    --dbName=<dbName>     name of the database to add the table content to
+
+    -d, --delete          delete yaml file(s) once added to datbase
+    -h, --help            show this help message
+    -v, --version         show version
+    -s, --settings        the settings file
 """
-################# GLOBAL IMPORTS ####################
+
 import sys
 import os
 import yaml
 import requests
-os.environ['TERM'] = 'vt100'
-from fundamentals import tools
+import re
+import glob
+import docopt
+from fundamentals import tools, times
+from fundamentals.mysql import convert_dictionary_to_mysql_table
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()
+
+
+def main(arguments=None):
+    """
+    The main function used when ``yaml_to_database.py`` when installed as a cl tool
+    """
+
+    # setup the command-line util settings
+    su = tools(
+        arguments=arguments,
+        docString=__doc__,
+        logLevel="WARNING",
+        options_first=False,
+        projectName=False
+    )
+    arguments, settings, log, dbConn = su.setup()
+
+    # unpack remaining cl arguments using `exec` to setup the variable names
+    # automatically
+    for arg, val in arguments.iteritems():
+        if arg[0] == "-":
+            varname = arg.replace("-", "") + "Flag"
+        else:
+            varname = arg.replace("<", "").replace(">", "")
+        if isinstance(val, str) or isinstance(val, unicode):
+            exec(varname + " = '%s'" % (val,))
+        else:
+            exec(varname + " = %s" % (val,))
+        if arg == "--dbConn":
+            dbConn = val
+        log.debug('%s = %s' % (varname, val,))
+
+    if os.path.isfile(pathToYaml):
+        from fundamentals.mysql import yaml_to_database
+        # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
+        yaml2db = yaml_to_database(
+            log=log,
+            settings=settings,
+            dbConn=dbConn
+        )
+        yaml2db.add_yaml_file_content_to_database(
+            filepath=pathToYaml,
+            deleteFile=deleteFlag
+        )
+        basename = os.path.basename(pathToYaml)
+        print "Content of %(basename)s added to database" % locals()
+
+    else:
+        from fundamentals.mysql import yaml_to_database
+        yaml2db = yaml_to_database(
+            log=log,
+            settings=settings,
+            dbConn=dbConn,
+            pathToInputDir=pathToYaml,
+            deleteFiles=deleteFlag
+        )
+        yaml2db.ingest()
+        print "Content of %(pathToYaml)s directory added to database" % locals()
+
+    return
 
 
 class yaml_to_database():
     """
-    *The worker class for the yaml_to_database module*
+    *Take key-values from yaml files including a tablename(s) and add them to a mysql database table*
 
     **Key Arguments:**
         - ``log`` -- logger
         - ``settings`` -- the settings dictionary
-        - ``pathToInputDir`` -- path to the directory containing the yaml files that will be added to the database table(s)
+        - ``pathToInputDir`` -- path to the directory containing the yaml files that will be added to the database table(s). Default *False*
+        - ``dbConn`` -- connection to database to add the content to
+        - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
 
     **Usage:**
 
         To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        To initiate a yaml_to_database object, use the following:
-
-        .. todo::
-
-            - add usage info
-            - create a sublime snippet for usage
-            - update the package tutorial if needed
+        To initiate a ``yaml2db`` object, use the following:
 
         .. code-block:: python 
 
-            usage code   
+            from fundamentals.mysql import yaml_to_database
+            yaml2db = yaml_to_database(
+                log=log,
+                settings=settings,
+                dbConn=dbConn,
+                pathToInputDir="/path/to/yaml/directory",
+                deleteFiles=False
+            ) 
+
+        And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
+
+        .. code-block:: yaml
+
+            title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
+            url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
+            kind: webpage
+            subtype: article
+            table: web_articles,podcasts 
     """
     # Initialisation
-    # 1. @flagged: what are the unique attrributes for each object? Add them
-    # to __init__
 
     def __init__(
             self,
             log,
-            pathToInputDir,
+            dbConn,
+            pathToInputDir=False,
             settings=False,
+            deleteFiles=False
 
     ):
         self.log = log
         log.debug("instansiating a new 'yaml_to_database' object")
         self.settings = settings
         self.pathToInputDir = pathToInputDir
-
+        self.dbConn = dbConn
+        self.deleteFiles = deleteFiles
         # xt-self-arg-tmpx
-
-        # 2. @flagged: what are the default attrributes each object could have? Add them to variable attribute set here
-        # Variable Data Atrributes
-
-        # 3. @flagged: what variable attrributes need overriden in any baseclass(es) used
-        # Override Variable Data Atrributes
-
-        # Initial Actions
 
         return None
 
-    # 4. @flagged: what actions does each object have to be able to perform? Add them here
-    # Method Attributes
-    def get(self):
+    def ingest(self):
         """
-        *get the yaml_to_database object*
-
-        **Return:**
-            - ``yaml_to_database``
-
-        **Usage:**
-        .. todo::
-
-            - add usage info
-            - create a sublime snippet for usage
-            - update the package tutorial if needed
-
-        .. code-block:: python 
-
-            usage code 
-        """
-        self.log.info('starting the ``get`` method')
-
-        yaml_to_database = None
-
-        self.log.info('completed the ``get`` method')
-        return yaml_to_database
-
-    def add_yaml_file_content_to_database(
-        self,
-        filepath
-    ):
-        """*given a file to a yaml file, add yaml file content to database*
-
-        **Key Arguments:**
-            # -
+        *ingest the contents of the directory of yaml files into a database*
 
         **Return:**
             - None
 
         **Usage:**
-            ..  todo::
 
-                - add usage info
-                - create a sublime snippet for usage
-                - update package tutorial if needed
+            To import an entire directory of yaml files into a database, use the following:
+
+        .. code-block:: python 
+
+            from fundamentals.mysql import yaml_to_database
+            yaml2db = yaml_to_database(
+                log=log,
+                settings=settings,
+                dbConn=dbConn,
+                pathToInputDir="/path/to/yaml/directory",
+                deleteFiles=False
+            ) 
+            yaml2db.ingest() 
+        """
+        self.log.info('starting the ``ingest`` method')
+
+        for d in os.listdir(self.pathToInputDir):
+            if os.path.isfile(os.path.join(self.pathToInputDir, d)):
+                self.add_yaml_file_content_to_database(
+                    filepath=os.path.join(self.pathToInputDir, d),
+                    deleteFile=self.deleteFiles
+                )
+
+        self.log.info('completed the ``ingest`` method')
+        return None
+
+    def add_yaml_file_content_to_database(
+        self,
+        filepath,
+        deleteFile=False
+    ):
+        """*given a file to a yaml file, add yaml file content to database*
+
+        **Key Arguments:**
+            - ``filepath`` -- the path to the yaml file
+            - ``deleteFile`` -- delete the yaml file when its content has been added to the database. Default *False*
+
+        **Return:**
+            - None
+
+        **Usage:**
+
+            To parse and import the contents of a single yaml file into the database, use the following:
 
             .. code-block:: python 
 
-                usage code 
-
+                from fundamentals.mysql import yaml_to_database
+                # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
+                yaml2db = yaml_to_database(
+                    log=log,
+                    settings=settings,
+                    dbConn=dbConn
+                ) 
+                yaml2db.add_yaml_file_content_to_database(
+                    filepath=${1:"/path/to/file.yaml"},
+                    deleteFile=True
+                )
         """
         self.log.info(
             'starting the ``add_yaml_file_content_to_database`` method')
 
-        # OPEN THE FILE AND GET THE YAML CONTENT
-        stream = file(filepath, 'r')
-        yamlContent = yaml.load(stream)
-        stream.close()
+        import codecs
+        try:
+            self.log.debug("attempting to open the file %s" % (filepath,))
+            readFile = codecs.open(filepath, encoding='utf-8', mode='r')
+            thisData = readFile.read()
+            readFile.close()
+        except IOError, e:
+            message = 'could not open the file %s' % (filepath,)
+            self.log.critical(message)
+            raise IOError(message)
+        readFile.close()
 
-        if "kind" not in yamlContent:
-            if "podcast" in yamlContent["table"]:
-                yamlContent["kind"] = "audio"
-            if "video" in yamlContent["table"]:
-                yamlContent["kind"] = "video"
-            if "reading-list" in yamlContent["table"]:
-                yamlContent["kind"] = "webpage"
+        matchObject = re.finditer(
+            r'(^|\n)(?P<key>[^\:]*)\:\s(?P<value>.*?)(\n|$)',
+            thisData,
+            flags=re.M | re.S  # re.S
+        )
 
-        # GET THE DATABASE TABLE NAME TO ENTER
-        if "table" not in yamlContent:
-            if yamlContent["kind"] == "video" or "podcast" in yamlContent["kind"]:
-                dbTable = "podcasts"
+        yamlContent = {}
+        for match in matchObject:
+            if match.group("value")[0] == '"' and match.group("value")[-1] == '"':
+                v = match.group("value")[1:-1]
+            elif match.group("value")[0] == "'" and match.group("value")[-1] == "'":
+                v = match.group("value")[1:-1]
             else:
-                dbTable = "reading-list"
-        dbTable = yamlContent["table"]
+                v = match.group("value")
+            yamlContent[match.group("key")] = v
+
+        if "table" not in yamlContent:
+            self.log.warning(
+                'A table value is need in the yaml content to indicate which database table to add the content to: %(filepath)s' % locals())
+            return None
+
+        # NOTE THERE MAY BE MORE THAN ONE DATABASE TABLE
+        dbTablesTmp = yamlContent["table"].split(",")
         del yamlContent["table"]
+        dbTables = []
+        dbTables[:] = [d.strip() for d in dbTablesTmp]
 
         # UNSHORTEN URL
         try:
@@ -154,9 +270,26 @@ class yaml_to_database():
         except:
             pass
 
-        # RECODE INTO ASCII
-        yamlContent["title"] = yamlContent["title"].encode("ascii", "dryx")
         yamlContent["original_yaml_path"] = filepath
+
+        if "url" in yamlContent:
+            uniqueKeyList = ["url"]
+        else:
+            uniqueKeyList = []
+
+        for t in dbTables:
+            convert_dictionary_to_mysql_table(
+                dbConn=self.dbConn,
+                log=self.log,
+                dictionary=yamlContent,
+                dbTableName=t,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=True,
+                returnInsertOnly=False,
+                replace=True
+            )
+        if deleteFile:
+            os.remove(filepath)
 
         self.log.info(
             'completed the ``add_yaml_file_content_to_database`` method')
@@ -165,6 +298,6 @@ class yaml_to_database():
     # use the tab-trigger below for new method
     # xt-class-method
 
-    # 5. @flagged: what actions of the base class(es) need ammending? ammend them here
-    # Override Method Attributes
-    # method-override-tmpx
+
+if __name__ == '__main__':
+    main()

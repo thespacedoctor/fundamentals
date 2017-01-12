@@ -261,7 +261,63 @@ To move successful script to a `passed` sub-directory of `/path/to/scriptdir` an
     mysqlSucker /path/to/scriptdir myLoginPath myDatabaseName -s pass -f failed
 
 
+yaml2db
+-------
 
+``yaml2db`` will take either a path to a single yaml file or to an entire directory of yaml files, parse the contents of those files and add the key-values to a mysql database. Here's the usages statement (printed by typing ``yaml2db -h`` from a terminal window):
+
+.. code-block:: bash 
+
+    Usage:
+        yaml2db [-d] -s <pathToSettingsFile> <pathToYaml>
+        yaml2db [-d] --host=<host> --user=<user> --passwd=<passwd> --dbName=<dbName> <pathToYaml>
+
+    Options:
+
+        pathToYaml            path to a single yaml file or directory of yaml files
+        pathToSettingsFile    path to a settings file with logging and database information (yaml file)
+        --host=<host>         the database host
+        --user=<user>         database user
+        --passwd=<passwd>     database user password
+        --dbName=<dbName>     name of the database to add the table content to
+
+        -d, --delete          delete yaml file(s) once added to datbase
+        -h, --help            show this help message
+        -s, --settings        path to a settings file with logging and database parameters
+
+The yaml files requires a ``table`` value to indicate the name of the database table (or tables; comma-separated) to add the yaml key-values to. If the database tables do not exist, ``yaml2db`` will create them for you. Here's an example of the content of a yaml file:
+
+.. code-block:: yaml 
+    
+    title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
+    url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
+    kind: webpage
+    subtype: article
+    table: web_articles,podcasts 
+
+``yaml2db`` will take the content of this file and it to both a ``web_articles`` and ``podcasts`` table.
+
+.. image:: https://i.imgur.com/sfPUfNj.png
+        :width: 1200px
+
+To execute ``yaml2db`` on a single yaml file run:
+
+.. code-block:: bash
+
+    yaml2db -d --host=localhost --user=username --passwd=mypassword --dbName=myGreatDatabase /Users/Me/yaml/20161219105124.yaml 
+
+Obviously replace the database parameters with your own. The ``-d`` flag indicates that you want to delete the yaml file once it's been parsed.
+
+To run ``yaml2db`` on an entire directory of yaml files run:
+
+    yaml2db -s /Users/Me/mydefault_settings.yaml /Users/Me/yaml/
+
+where ``/Users/Me/mydefault_settings.yaml`` contains my database and logging parameters (see example at the start of this tutorial).
+
+So, where would you need to add the content of a yaml file to a database? 
+
+
+    
     
 
 

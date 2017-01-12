@@ -41,7 +41,8 @@ setup(
     test_suite='nose.collector',
     tests_require=['nose', 'nose-cover3'],
     entry_points={
-        'console_scripts': ['mysqlSucker=fundamentals.mysql.directory_script_runner:main'],
+        'console_scripts': ['mysqlSucker=fundamentals.mysql.directory_script_runner:main',
+                            'yaml2db=fundamentals.mysql.yaml_to_database:main'],
     },
     zip_safe=False
 )
