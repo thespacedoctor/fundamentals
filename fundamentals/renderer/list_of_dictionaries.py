@@ -13,7 +13,7 @@
 import sys
 import os
 import io
-import csv
+import unicodecsv as csv
 import codecs
 import copy
 import json
@@ -446,7 +446,6 @@ class list_of_dictionaries():
             writer = csv.writer(output, delimiter=delimiter,
                                 quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
         else:
-            print "HERE"
             writer = csv.writer(output, dialect='excel', delimiter=delimiter,
                                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
@@ -473,8 +472,8 @@ class list_of_dictionaries():
         # set the column widths
         for row in dataCopy:
             for i, c in enumerate(tableColumnNames):
-                if len(str(row[c])) > columnWidths[i]:
-                    columnWidths[i] = len(str(row[c]))
+                if len(unicode(row[c])) > columnWidths[i]:
+                    columnWidths[i] = len(unicode(row[c]))
 
         # fill in the data
         for row in dataCopy:
@@ -487,8 +486,8 @@ class list_of_dictionaries():
                 if csvType in ["human", "markdown"]:
                     if row[c] == None:
                         row[c] = ""
-                    row[c] = str(str(row[c]).ljust(columnWidths[i] + 2)
-                                 .rjust(columnWidths[i] + 3))
+                    row[c] = unicode(unicode(row[c]).ljust(columnWidths[i] + 2)
+                                     .rjust(columnWidths[i] + 3))
                 thisRow.append(row[c])
             # table border for human readable
             if csvType in ["human", "markdown"]:
@@ -566,6 +565,7 @@ class list_of_dictionaries():
         else:
             output = ""
 
+        inserts = []
         for d in dataCopy:
             insertCommand = convert_dictionary_to_mysql_table(
                 log=self.log,
@@ -577,7 +577,8 @@ class list_of_dictionaries():
                 replace=True,
                 batchInserts=False
             )
-            output += insertCommand + ";\n"
+            inserts.append(insertCommand)
+        output += ";\n".join(inserts) + ";"
 
         self.log.info(
             'completed the ``_list_of_dictionaries_to_mysql_inserts`` function')
