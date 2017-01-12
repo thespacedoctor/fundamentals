@@ -209,8 +209,9 @@ def convert_dictionary_to_mysql_table(
 
     # ADD EXTRA COLUMNS TO THE DICTIONARY
     if dateModified:
-        dictionary['dateModified'] = [
+        dictionary['dateLastModified'] = [
             str(times.get_now_sql_datetime()), "date row was modified"]
+        dictionary['updated'] = [0, "this row has been updated"]
 
     # ITERATE THROUGH THE DICTIONARY AND GENERATE THE A TABLE COLUMN WITH THE
     # NAME OF THE KEY, IF IT DOES NOT EXIST
@@ -283,7 +284,7 @@ def convert_dictionary_to_mysql_table(
 
                 # IF COLUMN DOESN'T EXIT - GENERATE IT
                 if len(rows) == 0:
-                    qCreateColumn = """ALTER TABLE %s ADD `%s""" % (
+                    qCreateColumn = """ALTER TABLE `%s` ADD `%s""" % (
                         dbTableName, formattedKey)
                     if not isinstance(value, list):
                         value = [value]
@@ -372,8 +373,9 @@ def convert_dictionary_to_mysql_table(
                 if isinstance(uniqueKeyList, list):
                     uniqueKeyList = ','.join(uniqueKeyList)
 
-                addUniqueKey = 'ALTER TABLE ' + dbTableName + \
-                    ' ADD unique ' + indexName + """ (""" + uniqueKeyList + ')'
+                addUniqueKey = 'ALTER TABLE `' + dbTableName + \
+                    '` ADD unique ' + indexName + \
+                    """ (""" + uniqueKeyList + ')'
                 # log.debug('HERE IS THE COMMAND:'+addUniqueKey)
                 writequery(
                     log=log,
