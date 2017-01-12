@@ -1,0 +1,5 @@
+title: "Mental health and relationships 'key to happiness' - BBC News"
+url: "http://ift.tt/2hCGO8R"
+subtype: "article"
+kind: "webpage"
+table: "web_articles,icecream"
