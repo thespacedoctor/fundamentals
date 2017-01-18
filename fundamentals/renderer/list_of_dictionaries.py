@@ -13,6 +13,7 @@
 import sys
 import os
 import io
+import re
 import unicodecsv as csv
 import codecs
 import copy
@@ -157,7 +158,7 @@ class list_of_dictionaries():
 
                 +--------+------------+--------------+
                 | owner  | pet        | address      |
-                +--------+------------+--------------+
+                +========+============+==============+
                 | daisy  | dog        | belfast, uk  |
                 | john   | snake      | the moon     |
                 | susan  | crocodile  | larne        |
@@ -173,6 +174,58 @@ class list_of_dictionaries():
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("human")
+
+        if filepath and len(self.listOfDictionaries):
+
+            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile.write(renderedData)
+            writeFile.close()
+
+        self.log.info('completed the ``table`` method')
+        return renderedData
+
+    def reST(
+        self,
+        filepath=None
+    ):
+        """*Render the data as a  resturcturedText table*
+
+        **Key Arguments:**
+            - ``filepath`` -- path to the file to write the table to. Default *None*
+
+        **Return:**
+            - ``renderedData`` -- the data rendered as a resturcturedText table
+
+        **Usage:**
+
+            To render the data set as a resturcturedText table:
+
+            .. code-block:: python
+
+                print dataSet.reST()
+
+            .. code-block:: text
+
+                +--------+------------+--------------+
+                | owner  | pet        | address      |
+                +========+============+==============+
+                | daisy  | dog        | belfast, uk  |
+                +--------+------------+--------------+
+                | john   | snake      | the moon     |
+                +--------+------------+--------------+
+                | susan  | crocodile  | larne        |
+                +--------+------------+--------------+
+
+            and to save the table rendering to file:
+
+            .. code-block:: python
+
+                dataSet.reST("/path/to/myfile.rst")
+        """
+        self.log.info('starting the ``table`` method')
+
+        self.filepath = filepath
+        renderedData = self._list_of_dictionaries_to_csv("reST")
 
         if filepath and len(self.listOfDictionaries):
 
@@ -419,7 +472,7 @@ class list_of_dictionaries():
         """Convert a python list of dictionaries to pretty csv output
 
         **Key Arguments:**
-            - ``csvType`` -- human or machine
+            - ``csvType`` -- human, machine or reST
 
         **Return:**
             - ``output`` -- the contents of a CSV file
@@ -442,6 +495,8 @@ class list_of_dictionaries():
             delimiter = ","
         elif csvType in ["human", "markdown"]:
             delimiter = "|"
+        elif csvType in ["reST"]:
+            delimiter = "|"
         if csvType in ["markdown"]:
             writer = csv.writer(output, delimiter=delimiter,
                                 quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
@@ -458,6 +513,7 @@ class list_of_dictionaries():
         # add column names to csv
         header = []
         divider = []
+        rstDivider = []
         allRows = []
 
         # clean up data
@@ -475,45 +531,54 @@ class list_of_dictionaries():
                 if len(unicode(row[c])) > columnWidths[i]:
                     columnWidths[i] = len(unicode(row[c]))
 
+        # table borders for human readable
+        if csvType in ["human", "markdown", "reST"]:
+            header.append("")
+            divider.append("")
+            rstDivider.append("")
+
+        for i, c in enumerate(tableColumnNames):
+            if csvType == "machine":
+                header.append(c)
+            elif csvType in ["human", "markdown", "reST"]:
+                header.append(
+                    c.ljust(columnWidths[i] + 2).rjust(columnWidths[i] + 3))
+                divider.append('-' * (columnWidths[i] + 3))
+                rstDivider.append('=' * (columnWidths[i] + 3))
+
+        # table border for human readable
+        if csvType in ["human", "markdown", "reST"]:
+            header.append("")
+            divider.append("")
+            rstDivider.append("")
+
         # fill in the data
         for row in dataCopy:
             thisRow = []
             # table border for human readable
-            if csvType in ["human", "markdown"]:
+            if csvType in ["human", "markdown", "reST"]:
                 thisRow.append("")
 
             for i, c in enumerate(tableColumnNames):
-                if csvType in ["human", "markdown"]:
+                if csvType in ["human", "markdown", "reST"]:
                     if row[c] == None:
                         row[c] = ""
                     row[c] = unicode(unicode(row[c]).ljust(columnWidths[i] + 2)
                                      .rjust(columnWidths[i] + 3))
                 thisRow.append(row[c])
             # table border for human readable
-            if csvType in ["human", "markdown"]:
+            if csvType in ["human", "markdown", "reST"]:
                 thisRow.append("")
             allRows.append(thisRow)
-
-        # table borders for human readable
-        if csvType in ["human", "markdown"]:
-            header.append("")
-            divider.append("")
-
-        for i, c in enumerate(tableColumnNames):
-            if csvType == "machine":
-                header.append(c)
-            elif csvType in ["human", "markdown"]:
-                header.append(
-                    c.ljust(columnWidths[i] + 2).rjust(columnWidths[i] + 3))
-                divider.append('-' * (columnWidths[i] + 3))
-
-        # table border for human readable
-        if csvType in ["human", "markdown"]:
-            header.append("")
-            divider.append("")
+            if csvType in ["reST"]:
+                allRows.append(divider)
 
         if csvType == "machine":
             writer.writerow(header)
+        if csvType in ["reST"]:
+            dividerWriter.writerow(divider)
+            writer.writerow(header)
+            dividerWriter.writerow(rstDivider)
         if csvType in ["human"]:
             dividerWriter.writerow(divider)
             writer.writerow(header)
@@ -533,6 +598,8 @@ class list_of_dictionaries():
 
         if csvType in ["markdown"]:
             output = output.replace("|--", "|:-")
+        if csvType in ["reST"]:
+            output = output.replace("|--", "+--").replace("--|", "--+")
 
         self.log.info(
             'completed the ``_list_of_dictionaries_to_csv`` function')
