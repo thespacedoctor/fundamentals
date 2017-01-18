@@ -15,7 +15,7 @@ import os
 import yaml
 from collections import OrderedDict
 import shutil
-
+from subprocess import Popen, PIPE, STDOUT
 import logs as dl
 import time
 from docopt import docopt
@@ -218,6 +218,18 @@ class tools():
                         writeFile.write(thisData)
                         writeFile.close()
                         print "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals()
+                        try:
+                            cmd = """open %(pathToReadFile)s""" % locals()
+                            p = Popen(cmd, stdout=PIPE,
+                                      stderr=PIPE, shell=True)
+                        except:
+                            pass
+                        try:
+                            cmd = """start %(pathToReadFile)s""" % locals()
+                            p = Popen(cmd, stdout=PIPE,
+                                      stderr=PIPE, shell=True)
+                        except:
+                            pass
                     except:
                         print "please add settings to file '%(settingsFile)s'" % locals()
                     sys.exit(0)
