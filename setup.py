@@ -32,7 +32,6 @@ setup(
     install_requires=[
         'pyyaml',
         'docopt',
-        'MySQL-python',
         'python-dateutil',
         'eventlet',
         'requests',
