@@ -180,7 +180,7 @@ class yaml_to_database():
         self.log.info('starting the ``ingest`` method')
 
         for d in os.listdir(self.pathToInputDir):
-            if os.path.isfile(os.path.join(self.pathToInputDir, d)):
+            if os.path.isfile(os.path.join(self.pathToInputDir, d)) and "yaml" in d.lower():
                 self.add_yaml_file_content_to_database(
                     filepath=os.path.join(self.pathToInputDir, d),
                     deleteFile=self.deleteFiles
