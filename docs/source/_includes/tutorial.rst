@@ -227,7 +227,7 @@ yaml2db
 
 You may be thinking why would you ever need to dump the contents of a yaml file into a database. Well ... `IFTTT <https://ifttt.com>`_! With the IFTTT service you have quick and super easy access to the APIs of dozens of your favourite web-services. You can use any of the IFTTT channels as an input for an applet that then writes a yaml file with the data you wish to capture to a directory in your Dropbox account. Pointing ``yaml2db`` at this Dropbox directory in your filesystem then sucks all this lovely data into a MySQL database. It's up to you then what you want to do with the data, the point is you now have a simple, homogenised way of pouring content from all those APIs into a local database. 
 
-You could grab the URLs for new videos you like on youtube or add to your watch later list on vimeo. Or how about you sleep log from your fitbit, or a new contact added to your iOS device.
+You could grab the URLs for videos you ‘like’ on youtube or add to your watch-later list on vimeo. Or how about your sleep log from your fitbit, or a new contact added to your iOS device.
 
 How about `this applet <https://ifttt.com/applets/30164914d>`_ that logs URLs moved into my instapaper *read-work-projects* folder:
 

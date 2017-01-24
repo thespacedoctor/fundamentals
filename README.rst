@@ -16,7 +16,7 @@ Documentation for fundamentals is hosted by `Read the Docs <http://fundamentals.
 Installation
 ============
 
-The easiest way to install fundamentals us to use ``pip``:
+The easiest way to install fundamentals is to use ``pip``:
 
 .. code:: bash
 
