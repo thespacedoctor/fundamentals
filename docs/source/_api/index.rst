@@ -1,5 +1,5 @@
 .. fundamentals documentation master file, created by
-   sphinx-quickstart on Mon Jan 23 22:26:19 2017.
+   sphinx-quickstart on Tue Jan 24 13:42:54 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
