@@ -18,6 +18,7 @@ fundamentals.renderer.list_of_dictionaries (*class*)
       ~list_of_dictionaries.json
       ~list_of_dictionaries.markdown
       ~list_of_dictionaries.mysql
+      ~list_of_dictionaries.reST
       ~list_of_dictionaries.table
       ~list_of_dictionaries.yaml
    
