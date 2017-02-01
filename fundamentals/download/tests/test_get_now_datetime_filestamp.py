@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download import get_now_datetime_filestamp
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test_get_now_datetime_filestamp():
+# class test_get_now_datetime_filestamp(unittest.TestCase):
 
 #     def test_get_now_datetime_filestamp_function(self):
 #         kwargs = {}

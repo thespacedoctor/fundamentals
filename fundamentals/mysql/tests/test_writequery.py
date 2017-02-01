@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.mysql import writequery
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_writequery():
+class test_writequery(unittest.TestCase):
 
     def test_writequery_function(self):
 

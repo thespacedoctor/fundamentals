@@ -33,6 +33,7 @@ Classes
 
    fundamentals.tools
    fundamentals.utKit
+   fundamentals.mysql.sqlite2mysql
    fundamentals.mysql.yaml_to_database
    fundamentals.renderer.list_of_dictionaries
    fundamentals.logs.GroupWriteRotatingFileHandler

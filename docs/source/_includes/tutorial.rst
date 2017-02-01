@@ -106,6 +106,7 @@ And finally I also have a ``default-settings.yaml`` file at the root of my pytho
         user: unittesting
         password: utpass
         sshPort: False
+        loginPath: unittesting
 
     # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
@@ -287,7 +288,41 @@ To run ``yaml2db`` on an entire directory of yaml files run:
 where ``/Users/Me/mydefault_settings.yaml`` contains my database and logging parameters (see example at the start of this tutorial).
 
 
+sqlite2mysql
+------------
 
+The ``sqlite2mysql`` tool does exactly what you would expect it to do; it takes the path to a sqlite database file and copies the tables found in the database to a MySQL database of your choosing.
+
+For the usage run ``sqlite2mysql -h`` from the command-line:
+
+.. code-block:: bash 
+     
+    Take a sqlite database file and copy the tables within it to a MySQL database
+
+    Usage:
+        sqlite2mysql -s <pathToSettingsFile> <pathToSqliteDB> [<tablePrefix>]
+
+    Options:
+
+        pathToSqliteDB        path to the sqlite database file
+        tablePrefix           a string to prefix the table names when copying to mysql database
+        pathToSettingsFile    path to a settings file with logging and database information (yaml file)
+
+        -h, --help            show this help message
+        -v, --version         show version
+        -s, --settings        the settings file
+
+As usual ``pathToSettingsFile`` contains your MySQL database settings (see example at the start of this tutorial). To convert a sqlite databse I could run something like:
+
+.. code-block:: bash 
+
+    sqlite2mysql -s /Users/Me/mydefault_settings.yaml /Users/Me/ebooks.sqlite imported
+
+This command takes the tables in the ``/Users/Me/ebooks.sqlite`` database, prepends the names of the tables with *'imported_'* and imports the tables into the MySQL database whose settings are found in the ``/Users/Me/mydefault_settings.yaml`` file. Here are the resulting MySQL database tables as listed in MySQLWorkbench:
+
+.. image:: https://i.imgur.com/0UJ9eDH.png
+        :width: 800px
+        :alt: imported tables in MySQL database
 
     
     

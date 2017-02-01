@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.utKit import utKit
@@ -28,7 +30,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_get_database_table_column_names():
+class test_get_database_table_column_names(unittest.TestCase):
 
     def test_get_database_table_column_names_function(self):
 

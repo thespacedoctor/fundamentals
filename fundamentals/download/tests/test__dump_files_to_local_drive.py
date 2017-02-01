@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download import _dump_files_to_local_drive
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test__dump_files_to_local_drive():
+# class test__dump_files_to_local_drive(unittest.TestCase):
 
 #     def test__dump_files_to_local_drive_function(self):
 #         kwargs = {}

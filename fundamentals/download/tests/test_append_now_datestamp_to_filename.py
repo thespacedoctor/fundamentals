@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download import append_now_datestamp_to_filename
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test_append_now_datestamp_to_filename():
+# class test_append_now_datestamp_to_filename(unittest.TestCase):
 
 #     def test_append_now_datestamp_to_filename_function(self):
 #         kwargs = {}

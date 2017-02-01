@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.utKit import utKit
@@ -28,7 +30,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_table_exists():
+class test_table_exists(unittest.TestCase):
 
     def test_table_exists_function(self):
 

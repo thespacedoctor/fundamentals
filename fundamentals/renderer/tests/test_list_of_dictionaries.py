@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 import pickle
@@ -34,7 +36,7 @@ pathToPickleFile = pathToInputDir + "/list-of-dictionaries.p"
 listOfDictionaries = pickle.load(open(pathToPickleFile, "rb"))
 
 
-class test_list_of_dictionaries():
+class test_list_of_dictionaries(unittest.TestCase):
 
     def test_list_of_dictionaries_function(self):
 

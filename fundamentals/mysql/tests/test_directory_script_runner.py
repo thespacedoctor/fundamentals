@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.utKit import utKit
@@ -40,7 +42,7 @@ shutil.copytree(pathToInputDir + "/mysql_scripts",
                 pathToOutputDir + "/mysql_scripts")
 
 
-class test_directory_script_runner():
+class test_directory_script_runner(unittest.TestCase):
 
     def test_directory_script_runner_function(self):
 

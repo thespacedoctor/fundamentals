@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download import extract_filename_from_url
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test_extract_filename_from_url():
+# class test_extract_filename_from_url(unittest.TestCase):
 
 #     def test_extract_filename_from_url_function(self):
 #         kwargs = {}

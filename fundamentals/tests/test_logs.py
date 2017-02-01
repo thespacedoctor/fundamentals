@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals import logs
@@ -29,11 +31,13 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_logs():
+class test_logs(unittest.TestCase):
 
     def test_logs_function(self):
         from fundamentals.logs import emptyLogger
+
         log = emptyLogger()
+        print "shit"
         log.error("crap")
 
         # x-print-testpage-for-pessto-marshall-web-object
@@ -41,7 +45,7 @@ class test_logs():
     # x-class-to-test-named-worker-function
 
 
-# class test_logs():
+# class test_logs(unittest.TestCase):
 
 #     def test_logs_function(self):
 #         kwargs = {}

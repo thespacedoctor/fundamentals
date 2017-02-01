@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download import _fetch
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test__fetch():
+# class test__fetch(unittest.TestCase):
 
 #     def test__fetch_function(self):
 #         kwargs = {}

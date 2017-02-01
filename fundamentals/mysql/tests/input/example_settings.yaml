@@ -1,3 +1,10 @@
+database settings:
+  db: dryx_unit_testing
+  host: localhost
+  user: unittesting
+  password: utpass
+  loginPath: unittesting
+
 db: dryx_unit_testing
 host: localhost
 user: unittesting
