@@ -17,7 +17,7 @@ version](http://fundamentals.readthedocs.org/en/latest/)).
 Installation
 ============
 
-The easiest way to install fundamentals us to use `pip`:
+The easiest way to install fundamentals is to use `pip`:
 
     pip install fundamentals
 

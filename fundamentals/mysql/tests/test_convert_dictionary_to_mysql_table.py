@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_convert_dictionary_to_mysql_table():
+class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def test_convert_dictionary_to_mysql_table_function(self):
         dictionary = {"a newKey": "cool", "and another": "super cool",

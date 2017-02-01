@@ -17,6 +17,7 @@ Submodules
    fundamentals.mysql.insert_list_of_dictionaries_into_database_tables
    fundamentals.mysql.readquery
    fundamentals.mysql.setup_database_connection
+   fundamentals.mysql.sqlite2mysql
    fundamentals.mysql.table_exists
    fundamentals.mysql.writequery
    fundamentals.mysql.yaml_to_database

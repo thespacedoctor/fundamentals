@@ -633,18 +633,10 @@ class list_of_dictionaries():
             output = ""
 
         inserts = []
-        for d in dataCopy:
-            insertCommand = convert_dictionary_to_mysql_table(
-                log=self.log,
-                dictionary=d,
-                dbTableName=tableName,
-                uniqueKeyList=[],
-                dateModified=False,
-                returnInsertOnly=True,
-                replace=True,
-                batchInserts=False
-            )
-            inserts.append(insertCommand)
+
+        inserts = []
+        inserts[:] = [convert_dictionary_to_mysql_table(log=self.log, dictionary=d, dbTableName=tableName, uniqueKeyList=[
+        ], dateModified=False, returnInsertOnly=True, replace=True, batchInserts=False) for d in dataCopy]
         output += ";\n".join(inserts) + ";"
 
         self.log.info(

@@ -10,3 +10,4 @@ from get_database_table_column_names import get_database_table_column_names
 from insert_list_of_dictionaries_into_database_tables import insert_list_of_dictionaries_into_database_tables
 from directory_script_runner import directory_script_runner
 from yaml_to_database import yaml_to_database
+from sqlite2mysql import sqlite2mysql

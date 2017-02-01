@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.utKit import utKit
@@ -28,7 +30,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-class test_insert_list_of_dictionaries_into_database_tables():
+class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 
     def test_insert_list_of_dictionaries_into_database_tables_function(self):
 

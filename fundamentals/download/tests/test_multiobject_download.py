@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.download.multiobject_download import multiobject_download
@@ -29,7 +31,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 
-# class test_multiobject_download():
+# class test_multiobject_download(unittest.TestCase):
 
 #     def test_multiobject_download_function(self):
 #         kwargs = {}

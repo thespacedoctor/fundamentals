@@ -1,5 +1,7 @@
 import os
-import nose
+import nose2
+import nose2
+import unittest
 import shutil
 import yaml
 from fundamentals.utKit import utKit
@@ -43,7 +45,7 @@ if not os.path.exists(pathToOutputDir):
 # xt-setup-unit-testing-files-and-folders
 
 
-class test_yaml_to_database():
+class test_yaml_to_database(unittest.TestCase):
 
     def test_single_yaml_to_database_function(self):
 
