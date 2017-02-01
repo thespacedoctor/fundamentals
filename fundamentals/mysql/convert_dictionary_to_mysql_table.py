@@ -199,9 +199,7 @@ def convert_dictionary_to_mysql_table(
 
             )
 
-    reFeedParserClass = re.compile('FeedParserDict')
     reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
-    reTypeTime = re.compile('struct_time')
     qCreateColumn = ''
     formattedKey = ''
     formattedKeyList = []
@@ -235,7 +233,7 @@ def convert_dictionary_to_mysql_table(
         if len(key) > 0:
             # CONVERT LIST AND FEEDPARSER VALUES TO YAML (SO I CAN PASS IT AS A
             # STRING TO MYSQL)
-            if isinstance(value, list) and (isinstance(value[0], list) or reFeedParserClass.search(str(type(value[0])))):
+            if isinstance(value, list) and (isinstance(value[0], list)):
                 value[0] = yaml.dump(value[0])
                 value[0] = str(value[0])
             # REMOVE CHARACTERS THAT COLLIDE WITH MYSQL

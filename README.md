@@ -3,6 +3,8 @@ fundamentals
 
 [![Documentation Status](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge)
 
+[![Coverage Status](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/coverage.svg)](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/htmlcov/index.html)
+
 *Some project setup tools including logging, settings and database
 connections.*
 

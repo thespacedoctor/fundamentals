@@ -8,7 +8,7 @@ __all__ = ('Profiler',)
 import logging
 import cProfile
 import pstats
-
+from pyprof2calltree import convert, visualize
 import nose2
 
 log = logging.getLogger('.'.join(('nose2', 'plugins', __package__)))
@@ -24,6 +24,8 @@ class Profiler(nose2.events.Plugin):
     def __init__(self):
         self.sort = self.config.as_str('sort', 'cumulative')
         self.prof = None
+        self.pfile = self.config.as_str('filename', '')
+        self.cachegrind = self.config.as_str('cachegrind', '')
 
     def startTestRun(self, event):
         '''Setup profiler'''
@@ -37,3 +39,7 @@ class Profiler(nose2.events.Plugin):
             self.sort)
         event.stream.writeln(nose2.util.ln('Profiling results'))
         stats.print_stats()
+        if self.pfile:
+            stats.dump_stats(self.pfile)
+        if self.cachegrind:
+            visualize(self.prof.getstats())
