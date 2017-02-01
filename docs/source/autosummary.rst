@@ -12,6 +12,7 @@ Subpackages
    fundamentals.download
    fundamentals.files
    fundamentals.mysql
+   fundamentals.nose2_plugins
    fundamentals.renderer 
 
 Modules

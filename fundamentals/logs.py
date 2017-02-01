@@ -38,7 +38,7 @@ def console_logger(
     """
     ################ > IMPORTS ################
     ## STANDARD LIB ##
-    s
+
     import logging
     import logging.config
     ## THIRD PARTY ##

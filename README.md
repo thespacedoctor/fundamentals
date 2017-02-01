@@ -1,6 +1,8 @@
 fundamentals
 ============
 
+[![Documentation Status](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge)
+
 *Some project setup tools including logging, settings and database
 connections.*
 
