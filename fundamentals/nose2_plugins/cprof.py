@@ -10,12 +10,14 @@ import cProfile
 import pstats
 from pyprof2calltree import convert, visualize
 import nose2
+import os
+
+os.environ['PATH'] += ':/usr/local/bin'
 
 log = logging.getLogger('.'.join(('nose2', 'plugins', __package__)))
 
 
 class Profiler(nose2.events.Plugin):
-
     '''Profile the test run using cProfile'''
 
     configSection = 'profiler'

@@ -66,11 +66,11 @@ class utKit():
         handlers:
             console:
                 class: logging.StreamHandler
-                level: WARNING
+                level: DEBUG
                 formatter: console_style
                 stream: ext://sys.stdout
         root:
-            level: WARNING
+            level: DEBUG
             handlers: [console]"""
 
         self.dbConfig = """

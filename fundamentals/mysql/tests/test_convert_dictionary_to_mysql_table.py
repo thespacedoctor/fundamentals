@@ -62,7 +62,6 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dateModified=False,
             returnInsertOnly=True
         )
-
         print message
 
     def test_return_inserts_non_batch(self):

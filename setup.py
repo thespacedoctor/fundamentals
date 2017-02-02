@@ -35,10 +35,13 @@ setup(
         'python-dateutil',
         'eventlet',
         'requests',
-        'unicodecsv'
+        'unicodecsv',
+        'pyprof2calltree',
+        'nose2',
+        'cov-core'
     ],
-    test_suite='nose.collector',
-    tests_require=['nose', 'nose-cover3'],
+    test_suite='nose2.collector.collector',
+    tests_require=['nose2', 'cov-core'],
     entry_points={
         'console_scripts': ['mysqlSucker=fundamentals.mysql.directory_script_runner:main',
                             'yaml2db=fundamentals.mysql.yaml_to_database:main',

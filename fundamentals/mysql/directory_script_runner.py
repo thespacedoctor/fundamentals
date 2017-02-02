@@ -59,6 +59,7 @@ def directory_script_runner(
         pathToScriptDirectory,
         databaseName,
         loginPath,
+        waitForResult=True,
         successRule=None,
         failureRule=None):
     """A function to run all of the mysql scripts in a given directory (in a modified date order, oldest first) and then act on the script file in accordance with the succcess or failure of its execution
@@ -77,6 +78,7 @@ def directory_script_runner(
         - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
         - ``databaseName`` -- the name of the database 
         - ``loginPath`` -- the local-path as set with `mysql_config_editor`
+        - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
         - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
         - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
 
@@ -112,6 +114,21 @@ def directory_script_runner(
             )
 
         This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
+
+        Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+
+        .. code-block:: python 
+
+            from fundamentals.mysql import directory_script_runner
+            directory_script_runner(
+                log=log,
+                pathToScriptDirectory="/path/to/mysql_scripts",
+                databaseName="imports",
+                loginPath="myLoginDetails",
+                waitForResults=False
+            )
+
+        Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
     """
     log.info('starting the ``directory_script_runner`` function')
 
@@ -130,50 +147,58 @@ def directory_script_runner(
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
     for k, v in scriptList.iteritems():
         scriptname = os.path.basename(v)
-        cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" """ % locals(
-        )
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE, close_fds=True,
-                  env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
-        stdout, stderr = p.communicate()
+        if waitForResult == True:
+            cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" """ % locals(
+            )
+            p = Popen(cmd, stdout=PIPE, stderr=PIPE, close_fds=True,
+                      env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
+            stdout, stderr = p.communicate()
 
-        if len(stderr):
-            log.error(
-                "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals())
-            if failureRule == None or failureRule == False:
-                pass
-            elif failureRule == "delete":
-                os.remove(v)
-            elif "/" not in failureRule:
-                moveTo = pathToScriptDirectory + "/" + failureRule
-                # Recursively create missing directories
-                if not os.path.exists(moveTo):
-                    os.makedirs(moveTo)
-                moveTo = moveTo + "/" + scriptname
-                try:
-                    log.debug("attempting to rename file %s to %s" %
-                              (v, moveTo))
-                    os.rename(v, moveTo)
-                except Exception, e:
-                    log.error(
-                        "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
+            if len(stderr):
+                log.error(
+                    "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals())
+                if failureRule == None or failureRule == False:
+                    pass
+                elif failureRule == "delete":
+                    os.remove(v)
+                elif "/" not in failureRule:
+                    moveTo = pathToScriptDirectory + "/" + failureRule
+                    # Recursively create missing directories
+                    if not os.path.exists(moveTo):
+                        os.makedirs(moveTo)
+                    moveTo = moveTo + "/" + scriptname
+                    try:
+                        log.debug("attempting to rename file %s to %s" %
+                                  (v, moveTo))
+                        os.rename(v, moveTo)
+                    except Exception, e:
+                        log.error(
+                            "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
+            else:
+                if successRule == None or successRule == False:
+                    pass
+                elif successRule == "delete":
+                    os.remove(v)
+                elif "/" not in successRule:
+                    moveTo = pathToScriptDirectory + "/" + successRule
+                    # Recursively create missing directories
+                    if not os.path.exists(moveTo):
+                        os.makedirs(moveTo)
+                    moveTo = moveTo + "/" + scriptname
+                    try:
+                        log.debug("attempting to rename file %s to %s" %
+                                  (v, moveTo))
+                        os.rename(v, moveTo)
+                    except Exception, e:
+                        log.error(
+                            "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
         else:
-            if successRule == None or successRule == False:
-                pass
-            elif successRule == "delete":
-                os.remove(v)
-            elif "/" not in successRule:
-                moveTo = pathToScriptDirectory + "/" + successRule
-                # Recursively create missing directories
-                if not os.path.exists(moveTo):
-                    os.makedirs(moveTo)
-                moveTo = moveTo + "/" + scriptname
-                try:
-                    log.debug("attempting to rename file %s to %s" %
-                              (v, moveTo))
-                    os.rename(v, moveTo)
-                except Exception, e:
-                    log.error(
-                        "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
+            if waitForResult == "delete":
+                cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """ % locals()
+            else:
+                cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" > /dev/null 2>&1 """ % locals()
+            p = Popen(cmd, close_fds=True,
+                      env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True, stdin=None, stdout=None, stderr=None)
 
     log.info('completed the ``directory_script_runner`` function')
     return None

@@ -277,7 +277,6 @@ class tools():
             log = dl.console_logger(
                 level=self.logLevel
             )
-            log.debug('logger setup')
 
         self.log = log
 
@@ -297,7 +296,6 @@ class tools():
                 exec(varname + " = %s" % (val,))
             if arg == "--dbConn":
                 dbConn = val
-            log.debug('%s = %s' % (varname, val,))
 
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
@@ -340,7 +338,6 @@ class tools():
                 charset='utf8'
             )
             dbConn.autocommit(True)
-            log.debug('dbConn: %s' % (dbConn,))
 
         self.dbConn = dbConn
 
@@ -359,8 +356,6 @@ class tools():
         """
         *setup ssh tunnel if required*
         """
-        self.log.debug('starting the ``_setup_tunnel`` method')
-
         from subprocess import Popen, PIPE, STDOUT
         import MySQLdb as ms
 
@@ -371,7 +366,7 @@ class tools():
             connected = self._checkServer(
                 self.settings["database settings"]["host"], sshPort)
             if connected:
-                self.log.debug('ssh tunnel already exists - moving on')
+                pass
             else:
                 # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
                 ru = self.settings["ssh tunnel"]["remote user"]
@@ -381,7 +376,6 @@ class tools():
                 cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
                 p = Popen(cmd, shell=True, close_fds=True)
                 output = p.communicate()[0]
-                self.log.debug('output: %(output)s' % locals())
 
                 # TEST CONNECTION - QUIT AFTER SO MANY TRIES
                 connected = False
@@ -411,27 +405,20 @@ class tools():
             charset='utf8'
         )
         thisConn.autocommit(True)
-        self.log.debug('cataloguesDbConn: %s' % (thisConn,))
         self.remoteDBConn = thisConn
 
-        self.log.debug('completed the ``_setup_tunnel`` method')
         return None
 
     def _checkServer(self, address, port):
         """
         *Check that the TCP Port we've decided to use for tunnelling is available*
         """
-        self.log.debug('starting the ``_checkServer`` method')
-
         # CREATE A TCP SOCKET
         import socket
         s = socket.socket()
-        self.log.debug(
-            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals())
+
         try:
             s.connect((address, port))
-            self.log.debug(
-                """Connected to `%(address)s` on port `%(port)s`""" % locals())
             return True
         except socket.error, e:
             self.log.warning(
