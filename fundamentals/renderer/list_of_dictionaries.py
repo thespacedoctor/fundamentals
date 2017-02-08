@@ -33,6 +33,7 @@ class list_of_dictionaries():
     **Key Arguments:**
         - ``log`` -- logger
         - ``listOfDictionaries`` -- the list of dictionaries to render
+        - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
 
     **Usage:**
 
@@ -70,10 +71,12 @@ class list_of_dictionaries():
             self,
             log,
             listOfDictionaries,
+            reDatetime=False
     ):
         self.log = log
         self.log.debug("instansiating a new 'list_of_dictionaries' object")
         self.listOfDictionaries = listOfDictionaries
+        self.reDatetime = reDatetime
 
         return None
 
@@ -636,7 +639,7 @@ class list_of_dictionaries():
 
         inserts = []
         inserts[:] = [convert_dictionary_to_mysql_table(log=self.log, dictionary=d, dbTableName=tableName, uniqueKeyList=[
-        ], dateModified=False, returnInsertOnly=True, replace=True, batchInserts=False) for d in dataCopy]
+        ], dateModified=False, returnInsertOnly=True, replace=True, batchInserts=False, reDatetime=self.reDatetime) for d in dataCopy]
         output += ";\n".join(inserts) + ";"
 
         self.log.info(

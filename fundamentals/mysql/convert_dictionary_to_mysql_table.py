@@ -31,7 +31,8 @@ def convert_dictionary_to_mysql_table(
         dateModified=False,
         returnInsertOnly=False,
         replace=False,
-        batchInserts=True):
+        batchInserts=True,
+        reDatetime=False):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -45,6 +46,7 @@ def convert_dictionary_to_mysql_table(
         - ``dateModified`` -- add a modification date to the mysql table
         - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
         - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
+        - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -199,7 +201,8 @@ def convert_dictionary_to_mysql_table(
 
             )
 
-    reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
+    if not reDatetime:
+        reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
     qCreateColumn = ''
     formattedKey = ''
     formattedKeyList = []

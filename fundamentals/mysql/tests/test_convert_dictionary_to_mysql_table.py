@@ -4,6 +4,7 @@ import nose2
 import unittest
 import shutil
 import yaml
+import re
 
 from fundamentals.utKit import utKit
 
@@ -29,6 +30,8 @@ moduleDirectory = os.path.dirname(__file__)
 utKit = utKit(moduleDirectory)
 log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
+
+reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 
 
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
@@ -61,6 +64,23 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             createHelperTables=False,
             dateModified=False,
             returnInsertOnly=True
+        )
+        print message
+
+    def test_return_inserts_with_datetime_pre_compiled(self):
+        dictionary = {"a newKey": "cool", "and another": "super cool",
+                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+        message = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            createHelperTables=False,
+            dateModified=False,
+            returnInsertOnly=True,
+            reDatetime=reDatetime
         )
         print message
 
