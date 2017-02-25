@@ -34,7 +34,7 @@ setup(
         'docopt',
         'python-dateutil',
         'eventlet',
-        'requests',
+        'requests==2.11.1',
         'unicodecsv',
         'pyprof2calltree',
         'nose2',
