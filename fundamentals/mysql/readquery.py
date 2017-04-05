@@ -63,7 +63,7 @@ def readquery(
     except Exception as e:
         sqlQuery = sqlQuery[:1000]
         if quiet == False:
-            log.error(
+            log.warning(
                 'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
             raise e
 
