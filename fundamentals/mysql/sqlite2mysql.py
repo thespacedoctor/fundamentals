@@ -149,11 +149,25 @@ class sqlite2mysql():
             if table == "sqlite_sequence":
                 continue
 
+            # CREATE TABLE collection_books (folder_id, fingerprint, primary key(folder_id, fingerprint));
             # GENEREATE THE MYSQL CREATE STATEMENTS FOR EACH TABLE
             cur.execute(
                 "SELECT sql FROM sqlite_master WHERE name = '%(table)s';" % locals())
             createStatement = cur.fetchone()
             createStatement = createStatement[0].replace('"', '`') + ";"
+            if "DEFAULT" not in createStatement:
+                if "primary key(" in createStatement:
+                    tmp = createStatement.split("primary key(")
+                    tmp[0] = tmp[0].replace(
+                        ",", " varchar(150) DEFAULT NULL,")
+                    createStatement = ("primary key(").join(tmp)
+                if "primary key," in createStatement:
+                    tmp = createStatement.split("primary key,")
+                    tmp[1] = tmp[1].replace(
+                        ",", " varchar(150) DEFAULT NULL,")
+                    tmp[1] = tmp[1].replace(
+                        ");", " varchar(150) DEFAULT NULL);")
+                    createStatement = ("primary key,").join(tmp)
             createStatement = createStatement.replace(
                 "INTEGER PRIMARY KEY", "INTEGER AUTO_INCREMENT PRIMARY KEY")
             createStatement = createStatement.replace(
@@ -164,12 +178,24 @@ class sqlite2mysql():
                 "DEFAULT 'f'", "DEFAULT '0'")
             createStatement = createStatement.replace(",'t'", ",'1'")
             createStatement = createStatement.replace(",'f'", ",'0'")
-            createStatement = createStatement.replace(
-                "CREATE TABLE `", "CREATE TABLE IF NOT EXISTS `" + self.tablePrefix)
-            createStatement = createStatement.replace(");", """,
+            if "CREATE TABLE `" in createStatement:
+                createStatement = createStatement.replace(
+                    "CREATE TABLE `", "CREATE TABLE IF NOT EXISTS `" + self.tablePrefix)
+            else:
+                createStatement = createStatement.replace(
+                    "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS " + self.tablePrefix)
+            if ", primary key(" in createStatement:
+                createStatement = createStatement.replace(", primary key(", """,
 `dateLastModified` datetime DEFAULT NULL,
-`updated` tinyint(4) DEFAULT '0');
-            """)
+`updated` tinyint(4) DEFAULT '0',
+primary key(""")
+            else:
+                createStatement = createStatement.replace(");", """,
+    `dateLastModified` datetime DEFAULT NULL,
+    `updated` tinyint(4) DEFAULT '0');
+                """)
+            createStatement = createStatement.replace(
+                " text primary key", " varchar(100) primary key")
             createStatement = createStatement.replace(
                 "`EntryText` TEXT NOT NULL,", "`EntryText` TEXT,")
             createStatement = createStatement.replace(
