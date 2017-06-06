@@ -45,7 +45,7 @@ def readquery(
             )
     """
     log.info('starting the ``readquery`` function')
-    import MySQLdb
+    import pymysql
     import warnings
     warnings.filterwarnings('error', category=MySQLdb.Warning)
 
