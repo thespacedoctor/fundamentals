@@ -388,7 +388,8 @@ def convert_dictionary_to_mysql_table(
         myKeys = '`,`'.join(formattedKeyList)
         valueString = ("%s, " * len(myValues))[:-2]
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
-            """` (`""" + myKeys + """`) VALUES (""" + valueString + """)"""
+            """` (`""" + myKeys + """`, dateCreated) VALUES (""" + \
+            valueString + """, NOW())"""
         mv = []
         mv[:] = [None if m == "None" else m for m in myValues]
         valueTuple = tuple(mv)
@@ -454,8 +455,8 @@ def convert_dictionary_to_mysql_table(
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
-        """` (`""" + myKeys + """`) VALUES (\"""" + \
-        myValues + """) %(dup)s """ % locals()
+        """` (`""" + myKeys + """`, dateCreated) VALUES (\"""" + \
+        myValues + """, NOW()) %(dup)s """ % locals()
 
     addValue = addValue.replace('\\""', '\\" "')
     addValue = addValue.replace('""', "null")
