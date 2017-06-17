@@ -21,7 +21,7 @@ def readquery(
         dbConn,
         log,
         quiet=False):
-    """readquery
+    """Given a mysql query, read the data from the database and return the results as a list of dictionaries (database rows)
 
     **Key Arguments:**
         - ``log`` -- the logger.
