@@ -130,6 +130,10 @@ class list_of_dictionaries():
 
         if filepath and renderedData != "NO MATCH":
 
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
+
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
             writeFile.close()
@@ -179,6 +183,10 @@ class list_of_dictionaries():
         renderedData = self._list_of_dictionaries_to_csv("human")
 
         if filepath and len(self.listOfDictionaries):
+
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -232,6 +240,10 @@ class list_of_dictionaries():
 
         if filepath and len(self.listOfDictionaries):
 
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
+
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
             writeFile.close()
@@ -279,6 +291,10 @@ class list_of_dictionaries():
         renderedData = self._list_of_dictionaries_to_csv("markdown")
 
         if filepath and len(self.listOfDictionaries):
+
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
@@ -350,6 +366,10 @@ class list_of_dictionaries():
 
         if filepath and len(self.listOfDictionaries):
 
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
+
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
             writeFile.close()
@@ -402,6 +422,10 @@ class list_of_dictionaries():
         renderedData = yaml.dump(dataCopy, default_flow_style=False)
 
         if filepath and len(self.listOfDictionaries):
+
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
 
             stream = file(filepath, 'w')
             yaml.dump(dataCopy, stream, default_flow_style=False)
@@ -461,6 +485,10 @@ class list_of_dictionaries():
         )
 
         if filepath and len(self.listOfDictionaries):
+
+            # RECURSIVELY CREATE MISSING DIRECTORIES
+            if not os.path.exists(os.path.dirname(filepath)):
+                os.makedirs(os.path.dirname(filepath))
 
             writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
             writeFile.write(renderedData)
