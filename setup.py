@@ -40,8 +40,7 @@ setup(
         'unicodecsv',
         'pyprof2calltree',
         'nose2',
-        'cov-core',
-        'MySQLdb'
+        'cov-core'
     ],
     test_suite='nose2.collector.collector',
     tests_require=['nose2', 'cov-core'],
