@@ -68,12 +68,12 @@ def writequery(
 
     """
     log.info('starting the ``writequery`` function')
-    import pymysql
+    import MySQLdb
     import warnings
-    warnings.filterwarnings('error', category=pymysql.Warning)
+    warnings.filterwarnings('error', category=MySQLdb.Warning)
     message = ""
     try:
-        cursor = dbConn.cursor(pymysql.cursors.DictCursor)
+        cursor = dbConn.cursor(MySQLdb.cursors.DictCursor)
     except Exception as e:
         log.error('could not create the database cursor.')
     # EXECUTE THE SQL COMMAND
@@ -94,7 +94,7 @@ def writequery(
                 if len(thisList) < batch:
                     stop = 1
 
-    except pymysql.Error as e:
+    except MySQLdb.Error as e:
         if e[0] == 1050 and 'already exists' in e[1]:
             log.info(str(e) + '\n')
         elif e[0] == 1062:
@@ -118,7 +118,7 @@ def writequery(
             else:
                 log.warning(message)
                 return -1
-    except pymysql.Warning as e:
+    except MySQLdb.Warning as e:
         log.info(str(e))
     except Exception as e:
         if "truncated" in str(e):

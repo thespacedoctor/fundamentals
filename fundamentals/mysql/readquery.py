@@ -45,14 +45,14 @@ def readquery(
             )
     """
     log.info('starting the ``readquery`` function')
-    import pymysql
+    import MySQLdb
     import warnings
-    warnings.filterwarnings('error', category=pymysql.Warning)
+    warnings.filterwarnings('error', category=MySQLdb.Warning)
 
     rows = []
 
     try:
-        cursor = dbConn.cursor(pymysql.cursors.DictCursor)
+        cursor = dbConn.cursor(MySQLdb.cursors.DictCursor)
     except Exception as e:
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
