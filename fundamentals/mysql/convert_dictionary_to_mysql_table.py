@@ -115,7 +115,7 @@ def convert_dictionary_to_mysql_table(
             # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
             # uniquekey1="cheese"
     """
-    import pymysql as mdb
+    import MySQLdb as mdb
     log.info('starting the ``convert_dictionary_to_mysql_table`` function')
 
     # # >IMPORTS #

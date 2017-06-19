@@ -51,7 +51,7 @@ def setup_database_connection(
     """
     import sys
     import logging
-    import pymysql as ms
+    import MySQLdb as ms
 
     # IMPORT THE YAML CONNECTION DICTIONARY
     try:

@@ -328,7 +328,7 @@ class tools():
             return None
 
         if dbConn:
-            import pymysql as ms
+            import MySQLdb as ms
             dbConn = ms.connect(
                 host=host,
                 user=user,
@@ -357,7 +357,7 @@ class tools():
         *setup ssh tunnel if required*
         """
         from subprocess import Popen, PIPE, STDOUT
-        import pymysql as ms
+        import MySQLdb as ms
 
         # SETUP TUNNEL IF REQUIRED
         if "ssh tunnel" in self.settings:
