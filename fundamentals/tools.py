@@ -232,7 +232,7 @@ class tools():
                             pass
                     except:
                         print "please add settings to file '%(settingsFile)s'" % locals()
-                    sys.exit(0)
+                    return
         else:
 
             pass
