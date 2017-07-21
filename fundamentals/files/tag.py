@@ -57,7 +57,7 @@ def tag(
     if isinstance(tags, list):
         tags = (" ").join(tags)
 
-    if len(tags):
+    if tags and len(tags):
         tags = tags.replace(",", " ")
         tags = "<string>" + tags.replace("  ", " ").replace(
             "  ", " ").replace(" ", "</string><string>") + "</string>"
@@ -161,7 +161,7 @@ def tag(
         log.debug('output URL: %(stderr)s' % locals())
 
         # DELETE PLIST
-        os.remove(urlPlist)
+        # os.remove(urlPlist)
 
     log.info('completed the ``tag`` function')
     return None
