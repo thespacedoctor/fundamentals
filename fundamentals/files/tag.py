@@ -126,8 +126,6 @@ def tag(
         if len(wherefrom):
             wherefrom = "<string>%(wherefrom)s</string>" % locals()
 
-        print wherefrom
-
         # DAYONE LINK
         now = datetime.now()
         now = now.strftime("%Y%m%dt%H%M%S%f")
@@ -150,7 +148,7 @@ def tag(
         cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`xxd -ps %(urlPlist)s`" "%(filepath)s"' % locals(
         )
         # cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`plutil -convert binary1 %(urlPlist)s -o - | xxd -p`" "%(filepath)s"' % locals()
-        print cmd
+
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
         log.debug('output URL: %(stdout)s' % locals())
