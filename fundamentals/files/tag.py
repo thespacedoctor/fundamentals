@@ -91,7 +91,7 @@ def tag(
         log.debug('output: %(stderr)s' % locals())
 
         # ASSIGN TAGS TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:_kMDItemUserTags" "`xxd -ps %(tagPlist)s`" %(filepath)s' % locals(
+        cmd = 'xattr -wx "com.apple.metadata:_kMDItemUserTags" "`xxd -ps %(tagPlist)s`" "%(filepath)s"' % locals(
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
@@ -108,13 +108,13 @@ def tag(
         )
 
         # ASSIGN RATING TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" %(filepath)s' % locals(
+        cmd = 'xattr -wx "com.apple.metadata:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"' % locals(
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
         log.debug('output: %(stdout)s' % locals())
         log.debug('output: %(stderr)s' % locals())
-        cmd = 'xattr -wx "org.openmetainfo:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" %(filepath)s' % locals(
+        cmd = 'xattr -wx "org.openmetainfo:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"' % locals(
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
@@ -125,6 +125,8 @@ def tag(
 
         if len(wherefrom):
             wherefrom = "<string>%(wherefrom)s</string>" % locals()
+
+        print wherefrom
 
         # DAYONE LINK
         now = datetime.now()
@@ -145,15 +147,36 @@ def tag(
         writeFile.close()
 
         # ASSIGN WHEREFORM TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`xxd -ps %(urlPlist)s`" %(filepath)s' % locals(
+        cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`xxd -ps %(urlPlist)s`" "%(filepath)s"' % locals(
         )
+        # cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`plutil -convert binary1 %(urlPlist)s -o - | xxd -p`" "%(filepath)s"' % locals()
+        print cmd
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
         log.debug('output URL: %(stdout)s' % locals())
         log.debug('output URL: %(stderr)s' % locals())
 
+        now = datetime.now()
+        now = now.strftime("%Y%m%dt%H%M%S%f")
+        urlPlist = "/tmp/fund-%(now)s-url.plist" % locals()
+        # GENERATE THE WHEREFROM PLIST FILE
+        try:
+            writeFile = codecs.open(
+                urlPlist, encoding='utf-8', mode='w')
+        except IOError, e:
+            message = 'could not open the file %s' % (urlPlist,)
+            raise IOError(message)
+        writeFile.write("""
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+%(wherefrom)s
+</array>
+</plist>""" % locals())
+        writeFile.close()
+
         # ASSIGN WHEREFORM TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemWhereFroms" "`xxd -ps %(urlPlist)s`" %(filepath)s' % locals(
+        cmd = 'xattr -wx "com.apple.metadata:kMDItemWhereFroms" "`xxd -ps %(urlPlist)s`" "%(filepath)s"' % locals(
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
