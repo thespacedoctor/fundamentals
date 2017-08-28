@@ -59,6 +59,7 @@ def directory_script_runner(
         pathToScriptDirectory,
         databaseName,
         loginPath,
+        force=True,
         waitForResult=True,
         successRule=None,
         failureRule=None):
@@ -77,6 +78,7 @@ def directory_script_runner(
         - ``log`` -- logger
         - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
         - ``databaseName`` -- the name of the database 
+        - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
         - ``loginPath`` -- the local-path as set with `mysql_config_editor`
         - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
         - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
@@ -143,12 +145,18 @@ def directory_script_runner(
                 os.path.getmtime(filePath)), "%a %b %d %H:%M:%S %Y")
             scriptList[str(modified) + filename] = filePath
 
+    # FORCE MYSQL SCRIPT?
+    if force:
+        force = "--force"
+    else:
+        force = ""
+
     # ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
     for k, v in scriptList.iteritems():
         scriptname = os.path.basename(v)
         if waitForResult == True:
-            cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" """ % locals(
+            cmd =  """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """ % locals(
             )
             p = Popen(cmd, stdout=PIPE, stderr=PIPE, close_fds=True,
                       env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
@@ -194,9 +202,9 @@ def directory_script_runner(
                             "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
         else:
             if waitForResult == "delete":
-                cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """ % locals()
+                cmd =  """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """ % locals()
             else:
-                cmd =  """mysql --login-path=%(loginPath)s %(databaseName)s < "%(v)s" > /dev/null 2>&1 """ % locals()
+                cmd =  """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 """ % locals()
             p = Popen(cmd, close_fds=True,
                       env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True, stdin=None, stdout=None, stderr=None)
 
