@@ -90,6 +90,19 @@ class test_directory_script_runner(unittest.TestCase):
             failureRule="delete"
         )
 
+    def test_directory_script_runner_function_05(self):
+
+        from fundamentals.mysql import directory_script_runner
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            force=True,
+            databaseName="dryx_unit_testing",
+            loginPath="unittesting",
+            successRule="delete",
+            failureRule="failed"
+        )
+
     def test_directory_script_runner_function_exception(self):
 
         from fundamentals.mysql import directory_script_runner
