@@ -232,9 +232,8 @@ class tools():
                             pass
                     except:
                         print "please add settings to file '%(settingsFile)s'" % locals()
-                    return
+                    # return
         else:
-
             pass
 
         if stream is not False:
