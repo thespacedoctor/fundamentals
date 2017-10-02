@@ -38,6 +38,7 @@ class tools():
         - ``options_first`` -- options come before commands in CL usage. Default *False*.
         - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
         - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
+        - ``defaultSettingsFIle`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
 
     **Usage:**
 
@@ -115,7 +116,8 @@ class tools():
             logLevel="WARNING",
             options_first=False,
             projectName=False,
-            orderedSettings=False
+            orderedSettings=False,
+            defaultSettingsFile=False
     ):
         self.arguments = arguments
         self.docString = docString
@@ -132,6 +134,9 @@ class tools():
                 del arguments["<pathToSettingsFile>"]
         except:
             pass
+
+        if defaultSettingsFile and "settingsFile" not in arguments:
+            arguments["settingsFile"] = None
 
         # UNPACK SETTINGS
         stream = False
