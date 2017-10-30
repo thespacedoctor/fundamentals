@@ -551,7 +551,7 @@ class list_of_dictionaries():
         for row in dataCopy:
             for c in tableColumnNames:
                 if isinstance(row[c], float) or isinstance(row[c], Decimal):
-                    row[c] = "%0.4f" % row[c]
+                    row[c] = "%0.9g" % row[c]
                 elif isinstance(row[c], datetime):
                     thisDate = str(row[c])[:10]
                     row[c] = "%(thisDate)s" % locals()

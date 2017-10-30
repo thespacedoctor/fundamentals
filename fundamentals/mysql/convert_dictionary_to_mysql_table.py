@@ -191,6 +191,9 @@ def convert_dictionary_to_mysql_table(
             sqlQuery = """
                 CREATE TABLE `%(dbTableName)s`
                 (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
+                `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated` tinyint(4) DEFAULT '0',
                 PRIMARY KEY (`primaryId`))
                 ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
             """ % locals()
