@@ -38,7 +38,7 @@ class tools():
         - ``options_first`` -- options come before commands in CL usage. Default *False*.
         - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
         - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
-        - ``defaultSettingsFIle`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
+        - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
 
     **Usage:**
 
@@ -136,7 +136,8 @@ class tools():
             pass
 
         if defaultSettingsFile and "settingsFile" not in arguments:
-            arguments["settingsFile"] = None
+            arguments["settingsFile"] = settingsFile = os.getenv(
+                "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
 
         # UNPACK SETTINGS
         stream = False
@@ -166,6 +167,7 @@ class tools():
                 settingsFile = os.getenv(
                     "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
                 exists = os.path.exists(settingsFile)
+                arguments["settingsFile"] = settingsFile
 
                 if not exists:
                     import codecs
@@ -353,6 +355,7 @@ class tools():
         **Summary:**
             *setup the attributes and return*
         """
+
         return self.arguments, self.settings, self.log, self.dbConn
 
     def _setup_tunnel(

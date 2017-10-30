@@ -126,7 +126,7 @@ def writequery(
             if manyValueList:
                 log.error('... and the values:\n%s' % (thisList, ))
         elif "Duplicate entry" in str(e):
-            log.debug('Duplicate Key error: %s' % (str(e), ))
+            log.warning('Duplicate Key error: %s' % (str(e), ))
             message = "duplicate key error"
         else:
             sqlQuery = sqlQuery[:2000]
@@ -136,6 +136,7 @@ def writequery(
             if Force == False:
                 sys.exit(0)
             return -1
+    dbConn.commit()
     # CLOSE THE CURSOR
     cOpen = True
     count = 0
