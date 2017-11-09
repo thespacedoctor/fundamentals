@@ -99,39 +99,40 @@ def writequery(
             log.info(str(e) + '\n')
         elif e[0] == 1062:
                            # Duplicate Key error
-            log.debug('Duplicate Key error: %s' % (str(e), ))
+            log.debug('Duplicate Key error: %s\n' % (str(e), ))
             message = "duplicate key error"
         elif e[0] == 1061:
                            # Duplicate Key error
-            log.debug('index already exists: %s' % (str(e), ))
+            log.debug('index already exists: %s\n' % (str(e), ))
             message = "index already exists"
         elif "Duplicate entry" in str(e):
-            log.debug('Duplicate Key error: %s' % (str(e), ))
+            log.debug('Duplicate Key error: %s\n' % (str(e), ))
             message = "duplicate key error"
         else:
             sqlQueryTrim = sqlQuery[:1000]
-            message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s ' % (sqlQuery,
-                                                                                                         str(e))
+            message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
+                                                                                                           str(e))
             if Force == False:
                 log.error(message)
                 sys.exit(0)
             else:
                 log.warning(message)
+                print ""
                 return -1
     except pymysql.Warning as e:
         log.info(str(e))
     except Exception as e:
         if "truncated" in str(e):
-            log.error('%s\n Here is the sqlquery:\n%s' % (str(e), sqlQuery))
+            log.error('%s\n Here is the sqlquery:\n%s\n' % (str(e), sqlQuery))
             if manyValueList:
-                log.error('... and the values:\n%s' % (thisList, ))
+                log.error('... and the values:\n%s\n' % (thisList, ))
         elif "Duplicate entry" in str(e):
-            log.warning('Duplicate Key error: %s' % (str(e), ))
+            log.warning('Duplicate Key error: %s\n' % (str(e), ))
             message = "duplicate key error"
         else:
             sqlQuery = sqlQuery[:2000]
             log.error(
-                'MySQL write command not executed for this query: << %s >>\nThe error was: %s ' %
+                'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' %
                 (sqlQuery, str(e)))
             if Force == False:
                 sys.exit(0)

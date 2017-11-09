@@ -23,8 +23,7 @@ Modules
    :nosignatures:
 
    fundamentals.logs
-   fundamentals.times
-   fundamentals.files.tag 
+   fundamentals.times 
 
 Classes
 -----------
@@ -64,5 +63,4 @@ Functions
    fundamentals.logs.console_logger
    fundamentals.logs.setup_dryx_logging
    fundamentals.times.calculate_time_difference
-   fundamentals.times.get_now_sql_datetime
-   fundamentals.files.tag.tag 
+   fundamentals.times.get_now_sql_datetime 
