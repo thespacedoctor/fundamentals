@@ -58,6 +58,7 @@ def multiprocess(
 
     p.close()
     p.join()
+    p.terminate()
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
