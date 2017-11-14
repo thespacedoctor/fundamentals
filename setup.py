@@ -41,7 +41,8 @@ setup(
         'pyprof2calltree',
         'nose2',
         'cov-core',
-        'pymysql'
+        'pymysql',
+        'multiprocess'
     ],
     test_suite='nose2.collector.collector',
     tests_require=['nose2', 'cov-core'],

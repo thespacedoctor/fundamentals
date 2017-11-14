@@ -14,11 +14,11 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-from multiprocessing import Pool, cpu_count
+from multiprocess import cpu_count, Pool
 from functools import partial
 
 
-def multiprocess(
+def fmultiprocess(
         log,
         function,
         inputArray,
@@ -53,8 +53,12 @@ def multiprocess(
     p = Pool(processes=poolSize)
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
-    mapfunc = partial(function, **kwargs)
-    resultArray = p.map(mapfunc, inputArray)
+    try:
+        mapfunc = partial(function, log=log, **kwargs)
+        resultArray = p.map(mapfunc, inputArray)
+    except:
+        mapfunc = partial(function, **kwargs)
+        resultArray = p.map(mapfunc, inputArray)
 
     p.close()
     p.join()
