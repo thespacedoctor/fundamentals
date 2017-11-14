@@ -12,7 +12,7 @@ from fundamentals import tools
 su = tools(
     arguments={"settingsFile": None},
     docString=__doc__,
-    logLevel="DEBUG",
+    logLevel="INFO",
     options_first=False,
     projectName="fundamentals",
     defaultSettingsFile=False
@@ -63,13 +63,13 @@ class test_multiprocess(unittest.TestCase):
 
     def test_multiprocess_function(self):
 
-        from fundamentals import multiprocess
+        from fundamentals import fmultiprocess
 
         # DEFINE AN INPUT ARRAY
         inputArray = range(10000)
         t1 = time.time()
-        result = multiprocess(log=log, function=f,
-                              inputArray=inputArray, anotherKeyword="cheese")
+        result = fmultiprocess(log=log, function=f,
+                               inputArray=inputArray, anotherKeyword="cheese")
 
         took = time.time() - t1
         print "Multiprocessing took: %(took)s" % locals()
@@ -84,9 +84,9 @@ class test_multiprocess(unittest.TestCase):
 
     def test_multiprocess_function_exception(self):
 
-        from fundamentals import multiprocess
+        from fundamentals import fmultiprocess
         try:
-            this = multiprocess(
+            this = fmultiprocess(
                 log=log,
                 settings=settings,
                 fakeKey="break the code"
