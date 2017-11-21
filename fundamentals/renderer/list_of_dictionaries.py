@@ -530,17 +530,17 @@ class list_of_dictionaries():
             delimiter = "|"
         if csvType in ["markdown"]:
             writer = csv.writer(output, delimiter=delimiter,
-                                quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
+                                quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\", lineterminator="\n")
         else:
             writer = csv.writer(output, dialect='excel', delimiter=delimiter,
-                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
 
         if csvType in ["markdown"]:
             dividerWriter = csv.writer(
-                output, delimiter="|", quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\")
+                output, delimiter="|", quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\", lineterminator="\n")
         else:
             dividerWriter = csv.writer(output, dialect='excel', delimiter="+",
-                                       quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                       quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
         # add column names to csv
         header = []
         divider = []
