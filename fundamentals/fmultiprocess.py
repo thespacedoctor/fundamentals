@@ -50,6 +50,9 @@ def fmultiprocess(
         poolSize = cpu_count() - 1
     else:
         poolSize = 1
+
+    if len(inputArray) < poolSize:
+        poolSize = len(inputArray)
     p = Pool(processes=poolSize)
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
@@ -57,12 +60,16 @@ def fmultiprocess(
         mapfunc = partial(function, log=log, **kwargs)
         resultArray = p.map(mapfunc, inputArray)
     except:
-        mapfunc = partial(function, **kwargs)
-        resultArray = p.map(mapfunc, inputArray)
+        try:
+            mapfunc = partial(function, **kwargs)
+            resultArray = p.map(mapfunc, inputArray)
+        except:
+            mapfunc = partial(function, log=log, **kwargs)
+            resultArray = p.map(mapfunc, inputArray)
 
     p.close()
-    p.join()
     p.terminate()
+    p.join()
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
