@@ -66,7 +66,7 @@ class test_multiprocess(unittest.TestCase):
         from fundamentals import fmultiprocess
 
         # DEFINE AN INPUT ARRAY
-        inputArray = range(10000)
+        inputArray = range(1000)
         t1 = time.time()
         result = fmultiprocess(log=log, function=f,
                                inputArray=inputArray, anotherKeyword="cheese")
