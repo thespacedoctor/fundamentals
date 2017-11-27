@@ -80,3 +80,7 @@ def setup_database_connection(
         logging.critical('could not connect to the ' + connDict['db'] + ' database on ' + connDict['host'] + ' : '
                          + str(e) + '\n')
     return dbConn
+
+
+# use the tab-trigger below for new function
+# xt-def-function

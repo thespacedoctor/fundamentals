@@ -11,7 +11,7 @@ from fundamentals import tools
 su = tools(
     arguments={"settingsFile": None},
     docString=__doc__,
-    logLevel="DEBUG",
+    logLevel="WARNING",
     options_first=False,
     projectName="fundamentals"
 )
@@ -29,21 +29,21 @@ utKit = utKit(moduleDirectory)
 log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
+dictList = []
+
+for i in range(1000000):
+
+    dictList.append({
+        "col1": i,
+        "col2": i + 10.,
+        "col3": i / 2.,
+        "col4": i * 34.
+    })
+
 
 class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 
     def test_insert_list_of_dictionaries_into_database_tables_function(self):
-
-        dictList = []
-
-        for i in range(14000):
-
-            dictList.append({
-                "col1": i,
-                "col2": i + 10.,
-                "col3": i / 2.,
-                "col4": i * 34.
-            })
 
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
         insert_list_of_dictionaries_into_database_tables(
@@ -52,8 +52,9 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dictList=dictList,
             dbTableName="test_insert_many",
             uniqueKeyList=["col1", "col3"],
-            dateModified=False,
-            batchSize=2500
+            dateModified=True,
+            batchSize=10000,
+            replace=True
         )
 
         # x-print-testpage-for-pessto-marshall-web-object

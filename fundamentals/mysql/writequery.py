@@ -86,6 +86,7 @@ def writequery(
             batch = 100000
             offset = 0
             stop = 0
+
             while stop == 0:
                 thisList = manyValueList[offset:offset + batch]
                 offset += batch
@@ -137,7 +138,7 @@ def writequery(
             if Force == False:
                 sys.exit(0)
             return -1
-    dbConn.commit()
+    # dbConn.commit()
     # CLOSE THE CURSOR
     cOpen = True
     count = 0
