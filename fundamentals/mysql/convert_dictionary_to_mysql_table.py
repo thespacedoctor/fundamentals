@@ -17,6 +17,8 @@ import re
 import yaml
 import time
 import datetime
+import collections as c
+import pymysql as mdb
 from fundamentals import tools, times
 from fundamentals.mysql import writequery, table_exists, readquery
 
@@ -32,7 +34,8 @@ def convert_dictionary_to_mysql_table(
         returnInsertOnly=False,
         replace=False,
         batchInserts=True,
-        reDatetime=False):
+        reDatetime=False,
+        skipChecks=False):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -47,6 +50,7 @@ def convert_dictionary_to_mysql_table(
         - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
         - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
+        - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -115,14 +119,11 @@ def convert_dictionary_to_mysql_table(
             # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
             # uniquekey1="cheese"
     """
-    import pymysql as mdb
+
     log.info('starting the ``convert_dictionary_to_mysql_table`` function')
 
-    # # >IMPORTS #
-    # import ordereddict as c  # REMOVE WHEN PYTHON 2.7 INSTALLED ON PSDB
-    import collections as c
-
-    log.debug('starting convert_dictionary_to_mysql_table')
+    if not reDatetime:
+        reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 
     if not replace:
         insertVerb = "INSERT"
@@ -180,11 +181,14 @@ def convert_dictionary_to_mysql_table(
             raise TypeError(message)
 
         # TEST IF TABLE EXISTS
-        tableExists = table_exists.table_exists(
-            dbConn=dbConn,
-            log=log,
-            dbTableName=dbTableName
-        )
+        if skipChecks:
+            tableExists = table_exists.table_exists(
+                dbConn=dbConn,
+                log=log,
+                dbTableName=dbTableName
+            )
+        else:
+            tableExists = False
 
         # CREATE THE TABLE IF IT DOES NOT EXIST
         if tableExists is False:
@@ -204,20 +208,18 @@ def convert_dictionary_to_mysql_table(
 
             )
 
-    if not reDatetime:
-        reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
     qCreateColumn = ''
     formattedKey = ''
     formattedKeyList = []
     myValues = []
 
-    # ADD EXTRA COLUMNS TO THE DICTIONARY
-    if dateModified:
+    # ADD EXTRA COLUMNS TO THE DICTIONARY todo: do I need this?
+    if dateModified and replace == False:
         dictionary['dateLastModified'] = [
             str(times.get_now_sql_datetime()), "date row was modified"]
         dictionary['updated'] = [0, "this row has been updated"]
 
-    # ITERATE THROUGH THE DICTIONARY AND GENERATE THE A TABLE COLUMN WITH THE
+    # ITERATE THROUGH THE DICTIONARY AND GENERATE THE TABLE COLUMN WITH THE
     # NAME OF THE KEY, IF IT DOES NOT EXIST
     count = len(dictionary)
     i = 1
