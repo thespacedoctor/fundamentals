@@ -193,7 +193,7 @@ def _insert_single_batch_into_database(
     while inserted == False:
 
         if not replace:
-            insertVerb = "INSERT"
+            insertVerb = "INSERT IGNORE"
         else:
             insertVerb = "INSERT IGNORE"
 
