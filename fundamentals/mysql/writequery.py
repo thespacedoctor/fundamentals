@@ -77,6 +77,7 @@ def writequery(
     except Exception as e:
         log.error('could not create the database cursor.')
     # EXECUTE THE SQL COMMAND
+
     try:
         if manyValueList == False:
             cursor.execute(sqlQuery)
@@ -92,6 +93,7 @@ def writequery(
                 offset += batch
                 a = len(thisList)
                 cursor.executemany(sqlQuery, thisList)
+                dbConn.commit()
                 if len(thisList) < batch:
                     stop = 1
 
@@ -138,7 +140,7 @@ def writequery(
             if Force == False:
                 sys.exit(0)
             return -1
-    # dbConn.commit()
+    dbConn.commit()
     # CLOSE THE CURSOR
     cOpen = True
     count = 0
