@@ -44,14 +44,14 @@ class database():
             dbSettings = {
                 'host': '127.0.0.1', 
                 'loginPath': 'atlasMovers', 
-                'user': 'dryx', 
+                'user': 'monster', 
                 'tunnel': {
                     'remote ip': 'psweb.mp.qub.ac.uk', 
                     'remote datbase host': 'dormammu', 
-                    'remote user': 'dry', 
+                    'remote user': 'monster', 
                     'port': 9006
                 }, 
-                'password': 'dryxPass', 
+                'password': 'myPass', 
                 'db': 'atlas_moving_objects'
             }
 
