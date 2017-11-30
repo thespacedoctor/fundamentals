@@ -46,14 +46,15 @@ def fmultiprocess(
     log.info('starting the ``multiprocess`` function')
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
-    if cpu_count() > 1:
-        poolSize = cpu_count() - 1
-    else:
-        poolSize = 1
+    # if cpu_count() > 1:
+    #     poolSize = cpu_count() - 1
+    # else:
+    #     poolSize = 1
 
-    if len(inputArray) < poolSize:
-        poolSize = len(inputArray)
-    p = Pool(processes=poolSize)
+    # if len(inputArray) < poolSize:
+    #     poolSize = len(inputArray)
+    # p = Pool(processes=poolSize)
+    p = Pool()
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
     try:
