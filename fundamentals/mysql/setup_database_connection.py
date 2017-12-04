@@ -73,7 +73,8 @@ def setup_database_connection(
             passwd=connDict['password'],
             db=connDict['db'],
             use_unicode=True,
-            charset='utf8'
+            charset='utf8',
+            local_infile=1
         )
         dbConn.autocommit(True)
     except Exception as e:

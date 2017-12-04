@@ -22,6 +22,7 @@ def fmultiprocess(
         log,
         function,
         inputArray,
+        poolSize=False,
         **kwargs):
     """multiprocess pool
 
@@ -53,8 +54,10 @@ def fmultiprocess(
 
     # if len(inputArray) < poolSize:
     #     poolSize = len(inputArray)
-    # p = Pool(processes=poolSize)
-    p = Pool()
+    if poolSize:
+        p = Pool(processes=poolSize)
+    else:
+        p = Pool()
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
     try:
