@@ -112,7 +112,8 @@ class database():
             db=dbName,
             port=port,
             use_unicode=True,
-            charset='utf8'
+            charset='utf8',
+            local_infile=1
         )
         if self.autocommit:
             dbConn.autocommit(True)
