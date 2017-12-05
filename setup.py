@@ -42,7 +42,8 @@ setup(
         'nose2',
         'cov-core',
         'pymysql',
-        'multiprocess'
+        'multiprocess',
+        'pandas'
     ],
     test_suite='nose2.collector.collector',
     tests_require=['nose2', 'cov-core'],

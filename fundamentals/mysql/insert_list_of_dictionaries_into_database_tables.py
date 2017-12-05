@@ -18,11 +18,14 @@ from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.fmultiprocess import fmultiprocess
 import time
 import re
-
+from fundamentals.mysql.database import database
+import pandas as pd
+from datetime import datetime
 
 count = 0
 totalCount = 0
 globalDbConn = False
+sharedList = []
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -73,6 +76,7 @@ def insert_list_of_dictionaries_into_database_tables(
     global count
     global totalCount
     global globalDbConn
+    global sharedList
 
     reDate = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 
@@ -104,28 +108,35 @@ def insert_list_of_dictionaries_into_database_tables(
 
     start = 0
     end = 0
-    theseBatches = []
+    sharedList = []
     for i in range(batches + 1):
         end = end + batchSize
         start = i * batchSize
         thisBatch = dictList[start:end]
-        theseBatches.append((thisBatch, end))
+        sharedList.append((thisBatch, end))
 
     totalCount = total
 
-    fmultiprocess(
-        log=log,
-        function=_insert_single_batch_into_database,
-        inputArray=theseBatches,
-        dbTableName=dbTableName,
-        uniqueKeyList=uniqueKeyList,
-        dateModified=dateModified,
-        replace=replace,
-        batchSize=batchSize,
-        reDatetime=reDate
-    )
+    if dbSettings == False:
 
-    if len(theseBatches) > 1:
+        fmultiprocess(
+            log=log,
+            function=_insert_single_batch_into_database,
+            inputArray=range(len(sharedList)),
+            dbTableName=dbTableName,
+            uniqueKeyList=uniqueKeyList,
+            dateModified=dateModified,
+            replace=replace,
+            batchSize=batchSize,
+            reDatetime=reDate
+        )
+
+    else:
+        fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
+                      inputArray=range(len(sharedList)), dbTablename=dbTableName,
+                      dbSettings=dbSettings)
+
+    if len(sharedList) > 1:
         sys.stdout.write("\x1b[1A\x1b[2K")
     print "%(total)s / %(total)s rows inserted into %(dbTableName)s" % locals()
 
@@ -135,7 +146,7 @@ def insert_list_of_dictionaries_into_database_tables(
 
 
 def _insert_single_batch_into_database(
-        batch,
+        batchIndex,
         log,
         dbTableName,
         uniqueKeyList,
@@ -146,7 +157,7 @@ def _insert_single_batch_into_database(
     """*summary of function*
 
     **Key Arguments:**
-        - ``batch`` -- the batch to insert
+        - ``batchIndex`` -- the index of the batch to insert
         - ``dbConn`` -- mysql database connection
         - ``log`` -- logger
 
@@ -167,12 +178,23 @@ def _insert_single_batch_into_database(
 
     global totalCount
     global globalDbConn
+    global sharedList
+
+    batch = sharedList[batchIndex]
+
+    print "HERE"
+    print "HERE"
+    print "HERE"
+    print "HERE"
+    print "HERE"
+    print "HERE"
+    print "HERE"
 
     reDate = reDatetime
 
     if isinstance(globalDbConn, dict):
         # SETUP ALL DATABASE CONNECTIONS
-        from fundamentals.mysql import database
+
         dbConn = database(
             log=log,
             dbSettings=globalDbConn,
@@ -285,6 +307,105 @@ def _insert_single_batch_into_database(
 
     log.info('completed the ``_insert_single_batch_into_database`` function')
     return "None"
+
+
+def _add_dictlist_to_database_via_load_in_file(
+        masterListIndex,
+        log,
+        dbTablename,
+        dbSettings):
+    """*load a list of dictionaries into a database table with load data infile*
+
+    **Key Arguments:**
+
+        - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
+        - ``dbTablename`` -- the name of the database table to add the list to
+        - ``dbSettings`` -- the dictionary of database settings
+        - ``log`` -- logger
+
+    **Return:**
+        - None
+
+    **Usage:**
+        .. todo::
+
+            add usage info
+            create a sublime snippet for usage
+
+        .. code-block:: python
+
+            usage code
+    """
+    log.info('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
+
+    global sharedList
+
+    dictList = sharedList[masterListIndex][0]
+
+    # SETUP ALL DATABASE CONNECTIONS
+    dbConn = database(
+        log=log,
+        dbSettings=dbSettings
+    ).connect()
+
+    now = datetime.now()
+    tmpTable = now.strftime("tmp_%Y%m%dt%H%M%S%f")
+
+    # CREATE A TEMPORY TABLE TO ADD DATA TO
+    sqlQuery = """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;""" % locals()
+    writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn
+    )
+
+    csvColumns = dictList[0].keys()
+    csvColumnsString = (', ').join(csvColumns)
+
+    df = pd.DataFrame(dictList)
+    df = df.replace('None', '')
+    df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|", columns=csvColumns,
+              index=False, escapechar="\\", quotechar='"')
+
+    sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
+INTO TABLE %(tmpTable)s
+FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
+(%(csvColumnsString)s);""" % locals()
+    writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn
+    )
+
+    updateStatement = ""
+    for i in csvColumns:
+        updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
+    updateStatement += "dateLastModified = NOW(), updated = 1"
+
+    sqlQuery = """
+INSERT IGNORE INTO %(dbTablename)s
+SELECT * FROM %(tmpTable)s
+ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
+    writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn
+    )
+
+    sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
+    writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn
+    )
+
+    try:
+        os.remove('/tmp/%(tmpTable)s' % locals())
+    except:
+        pass
+
+    log.info('completed the ``_add_dictlist_to_database_via_load_in_file`` function')
+    return None
 
 # use the tab-trigger below for new function
 # xt-def-function
