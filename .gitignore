@@ -34,3 +34,4 @@ path_to_settings.yaml
 blog-post.md
 blog-post.rst
 build
+/fundamentals/files/tests/input/ppmxl-head.csv
