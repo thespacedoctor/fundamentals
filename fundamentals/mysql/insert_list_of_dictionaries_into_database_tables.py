@@ -26,7 +26,6 @@ count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
-firstLine = True
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -78,7 +77,6 @@ def insert_list_of_dictionaries_into_database_tables(
     global totalCount
     global globalDbConn
     global sharedList
-    global firstLine
 
     reDate = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 
@@ -137,7 +135,6 @@ def insert_list_of_dictionaries_into_database_tables(
         )
 
     else:
-        firstLine = True
         fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
                       inputArray=range(len(sharedList)), dbTablename=dbTableName,
                       dbSettings=dbSettings)
@@ -201,8 +198,6 @@ def _insert_single_batch_into_database(
         dbConn = globalDbConn
 
     count = batch[1]
-    if firstLine == True:
-        firstLine = False
     if count > totalCount:
         count = totalCount
     ltotalCount = totalCount
