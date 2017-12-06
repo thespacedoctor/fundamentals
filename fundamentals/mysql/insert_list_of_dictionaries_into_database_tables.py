@@ -26,6 +26,7 @@ count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
+firstLine = True
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -77,6 +78,7 @@ def insert_list_of_dictionaries_into_database_tables(
     global totalCount
     global globalDbConn
     global sharedList
+    global firstLine
 
     reDate = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 
@@ -115,7 +117,10 @@ def insert_list_of_dictionaries_into_database_tables(
         thisBatch = dictList[start:end]
         sharedList.append((thisBatch, end))
 
-    totalCount = total
+    totalCount = total + 1
+    ltotalCount = totalCount
+
+    print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
     if dbSettings == False:
 
@@ -132,13 +137,13 @@ def insert_list_of_dictionaries_into_database_tables(
         )
 
     else:
+        firstLine = True
         fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
                       inputArray=range(len(sharedList)), dbTablename=dbTableName,
                       dbSettings=dbSettings)
 
-    if len(sharedList) > 1:
-        sys.stdout.write("\x1b[1A\x1b[2K")
-    print "%(total)s / %(total)s rows inserted into %(dbTableName)s" % locals()
+    sys.stdout.write("\x1b[1A\x1b[2K")
+    print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
 
     log.info(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
@@ -182,14 +187,6 @@ def _insert_single_batch_into_database(
 
     batch = sharedList[batchIndex]
 
-    print "HERE"
-    print "HERE"
-    print "HERE"
-    print "HERE"
-    print "HERE"
-    print "HERE"
-    print "HERE"
-
     reDate = reDatetime
 
     if isinstance(globalDbConn, dict):
@@ -204,9 +201,8 @@ def _insert_single_batch_into_database(
         dbConn = globalDbConn
 
     count = batch[1]
-    if count > batchSize:
-        # Cursor up one line and clear line
-        sys.stdout.write("\x1b[1A\x1b[2K")
+    if firstLine == True:
+        firstLine = False
     if count > totalCount:
         count = totalCount
     ltotalCount = totalCount
@@ -303,8 +299,6 @@ def _insert_single_batch_into_database(
 
         dbConn.commit()
 
-        print "~%(count)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
-
     log.info('completed the ``_insert_single_batch_into_database`` function')
     return "None"
 
@@ -341,6 +335,11 @@ def _add_dictlist_to_database_via_load_in_file(
     global sharedList
 
     dictList = sharedList[masterListIndex][0]
+
+    count = sharedList[masterListIndex][1]
+    if count > totalCount:
+        count = totalCount
+    ltotalCount = totalCount
 
     # SETUP ALL DATABASE CONNECTIONS
     dbConn = database(
