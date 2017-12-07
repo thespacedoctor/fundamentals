@@ -21,6 +21,8 @@ import re
 from fundamentals.mysql.database import database
 import pandas as pd
 from datetime import datetime
+import numpy as np
+
 
 count = 0
 totalCount = 0
@@ -357,14 +359,16 @@ def _add_dictlist_to_database_via_load_in_file(
     csvColumnsString = (', ').join(csvColumns)
 
     df = pd.DataFrame(dictList)
-    df = df.replace('None', '')
+    df.replace(['nan', 'None', '', 'NaN', np.nan], '\\N', inplace=True)
     df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|", columns=csvColumns,
               index=False, escapechar="\\", quotechar='"')
 
     sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
 INTO TABLE %(tmpTable)s
 FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
+IGNORE 1 LINES
 (%(csvColumnsString)s);""" % locals()
+
     writequery(
         log=log,
         sqlQuery=sqlQuery,
