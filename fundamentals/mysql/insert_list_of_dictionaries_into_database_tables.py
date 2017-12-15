@@ -355,13 +355,14 @@ def _add_dictlist_to_database_via_load_in_file(
         dbConn=dbConn
     )
 
-    csvColumns = dictList[0].keys()
+    csvColumns = [k for d in dictList for k in d.keys()]
+    csvColumns = list(set(csvColumns))
     csvColumnsString = (', ').join(csvColumns)
 
     df = pd.DataFrame(dictList)
     df.replace(['nan', 'None', '', 'NaN', np.nan], '\\N', inplace=True)
-    df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|", columns=csvColumns,
-              index=False, escapechar="\\", quotechar='"')
+    df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|",
+              index=False, escapechar="\\", quotechar='"', columns=csvColumns)
 
     sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
 INTO TABLE %(tmpTable)s
