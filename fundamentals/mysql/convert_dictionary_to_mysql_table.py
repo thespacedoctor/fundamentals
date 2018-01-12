@@ -193,7 +193,7 @@ def convert_dictionary_to_mysql_table(
         # CREATE THE TABLE IF IT DOES NOT EXIST
         if tableExists is False:
             sqlQuery = """
-                CREATE TABLE IF NOT EXIST `%(dbTableName)s`
+                CREATE TABLE IF NOT EXISTS `%(dbTableName)s`
                 (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
                 `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
                 `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
