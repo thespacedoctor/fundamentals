@@ -181,7 +181,7 @@ def convert_dictionary_to_mysql_table(
             raise TypeError(message)
 
         # TEST IF TABLE EXISTS
-        if skipChecks:
+        if not skipChecks:
             tableExists = table_exists.table_exists(
                 dbConn=dbConn,
                 log=log,
