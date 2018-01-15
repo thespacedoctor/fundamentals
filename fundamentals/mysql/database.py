@@ -113,7 +113,9 @@ class database():
             port=port,
             use_unicode=True,
             charset='utf8',
-            local_infile=1
+            local_infile=1,
+            client_flag=ms.constants.CLIENT.MULTI_STATEMENT,
+            connect_timeout=3600
         )
         if self.autocommit:
             dbConn.autocommit(True)

@@ -342,7 +342,9 @@ class tools():
                 db=dbName,
                 use_unicode=True,
                 charset='utf8',
-                local_infile=1
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENT,
+                connect_timeout=3600
             )
             dbConn.autocommit(True)
 
@@ -411,7 +413,9 @@ class tools():
             port=sshPort,
             use_unicode=True,
             charset='utf8',
-            local_infile=1
+            local_infile=1,
+            client_flag=ms.constants.CLIENT.MULTI_STATEMENT,
+            connect_timeout=3600
         )
         thisConn.autocommit(True)
         self.remoteDBConn = thisConn
