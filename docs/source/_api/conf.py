@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # fundamentals documentation build configuration file, created by
-# sphinx-quickstart on Mon Oct 30 09:43:32 2017.
+# sphinx-quickstart on Mon Jan 15 12:03:45 2018.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'fundamentals'
-copyright = u'2017, Author'
+copyright = u'2018, Author'
 author = u'Author'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -237,26 +237,26 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-html_help_basename = 'fundamentalsdoc'
+htmlhelp_basename = 'fundamentalsdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+     # The paper size ('letterpaper' or 'a4paper').
+     #
+     # 'papersize': 'letterpaper',
 
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
+     # The font size ('10pt', '11pt' or '12pt').
+     #
+     # 'pointsize': '10pt',
 
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
+     # Additional stuff for the LaTeX preamble.
+     #
+     # 'preamble': '',
 
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+     # Latex figure (float) alignment
+     #
+     # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
