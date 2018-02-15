@@ -102,10 +102,11 @@ def insert_list_of_dictionaries_into_database_tables(
             dateModified=dateModified,
             reDatetime=reDate,
             replace=replace,)
+        dictList = dictList[1:]
 
     dbConn.autocommit(False)
 
-    total = len(dictList[1:])
+    total = len(dictList)
     batches = int(total / batchSize)
 
     start = 0
