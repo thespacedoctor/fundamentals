@@ -103,7 +103,7 @@ default_role = 'py:obj'
 pygments_style = 'monokai'
 
 # A list of ignored prefixes for module index sorting.
-# modindex_common_prefix = []
+modindex_common_prefix = ["fundamentals."]
 
 
 # -- Options for HTML output ---------------------------------------------
@@ -302,27 +302,38 @@ def generateAutosummaryIndex():
     for sp in allSubpackages:
         for name, obj in inspect.getmembers(__import__(sp, fromlist=[''])):
             if inspect.ismodule(obj):
+                if name in ["numpy"]:
+                    continue
                 thisMod = sp + "." + name
-                if thisMod not in allSubpackages and len(name) and name[0] != "_" and name[-5:] != "tests":
+                if thisMod not in allSubpackages and len(name) and name[0:2] != "__" and name[-5:] != "tests" and name != "cl_utils" and name != "utKit":
                     allModules.append(sp + "." + name)
 
     for spm in allSubpackages + allModules:
         for name, obj in inspect.getmembers(__import__(spm, fromlist=[''])):
             if inspect.isclass(obj):
                 thisClass = spm + "." + name
-                if (thisClass == obj.__module__ or spm == obj.__module__) and len(name) and name[0] != "_":
+                if (thisClass == obj.__module__ or spm == obj.__module__) and len(name) and name[0:2] != "__":
                     allClasses.append(thisClass)
             if inspect.isfunction(obj):
                 thisFunction = spm + "." + name
-                if (spm == obj.__module__ or obj.__module__ == thisFunction) and len(name) and name != "main" and name[0] != "_":
+                if (spm == obj.__module__ or obj.__module__ == thisFunction) and len(name) and name != "main" and name[0:2] != "__":
                     allFunctions.append(thisFunction)
 
+    allSubpackages = allSubpackages[1:]
+    allSubpackages.sort(reverse=False)
+    allModules.sort()
+    allClasses.sort()
+    allFunctions.sort()
     allSubpackages = ("\n   ").join(allSubpackages)
     allModules = ("\n   ").join(allModules)
     allClasses = ("\n   ").join(allClasses)
     allFunctions = ("\n   ").join(allFunctions)
 
-    thisText = u"""
+    # FOR SUBPACKAGES USE THE SUBPACKAGE TEMPLATE INSTEAD OF DEFAULT MODULE
+    # TEMPLATE
+    thisText = u""
+    if len(allSubpackages):
+        thisText += """
 Subpackages
 -----------
 
@@ -333,8 +344,12 @@ Subpackages
 
    %(allSubpackages)s 
 
+""" % locals()
+
+    if len(allModules):
+        thisText += """
 Modules
------------
+-------
 
 .. autosummary::
    :toctree: _autosummary
@@ -342,8 +357,12 @@ Modules
 
    %(allModules)s 
 
+""" % locals()
+
+    if len(allClasses):
+        thisText += """
 Classes
------------
+-------
 
 .. autosummary::
    :toctree: _autosummary
@@ -351,14 +370,19 @@ Classes
 
    %(allClasses)s 
 
+""" % locals()
+
+    if len(allFunctions):
+        thisText += """
 Functions
------------
+---------
 
 .. autosummary::
    :toctree: _autosummary
    :nosignatures:
 
    %(allFunctions)s 
+
 """ % locals()
 
     import codecs
