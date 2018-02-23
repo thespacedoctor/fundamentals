@@ -446,19 +446,22 @@ def convert_dictionary_to_mysql_table(
         for k, v in zip(dupKeys, dupValues):
             dup = """%(dup)s `%(k)s`=%(v)s,""" % locals()
 
-        dup = """%(dup)s updated=IF(""" % locals()
-        for k, v in zip(dupKeys, dupValues):
-            if v == "null":
-                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-            else:
-                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-        dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
-        for k, v in zip(dupKeys, dupValues):
-            if v == "null":
-                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-            else:
-                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-        dup = dup[:-5] + ", dateLastModified, NOW())"
+        if dateModified:
+            dup = """%(dup)s updated=IF(""" % locals()
+            for k, v in zip(dupKeys, dupValues):
+                if v == "null":
+                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
+                else:
+                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
+            dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
+            for k, v in zip(dupKeys, dupValues):
+                if v == "null":
+                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
+                else:
+                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
+            dup = dup[:-5] + ", dateLastModified, NOW())"
+        else:
+            dup = dup[:-1] + ")"
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
