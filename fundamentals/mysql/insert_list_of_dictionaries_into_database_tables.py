@@ -388,6 +388,8 @@ IGNORE 1 LINES
         updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
     if dateModified:
         updateStatement += "dateLastModified = NOW(), updated = 1"
+    else:
+        updateStatement = updateStatement[0:-2]
 
     sqlQuery = """
 INSERT IGNORE INTO %(dbTablename)s
