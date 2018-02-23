@@ -140,7 +140,7 @@ def insert_list_of_dictionaries_into_database_tables(
     else:
         fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
                       inputArray=range(len(sharedList)), dbTablename=dbTableName,
-                      dbSettings=dbSettings)
+                      dbSettings=dbSettings, dateModified=dateModified)
 
     sys.stdout.write("\x1b[1A\x1b[2K")
     print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
@@ -305,7 +305,8 @@ def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
         log,
         dbTablename,
-        dbSettings):
+        dbSettings,
+        dateModified=False):
     """*load a list of dictionaries into a database table with load data infile*
 
     **Key Arguments:**
@@ -314,6 +315,7 @@ def _add_dictlist_to_database_via_load_in_file(
         - ``dbTablename`` -- the name of the database table to add the list to
         - ``dbSettings`` -- the dictionary of database settings
         - ``log`` -- logger
+        - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
 
     **Return:**
         - None
@@ -380,7 +382,8 @@ IGNORE 1 LINES
     updateStatement = ""
     for i in csvColumns:
         updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
-    updateStatement += "dateLastModified = NOW(), updated = 1"
+    if dateModified:
+        updateStatement += "dateLastModified = NOW(), updated = 1"
 
     sqlQuery = """
 INSERT IGNORE INTO %(dbTablename)s
