@@ -46,7 +46,7 @@ def convert_dictionary_to_mysql_table(
         - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
         - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
         - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
-        - ``dateModified`` -- add a modification date to the mysql table
+        - ``dateModified`` -- add a modification date and updated flag to the mysql table
         - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
         - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
@@ -214,10 +214,13 @@ def convert_dictionary_to_mysql_table(
     myValues = []
 
     # ADD EXTRA COLUMNS TO THE DICTIONARY todo: do I need this?
-    if dateModified and replace == False:
+    if dateModified:
         dictionary['dateLastModified'] = [
             str(times.get_now_sql_datetime()), "date row was modified"]
-        dictionary['updated'] = [0, "this row has been updated"]
+        if replace == False:
+            dictionary['updated'] = [0, "this row has been updated"]
+        else:
+            dictionary['updated'] = [1, "this row has been updated"]
 
     # ITERATE THROUGH THE DICTIONARY AND GENERATE THE TABLE COLUMN WITH THE
     # NAME OF THE KEY, IF IT DOES NOT EXIST
@@ -404,7 +407,6 @@ def convert_dictionary_to_mysql_table(
             dup = " ON DUPLICATE KEY UPDATE "
             for k, v in zip(formattedKeyList, mv):
                 dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-            dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
 
         insertCommand = insertCommand + dup
 
