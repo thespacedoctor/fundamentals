@@ -71,9 +71,9 @@ def fmultiprocess(
             mapfunc = partial(function, log=log, **kwargs)
             resultArray = p.map(mapfunc, inputArray)
 
+    p.join(timeout=2)
     p.close()
     p.terminate()
-    p.join()
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
