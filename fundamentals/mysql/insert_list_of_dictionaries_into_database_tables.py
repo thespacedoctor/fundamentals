@@ -37,9 +37,11 @@ def insert_list_of_dictionaries_into_database_tables(
         dbTableName,
         uniqueKeyList=[],
         dateModified=False,
+        dateCreated=True,
         batchSize=2500,
         replace=False,
-        dbSettings=False):
+        dbSettings=False,
+        dateCreated=True):
     """insert list of dictionaries into database tables
 
     **Key Arguments:**
@@ -49,6 +51,7 @@ def insert_list_of_dictionaries_into_database_tables(
         - ``dbTableName`` -- name of the database table
         - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
         - ``dateModified`` -- add the modification date as a column in the database
+        - ``dateCreated`` -- add the created date as a column in the database
         - ``batchSize`` -- batch the insert commands into *batchSize* batches
         - ``replace`` -- repalce row if a duplicate is found
         - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
@@ -101,7 +104,8 @@ def insert_list_of_dictionaries_into_database_tables(
             uniqueKeyList=uniqueKeyList,
             dateModified=dateModified,
             reDatetime=reDate,
-            replace=replace,)
+            replace=replace,
+            dateCreated=dateCreated)
         dictList = dictList[1:]
 
     dbConn.autocommit(False)
@@ -134,7 +138,8 @@ def insert_list_of_dictionaries_into_database_tables(
             dateModified=dateModified,
             replace=replace,
             batchSize=batchSize,
-            reDatetime=reDate
+            reDatetime=reDate,
+            dateCreated=dateCreated
         )
 
     else:

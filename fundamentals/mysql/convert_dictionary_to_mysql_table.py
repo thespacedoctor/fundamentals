@@ -35,7 +35,8 @@ def convert_dictionary_to_mysql_table(
         replace=False,
         batchInserts=True,
         reDatetime=False,
-        skipChecks=False):
+        skipChecks=False,
+        dateCreated=True):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -51,6 +52,7 @@ def convert_dictionary_to_mysql_table(
         - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
         - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
+        - ``dateCreated`` -- add a timestamp for dateCreated?
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -416,6 +418,10 @@ def convert_dictionary_to_mysql_table(
         insertCommand = insertCommand.replace('!!python/unicode', '')
         insertCommand = insertCommand.replace('"None"', 'null')
 
+        if not dateCreated:
+            insertCommand = insertCommand.replace(
+                ", dateCreated)", ")").replace(", NOW())", ")")
+
         return insertCommand, valueTuple
 
     # GENERATE THE INSERT COMMAND - IGNORE DUPLICATE ENTRIES
@@ -467,6 +473,10 @@ def convert_dictionary_to_mysql_table(
     addValue = insertVerb + """ INTO `""" + dbTableName + \
         """` (`""" + myKeys + """`, dateCreated) VALUES (\"""" + \
         myValues + """, NOW()) %(dup)s """ % locals()
+
+    if not dateCreated:
+        addValue = addValue.replace(
+            ", dateCreated)", ")").replace(", NOW())", ")")
 
     addValue = addValue.replace('\\""', '\\" "')
     addValue = addValue.replace('""', "null")
