@@ -40,8 +40,7 @@ def insert_list_of_dictionaries_into_database_tables(
         dateCreated=True,
         batchSize=2500,
         replace=False,
-        dbSettings=False,
-        dateCreated=True):
+        dbSettings=False):
     """insert list of dictionaries into database tables
 
     **Key Arguments:**
