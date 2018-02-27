@@ -70,5 +70,8 @@ def fmultiprocess(
 
     resultArray = resultArray.get(timeout=timeout)
 
+    p.close()
+    p.terminate()
+
     log.info('completed the ``multiprocess`` function')
     return resultArray
