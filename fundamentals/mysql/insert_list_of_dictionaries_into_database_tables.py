@@ -94,8 +94,6 @@ def insert_list_of_dictionaries_into_database_tables(
             'the dictionary to be added to the database is empty' % locals())
         return None
 
-    print dictList
-
     if len(dictList):
         convert_dictionary_to_mysql_table(
             dbConn=dbConn,
@@ -111,45 +109,47 @@ def insert_list_of_dictionaries_into_database_tables(
 
     dbConn.autocommit(False)
 
-    total = len(dictList)
-    batches = int(total / batchSize)
+    if len(dictList):
 
-    start = 0
-    end = 0
-    sharedList = []
-    for i in range(batches + 1):
-        end = end + batchSize
-        start = i * batchSize
-        thisBatch = dictList[start:end]
-        sharedList.append((thisBatch, end))
+        total = len(dictList)
+        batches = int(total / batchSize)
 
-    totalCount = total + 1
-    ltotalCount = totalCount
+        start = 0
+        end = 0
+        sharedList = []
+        for i in range(batches + 1):
+            end = end + batchSize
+            start = i * batchSize
+            thisBatch = dictList[start:end]
+            sharedList.append((thisBatch, end))
 
-    print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
+        totalCount = total + 1
+        ltotalCount = totalCount
 
-    if dbSettings == False:
+        print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
-        fmultiprocess(
-            log=log,
-            function=_insert_single_batch_into_database,
-            inputArray=range(len(sharedList)),
-            dbTableName=dbTableName,
-            uniqueKeyList=uniqueKeyList,
-            dateModified=dateModified,
-            replace=replace,
-            batchSize=batchSize,
-            reDatetime=reDate,
-            dateCreated=dateCreated
-        )
+        if dbSettings == False:
 
-    else:
-        fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
-                      inputArray=range(len(sharedList)), dbTablename=dbTableName,
-                      dbSettings=dbSettings, dateModified=dateModified)
+            fmultiprocess(
+                log=log,
+                function=_insert_single_batch_into_database,
+                inputArray=range(len(sharedList)),
+                dbTableName=dbTableName,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=dateModified,
+                replace=replace,
+                batchSize=batchSize,
+                reDatetime=reDate,
+                dateCreated=dateCreated
+            )
 
-    sys.stdout.write("\x1b[1A\x1b[2K")
-    print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
+        else:
+            fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
+                          inputArray=range(len(sharedList)), dbTablename=dbTableName,
+                          dbSettings=dbSettings, dateModified=dateModified)
+
+        sys.stdout.write("\x1b[1A\x1b[2K")
+        print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
 
     log.info(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
