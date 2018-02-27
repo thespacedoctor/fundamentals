@@ -126,7 +126,7 @@ def insert_list_of_dictionaries_into_database_tables(
 
     print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
-    print len(sharedList)
+    print sharedList
     if dbSettings == False and len(sharedList):
 
         fmultiprocess(
