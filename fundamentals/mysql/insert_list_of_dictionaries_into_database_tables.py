@@ -190,6 +190,7 @@ def _insert_single_batch_into_database(
     global globalDbConn
     global sharedList
 
+    print batchIndex
     batch = sharedList[batchIndex]
 
     reDate = reDatetime
