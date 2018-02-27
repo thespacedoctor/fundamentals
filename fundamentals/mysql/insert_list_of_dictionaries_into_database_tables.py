@@ -162,7 +162,8 @@ def _insert_single_batch_into_database(
         dateModified,
         replace,
         batchSize,
-        reDatetime):
+        reDatetime,
+        dateCreated):
     """*summary of function*
 
     **Key Arguments:**
@@ -230,6 +231,10 @@ def _insert_single_batch_into_database(
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
             """` (`""" + myKeys + """`, dateCreated) VALUES (""" + \
             valueString + """, NOW())"""
+
+        if not dateCreated:
+            insertCommand = insertCommand.replace(
+                ", dateCreated)", ")").replace(", NOW())", ")")
 
         dup = ""
         if replace:
