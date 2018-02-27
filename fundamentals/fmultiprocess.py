@@ -69,12 +69,6 @@ def fmultiprocess(
         resultArray = p.map_async(mapfunc, inputArray)
 
     resultArray = resultArray.get(timeout=timeout)
-    # try:
-    #     resultArray = resultArray.get(timeout=timeout)
-    # except:
-    #     log.error(
-    #         "The multiprocessing job timed out at %(timeout)s secs" % locals())
-    #     sys.exit(0)
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
