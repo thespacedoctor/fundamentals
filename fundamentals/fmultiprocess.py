@@ -16,6 +16,7 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from multiprocess import cpu_count, Pool
 from functools import partial
+import inspect
 
 
 def fmultiprocess(
@@ -23,6 +24,7 @@ def fmultiprocess(
         function,
         inputArray,
         poolSize=False,
+        timeout=3600,
         **kwargs):
     """multiprocess pool
 
@@ -30,6 +32,8 @@ def fmultiprocess(
         - ``log`` -- logger
         - ``function`` -- the function to multiprocess
         - ``inputArray`` -- the array to be iterated over
+        - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
+        - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
 
     **Return:**
         - ``resultArray`` -- the array of results
@@ -41,39 +45,31 @@ def fmultiprocess(
             from fundamentals import multiprocess
             # DEFINE AN INPUT ARRAY
             inputArray = range(10000)
-            results = multiprocess(log=log, function=functionName,
+            results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
                                   inputArray=inputArray, otherFunctionKeyword="cheese")
     """
     log.info('starting the ``multiprocess`` function')
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
-    # if cpu_count() > 1:
-    #     poolSize = cpu_count() - 1
-    # else:
-    #     poolSize = 1
-
-    # if len(inputArray) < poolSize:
-    #     poolSize = len(inputArray)
     if poolSize:
         p = Pool(processes=poolSize)
     else:
         p = Pool()
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
-    try:
+    if "log" in inspect.getargspec(function)[0]:
         mapfunc = partial(function, log=log, **kwargs)
-        resultArray = p.map(mapfunc, inputArray)
-    except:
-        try:
-            mapfunc = partial(function, **kwargs)
-            resultArray = p.map(mapfunc, inputArray)
-        except:
-            mapfunc = partial(function, log=log, **kwargs)
-            resultArray = p.map(mapfunc, inputArray)
+        resultArray = p.map_async(mapfunc, inputArray)
+    else:
+        mapfunc = partial(function, **kwargs)
+        resultArray = p.map_async(mapfunc, inputArray)
 
-    p.join(timeout=2)
-    p.close()
-    p.terminate()
+    try:
+        resultArray = resultArray.get(timeout=timeout)
+    except:
+        log.error(
+            "The multiprocessing job timed out at %(timeout)s secs" % locals())
+        sys.exit(0)
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
