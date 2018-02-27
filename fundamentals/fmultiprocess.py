@@ -17,6 +17,7 @@ from fundamentals import tools
 from multiprocess import cpu_count, Pool
 from functools import partial
 import inspect
+import psutil
 
 
 def fmultiprocess(
@@ -51,6 +52,9 @@ def fmultiprocess(
     log.info('starting the ``multiprocess`` function')
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
+    if not poolSize:
+        poolSize = psutil.cpu_count()
+
     if poolSize:
         p = Pool(processes=poolSize)
     else:
@@ -64,12 +68,13 @@ def fmultiprocess(
         mapfunc = partial(function, **kwargs)
         resultArray = p.map_async(mapfunc, inputArray)
 
-    try:
-        resultArray = resultArray.get(timeout=timeout)
-    except:
-        log.error(
-            "The multiprocessing job timed out at %(timeout)s secs" % locals())
-        sys.exit(0)
+    resultArray = resultArray.get(timeout=timeout)
+    # try:
+    #     resultArray = resultArray.get(timeout=timeout)
+    # except:
+    #     log.error(
+    #         "The multiprocessing job timed out at %(timeout)s secs" % locals())
+    #     sys.exit(0)
 
     log.info('completed the ``multiprocess`` function')
     return resultArray
