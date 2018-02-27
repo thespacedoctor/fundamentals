@@ -126,7 +126,7 @@ def insert_list_of_dictionaries_into_database_tables(
 
     print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
-    if dbSettings == False:
+    if dbSettings == False and len(sharedList):
 
         fmultiprocess(
             log=log,
@@ -190,7 +190,6 @@ def _insert_single_batch_into_database(
     global globalDbConn
     global sharedList
 
-    print batchIndex
     batch = sharedList[batchIndex]
 
     reDate = reDatetime
