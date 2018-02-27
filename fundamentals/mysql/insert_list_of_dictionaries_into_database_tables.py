@@ -94,6 +94,8 @@ def insert_list_of_dictionaries_into_database_tables(
             'the dictionary to be added to the database is empty' % locals())
         return None
 
+    print dictList
+
     if len(dictList):
         convert_dictionary_to_mysql_table(
             dbConn=dbConn,
@@ -126,8 +128,7 @@ def insert_list_of_dictionaries_into_database_tables(
 
     print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
-    print sharedList
-    if dbSettings == False and len(sharedList):
+    if dbSettings == False:
 
         fmultiprocess(
             log=log,
