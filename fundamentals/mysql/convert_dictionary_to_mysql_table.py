@@ -35,7 +35,8 @@ def convert_dictionary_to_mysql_table(
         replace=False,
         batchInserts=True,
         reDatetime=False,
-        skipChecks=False):
+        skipChecks=False,
+        dateCreated=True):
     """convert dictionary to mysql table
 
     **Key Arguments:**
@@ -46,11 +47,12 @@ def convert_dictionary_to_mysql_table(
         - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
         - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
         - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
-        - ``dateModified`` -- add a modification date to the mysql table
+        - ``dateModified`` -- add a modification date and updated flag to the mysql table
         - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
         - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
         - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
+        - ``dateCreated`` -- add a timestamp for dateCreated?
 
     **Return:**
         - ``returnInsertOnly`` -- the insert statement if requested
@@ -214,10 +216,13 @@ def convert_dictionary_to_mysql_table(
     myValues = []
 
     # ADD EXTRA COLUMNS TO THE DICTIONARY todo: do I need this?
-    if dateModified and replace == False:
+    if dateModified:
         dictionary['dateLastModified'] = [
             str(times.get_now_sql_datetime()), "date row was modified"]
-        dictionary['updated'] = [0, "this row has been updated"]
+        if replace == False:
+            dictionary['updated'] = [0, "this row has been updated"]
+        else:
+            dictionary['updated'] = [1, "this row has been updated"]
 
     # ITERATE THROUGH THE DICTIONARY AND GENERATE THE TABLE COLUMN WITH THE
     # NAME OF THE KEY, IF IT DOES NOT EXIST
@@ -404,7 +409,6 @@ def convert_dictionary_to_mysql_table(
             dup = " ON DUPLICATE KEY UPDATE "
             for k, v in zip(formattedKeyList, mv):
                 dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-            dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
 
         insertCommand = insertCommand + dup
 
@@ -413,6 +417,10 @@ def convert_dictionary_to_mysql_table(
         insertCommand = insertCommand.replace('!!python/unicode:', '')
         insertCommand = insertCommand.replace('!!python/unicode', '')
         insertCommand = insertCommand.replace('"None"', 'null')
+
+        if not dateCreated:
+            insertCommand = insertCommand.replace(
+                ", dateCreated)", ")").replace(", NOW())", ")")
 
         return insertCommand, valueTuple
 
@@ -444,24 +452,31 @@ def convert_dictionary_to_mysql_table(
         for k, v in zip(dupKeys, dupValues):
             dup = """%(dup)s `%(k)s`=%(v)s,""" % locals()
 
-        dup = """%(dup)s updated=IF(""" % locals()
-        for k, v in zip(dupKeys, dupValues):
-            if v == "null":
-                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-            else:
-                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-        dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
-        for k, v in zip(dupKeys, dupValues):
-            if v == "null":
-                dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-            else:
-                dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-        dup = dup[:-5] + ", dateLastModified, NOW())"
+        if dateModified:
+            dup = """%(dup)s updated=IF(""" % locals()
+            for k, v in zip(dupKeys, dupValues):
+                if v == "null":
+                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
+                else:
+                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
+            dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
+            for k, v in zip(dupKeys, dupValues):
+                if v == "null":
+                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
+                else:
+                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
+            dup = dup[:-5] + ", dateLastModified, NOW())"
+        else:
+            dup = dup[:-1]
 
     # log.debug(myValues+" ------ POSTSTRIP")
     addValue = insertVerb + """ INTO `""" + dbTableName + \
         """` (`""" + myKeys + """`, dateCreated) VALUES (\"""" + \
         myValues + """, NOW()) %(dup)s """ % locals()
+
+    if not dateCreated:
+        addValue = addValue.replace(
+            ", dateCreated)", ")").replace(", NOW())", ")")
 
     addValue = addValue.replace('\\""', '\\" "')
     addValue = addValue.replace('""', "null")

@@ -37,6 +37,7 @@ def insert_list_of_dictionaries_into_database_tables(
         dbTableName,
         uniqueKeyList=[],
         dateModified=False,
+        dateCreated=True,
         batchSize=2500,
         replace=False,
         dbSettings=False):
@@ -49,6 +50,7 @@ def insert_list_of_dictionaries_into_database_tables(
         - ``dbTableName`` -- name of the database table
         - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
         - ``dateModified`` -- add the modification date as a column in the database
+        - ``dateCreated`` -- add the created date as a column in the database
         - ``batchSize`` -- batch the insert commands into *batchSize* batches
         - ``replace`` -- repalce row if a duplicate is found
         - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
@@ -101,49 +103,53 @@ def insert_list_of_dictionaries_into_database_tables(
             uniqueKeyList=uniqueKeyList,
             dateModified=dateModified,
             reDatetime=reDate,
-            replace=replace,)
+            replace=replace,
+            dateCreated=dateCreated)
         dictList = dictList[1:]
 
     dbConn.autocommit(False)
 
-    total = len(dictList)
-    batches = int(total / batchSize)
+    if len(dictList):
 
-    start = 0
-    end = 0
-    sharedList = []
-    for i in range(batches + 1):
-        end = end + batchSize
-        start = i * batchSize
-        thisBatch = dictList[start:end]
-        sharedList.append((thisBatch, end))
+        total = len(dictList)
+        batches = int(total / batchSize)
 
-    totalCount = total + 1
-    ltotalCount = totalCount
+        start = 0
+        end = 0
+        sharedList = []
+        for i in range(batches + 1):
+            end = end + batchSize
+            start = i * batchSize
+            thisBatch = dictList[start:end]
+            sharedList.append((thisBatch, end))
 
-    print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
+        totalCount = total + 1
+        ltotalCount = totalCount
 
-    if dbSettings == False:
+        print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
-        fmultiprocess(
-            log=log,
-            function=_insert_single_batch_into_database,
-            inputArray=range(len(sharedList)),
-            dbTableName=dbTableName,
-            uniqueKeyList=uniqueKeyList,
-            dateModified=dateModified,
-            replace=replace,
-            batchSize=batchSize,
-            reDatetime=reDate
-        )
+        if dbSettings == False:
 
-    else:
-        fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
-                      inputArray=range(len(sharedList)), dbTablename=dbTableName,
-                      dbSettings=dbSettings)
+            fmultiprocess(
+                log=log,
+                function=_insert_single_batch_into_database,
+                inputArray=range(len(sharedList)),
+                dbTableName=dbTableName,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=dateModified,
+                replace=replace,
+                batchSize=batchSize,
+                reDatetime=reDate,
+                dateCreated=dateCreated
+            )
 
-    sys.stdout.write("\x1b[1A\x1b[2K")
-    print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
+        else:
+            fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
+                          inputArray=range(len(sharedList)), dbTablename=dbTableName,
+                          dbSettings=dbSettings, dateModified=dateModified)
+
+        sys.stdout.write("\x1b[1A\x1b[2K")
+        print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
 
     log.info(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
@@ -158,7 +164,8 @@ def _insert_single_batch_into_database(
         dateModified,
         replace,
         batchSize,
-        reDatetime):
+        reDatetime,
+        dateCreated):
     """*summary of function*
 
     **Key Arguments:**
@@ -226,6 +233,10 @@ def _insert_single_batch_into_database(
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
             """` (`""" + myKeys + """`, dateCreated) VALUES (""" + \
             valueString + """, NOW())"""
+
+        if not dateCreated:
+            insertCommand = insertCommand.replace(
+                ", dateCreated)", ")").replace(", NOW())", ")")
 
         dup = ""
         if replace:
@@ -305,7 +316,8 @@ def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
         log,
         dbTablename,
-        dbSettings):
+        dbSettings,
+        dateModified=False):
     """*load a list of dictionaries into a database table with load data infile*
 
     **Key Arguments:**
@@ -314,6 +326,7 @@ def _add_dictlist_to_database_via_load_in_file(
         - ``dbTablename`` -- the name of the database table to add the list to
         - ``dbSettings`` -- the dictionary of database settings
         - ``log`` -- logger
+        - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
 
     **Return:**
         - None
@@ -380,7 +393,10 @@ IGNORE 1 LINES
     updateStatement = ""
     for i in csvColumns:
         updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
-    updateStatement += "dateLastModified = NOW(), updated = 1"
+    if dateModified:
+        updateStatement += "dateLastModified = NOW(), updated = 1"
+    else:
+        updateStatement = updateStatement[0:-2]
 
     sqlQuery = """
 INSERT IGNORE INTO %(dbTablename)s
