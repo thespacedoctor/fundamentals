@@ -119,8 +119,7 @@ def writequery(
                 log.error(message)
                 sys.exit(0)
             else:
-                log.warning(message)
-                print ""
+                log.info(message)
                 return -1
     except pymysql.Warning as e:
         log.info(str(e))
