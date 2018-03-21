@@ -57,7 +57,6 @@ def readquery(
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
     # EXECUTE THE SQL COMMAND
-
     cursor.execute(sqlQuery)
     rows = cursor.fetchall()
     try:

@@ -76,7 +76,7 @@ def setup_database_connection(
             charset='utf8',
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=3600
+            connect_timeout=36000
         )
         dbConn.autocommit(True)
     except Exception as e:

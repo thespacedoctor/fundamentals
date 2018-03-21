@@ -344,7 +344,8 @@ class tools():
                 charset='utf8',
                 local_infile=1,
                 client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-                connect_timeout=3600
+                connect_timeout=36000,
+                max_allowed_packet=51200000
             )
             dbConn.autocommit(True)
 
@@ -400,6 +401,38 @@ class tools():
                             'cound not setup tunnel to remote datbase' % locals())
                         sys.exit(0)
 
+        if "tunnel" in self.settings["database settings"] and self.settings["database settings"]["tunnel"]:
+            # TEST TUNNEL DOES NOT ALREADY EXIST
+            sshPort = self.settings["database settings"]["tunnel"]["port"]
+            connected = self._checkServer(
+                self.settings["database settings"]["host"], sshPort)
+            if connected:
+                pass
+            else:
+                # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
+                ru = self.settings["database settings"][
+                    "tunnel"]["remote user"]
+                rip = self.settings["database settings"]["tunnel"]["remote ip"]
+                rh = self.settings["database settings"][
+                    "tunnel"]["remote datbase host"]
+
+                cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
+                p = Popen(cmd, shell=True, close_fds=True)
+                output = p.communicate()[0]
+
+                # TEST CONNECTION - QUIT AFTER SO MANY TRIES
+                connected = False
+                count = 0
+                while not connected:
+                    connected = self._checkServer(
+                        self.settings["database settings"]["host"], sshPort)
+                    time.sleep(1)
+                    count += 1
+                    if count == 5:
+                        self.log.error(
+                            'cound not setup tunnel to remote datbase' % locals())
+                        sys.exit(0)
+
         # SETUP A DATABASE CONNECTION FOR THE remote database
         host = self.settings["database settings"]["host"]
         user = self.settings["database settings"]["user"]
@@ -415,7 +448,8 @@ class tools():
             charset='utf8',
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=3600
+            connect_timeout=36000,
+            max_allowed_packet=51200000
         )
         thisConn.autocommit(True)
         self.remoteDBConn = thisConn

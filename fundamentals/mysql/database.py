@@ -115,7 +115,8 @@ class database():
             charset='utf8',
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=3600
+            connect_timeout=36000,
+            max_allowed_packet=51200000
         )
         if self.autocommit:
             dbConn.autocommit(True)
