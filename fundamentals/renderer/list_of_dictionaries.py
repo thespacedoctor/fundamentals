@@ -124,7 +124,7 @@ class list_of_dictionaries():
 
                 dataSet.csv("/path/to/myfile.csv")
         """
-        self.log.info('starting the ``csv`` method')
+        self.log.debug('starting the ``csv`` method')
 
         renderedData = self._list_of_dictionaries_to_csv("machine")
 
@@ -138,7 +138,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``csv`` method')
+        self.log.debug('completed the ``csv`` method')
         return renderedData
 
     def table(
@@ -177,7 +177,7 @@ class list_of_dictionaries():
 
                 dataSet.table("/path/to/myfile.ascii")
         """
-        self.log.info('starting the ``table`` method')
+        self.log.debug('starting the ``table`` method')
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("human")
@@ -192,7 +192,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``table`` method')
+        self.log.debug('completed the ``table`` method')
         return renderedData
 
     def reST(
@@ -233,7 +233,7 @@ class list_of_dictionaries():
 
                 dataSet.reST("/path/to/myfile.rst")
         """
-        self.log.info('starting the ``table`` method')
+        self.log.debug('starting the ``table`` method')
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("reST")
@@ -248,7 +248,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``table`` method')
+        self.log.debug('completed the ``table`` method')
         return renderedData
 
     def markdown(
@@ -285,7 +285,7 @@ class list_of_dictionaries():
 
                 dataSet.table("/path/to/myfile.md")
         """
-        self.log.info('starting the ``markdown`` method')
+        self.log.debug('starting the ``markdown`` method')
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("markdown")
@@ -300,7 +300,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``markdown`` method')
+        self.log.debug('completed the ``markdown`` method')
         return renderedData
 
     def json(
@@ -349,7 +349,7 @@ class list_of_dictionaries():
 
                 dataSet.json("/path/to/myfile.json")
         """
-        self.log.info('starting the ``json`` method')
+        self.log.debug('starting the ``json`` method')
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
         for d in dataCopy:
@@ -374,7 +374,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``json`` method')
+        self.log.debug('completed the ``json`` method')
         return renderedData
 
     def yaml(
@@ -415,7 +415,7 @@ class list_of_dictionaries():
 
                 dataSet.json("/path/to/myfile.yaml")
         """
-        self.log.info('starting the ``yaml`` method')
+        self.log.debug('starting the ``yaml`` method')
 
         dataCopy = []
         dataCopy[:] = [dict(l) for l in self.listOfDictionaries]
@@ -431,7 +431,7 @@ class list_of_dictionaries():
             yaml.dump(dataCopy, stream, default_flow_style=False)
             stream.close()
 
-        self.log.info('completed the ``yaml`` method')
+        self.log.debug('completed the ``yaml`` method')
         return renderedData
 
     def mysql(
@@ -471,7 +471,7 @@ class list_of_dictionaries():
                 dataSet.mysql("testing_table", "/path/to/myfile.sql")
 
         """
-        self.log.info('starting the ``csv`` method')
+        self.log.debug('starting the ``csv`` method')
 
         import re
         if createStatement and "create table if not exists" not in createStatement.lower():
@@ -494,7 +494,7 @@ class list_of_dictionaries():
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.info('completed the ``csv`` method')
+        self.log.debug('completed the ``csv`` method')
         return renderedData
 
     def _list_of_dictionaries_to_csv(
@@ -508,7 +508,8 @@ class list_of_dictionaries():
         **Return:**
             - ``output`` -- the contents of a CSV file
         """
-        self.log.info('starting the ``_list_of_dictionaries_to_csv`` function')
+        self.log.debug(
+            'starting the ``_list_of_dictionaries_to_csv`` function')
 
         if not len(self.listOfDictionaries):
             return "NO MATCH"
@@ -632,7 +633,7 @@ class list_of_dictionaries():
         if csvType in ["reST"]:
             output = output.replace("|--", "+--").replace("--|", "--+")
 
-        self.log.info(
+        self.log.debug(
             'completed the ``_list_of_dictionaries_to_csv`` function')
 
         return output
@@ -650,8 +651,8 @@ class list_of_dictionaries():
         **Return:**
             - ``output`` -- the mysql insert statements (as a string)
         """
-        self.log.info(
-            'starting the ``_list_of_dictionaries_to_mysql_inserts`` function')
+        self.log.debug(
+            'completed the ````_list_of_dictionaries_to_mysql_inserts`` function')
 
         if not len(self.listOfDictionaries):
             return "NO MATCH"
@@ -670,6 +671,6 @@ class list_of_dictionaries():
         ], dateModified=False, returnInsertOnly=True, replace=True, batchInserts=False, reDatetime=self.reDatetime) for d in dataCopy]
         output += ";\n".join(inserts) + ";"
 
-        self.log.info(
+        self.log.debug(
             'completed the ``_list_of_dictionaries_to_mysql_inserts`` function')
         return output

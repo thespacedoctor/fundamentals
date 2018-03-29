@@ -74,8 +74,8 @@ def insert_list_of_dictionaries_into_database_tables(
             )
     """
 
-    log.info(
-        'starting the ``insert_list_of_dictionaries_into_database_tables`` function')
+    log.debug(
+        'completed the ````insert_list_of_dictionaries_into_database_tables`` function')
 
     global count
     global totalCount
@@ -151,7 +151,7 @@ def insert_list_of_dictionaries_into_database_tables(
         sys.stdout.write("\x1b[1A\x1b[2K")
         print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
 
-    log.info(
+    log.debug(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
     return None
 
@@ -186,7 +186,7 @@ def _insert_single_batch_into_database(
 
             usage code            
     """
-    log.info('starting the ``_insert_single_batch_into_database`` function')
+    log.debug('starting the ``_insert_single_batch_into_database`` function')
 
     global totalCount
     global globalDbConn
@@ -308,7 +308,7 @@ def _insert_single_batch_into_database(
 
         dbConn.commit()
 
-    log.info('completed the ``_insert_single_batch_into_database`` function')
+    log.debug('completed the ``_insert_single_batch_into_database`` function')
     return "None"
 
 
@@ -341,7 +341,7 @@ def _add_dictlist_to_database_via_load_in_file(
 
             usage code
     """
-    log.info('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
+    log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
 
     global sharedList
 
@@ -420,7 +420,8 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
     except:
         pass
 
-    log.info('completed the ``_add_dictlist_to_database_via_load_in_file`` function')
+    log.debug(
+        'completed the ``_add_dictlist_to_database_via_load_in_file`` function')
     return None
 
 # use the tab-trigger below for new function

@@ -132,7 +132,7 @@ class sqlite2mysql():
         """
         from fundamentals.renderer import list_of_dictionaries
         from fundamentals.mysql import directory_script_runner
-        self.log.info('starting the ``convert_sqlite_to_mysql`` method')
+        self.log.debug('starting the ``convert_sqlite_to_mysql`` method')
 
         con = lite.connect(self.pathToSqlite)
         con.row_factory = lite.Row
@@ -242,7 +242,7 @@ primary key(""")
 
         con.close()
 
-        self.log.info('completed the ``convert_sqlite_to_mysql`` method')
+        self.log.debug('completed the ``convert_sqlite_to_mysql`` method')
         return None
 
     # use the tab-trigger below for new method

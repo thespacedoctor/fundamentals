@@ -67,7 +67,7 @@ def writequery(
             )
 
     """
-    log.info('starting the ``writequery`` function')
+    log.debug('starting the ``writequery`` function')
     import pymysql
     import warnings
     warnings.filterwarnings('error', category=pymysql.Warning)
@@ -111,16 +111,47 @@ def writequery(
         elif "Duplicate entry" in str(e):
             log.debug('Duplicate Key error: %s\n' % (str(e), ))
             message = "duplicate key error"
+        elif "Deadlock" in str(e):
+            i = 0
+            while i < 10:
+                time.sleep(1)
+                i += 1
+                try:
+                    if manyValueList == False:
+                        cursor.execute(sqlQuery)
+                    else:
+                        # cursor.executemany(sqlQuery, manyValueList)
+                        # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER
+                        # BARFING
+                        batch = 100000
+                        offset = 0
+                        stop = 0
+
+                        while stop == 0:
+                            thisList = manyValueList[offset:offset + batch]
+                            offset += batch
+                            a = len(thisList)
+                            cursor.executemany(sqlQuery, thisList)
+                            dbConn.commit()
+                            if len(thisList) < batch:
+                                stop = 1
+                    i = 20
+                except:
+                    pass
+            if i == 10:
+                log.error('Deadlock: %s\n' % (str(e), ))
+                message = "Deadlock error"
+                raise
+
         else:
             sqlQueryTrim = sqlQuery[:1000]
             message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
                                                                                                            str(e))
             if Force == False:
                 log.error(message)
-                sys.exit(0)
+                raise
             else:
-                log.warning(message)
-                print ""
+                log.info(message)
                 return -1
     except pymysql.Warning as e:
         log.info(str(e))
@@ -156,5 +187,5 @@ def writequery(
                 raise e
                 count = 0
 
-    log.info('completed the ``writequery`` function')
+    log.debug('completed the ``writequery`` function')
     return message

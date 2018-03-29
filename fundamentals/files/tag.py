@@ -52,7 +52,7 @@ def tag(
                 wherefrom="http://www.thespacedoctor.co.uk"
             )
     """
-    log.info('starting the ``tag`` function')
+    log.debug('starting the ``tag`` function')
 
     if isinstance(tags, list):
         tags = (" ").join(tags)
@@ -184,5 +184,5 @@ def tag(
         # DELETE PLIST
         # os.remove(urlPlist)
 
-    log.info('completed the ``tag`` function')
+    log.debug('completed the ``tag`` function')
     return None

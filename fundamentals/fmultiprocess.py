@@ -49,7 +49,7 @@ def fmultiprocess(
             results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
                                   inputArray=inputArray, otherFunctionKeyword="cheese")
     """
-    log.info('starting the ``multiprocess`` function')
+    log.debug('starting the ``multiprocess`` function')
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
     if not poolSize:
@@ -73,5 +73,5 @@ def fmultiprocess(
     p.close()
     p.terminate()
 
-    log.info('completed the ``multiprocess`` function')
+    log.debug('completed the ``multiprocess`` function')
     return resultArray

@@ -177,7 +177,7 @@ class yaml_to_database():
             ) 
             yaml2db.ingest() 
         """
-        self.log.info('starting the ``ingest`` method')
+        self.log.debug('starting the ``ingest`` method')
 
         for d in os.listdir(self.pathToInputDir):
             if os.path.isfile(os.path.join(self.pathToInputDir, d)) and "yaml" in d.lower():
@@ -186,7 +186,7 @@ class yaml_to_database():
                     deleteFile=self.deleteFiles
                 )
 
-        self.log.info('completed the ``ingest`` method')
+        self.log.debug('completed the ``ingest`` method')
         return None
 
     def add_yaml_file_content_to_database(
@@ -221,8 +221,8 @@ class yaml_to_database():
                     deleteFile=True
                 )
         """
-        self.log.info(
-            'starting the ``add_yaml_file_content_to_database`` method')
+        self.log.debug(
+            'completed the ````add_yaml_file_content_to_database`` method')
 
         import codecs
         try:
@@ -291,7 +291,7 @@ class yaml_to_database():
         if deleteFile:
             os.remove(filepath)
 
-        self.log.info(
+        self.log.debug(
             'completed the ``add_yaml_file_content_to_database`` method')
         return None
 

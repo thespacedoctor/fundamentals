@@ -34,7 +34,7 @@ def readquery(
 
     **Usage:**
 
-        .. code-block:: python 
+        .. code-block:: python
 
             from fundamentals.mysql import readquery
             rows = readquery(
@@ -44,7 +44,7 @@ def readquery(
                 quiet=False
             )
     """
-    log.info('starting the ``readquery`` function')
+    log.debug('starting the ``readquery`` function')
     import pymysql
     import warnings
     warnings.filterwarnings('error', category=pymysql.Warning)
@@ -57,6 +57,8 @@ def readquery(
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
     # EXECUTE THE SQL COMMAND
+    cursor.execute(sqlQuery)
+    rows = cursor.fetchall()
     try:
         cursor.execute(sqlQuery)
         rows = cursor.fetchall()
@@ -73,5 +75,5 @@ def readquery(
     except Exception as e:
         log.warning('could not close the db cursor ' + str(e) + '\n')
 
-    log.info('completed the ``readquery`` function')
+    log.debug('completed the ``readquery`` function')
     return rows

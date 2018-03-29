@@ -122,7 +122,7 @@ def convert_dictionary_to_mysql_table(
             # uniquekey1="cheese"
     """
 
-    log.info('starting the ``convert_dictionary_to_mysql_table`` function')
+    log.debug('starting the ``convert_dictionary_to_mysql_table`` function')
 
     if not reDatetime:
         reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
@@ -502,5 +502,5 @@ def convert_dictionary_to_mysql_table(
         log.error("could not add new data added to the table '" +
                   dbTableName + "' : " + str(e) + '\n')
 
-    log.info('completed the ``convert_dictionary_to_mysql_table`` function')
+    log.debug('completed the ``convert_dictionary_to_mysql_table`` function')
     return None, None

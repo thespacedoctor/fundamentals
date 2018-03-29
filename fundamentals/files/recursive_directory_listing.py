@@ -63,7 +63,7 @@ def recursive_directory_listing(
             )
             print theseFiles        
     """
-    log.info('starting the ``recursive_directory_listing`` function')
+    log.debug('starting the ``recursive_directory_listing`` function')
 
     ## VARIABLES ##
     matchedPathList = []
@@ -105,5 +105,5 @@ def recursive_directory_listing(
 
                 parentDirectoryList = childDirList
 
-    log.info('completed the ``recursive_directory_listing`` function')
+    log.debug('completed the ``recursive_directory_listing`` function')
     return matchedPathList
