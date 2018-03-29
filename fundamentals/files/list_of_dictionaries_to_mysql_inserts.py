@@ -55,7 +55,7 @@ def list_of_dictionaries_to_mysql_inserts(
             ...
             ...
     """
-    log.info('starting the ``list_of_dictionaries_to_mysql_inserts`` function')
+    log.debug('starting the ``list_of_dictionaries_to_mysql_inserts`` function')
 
     if not len(datalist):
         return "NO MATCH"
@@ -77,5 +77,5 @@ def list_of_dictionaries_to_mysql_inserts(
 
     output = ";\n".join(inserts) + ";"
 
-    log.info('completed the ``list_of_dictionaries_to_mysql_inserts`` function')
+    log.debug('completed the ``list_of_dictionaries_to_mysql_inserts`` function')
     return output

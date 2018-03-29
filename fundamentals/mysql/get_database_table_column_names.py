@@ -45,7 +45,7 @@ def get_database_table_column_names(
                 dbTable="test_table"
             )
     """
-    log.info('starting the ``get_database_table_column_names`` function')
+    log.debug('starting the ``get_database_table_column_names`` function')
 
     sqlQuery = """SELECT * FROM %s LIMIT 1""" \
         % (dbTable, )
@@ -63,5 +63,5 @@ def get_database_table_column_names(
         return -1
     columnNames = rows[0].keys()
 
-    log.info('completed the ``get_database_table_column_names`` function')
+    log.debug('completed the ``get_database_table_column_names`` function')
     return columnNames

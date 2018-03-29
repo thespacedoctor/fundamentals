@@ -44,7 +44,7 @@ def readquery(
                 quiet=False
             )
     """
-    log.info('starting the ``readquery`` function')
+    log.debug('starting the ``readquery`` function')
     import pymysql
     import warnings
     warnings.filterwarnings('error', category=pymysql.Warning)
@@ -75,5 +75,5 @@ def readquery(
     except Exception as e:
         log.warning('could not close the db cursor ' + str(e) + '\n')
 
-    log.info('completed the ``readquery`` function')
+    log.debug('completed the ``readquery`` function')
     return rows

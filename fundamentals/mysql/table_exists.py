@@ -48,7 +48,7 @@ def table_exists(
 
             # OUTPUT: False
     """
-    log.info('starting the ``table_exists`` function')
+    log.debug('starting the ``table_exists`` function')
 
     sqlQuery = u"""
         SELECT count(*)
@@ -67,5 +67,5 @@ def table_exists(
     else:
         tableExists = True
 
-    log.info('completed the ``table_exists`` function')
+    log.debug('completed the ``table_exists`` function')
     return tableExists

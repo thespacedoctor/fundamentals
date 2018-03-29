@@ -132,7 +132,7 @@ def directory_script_runner(
 
         Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
     """
-    log.info('starting the ``directory_script_runner`` function')
+    log.debug('starting the ``directory_script_runner`` function')
 
     # COMPILE A DICTIONARY OF SCRIPTS / MODIFIED TIMES
     scriptList = {}
@@ -208,7 +208,7 @@ def directory_script_runner(
             p = Popen(cmd, close_fds=True,
                       env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True, stdin=None, stdout=None, stderr=None)
 
-    log.info('completed the ``directory_script_runner`` function')
+    log.debug('completed the ``directory_script_runner`` function')
     return None
 
 

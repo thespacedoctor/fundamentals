@@ -67,7 +67,7 @@ def writequery(
             )
 
     """
-    log.info('starting the ``writequery`` function')
+    log.debug('starting the ``writequery`` function')
     import pymysql
     import warnings
     warnings.filterwarnings('error', category=pymysql.Warning)
@@ -187,5 +187,5 @@ def writequery(
                 raise e
                 count = 0
 
-    log.info('completed the ``writequery`` function')
+    log.debug('completed the ``writequery`` function')
     return message
