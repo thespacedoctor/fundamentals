@@ -187,7 +187,7 @@ def _insert_single_batch_into_database(
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
-    global totalCount  # No. Stop it.
+    global totalCount  
     global globalDbConn
     global sharedList
 
