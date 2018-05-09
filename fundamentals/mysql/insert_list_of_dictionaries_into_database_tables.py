@@ -16,7 +16,6 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.fmultiprocess import fmultiprocess
-import time
 import re
 from fundamentals.mysql.database import database
 import pandas as pd
@@ -125,8 +124,8 @@ def insert_list_of_dictionaries_into_database_tables(
 
         totalCount = total + 1
         ltotalCount = totalCount
-
-        print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
+        # This should be switched to the logging module
+        print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
 
         if dbSettings == False:
 
@@ -149,7 +148,7 @@ def insert_list_of_dictionaries_into_database_tables(
                           dbSettings=dbSettings, dateModified=dateModified)
 
         sys.stdout.write("\x1b[1A\x1b[2K")
-        print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
+        print("%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals())
 
     log.debug(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
@@ -188,7 +187,7 @@ def _insert_single_batch_into_database(
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
-    global totalCount
+    global totalCount  # No. Stop it.
     global globalDbConn
     global sharedList
 

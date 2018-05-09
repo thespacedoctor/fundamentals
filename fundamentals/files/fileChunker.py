@@ -49,7 +49,7 @@ class fileChunker(object):
         try:
             self.readFile = codecs.open(
                 self.filepath, encoding='utf-8', mode='r')
-        except IOError, e:
+        except IOError as e:
             message = 'could not open the file %s' % (self.filepath,)
             raise IOError(message)
 

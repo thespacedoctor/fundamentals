@@ -179,7 +179,7 @@ def directory_script_runner(
                         log.debug("attempting to rename file %s to %s" %
                                   (v, moveTo))
                         os.rename(v, moveTo)
-                    except Exception, e:
+                    except Exception as e:
                         log.error(
                             "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
             else:
@@ -197,7 +197,7 @@ def directory_script_runner(
                         log.debug("attempting to rename file %s to %s" %
                                   (v, moveTo))
                         os.rename(v, moveTo)
-                    except Exception, e:
+                    except Exception as e:
                         log.error(
                             "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
         else:

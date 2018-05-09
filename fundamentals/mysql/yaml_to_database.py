@@ -78,7 +78,7 @@ def main(arguments=None):
             deleteFile=deleteFlag
         )
         basename = os.path.basename(pathToYaml)
-        print "Content of %(basename)s added to database" % locals()
+        print("Content of %(basename)s added to database" % locals())
 
     else:
         from fundamentals.mysql import yaml_to_database
@@ -90,7 +90,7 @@ def main(arguments=None):
             deleteFiles=deleteFlag
         )
         yaml2db.ingest()
-        print "Content of %(pathToYaml)s directory added to database" % locals()
+        print("Content of %(pathToYaml)s directory added to database" % locals())
 
     return
 
@@ -230,7 +230,7 @@ class yaml_to_database():
             readFile = codecs.open(filepath, encoding='utf-8', mode='r')
             thisData = readFile.read()
             readFile.close()
-        except IOError, e:
+        except IOError as e:
             message = 'could not open the file %s' % (filepath,)
             self.log.critical(message)
             raise IOError(message)

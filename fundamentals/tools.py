@@ -16,7 +16,7 @@ import yaml
 from collections import OrderedDict
 import shutil
 from subprocess import Popen, PIPE, STDOUT
-import logs as dl
+from . import logs as dl
 import time
 from docopt import docopt
 
@@ -141,6 +141,7 @@ class tools():
 
         # UNPACK SETTINGS
         stream = False
+        file = open
         if "<settingsFile>" in arguments and arguments["<settingsFile>"]:
             stream = file(arguments["<settingsFile>"], 'r')
         elif "<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"]:
@@ -207,7 +208,7 @@ class tools():
                                 pathToReadFile, encoding='utf-8', mode='r')
                             thisData = readFile.read()
                             readFile.close()
-                        except IOError, e:
+                        except IOError as e:
                             message = 'could not open the file %s' % (
                                 pathToReadFile,)
                             raise IOError(message)
@@ -218,13 +219,13 @@ class tools():
                         try:
                             writeFile = codecs.open(
                                 pathToWriteFile, encoding='utf-8', mode='w')
-                        except IOError, e:
+                        except IOError as e:
                             message = 'could not open the file %s' % (
                                 pathToWriteFile,)
                             raise IOError(message)
                         writeFile.write(thisData)
                         writeFile.close()
-                        print "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals()
+                        print("default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals())
                         try:
                             cmd = """open %(pathToReadFile)s""" % locals()
                             p = Popen(cmd, stdout=PIPE,
@@ -237,8 +238,8 @@ class tools():
                                       stderr=PIPE, shell=True)
                         except:
                             pass
-                    except:
-                        print "please add settings to file '%(settingsFile)s'" % locals()
+                    except Exception:
+                        print("please add settings to file '%(settingsFile)s'" % locals())
                     # return
         else:
             pass
@@ -295,7 +296,7 @@ class tools():
                 varname = arg.replace("<", "").replace(">", "")
             if varname == "import":
                 varname = "iimport"
-            if isinstance(val, str) or isinstance(val, unicode):
+            if isinstance(val, str):
                 val = val.replace("'", "\\'")
                 exec(varname + " = '%s'" % (val,))
             else:
@@ -467,7 +468,7 @@ class tools():
         try:
             s.connect((address, port))
             return True
-        except socket.error, e:
+        except socket.error as e:
             self.log.warning(
                 """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
             return False
@@ -492,7 +493,3 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
     return yaml.load(stream, OrderedLoader)
-
-
-if __name__ == '__main__':
-    main()
