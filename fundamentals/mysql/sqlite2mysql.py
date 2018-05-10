@@ -22,7 +22,7 @@ import os
 import sqlite3 as lite
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
+from fundamentals.mysql import writequery
 
 from datetime import datetime, date, time
 
@@ -62,7 +62,8 @@ def main(arguments=None):
         log=log,
         settings=settings,
         pathToSqlite=pathToSqliteDB,
-        tablePrefix=tablePrefix
+        tablePrefix=tablePrefix,
+        dbConn=dbConn
     )
     converter.convert_sqlite_to_mysql()
 
@@ -78,6 +79,7 @@ class sqlite2mysql():
         - ``settings`` -- the settings dictionary
         - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
         - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
+        - ``dbConn`` -- mysql database connection 
 
     **Usage:**
 
@@ -107,13 +109,15 @@ class sqlite2mysql():
             log,
             pathToSqlite,
             tablePrefix="",
-            settings=False
+            settings=False,
+            dbConn=False
     ):
         self.log = log
         log.debug("instansiating a new 'sqlite2mysql' object")
         self.settings = settings
         self.pathToSqlite = pathToSqlite
         self.tablePrefix = tablePrefix
+        self.dbConn = dbConn
 
         if not self.tablePrefix:
             self.tablePrefix = ""
@@ -186,12 +190,14 @@ class sqlite2mysql():
                     "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS " + self.tablePrefix)
             if ", primary key(" in createStatement:
                 createStatement = createStatement.replace(", primary key(", """,
-`dateLastModified` datetime DEFAULT NULL,
+`dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+`dateLastModified` datetime DEFAULT CURRENT_TIMESTAMP,
 `updated` tinyint(4) DEFAULT '0',
 primary key(""")
             else:
                 createStatement = createStatement.replace(");", """,
-    `dateLastModified` datetime DEFAULT NULL,
+    `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+    `dateLastModified` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated` tinyint(4) DEFAULT '0');
                 """)
             createStatement = createStatement.replace(
@@ -206,6 +212,10 @@ primary key(""")
                 "`SessionPartUUID` TEXT NOT NULL UNIQUE,", "`SessionPartUUID` VARCHAR(100) NOT NULL UNIQUE,")
             createStatement = createStatement.replace(
                 "`Name` TEXT PRIMARY KEY NOT NULL", "`Name` VARCHAR(100) PRIMARY KEY NOT NULL")
+            createStatement = createStatement.replace(
+                " VARCHAR ", " VARCHAR(100) ")
+            createStatement = createStatement.replace(
+                " VARCHAR,", " VARCHAR(100),")
 
             # GRAB THE DATA TO ADD TO THE MYSQL DATABASE TABLES
             cur.execute(
@@ -220,25 +230,47 @@ primary key(""")
             if not os.path.exists("/tmp/headjack/"):
                 os.makedirs("/tmp/headjack/")
 
-            # DUMP THE DATA INTO A MYSQL DATABASE
-            dataSet = list_of_dictionaries(
+            writequery(
                 log=self.log,
-                listOfDictionaries=allRows
+                sqlQuery=createStatement,
+                dbConn=self.dbConn,
             )
-            originalList = dataSet.list
-            now = datetime.now()
-            now = now.strftime("%Y%m%dt%H%M%S%f.sql")
-            mysqlData = dataSet.mysql(
-                tableName=self.tablePrefix + table, filepath="/tmp/headjack/" + now, createStatement=createStatement)
 
-            directory_script_runner(
+            from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+            # USE dbSettings TO ACTIVATE MULTIPROCESSING
+            insert_list_of_dictionaries_into_database_tables(
+                dbConn=self.dbConn,
                 log=self.log,
-                pathToScriptDirectory="/tmp/headjack/",
-                databaseName=self.settings["database settings"]["db"],
-                loginPath=self.settings["database settings"]["loginPath"],
-                successRule="delete",
-                failureRule="failed"
+                dictList=allRows,
+                dbTableName=self.tablePrefix + table,
+                uniqueKeyList=[],
+                dateModified=True,
+                dateCreated=True,
+                batchSize=10000,
+                replace=True,
+                dbSettings=self.settings["database settings"]
             )
+
+            # # DUMP THE DATA INTO A MYSQL DATABASE
+            # dataSet = list_of_dictionaries(
+            #     log=self.log,
+            #     listOfDictionaries=allRows
+            # )
+            # originalList = dataSet.list
+            # now = datetime.now()
+            # now = now.strftime("%Y%m%dt%H%M%S%f.sql")
+            # mysqlData = dataSet.mysql(
+            # tableName=self.tablePrefix + table, filepath="/tmp/headjack/" +
+            # now, createStatement=createStatement)
+
+            # directory_script_runner(
+            #     log=self.log,
+            #     pathToScriptDirectory="/tmp/headjack/",
+            #     databaseName=self.settings["database settings"]["db"],
+            #     loginPath=self.settings["database settings"]["loginPath"],
+            #     successRule="delete",
+            #     failureRule="failed"
+            # )
 
         con.close()
 
