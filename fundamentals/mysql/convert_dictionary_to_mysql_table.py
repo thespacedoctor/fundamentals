@@ -476,7 +476,7 @@ def convert_dictionary_to_mysql_table(
 
     if not dateCreated:
         addValue = addValue.replace(
-            ", dateCreated)", ")").replace(", NOW())", ")")
+            ", dateCreated)", ")").replace(", NOW())", ")", 1)
 
     addValue = addValue.replace('\\""', '\\" "')
     addValue = addValue.replace('""', "null")
