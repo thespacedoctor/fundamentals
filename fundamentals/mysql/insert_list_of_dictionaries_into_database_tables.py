@@ -128,6 +128,8 @@ def insert_list_of_dictionaries_into_database_tables(
 
         print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
 
+        print dbSettings
+
         if dbSettings == False:
 
             fmultiprocess(
