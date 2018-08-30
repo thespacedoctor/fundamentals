@@ -60,13 +60,19 @@ def fmultiprocess(
     else:
         p = Pool()
 
+    cpuCount = psutil.cpu_count()
+    chunksize = int((len(inputArray) + 1) / cpuCount * 3)
+
+    if chunksize == 0:
+        chunksize = 1
+
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
     if "log" in inspect.getargspec(function)[0]:
         mapfunc = partial(function, log=log, **kwargs)
-        resultArray = p.map_async(mapfunc, inputArray)
+        resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
     else:
         mapfunc = partial(function, **kwargs)
-        resultArray = p.map_async(mapfunc, inputArray)
+        resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
 
     resultArray = resultArray.get(timeout=timeout)
 

@@ -135,7 +135,8 @@ class tools():
         except:
             pass
 
-        if defaultSettingsFile and "settingsFile" not in arguments:
+        if defaultSettingsFile and "settingsFile" not in arguments and os.path.exists(os.getenv(
+                "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
             arguments["settingsFile"] = settingsFile = os.getenv(
                 "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
 
@@ -153,7 +154,7 @@ class tools():
             stream = file(arguments["pathToSettingsFile"], 'r')
         elif "settingsFile" in arguments and arguments["settingsFile"]:
             stream = file(arguments["settingsFile"], 'r')
-        elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None):
+        elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None) or ("pathToSettingsFile" in arguments and arguments["pathToSettingsFile"] == None):
 
             if projectName != False:
                 os.getenv("HOME")
@@ -198,6 +199,7 @@ class tools():
                             ds = "/".join(inspect.stack()
                                           [1][1].split("/")[:level]) + "/default_settings.yaml"
 
+                    shutil.copyfile(ds, settingsFile)
                     try:
                         shutil.copyfile(ds, settingsFile)
                         import codecs
@@ -253,7 +255,11 @@ class tools():
         # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
         # SETTINGS
         if 'settings' in locals() and "logging settings" in settings:
-            if "<settingsFile>" in arguments:
+            if "settingsFile" in arguments:
+                log = dl.setup_dryx_logging(
+                    yaml_file=arguments["settingsFile"]
+                )
+            elif "<settingsFile>" in arguments:
                 log = dl.setup_dryx_logging(
                     yaml_file=arguments["<settingsFile>"]
                 )
@@ -270,10 +276,6 @@ class tools():
                     yaml_file=arguments["pathToSettingsFile"]
                 )
 
-            elif "settingsFile" in arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=arguments["settingsFile"]
-                )
             elif "--settings" in arguments:
                 log = dl.setup_dryx_logging(
                     yaml_file=arguments["--settings"]
