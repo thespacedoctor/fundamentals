@@ -19,6 +19,7 @@ from subprocess import Popen, PIPE, STDOUT
 import logs as dl
 import time
 from docopt import docopt
+import psutil
 
 
 ###################################################################
@@ -128,6 +129,23 @@ class tools():
         if arguments == None:
             arguments = docopt(docString, options_first=options_first)
         self.arguments = arguments
+
+        # BUILD A STRING FOR THE PROCESS TO MATCH RUNNING PROCESSES AGAINST
+        lockname = "".join(sys.argv)
+
+        # TEST IF THE PROCESS IS ALREADY RUNNING WITH THE SAME ARGUMENTS (e.g.
+        # FROM CRON) - QUIT IF MATCH FOUND
+        for q in psutil.process_iter():
+            try:
+                this = q.cmdline()
+            except:
+                continue
+
+            test = "".join(this[1:])
+            if q.pid != os.getpid() and lockname == test:
+                thisId = q.pid
+                print "This command is already running (see PID %(thisId)s)" % locals()
+                sys.exit(0)
 
         try:
             if "tests.test" in arguments["<pathToSettingsFile>"]:
