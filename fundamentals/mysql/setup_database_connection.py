@@ -13,6 +13,10 @@
 import sys
 import os
 import yaml
+try:
+    yaml.warnings({'YAMLLoadWarning': False})
+except:
+    pass
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 

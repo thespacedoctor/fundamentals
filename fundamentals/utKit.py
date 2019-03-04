@@ -15,6 +15,10 @@ import os
 import logging
 import logging.config
 import yaml
+try:
+    yaml.warnings({'YAMLLoadWarning': False})
+except:
+    pass
 
 
 class utKit():

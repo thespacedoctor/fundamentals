@@ -61,7 +61,7 @@ def fmultiprocess(
         p = Pool()
 
     cpuCount = psutil.cpu_count()
-    chunksize = int((len(inputArray) + 1) / cpuCount * 3)
+    chunksize = int((len(inputArray) + 1) / (cpuCount * 3))
 
     if chunksize == 0:
         chunksize = 1

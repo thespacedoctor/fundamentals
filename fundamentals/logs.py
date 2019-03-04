@@ -43,6 +43,10 @@ def console_logger(
     import logging.config
     ## THIRD PARTY ##
     import yaml
+    try:
+        yaml.warnings({'YAMLLoadWarning': False})
+    except:
+        pass
     ## LOCAL APPLICATION ##
 
     # SETUP LOGGING
