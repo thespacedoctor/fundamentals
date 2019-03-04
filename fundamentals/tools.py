@@ -13,6 +13,10 @@
 import sys
 import os
 import yaml
+try:
+    yaml.warnings({'YAMLLoadWarning': False})
+except:
+    pass
 from collections import OrderedDict
 import shutil
 from subprocess import Popen, PIPE, STDOUT
