@@ -1,5 +1,5 @@
 fundamentals.mysql.readquery (*function*)
-============================
+=========================================
 
 .. currentmodule:: fundamentals.mysql
 

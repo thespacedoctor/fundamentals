@@ -33,7 +33,7 @@ exec(open(moduleDirectory + "/../../fundamentals/__version__.py").read())
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo',
-              'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinx.ext.autosummary', 'sphinx.ext.graphviz']
+              'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinx.ext.autosummary', 'sphinx.ext.graphviz', 'sphinx_markdown_tables', 'recommonmark']
 
 # Generate Summaries
 autosummary_generate = True
@@ -45,7 +45,11 @@ todo_include_todos = True
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown'
+}
+
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'

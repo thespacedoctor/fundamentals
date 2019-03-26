@@ -1,7 +1,7 @@
-fundamentals.logs module
-========================
+fundamentals.download.\_fetch module
+====================================
 
-.. automodule:: fundamentals.logs
+.. automodule:: fundamentals.download._fetch
     :members:
     :private-members:
     :undoc-members:

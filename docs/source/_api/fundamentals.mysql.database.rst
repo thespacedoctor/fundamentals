@@ -1,7 +1,7 @@
-fundamentals.logs module
-========================
+fundamentals.mysql.database module
+==================================
 
-.. automodule:: fundamentals.logs
+.. automodule:: fundamentals.mysql.database
     :members:
     :private-members:
     :undoc-members:

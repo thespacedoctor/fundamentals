@@ -1,20 +1,45 @@
 fundamentals.tools (*class*)
-==================
+============================
 
 .. currentmodule:: fundamentals
 
 .. autoclass:: tools
+   :members:
+   :private-members:
+   :show-inheritance:
+   :inherited-members:
+   :member-order: bysource
 
-   
-   .. automethod:: __init__
+    
 
    
    .. rubric:: Methods
 
    .. autosummary::
    
-      ~tools.__init__
-      ~tools.setup
+        
+   
+        
+            ~tools.setup
+       
+   
+   
+       
+   
+       
+   
+       
+   
+       
+            ~tools._checkServer
+        
+   
+       
+            ~tools._setup_tunnel
+        
+   
+       
+   
    
    
 

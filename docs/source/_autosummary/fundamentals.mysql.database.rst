@@ -1,9 +1,9 @@
-fundamentals.utKit (*class*)
-============================
+fundamentals.mysql.database (*class*)
+=====================================
 
-.. currentmodule:: fundamentals
+.. currentmodule:: fundamentals.mysql
 
-.. autoclass:: utKit
+.. autoclass:: database
    :members:
    :private-members:
    :show-inheritance:
@@ -20,21 +20,23 @@ fundamentals.utKit (*class*)
         
    
         
-            ~utKit.setupModule
+            ~database.connect
        
    
+   
+       
+   
+       
+   
+       
+   
+       
+            ~database._checkServer
         
-            ~utKit.tearDownModule
-       
-   
    
        
-   
-       
-   
-       
-   
-       
+            ~database._setup_tunnel
+        
    
        
    

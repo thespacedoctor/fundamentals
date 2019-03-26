@@ -1,7 +1,7 @@
-fundamentals.logs module
-========================
+fundamentals.files.fileChunker module
+=====================================
 
-.. automodule:: fundamentals.logs
+.. automodule:: fundamentals.files.fileChunker
     :members:
     :private-members:
     :undoc-members:

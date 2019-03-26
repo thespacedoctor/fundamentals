@@ -1,9 +1,9 @@
-fundamentals.logs.emptyLogger (*class*)
-=======================================
+fundamentals.files.fileChunker (*class*)
+========================================
 
-.. currentmodule:: fundamentals.logs
+.. currentmodule:: fundamentals.files
 
-.. autoclass:: emptyLogger
+.. autoclass:: fileChunker
    :members:
    :private-members:
    :show-inheritance:
@@ -18,25 +18,37 @@ fundamentals.logs.emptyLogger (*class*)
    .. autosummary::
    
         
-            ~emptyLogger.critical
-       
    
         
-            ~emptyLogger.debug
+            ~fileChunker.next
        
    
-        
-            ~emptyLogger.error
+   
        
    
-        
-            ~emptyLogger.info
        
    
-        
-            ~emptyLogger.warning
        
    
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
    
        
    

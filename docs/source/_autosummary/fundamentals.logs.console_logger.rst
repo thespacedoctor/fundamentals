@@ -1,5 +1,5 @@
 fundamentals.logs.console_logger (*function*)
-================================
+=============================================
 
 .. currentmodule:: fundamentals.logs
 

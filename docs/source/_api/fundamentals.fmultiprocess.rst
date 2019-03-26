@@ -1,7 +1,7 @@
-fundamentals.logs module
-========================
+fundamentals.fmultiprocess module
+=================================
 
-.. automodule:: fundamentals.logs
+.. automodule:: fundamentals.fmultiprocess
     :members:
     :private-members:
     :undoc-members:

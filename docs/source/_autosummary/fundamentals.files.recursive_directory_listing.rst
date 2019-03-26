@@ -1,5 +1,5 @@
 fundamentals.files.recursive_directory_listing (*function*)
-==============================================
+===========================================================
 
 .. currentmodule:: fundamentals.files
 
