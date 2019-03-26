@@ -1,0 +1,346 @@
+<h1 id="multimarkdown-rendering-test-document">Multimarkdown Rendering Test Document</h1>
+
+<h2 id="table-of-contents">Table of Contents</h2><div class="TOC">
+
+
+<ul>
+<li><a href="#multimarkdown-rendering-test-document">Multimarkdown Rendering Test Document</a>
+
+<ul>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#code-and-syntax-highlighting">Code and Syntax Highlighting</a></li>
+<li><a href="#mermaid">Mermaid</a></li>
+<li><a href="#flowchart">Flowchart</a></li>
+<li><a href="#tables">Tables</a></li>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#transclusion">Transclusion</a></li>
+<li><a href="#linking-to-an-adjacent-file">Linking to an Adjacent File</a></li>
+<li><a href="#math">Math</a></li>
+<li><a href="#supersub-scripts">Super/Sub Scripts</a></li>
+<li><a href="#citations">Citations</a></li>
+<li><a href="#criticmarkup">CriticMarkup</a></li>
+<li><a href="#paragraphs">Paragraphs</a></li>
+<li><a href="#cross-references">Cross References</a>
+
+<ul>
+<li><a href="#intro">Intro</a></li>
+<li><a href="#fin">Conclusion</a></li>
+</ul></li>
+<li><a href="#task-lists">Task Lists</a></li>
+<li><a href="#footnote">Footnote</a></li>
+<li><a href="#headers">Headers</a></li>
+<li><a href="#emphasis">Emphasis</a></li>
+<li><a href="#lists">Lists</a></li>
+<li><a href="#links">Links</a></li>
+<li><a href="#images">Images</a></li>
+<li><a href="#blockquotes">Blockquotes</a></li>
+<li><a href="#inline-html">Inline HTML</a></li>
+<li><a href="#horizontal-rule">Horizontal Rule</a></li>
+</ul></li>
+</ul>
+</div>
+
+<h2 id="code-and-syntax-highlighting">Code and Syntax Highlighting</h2>
+
+<p>Inline <code>code</code> has <code>back-ticks around</code> it.</p>
+
+<pre><code class="javascript">var s = &quot;JavaScript syntax highlighting&quot;;
+alert(s);
+</code></pre>
+
+<pre><code class="python">s = &quot;Python syntax highlighting&quot;
+print s
+myString = &quot;&quot;&quot;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&quot;&quot;&quot;
+</code></pre>
+
+<pre><code>No language indicated, so no syntax highlighting. 
+But let's throw in a &lt;b&gt;tag&lt;/b&gt;.
+</code></pre>
+
+<h2 id="mermaid">Mermaid</h2>
+
+<pre><code class="mermaid">gantt
+        dateFormat  YYYY-MM-DD
+        title Adding GANTT diagram functionality to mermaid
+        section A section
+        Completed task            :done,    des1, 2014-01-06,2014-01-08
+        Active task               :active,  des2, 2014-01-09, 3d
+        Future task               :         des3, after des2, 5d
+        Future task2               :         des4, after des3, 5d
+        section Critical tasks
+        Completed task in the critical line :crit, done, 2014-01-06,24h
+        Implement parser and jison          :crit, done, after des1, 2d
+        Create tests for parser             :crit, active, 3d
+        Future task in critical line        :crit, 5d
+        Create tests for renderer           :2d
+        Add to mermaid                      :1d
+</code></pre>
+
+<h2 id="flowchart">Flowchart</h2>
+
+<pre><code class="flow">s=&gt;start: start
+e=&gt;end: end
+o=&gt;operation: operation
+sr=&gt;subroutine: subroutine
+c=&gt;condition: condition
+i=&gt;inputoutput: inputoutput
+p=&gt;parallel: parallel
+
+s-&gt;o-&gt;c
+c(yes)-&gt;i-&gt;e
+c(no)-&gt;p
+p(path1, bottom)-&gt;sr(right)-&gt;o
+p(path2, top)-&gt;o
+</code></pre>
+
+<h2 id="tables">Tables</h2>
+
+<p>Colons can be used to align columns.</p>
+
+<table>
+<colgroup>
+<col/>
+<col style="text-align:center;"/>
+<col style="text-align:right;"/>
+</colgroup>
+
+<thead>
+<tr>
+    <th>Tables</th>
+    <th style="text-align:center;">Are</th>
+    <th style="text-align:right;">Cool</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+    <td>col 3 is</td>
+    <td style="text-align:center;">right-aligned</td>
+    <td style="text-align:right;">$1600</td>
+</tr>
+<tr>
+    <td>col 2 is</td>
+    <td style="text-align:center;">centered</td>
+    <td style="text-align:right;">$12</td>
+</tr>
+<tr>
+    <td>zebra stripes</td>
+    <td style="text-align:center;">are neat</td>
+    <td style="text-align:right;">$1</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="definitions">Definitions</h2>
+
+<dl>
+<dt>term</dt>
+<dd>definition</dd>
+</dl>
+
+<h2 id="transclusion">Transclusion</h2>
+
+<p>If MMD transclusion is working you will see a unicorn here:</p>
+
+<p>{{multimarkdown_transclusion_test_20190121111324.md}}</p>
+
+<p>If iA transclusion is working you will see a unicorn here:</p>
+
+<figure>
+<img src="https://farm5.staticflickr.com/4867/44888753205_c5ed7fe8df_o.png" alt="" />
+</figure>
+
+<h2 id="linking-to-an-adjacent-file">Linking to an Adjacent File</h2>
+
+<p><a href="./multimarkdown_transclusion_test_20190121111324.md">Here is another file in the same directory</a></p>
+
+<h2 id="math">Math</h2>
+
+<p>A formula, <span class="math">\({e}^{i\pi }+1=0\)</span>, inside a paragraph.</p>
+
+<p><span class="math">\[{e}^{i\pi }+1=0\]</span></p>
+
+<h2 id="supersub-scripts">Super/Sub Scripts</h2>
+
+<p>m<sup>2</sup></p>
+
+<p>x<sup>2,y</sup></p>
+
+<p>x<sub>z</sub></p>
+
+<p>C<sub>6</sub>H<sub>12</sub>O<sub>6</sub></p>
+
+<h2 id="citations">Citations</h2>
+
+<p>Cite a source.<a class="citation" href="#fn1-19679" title="Jump to citation">[<span class="locator">p. 42</span>, 1]<span class="citekey" style="display:none">source</span></a></p>
+
+<p>Black (2015)<a class="citation" href="#fn2-19679" title="Jump to citation">[2]<span class="citekey" style="display:none">Black:2015tz</span></a></p>
+
+<h2 id="criticmarkup">CriticMarkup</h2>
+
+<p>This {++is ++}a test.</p>
+
+<p>This is {&#8211;is &#8211;}a test.</p>
+
+<p>This {~~isn&#8217;t<sub>>is</sub><sub>}</sub> a test.</p>
+
+<p>This is a {==test==}.</p>
+
+<p>This is a test.{&gt;&gt;What is it a test of?&lt;&lt;}</p>
+
+<h2 id="paragraphs">Paragraphs</h2>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+
+<p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</p>
+
+<h2 id="cross-references">Cross References</h2>
+
+<h3 id="intro">Intro</h3>
+
+<p>Some text</p>
+
+<h3 id="fin">Conclusion</h3>
+
+<p>Link to <a href="#intro">Intro</a>.</p>
+
+<p>Link to the <a href="#fin">end</a>.</p>
+
+<h2 id="task-lists">Task Lists</h2>
+
+<ul>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled checked>Completed task item</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled>Unfinished task item</li>
+</ul>
+
+<h2 id="footnote">Footnote</h2>
+
+<p>Here&#8217;s a sentence with a footnote<sup><a href="#fn3-19679" id="fnr3-19679" title="see footnote" class="footnote">3</a></sup> in the middle of it!</p>
+
+<p>Text.<sup><a href="#fn4-19679" id="fnr4-19679" title="see footnote" class="footnote">4</a></sup></p>
+
+<h2 id="headers">Headers</h2>
+
+<pre><code># H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
+</code></pre>
+
+<h2 id="emphasis">Emphasis</h2>
+
+<p>Emphasis, aka italics, with <em>asterisks</em> or <em>underscores</em>.<br/>
+Strong emphasis, aka bold, with <strong>asterisks</strong> or <strong>underscores</strong>.<br/>
+Strikethrough uses two tildes. <del>Scratch this.</del> </p>
+
+<h2 id="lists">Lists</h2>
+
+<ol>
+<li><p>First ordered list item</p></li>
+<li>Another item
+
+<ul>
+<li>Unordered sub-list.</li>
+</ul></li>
+<li>Actual numbers don&#8217;t matter, just that it&#8217;s a number
+
+<ol>
+<li>Ordered sub-list</li>
+</ol></li>
+<li><p>And another item.</p>
+
+<p>You can have properly indented paragraphs within list items. </p></li>
+</ol>
+
+<p>and unordered lists:</p>
+
+<ul>
+<li>Unordered list can use asterisks</li>
+<li>Or minuses</li>
+<li>Or pluses</li>
+</ul>
+
+<h2 id="links">Links</h2>
+
+<p><a href="https://www.google.com">I&#8217;m an inline-style link</a></p>
+
+<p><a href="https://www.google.com" title="Google's Homepage">I&#8217;m an inline-style link with title</a></p>
+
+<p><a href="https://www.mozilla.org">I&#8217;m a reference-style link</a></p>
+
+<p><a href="../blob/master/LICENSE">I&#8217;m a relative reference to a repository file</a></p>
+
+<p><a href="http://slashdot.org">You can use numbers for reference-style link definitions</a></p>
+
+<p>Or leave it empty and use the <a href="http://www.reddit.com">link text itself</a>.</p>
+
+<p>URLs and URLs in angle brackets will automatically get turned into links.
+http://www.example.com or <a href="http://www.example.com">http://www.example.com</a> and sometimes example.com (but not on Github, for example).</p>
+
+<p>Some text to show that the reference links can follow later.</p>
+
+<h2 id="images">Images</h2>
+
+<p>Here&#8217;s our logo (hover to see the title text):</p>
+
+<p>Inline-style:
+<img src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png" alt="alt text" title="Logo Title Text 1" /></p>
+
+<p>Reference-style:
+<img src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png" alt="alt text" id="logo" title="Logo Title Text 2" /></p>
+
+<h2 id="blockquotes">Blockquotes</h2>
+
+<blockquote>
+<p>Blockquotes are very handy in email to emulate reply text.
+This line is part of the same quote.</p>
+</blockquote>
+
+<p>Quote break.</p>
+
+<blockquote>
+<p>This is a very long line that will still be quoted properly when it wraps. Oh boy let&#8217;s keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can <em>put</em> <strong>Markdown</strong> into a blockquote. </p>
+</blockquote>
+
+<h2 id="inline-html">Inline HTML</h2>
+
+<p>You can also use raw HTML in your Markdown, and it&#8217;ll mostly work pretty well.</p>
+<dl>
+ <dt>Definition list</dt>
+ <dd>Is something people use sometimes.</dd>
+ <dt>Markdown in HTML</dt>
+ <dd>Does <em>not</em> work <strong>very</strong> well. Use HTML <em>tags</em>.</dd>
+</dl>
+
+<h2 id="horizontal-rule">Horizontal Rule</h2>
+
+<p>Three or more&#8230;</p>
+
+<hr />
+
+<p>Hyphens</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+
+<li id="fn1-19679" class="citation"><span class="citekey" style="display:none">source</span><p>John Doe. <em>A Totally Fake Book</em>. Vanity Press, 2006.</p>
+</li>
+
+<li id="fn2-19679" class="citation"><span class="citekey" style="display:none">Black:2015tz</span><p>A Bryden Black 2015, <em>The Lion, the Dove, &amp; the Lamb</em>, Wipf and Stock Publishers </p>
+</li>
+
+<li id="fn3-19679">
+<p>This is the footnote. <a href="#fnr3-19679" title="return to article" class="reversefootnote">&#8617;&#xFE0E;</a></p>
+</li>
+
+<li id="fn4-19679">
+<p>This is an inline footnote. <a href="#fnr4-19679" title="return to article" class="reversefootnote">&#8617;&#xFE0E;</a></p>
+</li>
+
+</ol>
+</div>

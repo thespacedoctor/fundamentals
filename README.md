@@ -23,19 +23,25 @@ Installation
 
 The easiest way to install fundamentals is to use `pip`:
 
-    pip install fundamentals
+``` bash
+pip install fundamentals
+```
 
 Or you can clone the [github
 repo](https://github.com/thespacedoctor/fundamentals) and install from a
 local version of the code:
 
-    git clone git@github.com:thespacedoctor/fundamentals.git
-    cd fundamentals
-    python setup.py install
+``` bash
+git clone git@github.com:thespacedoctor/fundamentals.git
+cd fundamentals
+python setup.py install
+```
 
 To upgrade to the latest version of fundamentals use the command:
 
-    pip install fundamentals --upgrade
+``` bash
+pip install fundamentals --upgrade
+```
 
 Development
 -----------
@@ -43,9 +49,11 @@ Development
 If you want to tinker with the code, then install in development mode.
 This means you can modify the code from your cloned repo:
 
-    git clone git@github.com:thespacedoctor/fundamentals.git
-    cd fundamentals
-    python setup.py develop
+``` bash
+git clone git@github.com:thespacedoctor/fundamentals.git
+cd fundamentals
+python setup.py develop
+```
 
 [Pull requests](https://github.com/thespacedoctor/fundamentals/pulls)
 are welcomed!
