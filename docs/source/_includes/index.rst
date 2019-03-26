@@ -1,5 +1,5 @@
 
-.. include:: /_includes/html_test_stand_alone.html
+.. include:: /_includes/html_test_stand_alone.rst
 .. include:: /_includes/installation.rst
 .. include:: /_includes/development.rst
 .. include:: /_includes/issues.rst
