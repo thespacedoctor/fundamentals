@@ -75,7 +75,7 @@ def insert_list_of_dictionaries_into_database_tables(
     """
 
     log.debug(
-        'completed the ````insert_list_of_dictionaries_into_database_tables`` function')
+        'starting the ````insert_list_of_dictionaries_into_database_tables`` function')
 
     global count
     global totalCount
@@ -127,8 +127,6 @@ def insert_list_of_dictionaries_into_database_tables(
         ltotalCount = totalCount
 
         print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
-
-        print dbSettings
 
         if dbSettings == False:
 
