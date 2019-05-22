@@ -10,6 +10,8 @@
     December  4, 2017
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import range
+from builtins import object
 import sys
 import os
 os.environ['TERM'] = 'vt100'

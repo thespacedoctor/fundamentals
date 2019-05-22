@@ -13,6 +13,10 @@ There are options to rename all the downloaded resource, index the files, set di
 """
 from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -122,7 +126,7 @@ def multiobject_download(
             thisArray.extend([[url, localFilepath]])
 
             # GENERATE THE REQUESTS
-            request = urllib2.Request(url)
+            request = urllib.request.Request(url)
             if credentials != False:
                 username = credentials["username"]
                 password = credentials["password"]
@@ -152,7 +156,7 @@ def multiobject_download(
             log.debug(" about to download %s" % (u,))
 
             # GENERATE THE REQUESTS
-            request = urllib2.Request(u)
+            request = urllib.request.Request(u)
             if credentials != False:
                 log.debug('adding the credentials')
                 username = credentials["username"]

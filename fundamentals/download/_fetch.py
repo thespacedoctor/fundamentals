@@ -11,6 +11,9 @@
 """
 from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -41,7 +44,7 @@ def _fetch(url,):
     while count < tries and downloaded == False:
         try:
             log.debug('downloading ' + url.get_full_url())
-            body = urllib2.urlopen(url).read()
+            body = urllib.request.urlopen(url).read()
             downloaded = True
         except socket.timeout as e:
             print("timeout on URL, trying again")

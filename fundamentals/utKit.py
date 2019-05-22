@@ -10,6 +10,7 @@
     April 16, 2014
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import object
 import sys
 import os
 import logging
@@ -21,7 +22,7 @@ except:
     pass
 
 
-class utKit():
+class utKit(object):
 
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*

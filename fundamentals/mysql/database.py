@@ -10,6 +10,7 @@
     November 22, 2017
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import object
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -24,7 +25,7 @@ from docopt import docopt
 from fundamentals.mysql import readquery
 
 
-class database():
+class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
 

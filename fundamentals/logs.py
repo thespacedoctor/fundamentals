@@ -9,6 +9,7 @@
 :Date Created:
     October 10, 2012
 """
+from builtins import object
 import os
 import sys
 import logging
@@ -186,7 +187,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         return rtv
 
 
-class emptyLogger:
+class emptyLogger(object):
     """
     *A fake logger object so user can set ``log=False`` if required*
 

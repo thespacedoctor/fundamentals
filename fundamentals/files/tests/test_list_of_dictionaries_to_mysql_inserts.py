@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import str
 import os
 import nose2
 import nose2

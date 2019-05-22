@@ -44,6 +44,7 @@ Options:
     September 22, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
 import sys
 import os
 import time
@@ -153,7 +154,7 @@ def directory_script_runner(
 
     # ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
-    for k, v in scriptList.items():
+    for k, v in list(scriptList.items()):
         scriptname = os.path.basename(v)
         if waitForResult == True:
             cmd =  """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """ % locals(
@@ -229,7 +230,7 @@ def main(arguments=None):
 
     # UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES
     # AUTOMATICALLY
-    for arg, val in arguments.items():
+    for arg, val in list(arguments.items()):
         if arg[0] == "-":
             varname = arg.replace("-", "") + "Flag"
         else:

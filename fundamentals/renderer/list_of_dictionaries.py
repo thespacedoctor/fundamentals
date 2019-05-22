@@ -10,6 +10,9 @@
     September 14, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
+from builtins import range
+from builtins import object
 import sys
 import os
 import io
@@ -26,7 +29,7 @@ from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
 
-class list_of_dictionaries():
+class list_of_dictionaries(object):
     """
     *The dataset object is a list of python dictionaries. Using this class, the data can be rendered as various list and markup formats*
 
@@ -353,7 +356,7 @@ class list_of_dictionaries():
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
         for d in dataCopy:
-            for k, v in d.items():
+            for k, v in list(d.items()):
                 if isinstance(v,  datetime):
                     d[k] = v.strftime("%Y%m%dt%H%M%S")
 

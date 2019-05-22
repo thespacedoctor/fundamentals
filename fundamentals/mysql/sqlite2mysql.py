@@ -17,6 +17,7 @@ Options:
     -s, --settings        the settings file
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import object
 import sys
 import os
 import sqlite3 as lite
@@ -44,7 +45,7 @@ def main(arguments=None):
 
     # unpack remaining cl arguments using `exec` to setup the variable names
     # automatically
-    for arg, val in arguments.items():
+    for arg, val in list(arguments.items()):
         if arg[0] == "-":
             varname = arg.replace("-", "") + "Flag"
         else:
@@ -70,7 +71,7 @@ def main(arguments=None):
     return
 
 
-class sqlite2mysql():
+class sqlite2mysql(object):
     """
     *Take a sqlite database file and copy the tables within it to a MySQL database*
 

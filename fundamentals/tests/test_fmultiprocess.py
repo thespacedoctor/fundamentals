@@ -1,4 +1,6 @@
 from __future__ import print_function
+from builtins import str
+from builtins import range
 import os
 import nose2
 import shutil
@@ -67,7 +69,7 @@ class test_multiprocess(unittest.TestCase):
         from fundamentals import fmultiprocess
 
         # DEFINE AN INPUT ARRAY
-        inputArray = range(1000)
+        inputArray = list(range(1000))
         t1 = time.time()
         result = fmultiprocess(log=log, function=f,
                                inputArray=inputArray, anotherKeyword="cheese")

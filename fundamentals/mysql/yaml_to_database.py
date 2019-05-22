@@ -23,6 +23,7 @@ Options:
 """
 from __future__ import print_function
 
+from builtins import object
 import sys
 import os
 import yaml
@@ -53,7 +54,7 @@ def main(arguments=None):
 
     # unpack remaining cl arguments using `exec` to setup the variable names
     # automatically
-    for arg, val in arguments.items():
+    for arg, val in list(arguments.items()):
         if arg[0] == "-":
             varname = arg.replace("-", "") + "Flag"
         else:
@@ -96,7 +97,7 @@ def main(arguments=None):
     return
 
 
-class yaml_to_database():
+class yaml_to_database(object):
     """
     *Take key-values from yaml files including a tablename(s) and add them to a mysql database table*
 

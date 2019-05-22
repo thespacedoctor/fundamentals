@@ -10,6 +10,9 @@
     June 21, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import zip
+from builtins import str
+from builtins import range
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -150,12 +153,12 @@ def convert_dictionary_to_mysql_table(
             raise TypeError(message)
 
         for i in uniqueKeyList:
-            if i not in dictionary.keys():
+            if i not in list(dictionary.keys()):
                 message = 'Please make sure values in "uniqueKeyList" are present in the "dictionary" you are tring to convert'
                 log.critical(message)
                 raise ValueError(message)
 
-        for k, v in dictionary.items():
+        for k, v in list(dictionary.items()):
             # log.debug('k: %s, v: %s' % (k, v,))
             if isinstance(v, list) and len(v) != 2:
                 message = 'Please make sure the list values in "dictionary" 2 items in length'
@@ -163,7 +166,7 @@ def convert_dictionary_to_mysql_table(
                              (message, k, v, type(v)))
                 raise ValueError(message)
             if isinstance(v, list):
-                if not (isinstance(v[0], str) or isinstance(v[0], int) or isinstance(v[0], bool) or isinstance(v[0], float) or isinstance(v[0], long) or isinstance(v[0], datetime.date) or v[0] == None):
+                if not (isinstance(v[0], str) or isinstance(v[0], int) or isinstance(v[0], bool) or isinstance(v[0], float) or isinstance(v[0], int) or isinstance(v[0], datetime.date) or v[0] == None):
                     message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool'
                     log.critical("%s: in %s we have a %s (%s)" %
                                  (message, k, v, type(v)))
@@ -228,12 +231,12 @@ def convert_dictionary_to_mysql_table(
     # NAME OF THE KEY, IF IT DOES NOT EXIST
     count = len(dictionary)
     i = 1
-    for (key, value) in dictionary.items():
+    for (key, value) in list(dictionary.items()):
         if (isinstance(value, list) and value[0] is None):
             del dictionary[key]
     # SORT THE DICTIONARY BY KEY
     odictionary = c.OrderedDict(sorted(dictionary.items()))
-    for (key, value) in odictionary.items():
+    for (key, value) in list(odictionary.items()):
 
         formattedKey = key.replace(" ", "_").replace("-", "_")
         # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
@@ -311,7 +314,7 @@ def convert_dictionary_to_mysql_table(
                         qCreateColumn += '` tinyint DEFAULT NULL'
                     elif isinstance(value[0], int):
                         qCreateColumn += '` int DEFAULT NULL'
-                    elif isinstance(value[0], float) or isinstance(value[0], long):
+                    elif isinstance(value[0], float) or isinstance(value[0], int):
                         qCreateColumn += '` double DEFAULT NULL'
                     elif isinstance(value[0], bool):
                         qCreateColumn += '` tinyint DEFAULT NULL'

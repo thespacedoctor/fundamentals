@@ -12,6 +12,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 ################# GLOBAL IMPORTS ####################
+from builtins import object
 import sys
 import os
 import yaml
@@ -33,7 +34,7 @@ import psutil
 ###################################################################
 
 
-class tools():
+class tools(object):
     """
     *common setup methods & attributes of the main function in cl-util*
 
@@ -316,7 +317,7 @@ class tools():
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically
-        for arg, val in arguments.items():
+        for arg, val in list(arguments.items()):
             if arg[0] == "-":
                 varname = arg.replace("-", "") + "Flag"
             else:
