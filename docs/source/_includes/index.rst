@@ -1,9 +1,16 @@
 
-.. include:: /_includes/installation.rst
-.. include:: /_includes/development.rst
-.. include:: /_includes/issues.rst
-.. include:: /_includes/usage.rst
-.. include:: /_includes/documentation.rst
-.. include:: /_includes/tutorial.rst
 
 
+* :doc:`Installation</_includes/installation>`
+* :doc:`Usage</_includes/usage>`
+* :doc:`Tutorials</_includes/tutorial>`
+* :doc:`Documentation</_includes/documentation>`
+* :doc:`Issues</_includes/issues>`
+* :doc:`Development</_includes/development>`
+
+/_includes/installation.rst
+/_includes/development.rst
+/_includes/issues.rst
+/_includes/usage.rst
+/_includes/documentation.rst
+/_includes/tutorial.rst

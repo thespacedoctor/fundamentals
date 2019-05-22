@@ -1,5 +1,6 @@
 """
 *Tools for working with files and folders*
 """
-from recursive_directory_listing import recursive_directory_listing
-from fileChunker import fileChunker
+from __future__ import absolute_import
+from .recursive_directory_listing import recursive_directory_listing
+from .fileChunker import fileChunker

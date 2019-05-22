@@ -9,6 +9,7 @@
 :Date Created:
     October 10, 2012
 """
+from builtins import object
 import os
 import sys
 import logging
@@ -135,7 +136,7 @@ def setup_dryx_logging(yaml_file):
     handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
 
     # IMPORT YAML LOGGING DICTIONARY
-    stream = file(yaml_file, 'r')
+    stream = open(yaml_file, 'r')
     yamlContent = yaml.load(stream)
     stream.close()
 
@@ -186,7 +187,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         return rtv
 
 
-class emptyLogger:
+class emptyLogger(object):
     """
     *A fake logger object so user can set ``log=False`` if required*
 

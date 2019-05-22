@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -12,12 +13,12 @@ su = tools(
     docString=__doc__,
     logLevel="DEBUG",
     options_first=False,
-    projectName="headjack"
+    projectName="fundamentals"
 )
 arguments, settings, log, dbConn = su.setup()
 
 # # load settings
-# stream = file(
+# stream = open(
 #     "/Users/Dave/.config/headjack/headjack.yaml", 'r')
 # settings = yaml.load(stream)
 # stream.close()
@@ -29,7 +30,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 # load settings
-stream = file(
+stream = open(
     pathToInputDir + "/example_settings.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -60,7 +61,8 @@ class test_sqlite2mysql(unittest.TestCase):
             log=log,
             settings=settings,
             pathToSqlite=pathToSqlite,
-            tablePrefix="Marvin"
+            tablePrefix="Marvin",
+            dbConn=dbConn
         )
         this.convert_sqlite_to_mysql()
 
@@ -76,9 +78,9 @@ class test_sqlite2mysql(unittest.TestCase):
             )
             this.get()
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            # print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 

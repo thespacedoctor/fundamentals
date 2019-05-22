@@ -3,8 +3,11 @@ fundamentals package
 
 .. automodule:: fundamentals
     :members:
+    :private-members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
+    :member-order=bysource:
 
 Subpackages
 -----------
@@ -23,6 +26,7 @@ Submodules
 
 .. toctree::
 
+   fundamentals.fmultiprocess
    fundamentals.logs
    fundamentals.times
    fundamentals.tools

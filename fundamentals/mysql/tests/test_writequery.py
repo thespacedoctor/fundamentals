@@ -19,7 +19,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -36,7 +36,7 @@ class test_writequery(unittest.TestCase):
     def test_writequery_function(self):
 
         from fundamentals.mysql import writequery
-        sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        sqlQuery = "CREATE TABLE  IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
             log=log,
             sqlQuery=sqlQuery,
@@ -47,7 +47,7 @@ class test_writequery(unittest.TestCase):
 
     def test_manyvalue_insert(self):
         from fundamentals.mysql import writequery
-        sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        sqlQuery = "CREATE TABLE  IF NOT EXISTS  `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
             log=log,
             sqlQuery=sqlQuery,

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 import os
 import nose2
 import nose2
@@ -18,7 +20,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -31,7 +33,7 @@ utKit.tearDownModule()
 
 dictList = []
 
-for i in range(10000000):
+for i in range(100000):
 
     dictList.append({
         "col1": i,
@@ -63,12 +65,12 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dbTableName="test_insert_many",
             uniqueKeyList=["col1", "col3"],
             dateModified=True,
-            batchSize=1000000,
+            batchSize=10000,
             replace=True,
             dbSettings=dbSettings
         )
 
-        print time.time() - t1
+        # print(time.time() - t1)
 
         # x-print-testpage-for-pessto-marshall-web-object
 

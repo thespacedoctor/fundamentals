@@ -9,7 +9,9 @@
 :Date Created:
     November  9, 2017
 """
+from __future__ import division
 ################# GLOBAL IMPORTS ####################
+from past.utils import old_div
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -61,7 +63,7 @@ def fmultiprocess(
         p = Pool()
 
     cpuCount = psutil.cpu_count()
-    chunksize = int((len(inputArray) + 1) / (cpuCount * 3))
+    chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
 
     if chunksize == 0:
         chunksize = 1

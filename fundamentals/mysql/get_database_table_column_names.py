@@ -10,6 +10,7 @@
     June 21, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -61,7 +62,7 @@ def get_database_table_column_names(
             'could not find column names for dbTable %s - failed with this error: %s ' %
             (dbTable, str(e)))
         return -1
-    columnNames = rows[0].keys()
+    columnNames = list(rows[0].keys())
 
     log.debug('completed the ``get_database_table_column_names`` function')
     return columnNames

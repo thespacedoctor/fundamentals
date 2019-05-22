@@ -9,7 +9,12 @@
 :Date Created:
     June 21, 2016
 """
+from __future__ import print_function
+from __future__ import division
 ################# GLOBAL IMPORTS ####################
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -75,7 +80,7 @@ def insert_list_of_dictionaries_into_database_tables(
     """
 
     log.debug(
-        'completed the ````insert_list_of_dictionaries_into_database_tables`` function')
+        'starting the ````insert_list_of_dictionaries_into_database_tables`` function')
 
     global count
     global totalCount
@@ -112,7 +117,7 @@ def insert_list_of_dictionaries_into_database_tables(
     if len(dictList):
 
         total = len(dictList)
-        batches = int(total / batchSize)
+        batches = int(old_div(total, batchSize))
 
         start = 0
         end = 0
@@ -126,16 +131,14 @@ def insert_list_of_dictionaries_into_database_tables(
         totalCount = total + 1
         ltotalCount = totalCount
 
-        print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
-
-        print dbSettings
+        print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
 
         if dbSettings == False:
 
             fmultiprocess(
                 log=log,
                 function=_insert_single_batch_into_database,
-                inputArray=range(len(sharedList)),
+                inputArray=list(range(len(sharedList))),
                 dbTableName=dbTableName,
                 uniqueKeyList=uniqueKeyList,
                 dateModified=dateModified,
@@ -147,11 +150,11 @@ def insert_list_of_dictionaries_into_database_tables(
 
         else:
             fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
-                          inputArray=range(len(sharedList)), dbTablename=dbTableName,
+                          inputArray=list(range(len(sharedList))), dbTablename=dbTableName,
                           dbSettings=dbSettings, dateModified=dateModified)
 
         sys.stdout.write("\x1b[1A\x1b[2K")
-        print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
+        print("%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals())
 
     log.debug(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
@@ -222,7 +225,7 @@ def _insert_single_batch_into_database(
         else:
             insertVerb = "INSERT IGNORE"
 
-        uniKeys = set().union(*(d.keys() for d in batch[0]))
+        uniKeys = set().union(*(list(d.keys()) for d in batch[0]))
         tmp = []
         tmp[:] = [m.replace(" ", "_").replace(
             "-", "_") for m in uniKeys]
@@ -371,7 +374,7 @@ def _add_dictlist_to_database_via_load_in_file(
         dbConn=dbConn
     )
 
-    csvColumns = [k for d in dictList for k in d.keys()]
+    csvColumns = [k for d in dictList for k in list(d.keys())]
     csvColumns = list(set(csvColumns))
     csvColumnsString = (', ').join(csvColumns)
 

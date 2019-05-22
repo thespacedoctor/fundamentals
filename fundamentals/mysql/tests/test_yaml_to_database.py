@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -25,7 +26,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 # load settings
-stream = file(
+stream = open(
     pathToInputDir + "/example_settings.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -38,6 +39,7 @@ except:
 # COPY INPUT TO OUTPUT DIR
 shutil.copytree(pathToInputDir, pathToOutputDir)
 
+
 # Recursively create missing directories
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
@@ -48,16 +50,24 @@ if not os.path.exists(pathToOutputDir):
 class test_yaml_to_database(unittest.TestCase):
 
     def test_single_yaml_to_database_function(self):
+        # COPY INPUT TO OUTPUT DIR
+        import shutil
+        try:
+            shutil.rmtree(pathToOutputDir)
+        except:
+            pass
+        # COPY INPUT TO OUTPUT DIR
+        shutil.copytree(pathToInputDir, pathToOutputDir)
 
         from fundamentals.mysql import yaml_to_database
         yaml2db = yaml_to_database(
             log=log,
             settings=settings,
             dbConn=dbConn,
-            pathToInputDir=pathToOutputDir + "/yaml"
+            pathToInputDir=pathToOutputDir + "yaml"
         )
         yaml2db.add_yaml_file_content_to_database(
-            filepath=pathToOutputDir + "/yaml/20161219105124.yaml"
+            filepath=pathToOutputDir + "yaml/20161219105124.yaml"
         )
 
     def test_yaml_to_database_function(self):
@@ -83,9 +93,9 @@ class test_yaml_to_database(unittest.TestCase):
             )
             this.get()
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            # print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 

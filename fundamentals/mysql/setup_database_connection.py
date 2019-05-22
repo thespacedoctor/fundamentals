@@ -10,6 +10,7 @@
     June 21, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
 import sys
 import os
 import yaml
@@ -61,7 +62,7 @@ def setup_database_connection(
     try:
         logging.info(
             'importing the yaml database connection dictionary from ' + pathToYamlFile)
-        stream = file(pathToYamlFile, 'r')
+        stream = open(pathToYamlFile, 'r')
         connDict = yaml.load(stream)
     except:
         logging.critical(

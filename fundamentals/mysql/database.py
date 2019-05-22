@@ -10,6 +10,7 @@
     November 22, 2017
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import object
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -24,7 +25,7 @@ from docopt import docopt
 from fundamentals.mysql import readquery
 
 
-class database():
+class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
 
@@ -184,7 +185,7 @@ class database():
             self.log.debug(
                 """Connected to `%(address)s` on port `%(port)s`""" % locals())
             return True
-        except socket.error, e:
+        except socket.error as e:
             self.log.warning(
                 """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
             return False

@@ -44,6 +44,7 @@ Options:
     September 22, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
 import sys
 import os
 import time
@@ -153,13 +154,13 @@ def directory_script_runner(
 
     # ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
-    for k, v in scriptList.iteritems():
+    for k, v in list(scriptList.items()):
         scriptname = os.path.basename(v)
         if waitForResult == True:
             cmd =  """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """ % locals(
             )
             p = Popen(cmd, stdout=PIPE, stderr=PIPE, close_fds=True,
-                      env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
+                      env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
             stdout, stderr = p.communicate()
 
             if len(stderr):
@@ -179,7 +180,7 @@ def directory_script_runner(
                         log.debug("attempting to rename file %s to %s" %
                                   (v, moveTo))
                         os.rename(v, moveTo)
-                    except Exception, e:
+                    except Exception as e:
                         log.error(
                             "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
             else:
@@ -197,7 +198,7 @@ def directory_script_runner(
                         log.debug("attempting to rename file %s to %s" %
                                   (v, moveTo))
                         os.rename(v, moveTo)
-                    except Exception, e:
+                    except Exception as e:
                         log.error(
                             "could not rename file %s to %s - failed with this error: %s " % (v, moveTo, str(e),))
         else:
@@ -229,12 +230,12 @@ def main(arguments=None):
 
     # UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES
     # AUTOMATICALLY
-    for arg, val in arguments.iteritems():
+    for arg, val in list(arguments.items()):
         if arg[0] == "-":
             varname = arg.replace("-", "") + "Flag"
         else:
             varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, str) or isinstance(val, unicode):
+        if isinstance(val, str):
             exec(varname + " = '%s'" % (val,))
         else:
             exec(varname + " = %s" % (val,))

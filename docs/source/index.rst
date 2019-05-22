@@ -4,30 +4,16 @@
    :maxdepth: 30
    :caption: Getting Started
 
-   _includes/index
-
-.. include:: /_includes/index.rst
-
-
-.. toctree::
-   :maxdepth: 30
-   :caption: Python Package Documentation
-
-   autosummary
-
-.. _Indexes:
-
-Indexes
--------
-
-* :ref:`Module Index<modindex>`
-* :ref:`Full Index<genindex>`
+   _includes/installation.rst
+   _includes/development.rst
+   _includes/issues.rst
+   _includes/usage.rst
+   _includes/documentation.rst
+   _includes/tutorial.rst
 
 
-Todo
-----
 
-* `Todolist <todo.html>`_
+
 
 
 
