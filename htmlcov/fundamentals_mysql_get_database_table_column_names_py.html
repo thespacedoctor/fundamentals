@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for fundamentals/mysql/get_database_table_column_names.py: 0%</title>
+    <title>Coverage for fundamentals/mysql/get_database_table_column_names.py: 41%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
@@ -17,13 +17,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/get_database_table_column_names.py</b> :
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">41%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             17 statements &nbsp;
-            <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
-            <span class="mis shortkey_m button_toggle_mis">17 missing</span>
+            <span class="run hide_run shortkey_r button_toggle_run">7 run</span>
+            <span class="mis shortkey_m button_toggle_mis">10 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
         </h2>
     </div>
@@ -101,22 +101,22 @@
 <p id="n45" class="pln"><a href="#n45">45</a></p>
 <p id="n46" class="pln"><a href="#n46">46</a></p>
 <p id="n47" class="pln"><a href="#n47">47</a></p>
-<p id="n48" class="stm mis"><a href="#n48">48</a></p>
+<p id="n48" class="stm run hide_run"><a href="#n48">48</a></p>
 <p id="n49" class="pln"><a href="#n49">49</a></p>
-<p id="n50" class="stm mis"><a href="#n50">50</a></p>
+<p id="n50" class="stm run hide_run"><a href="#n50">50</a></p>
 <p id="n51" class="pln"><a href="#n51">51</a></p>
 <p id="n52" class="pln"><a href="#n52">52</a></p>
-<p id="n53" class="stm mis"><a href="#n53">53</a></p>
-<p id="n54" class="stm mis"><a href="#n54">54</a></p>
+<p id="n53" class="stm run hide_run"><a href="#n53">53</a></p>
+<p id="n54" class="stm run hide_run"><a href="#n54">54</a></p>
 <p id="n55" class="pln"><a href="#n55">55</a></p>
 <p id="n56" class="pln"><a href="#n56">56</a></p>
 <p id="n57" class="pln"><a href="#n57">57</a></p>
 <p id="n58" class="pln"><a href="#n58">58</a></p>
-<p id="n59" class="stm mis"><a href="#n59">59</a></p>
-<p id="n60" class="stm mis"><a href="#n60">60</a></p>
+<p id="n59" class="stm run hide_run"><a href="#n59">59</a></p>
+<p id="n60" class="stm run hide_run"><a href="#n60">60</a></p>
 <p id="n61" class="pln"><a href="#n61">61</a></p>
 <p id="n62" class="pln"><a href="#n62">62</a></p>
-<p id="n63" class="stm mis"><a href="#n63">63</a></p>
+<p id="n63" class="stm run hide_run"><a href="#n63">63</a></p>
 <p id="n64" class="stm mis"><a href="#n64">64</a></p>
 <p id="n65" class="pln"><a href="#n65">65</a></p>
 <p id="n66" class="stm mis"><a href="#n66">66</a></p>
@@ -170,22 +170,22 @@
 <p id="t45" class="pln"><span class="str">                dbTable="test_table"</span><span class="strut">&nbsp;</span></p>
 <p id="t46" class="pln"><span class="str">            )</span><span class="strut">&nbsp;</span></p>
 <p id="t47" class="pln"><span class="str">    """</span><span class="strut">&nbsp;</span></p>
-<p id="t48" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``get_database_table_column_names`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t48" class="stm run hide_run">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``get_database_table_column_names`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t49" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t50" class="stm mis">    <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"""SELECT * FROM %s LIMIT 1"""</span> <span class="xx">\</span><span class="strut">&nbsp;</span></p>
+<p id="t50" class="stm run hide_run">    <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"""SELECT * FROM %s LIMIT 1"""</span> <span class="xx">\</span><span class="strut">&nbsp;</span></p>
 <p id="t51" class="pln">        <span class="op">%</span> <span class="op">(</span><span class="nam">dbTable</span><span class="op">,</span> <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t52" class="pln">    <span class="com"># ############### >ACTION(S) ################</span><span class="strut">&nbsp;</span></p>
-<p id="t53" class="stm mis">    <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t54" class="stm mis">        <span class="nam">rows</span> <span class="op">=</span> <span class="nam">readquery</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
+<p id="t53" class="stm run hide_run">    <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t54" class="stm run hide_run">        <span class="nam">rows</span> <span class="op">=</span> <span class="nam">readquery</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t55" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t56" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t57" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t58" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t59" class="stm mis">    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t60" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
+<p id="t59" class="stm run hide_run">    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t60" class="stm run hide_run">        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t61" class="pln">            <span class="str">'could not find column names for dbTable %s - failed with this error: %s '</span> <span class="op">%</span><span class="strut">&nbsp;</span></p>
 <p id="t62" class="pln">            <span class="op">(</span><span class="nam">dbTable</span><span class="op">,</span> <span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t63" class="stm mis">        <span class="key">return</span> <span class="op">-</span><span class="num">1</span><span class="strut">&nbsp;</span></p>
+<p id="t63" class="stm run hide_run">        <span class="key">return</span> <span class="op">-</span><span class="num">1</span><span class="strut">&nbsp;</span></p>
 <p id="t64" class="stm mis">    <span class="nam">columnNames</span> <span class="op">=</span> <span class="nam">rows</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">keys</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t65" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t66" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``get_database_table_column_names`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -198,7 +198,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
-            created at 2019-05-21 16:18
+            created at 2019-05-22 12:38
         </p>
     </div>
 </div>
