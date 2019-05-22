@@ -10,6 +10,7 @@
     June 21, 2016
 """
 ################# GLOBAL IMPORTS ####################
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -57,8 +58,6 @@ def readquery(
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
     # EXECUTE THE SQL COMMAND
-    cursor.execute(sqlQuery)
-    rows = cursor.fetchall()
     try:
         cursor.execute(sqlQuery)
         rows = cursor.fetchall()
@@ -68,6 +67,10 @@ def readquery(
             log.warning(
                 'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
             raise e
+        else:
+            log.warning(
+                'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
+            pass
 
     # CLOSE THE CURSOR
     try:

@@ -9,7 +9,7 @@ database settings:
         password: dryxPass
         tunnel:
             remote user: dry
-            remote ip: psweb.mp.qub.ac.uk
+            remote ip: starbase2.mp.qub.ac.uk
             remote datbase host: dormammu
             port: 9006
         loginPath: atlasMovers

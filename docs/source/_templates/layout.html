@@ -2,6 +2,8 @@
 {# Import the theme's layout. #}
 {% extends "!layout.html" %}
 
+ {% set css_files = css_files + ['_static/core.css'] %}
+ {% set css_files = css_files + ['_static/style.css'] %}
  {% set css_files = css_files + ['_static/dryx.css'] %}
 
 {% block extrahead %}
@@ -16,7 +18,7 @@
 
   <link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bigfoot/2.1.4/bigfoot-number.min.css">
   <link rel="stylesheet" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/monokai-sublime.min.css">
-  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/7.1.2/mermaid.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>

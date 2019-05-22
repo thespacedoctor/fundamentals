@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -20,7 +21,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -37,6 +38,16 @@ reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def test_convert_dictionary_to_mysql_table_function(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -52,6 +63,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         )
 
     def test_return_inserts(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -65,9 +86,19 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dateModified=False,
             returnInsertOnly=True
         )
-        print message
+        # print(message)
 
     def test_return_inserts_with_datetime_pre_compiled(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -82,7 +113,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             returnInsertOnly=True,
             reDatetime=reDatetime
         )
-        print message
+        # print(message)
 
     def test_return_inserts_non_batch(self):
         dictionary = {"a newKey": "cool", "and another": "super cool",
@@ -99,23 +130,6 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             replace=True,
             batchInserts=False
         )
-
-        print inserts
-
-    # def test_convert_dictionary_to_mysql_table_function_exception(self):
-
-    #     from fundamentals import convert_dictionary_to_mysql_table
-    #     try:
-    #         this = convert_dictionary_to_mysql_table(
-    #             log=log,
-    #             settings=settings,
-    #             fakeKey="break the code"
-    #         )
-    #         this.get()
-    #         assert False
-    #     except Exception, e:
-    #         assert True
-    #         print str(e)
 
         # x-print-testpage-for-pessto-marshall-web-object
 

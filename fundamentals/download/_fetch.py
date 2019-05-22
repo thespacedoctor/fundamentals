@@ -9,7 +9,11 @@
 :Date Created:
     March 16, 2016
 """
+from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -40,12 +44,12 @@ def _fetch(url,):
     while count < tries and downloaded == False:
         try:
             log.debug('downloading ' + url.get_full_url())
-            body = urllib2.urlopen(url).read()
+            body = urllib.request.urlopen(url).read()
             downloaded = True
-        except socket.timeout, e:
-            print "timeout on URL, trying again"
+        except socket.timeout as e:
+            print("timeout on URL, trying again")
             count += 1
-        except Exception, e:
+        except Exception as e:
             if "[Errno 60]" in str(e):
                 log.warning('timeout on URL, trying again' % locals())
                 count += 1

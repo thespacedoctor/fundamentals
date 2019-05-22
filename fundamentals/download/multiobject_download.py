@@ -11,7 +11,12 @@ There are options to rename all the downloaded resource, index the files, set di
 :Date Created:
     March  3, 2016
 """
+from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -121,7 +126,7 @@ def multiobject_download(
             thisArray.extend([[url, localFilepath]])
 
             # GENERATE THE REQUESTS
-            request = urllib2.Request(url)
+            request = urllib.request.Request(url)
             if credentials != False:
                 username = credentials["username"]
                 password = credentials["password"]
@@ -151,7 +156,7 @@ def multiobject_download(
             log.debug(" about to download %s" % (u,))
 
             # GENERATE THE REQUESTS
-            request = urllib2.Request(u)
+            request = urllib.request.Request(u)
             if credentials != False:
                 log.debug('adding the credentials')
                 username = credentials["username"]
@@ -175,7 +180,7 @@ def multiobject_download(
                 # CURSOR UP ONE LINE AND CLEAR LINE
                 sys.stdout.write("\x1b[1A\x1b[2K")
             percent = (float(urlNum) / float(totalCount)) * 100.
-            print "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals()
+            print("  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
 
             if(body):
                 bodies.extend([body])
@@ -192,7 +197,7 @@ def multiobject_download(
                 bodies = []
                 theseUrls = []
             i += 1
-    except Exception, e:
+    except Exception as e:
         log.error(
             "something went wrong with the mutli-threaded download : " + str(e) + "\n")
 

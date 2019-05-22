@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -18,7 +19,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -40,7 +41,7 @@ class test_get_database_table_column_names(unittest.TestCase):
             log=log,
             dbTable="testing_table"
         )
-        print columnNames
+        # print(columnNames)
 
         # x-print-testpage-for-pessto-marshall-web-object
 

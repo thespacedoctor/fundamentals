@@ -70,7 +70,7 @@ def tag(
         try:
             writeFile = codecs.open(
                 tagPlist, encoding='utf-8', mode='w')
-        except IOError, e:
+        except IOError as e:
             message = 'could not open the file %s' % (tagPlist,)
             raise IOError(message)
         writeFile.write("""
@@ -134,7 +134,7 @@ def tag(
         try:
             writeFile = codecs.open(
                 urlPlist, encoding='utf-8', mode='w')
-        except IOError, e:
+        except IOError as e:
             message = 'could not open the file %s' % (urlPlist,)
             raise IOError(message)
         writeFile.write("""
@@ -161,7 +161,7 @@ def tag(
         try:
             writeFile = codecs.open(
                 urlPlist, encoding='utf-8', mode='w')
-        except IOError, e:
+        except IOError as e:
             message = 'could not open the file %s' % (urlPlist,)
             raise IOError(message)
         writeFile.write("""

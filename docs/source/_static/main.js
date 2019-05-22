@@ -112,6 +112,7 @@ window.addEventListener('load', function() {
     // MERMAID FLOWCHATS, GANTT AND SEQUENCE DIAGRAMS
     var mermaidCode = function() {
         mermaid.init(undefined, $("code.mermaid"));
+       
     };
 
     // FLOWCHART RENDERING
@@ -127,6 +128,31 @@ window.addEventListener('load', function() {
             var diagram = document.createElement("div");
             diagram.id = uniqid
             document.body.insertBefore(diagram, flowBlock.parentNode);
+
+            // GET CONTENT OF CODE BLOCK AND RENDER IT INTO THE ABOVE DIV
+            var code = flowBlock.value || flowBlock.textContent;
+            diagram = flowchart.parse(code);
+            diagram.drawSVG(uniqid);
+
+            // REMOVE ORIGINAL CODEBLOCK
+            var del = flowBlock.parentElement;
+            var parent = del.parentElement;
+            parent.removeChild(del);
+        })
+
+        var parentDivs = document.querySelectorAll("div.highlight-flow");
+        Array.prototype.forEach.call(parentDivs, function(parentDiv, index) {
+
+            var flowBlock = parentDiv.querySelector("div>pre")
+
+            // CREATE A UNIQUE ID FOR AN ELEMENT
+            var randLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            var uniqid = randLetter + Date.now();
+
+            // ADD DIV PLACEHOLDER TO ADD THE RENDERED FLOWCHART TO
+            var diagram = document.createElement("div");
+            diagram.id = uniqid
+            parentDiv.insertBefore(diagram, flowBlock.parentNode);
 
             // GET CONTENT OF CODE BLOCK AND RENDER IT INTO THE ABOVE DIV
             var code = flowBlock.value || flowBlock.textContent;
@@ -175,6 +201,14 @@ window.addEventListener('load', function() {
             preventPageScroll: false,
             actionOriginalFN: "ignore",
             anchorPattern: /(fn|footnote|note)\:?\d+(-\d+)?footnote/gi,
+            numberResetSelector:"body"
+        });
+        // SPHINX FOOTNOTES AND CITATIONS
+        $.bigfoot({
+            positionContent: true,
+            preventPageScroll: false,
+            actionOriginalFN: "delete",
+            anchorPattern: /(fn|cn)\d+/gi,
             numberResetSelector:"body"
         });
     };
@@ -446,19 +480,19 @@ window.addEventListener('load', function() {
     }
     
     function handler(event) {
-
         processMath()
         changeFootnoteHref()
         if (window.matchMedia("screen").matches) {
             bigfootCode()
         }
-        setTimeout(function(){relabelFootnotes()}, 2000);
-        splitFootnotesAndCitations()
+        // setTimeout(function(){relabelFootnotes()}, 2000);
+        // splitFootnotesAndCitations()
+
         mermaidCode()
         flowchartCode()
         highlightCode()
-        convertLinksToIaLinks()
-        additionalResources()
+        // convertLinksToIaLinks()
+        // additionalResources()
 
     }
 
@@ -471,6 +505,7 @@ window.addEventListener('load', function() {
         $(document).ready(handler);
     } else if (document.body.classList.contains('wy-body-for-nav')) {
         // SPHINX
+
         $(document).ready(handler);
     } else {
         // iA Writer

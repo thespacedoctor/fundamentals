@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -18,7 +19,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -38,4 +39,4 @@ class test_setup_database_connection(unittest.TestCase):
         this = setup_database_connection(
             pathToYamlFile=pathToInputDir + "/db_settings.yaml"
         )
-        print this
+        # print(this)

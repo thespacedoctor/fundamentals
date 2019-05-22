@@ -78,7 +78,7 @@ def recursive_directory_listing(
             for parentDir in parentDirectoryList:
                 try:
                     thisDirList = os.listdir(parentDir)
-                except Exception, e:
+                except Exception as e:
                     log.error(e)
                     continue
 

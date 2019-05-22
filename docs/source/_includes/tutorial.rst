@@ -54,7 +54,7 @@ For example, I can have a `cl-utils.py` module living at the root of my python p
                 varname = arg.replace("-", "") + "Flag"
             else:
                 varname = arg.replace("<", "").replace(">", "")
-            if isinstance(val, str) or isinstance(val, unicode):
+            if isinstance(val, str):
                 exec(varname + " = '%s'" % (val,))
             else:
                 exec(varname + " = %s" % (val,))

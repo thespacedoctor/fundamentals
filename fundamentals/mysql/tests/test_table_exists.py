@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -18,7 +19,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -35,7 +36,7 @@ class test_table_exists(unittest.TestCase):
     def test_table_exists_function(self):
 
         from fundamentals.mysql import writequery
-        sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
             log=log,
             sqlQuery=sqlQuery,
@@ -51,7 +52,7 @@ class test_table_exists(unittest.TestCase):
             log=log,
             dbTableName=tableName
         )
-        print "%(tableName)s exists: %(this)s" % locals()
+        # print("%(tableName)s exists: %(this)s" % locals())
 
         from fundamentals.mysql import writequery
         sqlQuery = "DROP TABLE `testing_table`;"
@@ -72,7 +73,7 @@ class test_table_exists(unittest.TestCase):
             log=log,
             dbTableName=tableName
         )
-        print "%(tableName)s exists: %(this)s" % locals()
+        # print("%(tableName)s exists: %(this)s" % locals())
 
         # x-print-testpage-for-pessto-marshall-web-object
 

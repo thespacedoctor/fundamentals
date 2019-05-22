@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose
 import shutil
@@ -16,7 +17,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # # load settings
-# stream = file(
+# stream = open(
 #     "/Users/Dave/.config/rockAtlas/rockAtlas.yaml", 'r')
 # settings = yaml.load(stream)
 # stream.close()
@@ -28,7 +29,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 # load settings
-stream = file(
+stream = open(
     pathToInputDir + "/example_settings_2.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -82,7 +83,7 @@ class test_database(unittest.TestCase):
         from fundamentals.mysql import database
         dbConn = database(
             log=log,
-            dbSettings=dbSettings
+            dbSettings=dbSettings2
         ).connect()
 
         from fundamentals.mysql import readquery
@@ -95,7 +96,7 @@ class test_database(unittest.TestCase):
             dbConn=dbConn,
             quiet=False
         )
-        print rows
+        # print(rows)
 
     def test_database_function_exception(self):
 
@@ -103,14 +104,14 @@ class test_database(unittest.TestCase):
         try:
             this = database(
                 log=log,
-                dbSettings=dbSettings,
+                dbSettings=dbSettings2,
                 fakeKey="break the code"
             )
             this.get()
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            # print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 
