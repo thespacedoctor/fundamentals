@@ -38,6 +38,16 @@ reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def test_convert_dictionary_to_mysql_table_function(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -53,6 +63,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         )
 
     def test_return_inserts(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -69,6 +89,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         # print(message)
 
     def test_return_inserts_with_datetime_pre_compiled(self):
+        from fundamentals.mysql import writequery
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        writequery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            Force=False,
+            manyValueList=False
+        )
+
         dictionary = {"a newKey": "cool", "and another": "super cool",
                       "uniquekey1": "cheese", "uniqueKey2": "burgers"}
         from fundamentals.mysql import convert_dictionary_to_mysql_table

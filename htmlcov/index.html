@@ -1,9 +1,13 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage report</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
     <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
@@ -14,17 +18,21 @@
     </script>
 </head>
 <body class="indexfile">
+
 <div id="header">
     <div class="content">
         <h1>Coverage report:
             <span class="pc_cov">61%</span>
         </h1>
+
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
         <form id="filter_container">
             <input id="filter" type="text" value="" placeholder="filter..." />
         </form>
     </div>
 </div>
+
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -34,534 +42,684 @@
         <span class="key">s</span>
         <span class="key">m</span>
         <span class="key">x</span>
+        
         <span class="key">c</span> &nbsp; change column sorting
     </p>
     </div>
 </div>
+
 <div id="index">
     <table class="index">
         <thead>
+            
             <tr class="tablehead" title="Click to sort">
                 <th class="name left headerSortDown shortkey_n">Module</th>
                 <th class="shortkey_s">statements</th>
                 <th class="shortkey_m">missing</th>
                 <th class="shortkey_x">excluded</th>
+                
                 <th class="right shortkey_c">coverage</th>
             </tr>
         </thead>
+        
         <tfoot>
             <tr class="total">
                 <td class="name left">Total</td>
-                <td>2846</td>
-                <td>1111</td>
+                <td>2856</td>
+                <td>1109</td>
                 <td>0</td>
-                <td class="right" data-ratio="1735 2846">61%</td>
+                
+                <td class="right" data-ratio="1747 2856">61%</td>
             </tr>
         </tfoot>
         <tbody>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals___init___py.html">fundamentals/__init__.py</a></td>
                 <td>10</td>
                 <td>10</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 10">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals___version___py.html">fundamentals/__version__.py</a></td>
                 <td>1</td>
                 <td>1</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 1">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_commonutils___init___py.html">fundamentals/commonutils/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_commonutils_getpackagepath_py.html">fundamentals/commonutils/getpackagepath.py</a></td>
                 <td>6</td>
                 <td>6</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 6">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download___init___py.html">fundamentals/download/__init__.py</a></td>
                 <td>7</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="7 7">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download__dump_files_to_local_drive_py.html">fundamentals/download/_dump_files_to_local_drive.py</a></td>
                 <td>21</td>
                 <td>14</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="7 21">33%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download__fetch_py.html">fundamentals/download/_fetch.py</a></td>
                 <td>38</td>
                 <td>28</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="10 38">26%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_append_now_datestamp_to_filename_py.html">fundamentals/download/append_now_datestamp_to_filename.py</a></td>
                 <td>17</td>
                 <td>10</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="7 17">41%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_extract_filename_from_url_py.html">fundamentals/download/extract_filename_from_url.py</a></td>
                 <td>20</td>
                 <td>13</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="7 20">35%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_get_now_datetime_filestamp_py.html">fundamentals/download/get_now_datetime_filestamp.py</a></td>
                 <td>12</td>
                 <td>6</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="6 12">50%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_multiobject_download_py.html">fundamentals/download/multiobject_download.py</a></td>
                 <td>96</td>
                 <td>85</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="11 96">11%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests___init___py.html">fundamentals/download/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test__dump_files_to_local_drive_py.html">fundamentals/download/tests/test__dump_files_to_local_drive.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test__fetch_py.html">fundamentals/download/tests/test__fetch.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test_append_now_datestamp_to_filename_py.html">fundamentals/download/tests/test_append_now_datestamp_to_filename.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test_extract_filename_from_url_py.html">fundamentals/download/tests/test_extract_filename_from_url.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test_get_now_datetime_filestamp_py.html">fundamentals/download/tests/test_get_now_datetime_filestamp.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_download_tests_test_multiobject_download_py.html">fundamentals/download/tests/test_multiobject_download.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files___init___py.html">fundamentals/files/__init__.py</a></td>
                 <td>3</td>
                 <td>3</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 3">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_fileChunker_py.html">fundamentals/files/fileChunker.py</a></td>
                 <td>27</td>
                 <td>14</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="13 27">48%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_list_of_dictionaries_to_mysql_inserts_py.html">fundamentals/files/list_of_dictionaries_to_mysql_inserts.py</a></td>
                 <td>21</td>
                 <td>1</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="20 21">95%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_recursive_directory_listing_py.html">fundamentals/files/recursive_directory_listing.py</a></td>
                 <td>37</td>
                 <td>8</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="29 37">78%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tag_py.html">fundamentals/files/tag.py</a></td>
                 <td>85</td>
                 <td>10</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="75 85">88%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tests___init___py.html">fundamentals/files/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tests_test_fileChunker_py.html">fundamentals/files/tests/test_fileChunker.py</a></td>
                 <td>29</td>
                 <td>3</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="26 29">90%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tests_test_list_of_dictionaries_to_mysql_inserts_py.html">fundamentals/files/tests/test_list_of_dictionaries_to_mysql_inserts.py</a></td>
                 <td>35</td>
                 <td>2</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="33 35">94%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tests_test_recursive_directory_listing_py.html">fundamentals/files/tests/test_recursive_directory_listing.py</a></td>
                 <td>27</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="27 27">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_files_tests_test_tag_py.html">fundamentals/files/tests/test_tag.py</a></td>
                 <td>36</td>
                 <td>4</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="32 36">89%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_fmultiprocess_py.html">fundamentals/fmultiprocess.py</a></td>
                 <td>32</td>
                 <td>13</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="19 32">59%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_logs_py.html">fundamentals/logs.py</a></td>
                 <td>55</td>
                 <td>27</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="28 55">51%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql___init___py.html">fundamentals/mysql/__init__.py</a></td>
                 <td>12</td>
                 <td>12</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 12">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_convert_dictionary_to_mysql_table_py.html">fundamentals/mysql/convert_dictionary_to_mysql_table.py</a></td>
-                <td>236</td>
-                <td>80</td>
+                <td>237</td>
+                <td>78</td>
                 <td>0</td>
-                <td class="right" data-ratio="156 236">66%</td>
+                
+                <td class="right" data-ratio="159 237">67%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_database_py.html">fundamentals/mysql/database.py</a></td>
                 <td>71</td>
-                <td>23</td>
+                <td>39</td>
                 <td>0</td>
-                <td class="right" data-ratio="48 71">68%</td>
+                
+                <td class="right" data-ratio="32 71">45%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_directory_script_runner_py.html">fundamentals/mysql/directory_script_runner.py</a></td>
                 <td>87</td>
                 <td>45</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="42 87">48%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_get_database_table_column_names_py.html">fundamentals/mysql/get_database_table_column_names.py</a></td>
                 <td>18</td>
                 <td>11</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="7 18">39%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_insert_list_of_dictionaries_into_database_tables_py.html">fundamentals/mysql/insert_list_of_dictionaries_into_database_tables.py</a></td>
                 <td>145</td>
                 <td>114</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="31 145">21%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_readquery_py.html">fundamentals/mysql/readquery.py</a></td>
                 <td>33</td>
                 <td>12</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="21 33">64%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_setup_database_connection_py.html">fundamentals/mysql/setup_database_connection.py</a></td>
                 <td>29</td>
                 <td>17</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="12 29">41%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_sqlite2mysql_py.html">fundamentals/mysql/sqlite2mysql.py</a></td>
                 <td>104</td>
                 <td>42</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="62 104">60%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_table_exists_py.html">fundamentals/mysql/table_exists.py</a></td>
                 <td>15</td>
                 <td>7</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="8 15">53%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests___init___py.html">fundamentals/mysql/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_convert_dictionary_to_mysql_table_py.html">fundamentals/mysql/tests/test_convert_dictionary_to_mysql_table.py</a></td>
-                <td>37</td>
+                <td>46</td>
                 <td>0</td>
                 <td>0</td>
-                <td class="right" data-ratio="37 37">100%</td>
+                
+                <td class="right" data-ratio="46 46">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_database_py.html">fundamentals/mysql/tests/test_database.py</a></td>
                 <td>51</td>
                 <td>5</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="46 51">90%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_directory_script_runner_py.html">fundamentals/mysql/tests/test_directory_script_runner.py</a></td>
                 <td>48</td>
                 <td>3</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="45 48">94%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_get_database_table_column_names_py.html">fundamentals/mysql/tests/test_get_database_table_column_names.py</a></td>
                 <td>22</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="22 22">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_insert_list_of_dictionaries_into_database_tables_py.html">fundamentals/mysql/tests/test_insert_list_of_dictionaries_into_database_tables.py</a></td>
                 <td>29</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="29 29">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_readquery_py.html">fundamentals/mysql/tests/test_readquery.py</a></td>
                 <td>37</td>
                 <td>3</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="34 37">92%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_setup_database_connection_py.html">fundamentals/mysql/tests/test_setup_database_connection.py</a></td>
                 <td>22</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="22 22">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_sqlite2mysql_py.html">fundamentals/mysql/tests/test_sqlite2mysql.py</a></td>
                 <td>40</td>
                 <td>5</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="35 40">88%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_table_exists_py.html">fundamentals/mysql/tests/test_table_exists.py</a></td>
                 <td>33</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="33 33">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_writequery_py.html">fundamentals/mysql/tests/test_writequery.py</a></td>
                 <td>38</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="38 38">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_tests_test_yaml_to_database_py.html">fundamentals/mysql/tests/test_yaml_to_database.py</a></td>
                 <td>49</td>
                 <td>7</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="42 49">86%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_writequery_py.html">fundamentals/mysql/writequery.py</a></td>
                 <td>113</td>
-                <td>73</td>
+                <td>63</td>
                 <td>0</td>
-                <td class="right" data-ratio="40 113">35%</td>
+                
+                <td class="right" data-ratio="50 113">44%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_mysql_yaml_to_database_py.html">fundamentals/mysql/yaml_to_database.py</a></td>
                 <td>100</td>
                 <td>55</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="45 100">45%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_nose2_plugins___init___py.html">fundamentals/nose2_plugins/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_nose2_plugins_cprof_py.html">fundamentals/nose2_plugins/cprof.py</a></td>
                 <td>29</td>
                 <td>29</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 29">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_nose2_plugins_tests___init___py.html">fundamentals/nose2_plugins/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_renderer___init___py.html">fundamentals/renderer/__init__.py</a></td>
                 <td>2</td>
                 <td>2</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 2">0%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_renderer_list_of_dictionaries_py.html">fundamentals/renderer/list_of_dictionaries.py</a></td>
                 <td>223</td>
                 <td>63</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="160 223">72%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_renderer_tests___init___py.html">fundamentals/renderer/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_renderer_tests_test_list_of_dictionaries_py.html">fundamentals/renderer/tests/test_list_of_dictionaries.py</a></td>
                 <td>50</td>
                 <td>2</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="48 50">96%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tests___init___py.html">fundamentals/tests/__init__.py</a></td>
                 <td>0</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 0">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tests_test_fmultiprocess_py.html">fundamentals/tests/test_fmultiprocess.py</a></td>
                 <td>56</td>
                 <td>5</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="51 56">91%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tests_test_logs_py.html">fundamentals/tests/test_logs.py</a></td>
                 <td>24</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="24 24">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tests_test_times_py.html">fundamentals/tests/test_times.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tests_test_utKit_py.html">fundamentals/tests/test_utKit.py</a></td>
                 <td>18</td>
                 <td>0</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="18 18">100%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_times_py.html">fundamentals/times.py</a></td>
                 <td>36</td>
                 <td>32</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="4 36">11%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_tools_py.html">fundamentals/tools.py</a></td>
                 <td>259</td>
-                <td>181</td>
+                <td>175</td>
                 <td>0</td>
-                <td class="right" data-ratio="78 259">30%</td>
+                
+                <td class="right" data-ratio="84 259">32%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="fundamentals_utKit_py.html">fundamentals/utKit.py</a></td>
                 <td>31</td>
                 <td>17</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="14 31">45%</td>
             </tr>
+            
             <tr class="file">
                 <td class="name left"><a href="setup_py.html">setup.py</a></td>
                 <td>8</td>
                 <td>8</td>
                 <td>0</td>
+                
                 <td class="right" data-ratio="0 8">0%</td>
             </tr>
+            
         </tbody>
     </table>
+
     <p id="no_rows">
         No items found using the specified filter.
     </p>
 </div>
+
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
-            created at 2019-05-22 12:51
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.4.1</a>,
+            created at 2019-05-22 15:09
         </p>
     </div>
 </div>
+
 </body>
 </html>

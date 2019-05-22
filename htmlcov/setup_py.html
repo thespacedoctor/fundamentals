@@ -1,10 +1,16 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for setup.py: 0%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -14,20 +20,26 @@
     </script>
 </head>
 <body class="pyfile">
+
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>setup.py</b> :
             <span class="pc_cov">0%</span>
         </h1>
+
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
         <h2 class="stats">
             8 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
             <span class="mis shortkey_m button_toggle_mis">8 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
+
+            
         </h2>
     </div>
 </div>
+
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -50,6 +62,7 @@
     </p>
     </div>
 </div>
+
 <div id="source">
     <table>
         <tr>
@@ -111,13 +124,15 @@
 <p id="n55" class="pln"><a href="#n55">55</a></p>
 <p id="n56" class="pln"><a href="#n56">56</a></p>
 <p id="n57" class="pln"><a href="#n57">57</a></p>
+<p id="n58" class="pln"><a href="#n58">58</a></p>
+
             </td>
             <td class="text">
 <p id="t1" class="stm mis"><span class="key">from</span> <span class="nam">setuptools</span> <span class="key">import</span> <span class="nam">setup</span><span class="op">,</span> <span class="nam">find_packages</span><span class="strut">&nbsp;</span></p>
 <p id="t2" class="stm mis"><span class="key">import</span> <span class="nam">os</span><span class="strut">&nbsp;</span></p>
 <p id="t3" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t4" class="stm mis"><span class="nam">moduleDirectory</span> <span class="op">=</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">dirname</span><span class="op">(</span><span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">realpath</span><span class="op">(</span><span class="nam">__file__</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t5" class="stm mis"><span class="nam">exec</span><span class="op">(</span><span class="nam">open</span><span class="op">(</span><span class="nam">moduleDirectory</span> <span class="op">+</span> <span class="str">"/fundamentals/__version__.py"</span><span class="op">)</span><span class="op">.</span><span class="nam">read</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t5" class="stm mis"><span class="key">exec</span><span class="op">(</span><span class="nam">open</span><span class="op">(</span><span class="nam">moduleDirectory</span> <span class="op">+</span> <span class="str">"/fundamentals/__version__.py"</span><span class="op">)</span><span class="op">.</span><span class="nam">read</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t6" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t7" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t8" class="stm mis"><span class="key">def</span> <span class="nam">readme</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
@@ -145,7 +160,7 @@
 <p id="t30" class="pln">    <span class="nam">packages</span><span class="op">=</span><span class="nam">find_packages</span><span class="op">(</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t31" class="pln">    <span class="nam">package_data</span><span class="op">=</span><span class="op">{</span><span class="str">'fundamentals'</span><span class="op">:</span> <span class="op">[</span><span class="strut">&nbsp;</span></p>
 <p id="t32" class="pln">        <span class="str">'resources/*/*'</span><span class="op">,</span> <span class="str">'resources/*.*'</span><span class="op">]</span><span class="op">}</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t33" class="pln">    <span class="nam">include_package_data</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t33" class="pln">    <span class="nam">include_package_data</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t34" class="pln">    <span class="nam">install_requires</span><span class="op">=</span><span class="op">[</span><span class="strut">&nbsp;</span></p>
 <p id="t35" class="pln">        <span class="str">'pyyaml'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t36" class="pln">        <span class="str">'docopt'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
@@ -159,28 +174,32 @@
 <p id="t44" class="pln">        <span class="str">'pymysql==0.9.0'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t45" class="pln">        <span class="str">'multiprocess'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t46" class="pln">        <span class="str">'pandas'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t47" class="pln">        <span class="str">'psutil'</span><span class="strut">&nbsp;</span></p>
-<p id="t48" class="pln">    <span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t49" class="pln">    <span class="nam">test_suite</span><span class="op">=</span><span class="str">'nose2.collector.collector'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t50" class="pln">    <span class="nam">tests_require</span><span class="op">=</span><span class="op">[</span><span class="str">'nose2'</span><span class="op">,</span> <span class="str">'cov-core'</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t51" class="pln">    <span class="nam">entry_points</span><span class="op">=</span><span class="op">{</span><span class="strut">&nbsp;</span></p>
-<p id="t52" class="pln">        <span class="str">'console_scripts'</span><span class="op">:</span> <span class="op">[</span><span class="str">'mysqlSucker=fundamentals.mysql.directory_script_runner:main'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t53" class="pln">                            <span class="str">'yaml2db=fundamentals.mysql.yaml_to_database:main'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t54" class="pln">                            <span class="str">'sqlite2mysql=fundamentals.mysql.sqlite2mysql:main'</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t55" class="pln">    <span class="op">}</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t56" class="pln">    <span class="nam">zip_safe</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
-<p id="t57" class="pln"><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t47" class="pln">        <span class="str">'psutil'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t48" class="pln">        <span class="str">'future'</span><span class="strut">&nbsp;</span></p>
+<p id="t49" class="pln">    <span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t50" class="pln">    <span class="nam">test_suite</span><span class="op">=</span><span class="str">'nose2.collector.collector'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t51" class="pln">    <span class="nam">tests_require</span><span class="op">=</span><span class="op">[</span><span class="str">'nose2'</span><span class="op">,</span> <span class="str">'cov-core'</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t52" class="pln">    <span class="nam">entry_points</span><span class="op">=</span><span class="op">{</span><span class="strut">&nbsp;</span></p>
+<p id="t53" class="pln">        <span class="str">'console_scripts'</span><span class="op">:</span> <span class="op">[</span><span class="str">'mysqlSucker=fundamentals.mysql.directory_script_runner:main'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t54" class="pln">                            <span class="str">'yaml2db=fundamentals.mysql.yaml_to_database:main'</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t55" class="pln">                            <span class="str">'sqlite2mysql=fundamentals.mysql.sqlite2mysql:main'</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t56" class="pln">    <span class="op">}</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t57" class="pln">    <span class="nam">zip_safe</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t58" class="pln"><span class="op">)</span><span class="strut">&nbsp;</span></p>
+
             </td>
         </tr>
     </table>
 </div>
+
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
-            created at 2019-05-21 15:56
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.4.1</a>,
+            created at 2019-05-22 15:05
         </p>
     </div>
 </div>
+
 </body>
 </html>

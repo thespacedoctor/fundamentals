@@ -24,6 +24,7 @@ import collections as c
 import pymysql as mdb
 from fundamentals import tools, times
 from fundamentals.mysql import writequery, table_exists, readquery
+import six
 
 
 def convert_dictionary_to_mysql_table(
@@ -166,13 +167,13 @@ def convert_dictionary_to_mysql_table(
                              (message, k, v, type(v)))
                 raise ValueError(message)
             if isinstance(v, list):
-                if not (isinstance(v[0], str) or isinstance(v[0], int) or isinstance(v[0], bool) or isinstance(v[0], float) or isinstance(v[0], int) or isinstance(v[0], datetime.date) or v[0] == None):
+                if not (isinstance(v[0], six.string_types) or isinstance(v[0], int) or isinstance(v[0], bool) or isinstance(v[0], float) or isinstance(v[0], int) or isinstance(v[0], datetime.date) or v[0] == None):
                     message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool'
                     log.critical("%s: in %s we have a %s (%s)" %
                                  (message, k, v, type(v)))
                     raise ValueError(message)
             else:
-                if not (isinstance(v, str) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, datetime.date) or v == None):
+                if not (isinstance(v, six.string_types) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, datetime.date) or v == None):
                     this = type(v)
                     message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool : %(k)s is a %(this)s' % locals(
                     )

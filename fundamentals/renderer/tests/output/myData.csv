@@ -1,1 +1,4 @@
-b'owner,pet,address\ndaisy,dog,"belfast, uk"\njohn,snake,the moon\nsusan,crocodile,larne'
+owner,pet,address
+daisy,dog,"belfast, uk"
+john,snake,the moon
+susan,crocodile,larne

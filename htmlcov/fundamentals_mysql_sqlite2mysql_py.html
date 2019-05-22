@@ -1,10 +1,16 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for fundamentals/mysql/sqlite2mysql.py: 60%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -14,20 +20,26 @@
     </script>
 </head>
 <body class="pyfile">
+
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/sqlite2mysql.py</b> :
             <span class="pc_cov">60%</span>
         </h1>
+
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
         <h2 class="stats">
             104 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">62 run</span>
             <span class="mis shortkey_m button_toggle_mis">42 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
+
+            
         </h2>
     </div>
 </div>
+
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -50,6 +62,7 @@
     </p>
     </div>
 </div>
+
 <div id="source">
     <table>
         <tr>
@@ -343,6 +356,7 @@
 <p id="n287" class="pln"><a href="#n287">287</a></p>
 <p id="n288" class="stm mis"><a href="#n288">288</a></p>
 <p id="n289" class="stm mis"><a href="#n289">289</a></p>
+
             </td>
             <td class="text">
 <p id="t1" class="pln"><span class="com">#!/usr/local/bin/python</span><span class="strut">&nbsp;</span></p>
@@ -375,7 +389,7 @@
 <p id="t28" class="stm mis"><span class="key">from</span> <span class="nam">datetime</span> <span class="key">import</span> <span class="nam">datetime</span><span class="op">,</span> <span class="nam">date</span><span class="op">,</span> <span class="nam">time</span><span class="strut">&nbsp;</span></p>
 <p id="t29" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t30" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t31" class="stm mis"><span class="key">def</span> <span class="nam">main</span><span class="op">(</span><span class="nam">arguments</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t31" class="stm mis"><span class="key">def</span> <span class="nam">main</span><span class="op">(</span><span class="nam">arguments</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t32" class="pln">    <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t33" class="pln"><span class="str">    The main function used when ``yaml_to_database.py`` when installed as a cl tool</span><span class="strut">&nbsp;</span></p>
 <p id="t34" class="pln"><span class="str">    """</span><span class="strut">&nbsp;</span></p>
@@ -385,8 +399,8 @@
 <p id="t38" class="pln">        <span class="nam">arguments</span><span class="op">=</span><span class="nam">arguments</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t39" class="pln">        <span class="nam">docString</span><span class="op">=</span><span class="nam">__doc__</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t40" class="pln">        <span class="nam">logLevel</span><span class="op">=</span><span class="str">"WARNING"</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t41" class="pln">        <span class="nam">options_first</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t42" class="pln">        <span class="nam">projectName</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
+<p id="t41" class="pln">        <span class="nam">options_first</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t42" class="pln">        <span class="nam">projectName</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
 <p id="t43" class="pln">    <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t44" class="stm mis">    <span class="nam">arguments</span><span class="op">,</span> <span class="nam">settings</span><span class="op">,</span> <span class="nam">log</span><span class="op">,</span> <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">su</span><span class="op">.</span><span class="nam">setup</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t45" class="pln"><span class="strut">&nbsp;</span></p>
@@ -398,9 +412,9 @@
 <p id="t51" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t52" class="stm mis">            <span class="nam">varname</span> <span class="op">=</span> <span class="nam">arg</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"&lt;"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">">"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t53" class="stm mis">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">val</span><span class="op">,</span> <span class="nam">str</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t54" class="stm mis">            <span class="nam">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = '%s'"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t54" class="stm mis">            <span class="key">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = '%s'"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t55" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t56" class="stm mis">            <span class="nam">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = %s"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t56" class="stm mis">            <span class="key">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = %s"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t57" class="stm mis">        <span class="key">if</span> <span class="nam">arg</span> <span class="op">==</span> <span class="str">"--dbConn"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t58" class="stm mis">            <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">val</span><span class="strut">&nbsp;</span></p>
 <p id="t59" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'%s = %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">varname</span><span class="op">,</span> <span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -457,8 +471,8 @@
 <p id="t110" class="pln">            <span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t111" class="pln">            <span class="nam">pathToSqlite</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t112" class="pln">            <span class="nam">tablePrefix</span><span class="op">=</span><span class="str">""</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t113" class="pln">            <span class="nam">settings</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t114" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
+<p id="t113" class="pln">            <span class="nam">settings</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t114" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
 <p id="t115" class="pln">    <span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t116" class="stm run hide_run">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span> <span class="op">=</span> <span class="nam">log</span><span class="strut">&nbsp;</span></p>
 <p id="t117" class="stm run hide_run">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">"instansiating a new 'sqlite2mysql' object"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -474,7 +488,7 @@
 <p id="t127" class="stm run hide_run">            <span class="nam">self</span><span class="op">.</span><span class="nam">tablePrefix</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">tablePrefix</span> <span class="op">+</span> <span class="str">"_"</span><span class="strut">&nbsp;</span></p>
 <p id="t128" class="pln">        <span class="com"># xt-self-arg-tmpx</span><span class="strut">&nbsp;</span></p>
 <p id="t129" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t130" class="stm run hide_run">        <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
+<p id="t130" class="stm run hide_run">        <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 <p id="t131" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t132" class="stm mis">    <span class="key">def</span> <span class="nam">convert_sqlite_to_mysql</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t133" class="pln">            <span class="nam">self</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
@@ -596,10 +610,10 @@
 <p id="t249" class="pln">                <span class="nam">dictList</span><span class="op">=</span><span class="nam">allRows</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t250" class="pln">                <span class="nam">dbTableName</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">tablePrefix</span> <span class="op">+</span> <span class="nam">table</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t251" class="pln">                <span class="nam">uniqueKeyList</span><span class="op">=</span><span class="op">[</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t252" class="pln">                <span class="nam">dateModified</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t253" class="pln">                <span class="nam">dateCreated</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t252" class="pln">                <span class="nam">dateModified</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t253" class="pln">                <span class="nam">dateCreated</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t254" class="pln">                <span class="nam">batchSize</span><span class="op">=</span><span class="num">10000</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t255" class="pln">                <span class="nam">replace</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t255" class="pln">                <span class="nam">replace</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t256" class="pln">                <span class="nam">dbSettings</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">settings</span><span class="op">[</span><span class="str">"database settings"</span><span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t257" class="pln">            <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t258" class="pln"><span class="strut">&nbsp;</span></p>
@@ -627,24 +641,27 @@
 <p id="t280" class="stm run hide_run">        <span class="nam">con</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t281" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t282" class="stm run hide_run">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``convert_sqlite_to_mysql`` method'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t283" class="stm run hide_run">        <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
+<p id="t283" class="stm run hide_run">        <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 <p id="t284" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t285" class="pln">    <span class="com"># use the tab-trigger below for new method</span><span class="strut">&nbsp;</span></p>
 <p id="t286" class="pln">    <span class="com"># xt-class-method</span><span class="strut">&nbsp;</span></p>
 <p id="t287" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t288" class="stm mis"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">'__main__'</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t289" class="stm mis">    <span class="nam">main</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+
             </td>
         </tr>
     </table>
 </div>
+
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
-            created at 2019-05-22 12:51
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.4.1</a>,
+            created at 2019-05-22 15:05
         </p>
     </div>
 </div>
+
 </body>
 </html>

@@ -1,10 +1,16 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for fundamentals/mysql/insert_list_of_dictionaries_into_database_tables.py: 21%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -14,20 +20,26 @@
     </script>
 </head>
 <body class="pyfile">
+
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/insert_list_of_dictionaries_into_database_tables.py</b> :
             <span class="pc_cov">21%</span>
         </h1>
+
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
         <h2 class="stats">
             145 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">31 run</span>
             <span class="mis shortkey_m button_toggle_mis">114 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
+
+            
         </h2>
     </div>
 </div>
+
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -50,6 +62,7 @@
     </p>
     </div>
 </div>
+
 <div id="source">
     <table>
         <tr>
@@ -487,6 +500,7 @@
 <p id="n431" class="pln"><a href="#n431">431</a></p>
 <p id="n432" class="pln"><a href="#n432">432</a></p>
 <p id="n433" class="pln"><a href="#n433">433</a></p>
+
             </td>
             <td class="text">
 <p id="t1" class="pln"><span class="com">#!/usr/local/bin/python</span><span class="strut">&nbsp;</span></p>
@@ -522,7 +536,7 @@
 <p id="t31" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t32" class="stm mis"><span class="nam">count</span> <span class="op">=</span> <span class="num">0</span><span class="strut">&nbsp;</span></p>
 <p id="t33" class="stm mis"><span class="nam">totalCount</span> <span class="op">=</span> <span class="num">0</span><span class="strut">&nbsp;</span></p>
-<p id="t34" class="stm mis"><span class="nam">globalDbConn</span> <span class="op">=</span> <span class="key">False</span><span class="strut">&nbsp;</span></p>
+<p id="t34" class="stm mis"><span class="nam">globalDbConn</span> <span class="op">=</span> <span class="nam">False</span><span class="strut">&nbsp;</span></p>
 <p id="t35" class="stm mis"><span class="nam">sharedList</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t36" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t37" class="pln"><span class="strut">&nbsp;</span></p>
@@ -532,11 +546,11 @@
 <p id="t41" class="pln">        <span class="nam">dictList</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t42" class="pln">        <span class="nam">dbTableName</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t43" class="pln">        <span class="nam">uniqueKeyList</span><span class="op">=</span><span class="op">[</span><span class="op">]</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t44" class="pln">        <span class="nam">dateModified</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t45" class="pln">        <span class="nam">dateCreated</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t44" class="pln">        <span class="nam">dateModified</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t45" class="pln">        <span class="nam">dateCreated</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t46" class="pln">        <span class="nam">batchSize</span><span class="op">=</span><span class="num">2500</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t47" class="pln">        <span class="nam">replace</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t48" class="pln">        <span class="nam">dbSettings</span><span class="op">=</span><span class="key">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t47" class="pln">        <span class="nam">replace</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t48" class="pln">        <span class="nam">dbSettings</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t49" class="pln">    <span class="str">"""insert list of dictionaries into database tables</span><span class="strut">&nbsp;</span></p>
 <p id="t50" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t51" class="pln"><span class="str">    **Key Arguments:**</span><span class="strut">&nbsp;</span></p>
@@ -588,7 +602,7 @@
 <p id="t97" class="stm run hide_run">    <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">dictList</span><span class="op">)</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t98" class="stm run hide_run">        <span class="nam">log</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t99" class="pln">            <span class="str">'the dictionary to be added to the database is empty'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t100" class="stm run hide_run">        <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
+<p id="t100" class="stm run hide_run">        <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 <p id="t101" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t102" class="stm run hide_run">    <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">dictList</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t103" class="stm run hide_run">        <span class="nam">convert_dictionary_to_mysql_table</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
@@ -603,7 +617,7 @@
 <p id="t112" class="pln">            <span class="nam">dateCreated</span><span class="op">=</span><span class="nam">dateCreated</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t113" class="stm run hide_run">        <span class="nam">dictList</span> <span class="op">=</span> <span class="nam">dictList</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t114" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t115" class="stm run hide_run">    <span class="nam">dbConn</span><span class="op">.</span><span class="nam">autocommit</span><span class="op">(</span><span class="key">False</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t115" class="stm run hide_run">    <span class="nam">dbConn</span><span class="op">.</span><span class="nam">autocommit</span><span class="op">(</span><span class="nam">False</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t116" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t117" class="stm run hide_run">    <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">dictList</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t118" class="pln"><span class="strut">&nbsp;</span></p>
@@ -622,9 +636,9 @@
 <p id="t131" class="stm run hide_run">        <span class="nam">totalCount</span> <span class="op">=</span> <span class="nam">total</span> <span class="op">+</span> <span class="num">1</span><span class="strut">&nbsp;</span></p>
 <p id="t132" class="stm run hide_run">        <span class="nam">ltotalCount</span> <span class="op">=</span> <span class="nam">totalCount</span><span class="strut">&nbsp;</span></p>
 <p id="t133" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t134" class="stm run hide_run">        <span class="nam">print</span><span class="op">(</span><span class="str">"Starting to insert %(ltotalCount)s rows into %(dbTableName)s"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t134" class="stm run hide_run">        <span class="key">print</span><span class="op">(</span><span class="str">"Starting to insert %(ltotalCount)s rows into %(dbTableName)s"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t135" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t136" class="stm run hide_run">        <span class="key">if</span> <span class="nam">dbSettings</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t136" class="stm run hide_run">        <span class="key">if</span> <span class="nam">dbSettings</span> <span class="op">==</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t137" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t138" class="stm mis">            <span class="nam">fmultiprocess</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t139" class="pln">                <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
@@ -645,11 +659,11 @@
 <p id="t154" class="pln">                          <span class="nam">dbSettings</span><span class="op">=</span><span class="nam">dbSettings</span><span class="op">,</span> <span class="nam">dateModified</span><span class="op">=</span><span class="nam">dateModified</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t155" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t156" class="stm run hide_run">        <span class="nam">sys</span><span class="op">.</span><span class="nam">stdout</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="str">"\x1b[1A\x1b[2K"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t157" class="stm run hide_run">        <span class="nam">print</span><span class="op">(</span><span class="str">"%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t157" class="stm run hide_run">        <span class="key">print</span><span class="op">(</span><span class="str">"%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t158" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t159" class="stm run hide_run">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t160" class="pln">        <span class="str">'completed the ``insert_list_of_dictionaries_into_database_tables`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t161" class="stm run hide_run">    <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
+<p id="t161" class="stm run hide_run">    <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 <p id="t162" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t163" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t164" class="stm mis"><span class="key">def</span> <span class="nam">_insert_single_batch_into_database</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
@@ -698,7 +712,7 @@
 <p id="t207" class="stm mis">        <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">database</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t208" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t209" class="pln">            <span class="nam">dbSettings</span><span class="op">=</span><span class="nam">globalDbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t210" class="pln">            <span class="nam">autocommit</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
+<p id="t210" class="pln">            <span class="nam">autocommit</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
 <p id="t211" class="pln">        <span class="op">)</span><span class="op">.</span><span class="nam">connect</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t212" class="pln">    <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t213" class="stm mis">        <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">globalDbConn</span><span class="strut">&nbsp;</span></p>
@@ -708,8 +722,8 @@
 <p id="t217" class="stm mis">        <span class="nam">count</span> <span class="op">=</span> <span class="nam">totalCount</span><span class="strut">&nbsp;</span></p>
 <p id="t218" class="stm mis">    <span class="nam">ltotalCount</span> <span class="op">=</span> <span class="nam">totalCount</span><span class="strut">&nbsp;</span></p>
 <p id="t219" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t220" class="stm mis">    <span class="nam">inserted</span> <span class="op">=</span> <span class="key">False</span><span class="strut">&nbsp;</span></p>
-<p id="t221" class="stm mis">    <span class="key">while</span> <span class="nam">inserted</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t220" class="stm mis">    <span class="nam">inserted</span> <span class="op">=</span> <span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t221" class="stm mis">    <span class="key">while</span> <span class="nam">inserted</span> <span class="op">==</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t222" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t223" class="stm mis">        <span class="key">if</span> <span class="key">not</span> <span class="nam">replace</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t224" class="stm mis">            <span class="nam">insertVerb</span> <span class="op">=</span> <span class="str">"INSERT IGNORE"</span><span class="strut">&nbsp;</span></p>
@@ -723,7 +737,7 @@
 <p id="t232" class="stm mis">        <span class="nam">uniKeys</span> <span class="op">=</span> <span class="nam">tmp</span><span class="strut">&nbsp;</span></p>
 <p id="t233" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t234" class="stm mis">        <span class="nam">myKeys</span> <span class="op">=</span> <span class="str">'`,`'</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">uniKeys</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t235" class="stm mis">        <span class="nam">vals</span> <span class="op">=</span> <span class="op">[</span><span class="nam">tuple</span><span class="op">(</span><span class="op">[</span><span class="key">None</span> <span class="key">if</span> <span class="nam">d</span><span class="op">[</span><span class="nam">k</span><span class="op">]</span> <span class="key">in</span> <span class="op">[</span><span class="str">"None"</span><span class="op">,</span> <span class="key">None</span><span class="op">]</span> <span class="key">else</span> <span class="nam">str</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="nam">k</span><span class="op">]</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t235" class="stm mis">        <span class="nam">vals</span> <span class="op">=</span> <span class="op">[</span><span class="nam">tuple</span><span class="op">(</span><span class="op">[</span><span class="nam">None</span> <span class="key">if</span> <span class="nam">d</span><span class="op">[</span><span class="nam">k</span><span class="op">]</span> <span class="key">in</span> <span class="op">[</span><span class="str">"None"</span><span class="op">,</span> <span class="nam">None</span><span class="op">]</span> <span class="key">else</span> <span class="nam">str</span><span class="op">(</span><span class="nam">d</span><span class="op">[</span><span class="nam">k</span><span class="op">]</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t236" class="pln">                       <span class="key">for</span> <span class="nam">k</span> <span class="key">in</span> <span class="nam">uniKeys</span><span class="op">]</span><span class="op">)</span> <span class="key">for</span> <span class="nam">d</span> <span class="key">in</span> <span class="nam">batch</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t237" class="stm mis">        <span class="nam">valueString</span> <span class="op">=</span> <span class="op">(</span><span class="str">"%s, "</span> <span class="op">*</span> <span class="nam">len</span><span class="op">(</span><span class="nam">vals</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="op">:</span><span class="op">-</span><span class="num">2</span><span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t238" class="stm mis">        <span class="nam">insertCommand</span> <span class="op">=</span> <span class="nam">insertVerb</span> <span class="op">+</span> <span class="str">""" INTO `"""</span> <span class="op">+</span> <span class="nam">dbTableName</span> <span class="op">+</span> <span class="xx">\</span><span class="strut">&nbsp;</span></p>
@@ -755,7 +769,7 @@
 <p id="t264" class="pln">                <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t265" class="pln">                <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">insertCommand</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t266" class="pln">                <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t267" class="pln">                <span class="nam">Force</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t267" class="pln">                <span class="nam">Force</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t268" class="pln">                <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">vals</span><span class="strut">&nbsp;</span></p>
 <p id="t269" class="pln">            <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t270" class="stm mis">        <span class="key">except</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
@@ -769,10 +783,10 @@
 <p id="t278" class="pln">                    <span class="nam">dbTableName</span><span class="op">=</span><span class="nam">dbTableName</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t279" class="pln">                    <span class="nam">uniqueKeyList</span><span class="op">=</span><span class="nam">uniqueKeyList</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t280" class="pln">                    <span class="nam">dateModified</span><span class="op">=</span><span class="nam">dateModified</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t281" class="pln">                    <span class="nam">returnInsertOnly</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t281" class="pln">                    <span class="nam">returnInsertOnly</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t282" class="pln">                    <span class="nam">replace</span><span class="op">=</span><span class="nam">replace</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t283" class="pln">                    <span class="nam">reDatetime</span><span class="op">=</span><span class="nam">reDate</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t284" class="pln">                    <span class="nam">skipChecks</span><span class="op">=</span><span class="key">True</span><span class="strut">&nbsp;</span></p>
+<p id="t284" class="pln">                    <span class="nam">skipChecks</span><span class="op">=</span><span class="nam">True</span><span class="strut">&nbsp;</span></p>
 <p id="t285" class="pln">                <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t286" class="stm mis">                <span class="nam">theseInserts</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">valueTuple</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t287" class="pln"><span class="strut">&nbsp;</span></p>
@@ -783,7 +797,7 @@
 <p id="t292" class="pln">                <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t293" class="pln">                <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">insertCommand</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t294" class="pln">                <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t295" class="pln">                <span class="nam">Force</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t295" class="pln">                <span class="nam">Force</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t296" class="pln">                <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">theseInserts</span><span class="strut">&nbsp;</span></p>
 <p id="t297" class="pln">            <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t298" class="pln"><span class="strut">&nbsp;</span></p>
@@ -800,7 +814,7 @@
 <p id="t309" class="pln">                    <span class="nam">replace</span><span class="op">=</span><span class="nam">replace</span><span class="strut">&nbsp;</span></p>
 <p id="t310" class="pln">                <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t311" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t312" class="stm mis">            <span class="nam">inserted</span> <span class="op">=</span> <span class="key">True</span><span class="strut">&nbsp;</span></p>
+<p id="t312" class="stm mis">            <span class="nam">inserted</span> <span class="op">=</span> <span class="nam">True</span><span class="strut">&nbsp;</span></p>
 <p id="t313" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t314" class="stm mis">        <span class="nam">dbConn</span><span class="op">.</span><span class="nam">commit</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t315" class="pln"><span class="strut">&nbsp;</span></p>
@@ -813,7 +827,7 @@
 <p id="t322" class="pln">        <span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t323" class="pln">        <span class="nam">dbTablename</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t324" class="pln">        <span class="nam">dbSettings</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t325" class="pln">        <span class="nam">dateModified</span><span class="op">=</span><span class="key">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t325" class="pln">        <span class="nam">dateModified</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t326" class="pln">    <span class="str">"""*load a list of dictionaries into a database table with load data infile*</span><span class="strut">&nbsp;</span></p>
 <p id="t327" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t328" class="pln"><span class="str">    **Key Arguments:**</span><span class="strut">&nbsp;</span></p>
@@ -870,9 +884,9 @@
 <p id="t379" class="stm mis">    <span class="nam">csvColumnsString</span> <span class="op">=</span> <span class="op">(</span><span class="str">', '</span><span class="op">)</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">csvColumns</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t380" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t381" class="stm mis">    <span class="nam">df</span> <span class="op">=</span> <span class="nam">pd</span><span class="op">.</span><span class="nam">DataFrame</span><span class="op">(</span><span class="nam">dictList</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t382" class="stm mis">    <span class="nam">df</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="op">[</span><span class="str">'nan'</span><span class="op">,</span> <span class="str">'None'</span><span class="op">,</span> <span class="str">''</span><span class="op">,</span> <span class="str">'NaN'</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">nan</span><span class="op">]</span><span class="op">,</span> <span class="str">'\\N'</span><span class="op">,</span> <span class="nam">inplace</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t382" class="stm mis">    <span class="nam">df</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="op">[</span><span class="str">'nan'</span><span class="op">,</span> <span class="str">'None'</span><span class="op">,</span> <span class="str">''</span><span class="op">,</span> <span class="str">'NaN'</span><span class="op">,</span> <span class="nam">np</span><span class="op">.</span><span class="nam">nan</span><span class="op">]</span><span class="op">,</span> <span class="str">'\\N'</span><span class="op">,</span> <span class="nam">inplace</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t383" class="stm mis">    <span class="nam">df</span><span class="op">.</span><span class="nam">to_csv</span><span class="op">(</span><span class="str">'/tmp/%(tmpTable)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">,</span> <span class="nam">sep</span><span class="op">=</span><span class="str">"|"</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t384" class="pln">              <span class="nam">index</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">escapechar</span><span class="op">=</span><span class="str">"\\"</span><span class="op">,</span> <span class="nam">quotechar</span><span class="op">=</span><span class="str">'"'</span><span class="op">,</span> <span class="nam">columns</span><span class="op">=</span><span class="nam">csvColumns</span><span class="op">,</span> <span class="nam">encoding</span><span class="op">=</span><span class="str">'utf-8'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t384" class="pln">              <span class="nam">index</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span> <span class="nam">escapechar</span><span class="op">=</span><span class="str">"\\"</span><span class="op">,</span> <span class="nam">quotechar</span><span class="op">=</span><span class="str">'"'</span><span class="op">,</span> <span class="nam">columns</span><span class="op">=</span><span class="nam">csvColumns</span><span class="op">,</span> <span class="nam">encoding</span><span class="op">=</span><span class="str">'utf-8'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t385" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t386" class="stm mis">    <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"""LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'</span><span class="strut">&nbsp;</span></p>
 <p id="t387" class="pln"><span class="str">INTO TABLE %(tmpTable)s</span><span class="strut">&nbsp;</span></p>
@@ -918,21 +932,24 @@
 <p id="t427" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t428" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t429" class="pln">        <span class="str">'completed the ``_add_dictlist_to_database_via_load_in_file`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t430" class="stm mis">    <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
+<p id="t430" class="stm mis">    <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 <p id="t431" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t432" class="pln"><span class="com"># use the tab-trigger below for new function</span><span class="strut">&nbsp;</span></p>
 <p id="t433" class="pln"><span class="com"># xt-def-function</span><span class="strut">&nbsp;</span></p>
+
             </td>
         </tr>
     </table>
 </div>
+
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
-            created at 2019-05-22 12:51
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.4.1</a>,
+            created at 2019-05-22 15:05
         </p>
     </div>
 </div>
+
 </body>
 </html>
