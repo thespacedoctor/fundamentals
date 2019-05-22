@@ -135,7 +135,7 @@ def setup_dryx_logging(yaml_file):
     handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
 
     # IMPORT YAML LOGGING DICTIONARY
-    stream = file(yaml_file, 'r')
+    stream = open(yaml_file, 'r')
     yamlContent = yaml.load(stream)
     stream.close()
 

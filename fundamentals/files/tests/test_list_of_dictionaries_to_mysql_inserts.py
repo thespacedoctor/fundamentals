@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -19,7 +20,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -45,7 +46,6 @@ class test_list_of_dictionaries_to_mysql(unittest.TestCase):
             datalist=listOfDictionaries,
             tableName="my_new_table"
         )
-        print mysqlInserts
 
     def test_list_of_dictionaries_to_mysql_function_exception(self):
 
@@ -58,9 +58,9 @@ class test_list_of_dictionaries_to_mysql(unittest.TestCase):
             )
             this.get()
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 

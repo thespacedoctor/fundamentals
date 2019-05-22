@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -19,7 +20,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -42,7 +43,6 @@ class test_readquery(unittest.TestCase):
             dbConn=dbConn,
             quiet=False
         )
-        print rows
 
     def test_readquery_error_function(self):
 
@@ -55,9 +55,9 @@ class test_readquery(unittest.TestCase):
                 quiet=False
             )
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            # print(str(e))
 
     def test_readquery_error_function_quiet(self):
 
@@ -70,9 +70,9 @@ class test_readquery(unittest.TestCase):
                 quiet=True
             )
             assert True
-        except Exception, e:
+        except Exception as e:
             assert False
-            print str(e)
+            # print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 

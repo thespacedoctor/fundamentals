@@ -9,6 +9,7 @@
 :Date Created:
     March 16, 2016
 """
+from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
 import sys
 import os
@@ -42,10 +43,10 @@ def _fetch(url,):
             log.debug('downloading ' + url.get_full_url())
             body = urllib2.urlopen(url).read()
             downloaded = True
-        except socket.timeout, e:
-            print "timeout on URL, trying again"
+        except socket.timeout as e:
+            print("timeout on URL, trying again")
             count += 1
-        except Exception, e:
+        except Exception as e:
             if "[Errno 60]" in str(e):
                 log.warning('timeout on URL, trying again' % locals())
                 count += 1

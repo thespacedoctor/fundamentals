@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -18,7 +19,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -68,7 +69,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dbSettings=dbSettings
         )
 
-        print time.time() - t1
+        # print(time.time() - t1)
 
         # x-print-testpage-for-pessto-marshall-web-object
 

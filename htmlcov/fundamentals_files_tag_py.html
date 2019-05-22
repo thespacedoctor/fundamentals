@@ -1,16 +1,10 @@
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    
-    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for fundamentals/files/tag.py: 0%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
-    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -20,26 +14,20 @@
     </script>
 </head>
 <body class="pyfile">
-
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/files/tag.py</b> :
             <span class="pc_cov">0%</span>
         </h1>
-
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
-
         <h2 class="stats">
             85 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
             <span class="mis shortkey_m button_toggle_mis">85 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
-
-            
         </h2>
     </div>
 </div>
-
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -62,7 +50,6 @@
     </p>
     </div>
 </div>
-
 <div id="source">
     <table>
         <tr>
@@ -255,7 +242,6 @@
 <p id="n186" class="pln"><a href="#n186">186</a></p>
 <p id="n187" class="stm mis"><a href="#n187">187</a></p>
 <p id="n188" class="stm mis"><a href="#n188">188</a></p>
-
             </td>
             <td class="text">
 <p id="t1" class="pln"><span class="com">#!/usr/local/bin/python</span><span class="strut">&nbsp;</span></p>
@@ -282,9 +268,9 @@
 <p id="t22" class="stm mis"><span class="key">def</span> <span class="nam">tag</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t23" class="pln">        <span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t24" class="pln">        <span class="nam">filepath</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t25" class="pln">        <span class="nam">tags</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t26" class="pln">        <span class="nam">rating</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t27" class="pln">        <span class="nam">wherefrom</span><span class="op">=</span><span class="nam">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t25" class="pln">        <span class="nam">tags</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t26" class="pln">        <span class="nam">rating</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t27" class="pln">        <span class="nam">wherefrom</span><span class="op">=</span><span class="key">False</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t28" class="pln">    <span class="str">"""Add tags and ratings to your macOS files and folders</span><span class="strut">&nbsp;</span></p>
 <p id="t29" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t30" class="pln"><span class="str">    **Key Arguments:**</span><span class="strut">&nbsp;</span></p>
@@ -312,7 +298,7 @@
 <p id="t52" class="pln"><span class="str">                wherefrom="http://www.thespacedoctor.co.uk"</span><span class="strut">&nbsp;</span></p>
 <p id="t53" class="pln"><span class="str">            )</span><span class="strut">&nbsp;</span></p>
 <p id="t54" class="pln"><span class="str">    """</span><span class="strut">&nbsp;</span></p>
-<p id="t55" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">info</span><span class="op">(</span><span class="str">'starting the ``tag`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t55" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``tag`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t56" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t57" class="stm mis">    <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">tags</span><span class="op">,</span> <span class="nam">list</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t58" class="stm mis">        <span class="nam">tags</span> <span class="op">=</span> <span class="op">(</span><span class="str">" "</span><span class="op">)</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">tags</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -322,7 +308,7 @@
 <p id="t62" class="stm mis">        <span class="nam">tags</span> <span class="op">=</span> <span class="str">"&lt;string>"</span> <span class="op">+</span> <span class="nam">tags</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"  "</span><span class="op">,</span> <span class="str">" "</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t63" class="pln">            <span class="str">"  "</span><span class="op">,</span> <span class="str">" "</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">" "</span><span class="op">,</span> <span class="str">"&lt;/string>&lt;string>"</span><span class="op">)</span> <span class="op">+</span> <span class="str">"&lt;/string>"</span><span class="strut">&nbsp;</span></p>
 <p id="t64" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t65" class="stm mis">    <span class="key">if</span> <span class="nam">tags</span> <span class="op">!=</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t65" class="stm mis">    <span class="key">if</span> <span class="nam">tags</span> <span class="op">!=</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t66" class="stm mis">        <span class="nam">now</span> <span class="op">=</span> <span class="nam">datetime</span><span class="op">.</span><span class="nam">now</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t67" class="stm mis">        <span class="nam">now</span> <span class="op">=</span> <span class="nam">now</span><span class="op">.</span><span class="nam">strftime</span><span class="op">(</span><span class="str">"%Y%m%dt%H%M%S%f"</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t68" class="stm mis">        <span class="nam">tagPlist</span> <span class="op">=</span> <span class="str">"/tmp/fund-%(now)s-tags.plist"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -330,7 +316,7 @@
 <p id="t70" class="stm mis">        <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t71" class="stm mis">            <span class="nam">writeFile</span> <span class="op">=</span> <span class="nam">codecs</span><span class="op">.</span><span class="nam">open</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t72" class="pln">                <span class="nam">tagPlist</span><span class="op">,</span> <span class="nam">encoding</span><span class="op">=</span><span class="str">'utf-8'</span><span class="op">,</span> <span class="nam">mode</span><span class="op">=</span><span class="str">'w'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t73" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span><span class="op">,</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t73" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t74" class="stm mis">            <span class="nam">message</span> <span class="op">=</span> <span class="str">'could not open the file %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">tagPlist</span><span class="op">,</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t75" class="stm mis">            <span class="key">raise</span> <span class="nam">IOError</span><span class="op">(</span><span class="nam">message</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t76" class="stm mis">        <span class="nam">writeFile</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="str">"""</span><span class="strut">&nbsp;</span></p>
@@ -345,7 +331,7 @@
 <p id="t85" class="pln">        <span class="com"># CONVERT PLIST TO BINARY</span><span class="strut">&nbsp;</span></p>
 <p id="t86" class="stm mis">        <span class="nam">cmd</span> <span class="op">=</span> <span class="str">"""plutil -convert binary1 %(tagPlist)s"""</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t87" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t88" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t88" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t89" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t90" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t91" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -353,7 +339,7 @@
 <p id="t93" class="pln">        <span class="com"># ASSIGN TAGS TO FILE</span><span class="strut">&nbsp;</span></p>
 <p id="t94" class="stm mis">        <span class="nam">cmd</span> <span class="op">=</span> <span class="str">'xattr -wx "com.apple.metadata:_kMDItemUserTags" "`xxd -ps %(tagPlist)s`" "%(filepath)s"'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t95" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t96" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t96" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t97" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t98" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t99" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -361,7 +347,7 @@
 <p id="t101" class="pln">        <span class="com"># DELETE PLIST</span><span class="strut">&nbsp;</span></p>
 <p id="t102" class="stm mis">        <span class="nam">os</span><span class="op">.</span><span class="nam">remove</span><span class="op">(</span><span class="nam">tagPlist</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t103" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t104" class="stm mis">    <span class="key">if</span> <span class="nam">rating</span> <span class="op">!=</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t104" class="stm mis">    <span class="key">if</span> <span class="nam">rating</span> <span class="op">!=</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t105" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t106" class="stm mis">        <span class="nam">ratingsContainer</span> <span class="op">=</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">dirname</span><span class="op">(</span><span class="nam">__file__</span><span class="op">)</span> <span class="op">+</span> <span class="str">"/resources/ratings/"</span><span class="strut">&nbsp;</span></p>
 <p id="t107" class="stm mis">        <span class="nam">ratingPlist</span> <span class="op">=</span> <span class="str">"%(ratingsContainer)s%(rating)s.plist"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
@@ -370,18 +356,18 @@
 <p id="t110" class="pln">        <span class="com"># ASSIGN RATING TO FILE</span><span class="strut">&nbsp;</span></p>
 <p id="t111" class="stm mis">        <span class="nam">cmd</span> <span class="op">=</span> <span class="str">'xattr -wx "com.apple.metadata:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t112" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t113" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t113" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t114" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t115" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t116" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t117" class="stm mis">        <span class="nam">cmd</span> <span class="op">=</span> <span class="str">'xattr -wx "org.openmetainfo:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t118" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t119" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t119" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t120" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t121" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t122" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t123" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t124" class="stm mis">    <span class="key">if</span> <span class="nam">wherefrom</span> <span class="op">!=</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t124" class="stm mis">    <span class="key">if</span> <span class="nam">wherefrom</span> <span class="op">!=</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t125" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t126" class="stm mis">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">wherefrom</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t127" class="stm mis">            <span class="nam">wherefrom</span> <span class="op">=</span> <span class="str">"&lt;string>%(wherefrom)s&lt;/string>"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -394,7 +380,7 @@
 <p id="t134" class="stm mis">        <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t135" class="stm mis">            <span class="nam">writeFile</span> <span class="op">=</span> <span class="nam">codecs</span><span class="op">.</span><span class="nam">open</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t136" class="pln">                <span class="nam">urlPlist</span><span class="op">,</span> <span class="nam">encoding</span><span class="op">=</span><span class="str">'utf-8'</span><span class="op">,</span> <span class="nam">mode</span><span class="op">=</span><span class="str">'w'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t137" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span><span class="op">,</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t137" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t138" class="stm mis">            <span class="nam">message</span> <span class="op">=</span> <span class="str">'could not open the file %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">urlPlist</span><span class="op">,</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t139" class="stm mis">            <span class="key">raise</span> <span class="nam">IOError</span><span class="op">(</span><span class="nam">message</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t140" class="stm mis">        <span class="nam">writeFile</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="str">"""</span><span class="strut">&nbsp;</span></p>
@@ -409,7 +395,7 @@
 <p id="t149" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t150" class="pln">        <span class="com"># cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`plutil -convert binary1 %(urlPlist)s -o - | xxd -p`" "%(filepath)s"' % locals()</span><span class="strut">&nbsp;</span></p>
 <p id="t151" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t152" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t152" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t153" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t154" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output URL: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t155" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output URL: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -421,7 +407,7 @@
 <p id="t161" class="stm mis">        <span class="key">try</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t162" class="stm mis">            <span class="nam">writeFile</span> <span class="op">=</span> <span class="nam">codecs</span><span class="op">.</span><span class="nam">open</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t163" class="pln">                <span class="nam">urlPlist</span><span class="op">,</span> <span class="nam">encoding</span><span class="op">=</span><span class="str">'utf-8'</span><span class="op">,</span> <span class="nam">mode</span><span class="op">=</span><span class="str">'w'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t164" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span><span class="op">,</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t164" class="stm mis">        <span class="key">except</span> <span class="nam">IOError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t165" class="stm mis">            <span class="nam">message</span> <span class="op">=</span> <span class="str">'could not open the file %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">urlPlist</span><span class="op">,</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t166" class="stm mis">            <span class="key">raise</span> <span class="nam">IOError</span><span class="op">(</span><span class="nam">message</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t167" class="stm mis">        <span class="nam">writeFile</span><span class="op">.</span><span class="nam">write</span><span class="op">(</span><span class="str">"""</span><span class="strut">&nbsp;</span></p>
@@ -436,7 +422,7 @@
 <p id="t176" class="pln">        <span class="com"># ASSIGN WHEREFORM TO FILE</span><span class="strut">&nbsp;</span></p>
 <p id="t177" class="stm mis">        <span class="nam">cmd</span> <span class="op">=</span> <span class="str">'xattr -wx "com.apple.metadata:kMDItemWhereFroms" "`xxd -ps %(urlPlist)s`" "%(filepath)s"'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t178" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t179" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t179" class="stm mis">        <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t180" class="stm mis">        <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t181" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output URL: %(stdout)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t182" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'output URL: %(stderr)s'</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -444,22 +430,19 @@
 <p id="t184" class="pln">        <span class="com"># DELETE PLIST</span><span class="strut">&nbsp;</span></p>
 <p id="t185" class="pln">        <span class="com"># os.remove(urlPlist)</span><span class="strut">&nbsp;</span></p>
 <p id="t186" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t187" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">info</span><span class="op">(</span><span class="str">'completed the ``tag`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t188" class="stm mis">    <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
-
+<p id="t187" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``tag`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t188" class="stm mis">    <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
             </td>
         </tr>
     </table>
 </div>
-
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.3.4</a>,
-            created at 2017-08-28 10:29
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
+            created at 2019-05-21 15:56
         </p>
     </div>
 </div>
-
 </body>
 </html>

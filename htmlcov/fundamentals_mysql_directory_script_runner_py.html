@@ -1,16 +1,10 @@
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    
-    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for fundamentals/mysql/directory_script_runner.py: 0%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
-    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -20,26 +14,20 @@
     </script>
 </head>
 <body class="pyfile">
-
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/directory_script_runner.py</b> :
             <span class="pc_cov">0%</span>
         </h1>
-
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
-
         <h2 class="stats">
             86 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
             <span class="mis shortkey_m button_toggle_mis">86 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
-
-            
         </h2>
     </div>
 </div>
-
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -62,7 +50,6 @@
     </p>
     </div>
 </div>
-
 <div id="source">
     <table>
         <tr>
@@ -329,7 +316,6 @@
 <p id="n260" class="pln"><a href="#n260">260</a></p>
 <p id="n261" class="stm mis"><a href="#n261">261</a></p>
 <p id="n262" class="stm mis"><a href="#n262">262</a></p>
-
             </td>
             <td class="text">
 <p id="t1" class="pln"><span class="com">#!/usr/local/bin/python</span><span class="strut">&nbsp;</span></p>
@@ -393,10 +379,10 @@
 <p id="t59" class="pln">        <span class="nam">pathToScriptDirectory</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t60" class="pln">        <span class="nam">databaseName</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t61" class="pln">        <span class="nam">loginPath</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t62" class="pln">        <span class="nam">force</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t63" class="pln">        <span class="nam">waitForResult</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t64" class="pln">        <span class="nam">successRule</span><span class="op">=</span><span class="nam">None</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t65" class="pln">        <span class="nam">failureRule</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t62" class="pln">        <span class="nam">force</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t63" class="pln">        <span class="nam">waitForResult</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t64" class="pln">        <span class="nam">successRule</span><span class="op">=</span><span class="key">None</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t65" class="pln">        <span class="nam">failureRule</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t66" class="pln">    <span class="str">"""A function to run all of the mysql scripts in a given directory (in a modified date order, oldest first) and then act on the script file in accordance with the succcess or failure of its execution</span><span class="strut">&nbsp;</span></p>
 <p id="t67" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t68" class="pln"><span class="str">    As it's insecure to pass in mysql database credentials via the command-line, run the following command from the terminal </span><span class="strut">&nbsp;</span></p>
@@ -466,7 +452,7 @@
 <p id="t132" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t133" class="pln"><span class="str">        Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)</span><span class="strut">&nbsp;</span></p>
 <p id="t134" class="pln"><span class="str">    """</span><span class="strut">&nbsp;</span></p>
-<p id="t135" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">info</span><span class="op">(</span><span class="str">'starting the ``directory_script_runner`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t135" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``directory_script_runner`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t136" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t137" class="pln">    <span class="com"># COMPILE A DICTIONARY OF SCRIPTS / MODIFIED TIMES</span><span class="strut">&nbsp;</span></p>
 <p id="t138" class="stm mis">    <span class="nam">scriptList</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span><span class="strut">&nbsp;</span></p>
@@ -487,19 +473,19 @@
 <p id="t153" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t154" class="pln">    <span class="com"># ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST</span><span class="strut">&nbsp;</span></p>
 <p id="t155" class="stm mis">    <span class="nam">scriptList</span> <span class="op">=</span> <span class="nam">collections</span><span class="op">.</span><span class="nam">OrderedDict</span><span class="op">(</span><span class="nam">sorted</span><span class="op">(</span><span class="nam">scriptList</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t156" class="stm mis">    <span class="key">for</span> <span class="nam">k</span><span class="op">,</span> <span class="nam">v</span> <span class="key">in</span> <span class="nam">scriptList</span><span class="op">.</span><span class="nam">iteritems</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t156" class="stm mis">    <span class="key">for</span> <span class="nam">k</span><span class="op">,</span> <span class="nam">v</span> <span class="key">in</span> <span class="nam">scriptList</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t157" class="stm mis">        <span class="nam">scriptname</span> <span class="op">=</span> <span class="nam">os</span><span class="op">.</span><span class="nam">path</span><span class="op">.</span><span class="nam">basename</span><span class="op">(</span><span class="nam">v</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t158" class="stm mis">        <span class="key">if</span> <span class="nam">waitForResult</span> <span class="op">==</span> <span class="nam">True</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t158" class="stm mis">        <span class="key">if</span> <span class="nam">waitForResult</span> <span class="op">==</span> <span class="key">True</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t159" class="stm mis">            <span class="nam">cmd</span> <span class="op">=</span>  <span class="str">"""mysql --login-path=%(loginPath)s %(force)s %(databaseName)s &lt; "%(v)s" """</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t160" class="pln">            <span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t161" class="stm mis">            <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">close_fds</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t162" class="pln">                      <span class="nam">env</span><span class="op">=</span><span class="op">{</span><span class="str">'PATH'</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'PATH'</span><span class="op">)</span> <span class="op">+</span> <span class="str">":/usr/local/bin:/usr/bin:"</span><span class="op">,</span> <span class="str">"MYSQL_TEST_LOGIN_FILE"</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'HOME'</span><span class="op">)</span> <span class="op">+</span> <span class="str">"/.mylogin.cnf"</span><span class="op">}</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t161" class="stm mis">            <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">PIPE</span><span class="op">,</span> <span class="nam">close_fds</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t162" class="pln">                      <span class="nam">env</span><span class="op">=</span><span class="op">{</span><span class="str">'PATH'</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'PATH'</span><span class="op">)</span> <span class="op">+</span> <span class="str">":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin"</span><span class="op">,</span> <span class="str">"MYSQL_TEST_LOGIN_FILE"</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'HOME'</span><span class="op">)</span> <span class="op">+</span> <span class="str">"/.mylogin.cnf"</span><span class="op">}</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t163" class="stm mis">            <span class="nam">stdout</span><span class="op">,</span> <span class="nam">stderr</span> <span class="op">=</span> <span class="nam">p</span><span class="op">.</span><span class="nam">communicate</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t164" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t165" class="stm mis">            <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">stderr</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t166" class="stm mis">                <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t167" class="pln">                    <span class="str">"MySQL Script `%(scriptname)s` Failed: '%(stderr)s'"</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t168" class="stm mis">                <span class="key">if</span> <span class="nam">failureRule</span> <span class="op">==</span> <span class="nam">None</span> <span class="key">or</span> <span class="nam">failureRule</span> <span class="op">==</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t168" class="stm mis">                <span class="key">if</span> <span class="nam">failureRule</span> <span class="op">==</span> <span class="key">None</span> <span class="key">or</span> <span class="nam">failureRule</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t169" class="stm mis">                    <span class="key">pass</span><span class="strut">&nbsp;</span></p>
 <p id="t170" class="stm mis">                <span class="key">elif</span> <span class="nam">failureRule</span> <span class="op">==</span> <span class="str">"delete"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t171" class="stm mis">                    <span class="nam">os</span><span class="op">.</span><span class="nam">remove</span><span class="op">(</span><span class="nam">v</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -513,11 +499,11 @@
 <p id="t179" class="stm mis">                        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">"attempting to rename file %s to %s"</span> <span class="op">%</span><span class="strut">&nbsp;</span></p>
 <p id="t180" class="pln">                                  <span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t181" class="stm mis">                        <span class="nam">os</span><span class="op">.</span><span class="nam">rename</span><span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t182" class="stm mis">                    <span class="key">except</span> <span class="nam">Exception</span><span class="op">,</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t182" class="stm mis">                    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t183" class="stm mis">                        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t184" class="pln">                            <span class="str">"could not rename file %s to %s - failed with this error: %s "</span> <span class="op">%</span> <span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">,</span> <span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t185" class="pln">            <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t186" class="stm mis">                <span class="key">if</span> <span class="nam">successRule</span> <span class="op">==</span> <span class="nam">None</span> <span class="key">or</span> <span class="nam">successRule</span> <span class="op">==</span> <span class="nam">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t186" class="stm mis">                <span class="key">if</span> <span class="nam">successRule</span> <span class="op">==</span> <span class="key">None</span> <span class="key">or</span> <span class="nam">successRule</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t187" class="stm mis">                    <span class="key">pass</span><span class="strut">&nbsp;</span></p>
 <p id="t188" class="stm mis">                <span class="key">elif</span> <span class="nam">successRule</span> <span class="op">==</span> <span class="str">"delete"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t189" class="stm mis">                    <span class="nam">os</span><span class="op">.</span><span class="nam">remove</span><span class="op">(</span><span class="nam">v</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -531,7 +517,7 @@
 <p id="t197" class="stm mis">                        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">"attempting to rename file %s to %s"</span> <span class="op">%</span><span class="strut">&nbsp;</span></p>
 <p id="t198" class="pln">                                  <span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t199" class="stm mis">                        <span class="nam">os</span><span class="op">.</span><span class="nam">rename</span><span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t200" class="stm mis">                    <span class="key">except</span> <span class="nam">Exception</span><span class="op">,</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t200" class="stm mis">                    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t201" class="stm mis">                        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t202" class="pln">                            <span class="str">"could not rename file %s to %s - failed with this error: %s "</span> <span class="op">%</span> <span class="op">(</span><span class="nam">v</span><span class="op">,</span> <span class="nam">moveTo</span><span class="op">,</span> <span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t203" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
@@ -539,14 +525,14 @@
 <p id="t205" class="stm mis">                <span class="nam">cmd</span> <span class="op">=</span>  <span class="str">"""mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s &lt; "%(v)s" > /dev/null 2>&amp;1 &amp; rm "%(v)s" """</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t206" class="pln">            <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t207" class="stm mis">                <span class="nam">cmd</span> <span class="op">=</span>  <span class="str">"""mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s &lt; "%(v)s" > /dev/null 2>&amp;1 """</span> <span class="op">%</span> <span class="nam">locals</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t208" class="stm mis">            <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">close_fds</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t209" class="pln">                      <span class="nam">env</span><span class="op">=</span><span class="op">{</span><span class="str">'PATH'</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'PATH'</span><span class="op">)</span> <span class="op">+</span> <span class="str">":/usr/local/bin:/usr/bin:"</span><span class="op">,</span> <span class="str">"MYSQL_TEST_LOGIN_FILE"</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'HOME'</span><span class="op">)</span> <span class="op">+</span> <span class="str">"/.mylogin.cnf"</span><span class="op">}</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span> <span class="nam">stdin</span><span class="op">=</span><span class="nam">None</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="nam">None</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t208" class="stm mis">            <span class="nam">p</span> <span class="op">=</span> <span class="nam">Popen</span><span class="op">(</span><span class="nam">cmd</span><span class="op">,</span> <span class="nam">close_fds</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t209" class="pln">                      <span class="nam">env</span><span class="op">=</span><span class="op">{</span><span class="str">'PATH'</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'PATH'</span><span class="op">)</span> <span class="op">+</span> <span class="str">":/usr/local/bin:/usr/bin:"</span><span class="op">,</span> <span class="str">"MYSQL_TEST_LOGIN_FILE"</span><span class="op">:</span> <span class="nam">os</span><span class="op">.</span><span class="nam">getenv</span><span class="op">(</span><span class="str">'HOME'</span><span class="op">)</span> <span class="op">+</span> <span class="str">"/.mylogin.cnf"</span><span class="op">}</span><span class="op">,</span> <span class="nam">shell</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">stdin</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">stdout</span><span class="op">=</span><span class="key">None</span><span class="op">,</span> <span class="nam">stderr</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t210" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t211" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">info</span><span class="op">(</span><span class="str">'completed the ``directory_script_runner`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t212" class="stm mis">    <span class="key">return</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
+<p id="t211" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``directory_script_runner`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t212" class="stm mis">    <span class="key">return</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
 <p id="t213" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t214" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t215" class="stm mis"><span class="key">def</span> <span class="nam">main</span><span class="op">(</span><span class="nam">arguments</span><span class="op">=</span><span class="nam">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t215" class="stm mis"><span class="key">def</span> <span class="nam">main</span><span class="op">(</span><span class="nam">arguments</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t216" class="pln">    <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t217" class="pln"><span class="str">    The main function used when ``directory_script_runner.py`` is run as a single script from the cl, or when installed as a cl command</span><span class="strut">&nbsp;</span></p>
 <p id="t218" class="pln"><span class="str">    """</span><span class="strut">&nbsp;</span></p>
@@ -556,30 +542,30 @@
 <p id="t222" class="pln">        <span class="nam">arguments</span><span class="op">=</span><span class="nam">arguments</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t223" class="pln">        <span class="nam">docString</span><span class="op">=</span><span class="nam">__doc__</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t224" class="pln">        <span class="nam">logLevel</span><span class="op">=</span><span class="str">"WARNING"</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t225" class="pln">        <span class="nam">options_first</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t225" class="pln">        <span class="nam">options_first</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t226" class="pln">        <span class="nam">projectName</span><span class="op">=</span><span class="str">"fundmentals"</span><span class="strut">&nbsp;</span></p>
 <p id="t227" class="pln">    <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t228" class="stm mis">    <span class="nam">arguments</span><span class="op">,</span> <span class="nam">settings</span><span class="op">,</span> <span class="nam">log</span><span class="op">,</span> <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">su</span><span class="op">.</span><span class="nam">setup</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t229" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t230" class="pln">    <span class="com"># UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES</span><span class="strut">&nbsp;</span></p>
 <p id="t231" class="pln">    <span class="com"># AUTOMATICALLY</span><span class="strut">&nbsp;</span></p>
-<p id="t232" class="stm mis">    <span class="key">for</span> <span class="nam">arg</span><span class="op">,</span> <span class="nam">val</span> <span class="key">in</span> <span class="nam">arguments</span><span class="op">.</span><span class="nam">iteritems</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t232" class="stm mis">    <span class="key">for</span> <span class="nam">arg</span><span class="op">,</span> <span class="nam">val</span> <span class="key">in</span> <span class="nam">arguments</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t233" class="stm mis">        <span class="key">if</span> <span class="nam">arg</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">==</span> <span class="str">"-"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t234" class="stm mis">            <span class="nam">varname</span> <span class="op">=</span> <span class="nam">arg</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"-"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span> <span class="op">+</span> <span class="str">"Flag"</span><span class="strut">&nbsp;</span></p>
 <p id="t235" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t236" class="stm mis">            <span class="nam">varname</span> <span class="op">=</span> <span class="nam">arg</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"&lt;"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">">"</span><span class="op">,</span> <span class="str">""</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t237" class="stm mis">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">val</span><span class="op">,</span> <span class="nam">str</span><span class="op">)</span> <span class="key">or</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">val</span><span class="op">,</span> <span class="nam">unicode</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t238" class="stm mis">            <span class="key">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = '%s'"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t237" class="stm mis">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">val</span><span class="op">,</span> <span class="nam">str</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t238" class="stm mis">            <span class="nam">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = '%s'"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t239" class="pln">        <span class="key">else</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t240" class="stm mis">            <span class="key">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = %s"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t240" class="stm mis">            <span class="nam">exec</span><span class="op">(</span><span class="nam">varname</span> <span class="op">+</span> <span class="str">" = %s"</span> <span class="op">%</span> <span class="op">(</span><span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t241" class="stm mis">        <span class="key">if</span> <span class="nam">arg</span> <span class="op">==</span> <span class="str">"--dbConn"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t242" class="stm mis">            <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">val</span><span class="strut">&nbsp;</span></p>
 <p id="t243" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'%s = %s'</span> <span class="op">%</span> <span class="op">(</span><span class="nam">varname</span><span class="op">,</span> <span class="nam">val</span><span class="op">,</span><span class="op">)</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t244" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t245" class="stm mis">    <span class="key">if</span> <span class="nam">successFlag</span> <span class="key">and</span> <span class="nam">successFlag</span><span class="op">.</span><span class="nam">lower</span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="str">"none"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t246" class="stm mis">        <span class="nam">successFlag</span> <span class="op">=</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
+<p id="t246" class="stm mis">        <span class="nam">successFlag</span> <span class="op">=</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
 <p id="t247" class="stm mis">    <span class="key">if</span> <span class="nam">failureFlag</span> <span class="key">and</span> <span class="nam">failureFlag</span><span class="op">.</span><span class="nam">lower</span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="str">"none"</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t248" class="stm mis">        <span class="nam">failureFlag</span> <span class="op">=</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
+<p id="t248" class="stm mis">        <span class="nam">failureFlag</span> <span class="op">=</span> <span class="key">None</span><span class="strut">&nbsp;</span></p>
 <p id="t249" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t250" class="stm mis">    <span class="nam">directory_script_runner</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t251" class="pln">        <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
@@ -594,20 +580,17 @@
 <p id="t260" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t261" class="stm mis"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">'__main__'</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t262" class="stm mis">    <span class="nam">main</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-
             </td>
         </tr>
     </table>
 </div>
-
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.3.4</a>,
-            created at 2017-08-28 11:03
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
+            created at 2019-05-21 16:18
         </p>
     </div>
 </div>
-
 </body>
 </html>

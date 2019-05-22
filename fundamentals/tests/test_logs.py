@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -19,7 +20,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -37,7 +38,6 @@ class test_logs(unittest.TestCase):
         from fundamentals.logs import emptyLogger
 
         log = emptyLogger()
-        print "shit"
         log.error("crap")
 
         # x-print-testpage-for-pessto-marshall-web-object

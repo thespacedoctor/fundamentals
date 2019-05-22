@@ -1,37 +1,24 @@
-fundamentals
-============
+# fundamentals
 
-[![Documentation Status](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge)
+[![Documentation Status](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge) [![Coverage Status](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/coverage.svg)](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/htmlcov/index.html)
 
-[![Coverage Status](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/coverage.svg)](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/htmlcov/index.html)
+*Some project setup tools including logging, settings and database connections.*
 
-*Some project setup tools including logging, settings and database
-connections.*
+## Documentation
 
-Here's a summary of what's included in the python package:
+Documentation for *fundamentals* is hosted on [Read the Docs](http://fundamentals.readthedocs.org/en/stable/).
 
-Documentation
-=============
+## Installation
 
-Documentation for fundamentals is hosted by [Read the
-Docs](http://fundamentals.readthedocs.org/en/stable/) (last [stable
-version](http://fundamentals.readthedocs.org/en/stable/) and [latest
-version](http://fundamentals.readthedocs.org/en/latest/)).
+The easiest way to install *fundamentals* is to use `pip`:
 
-Installation
-============
-
-The easiest way to install fundamentals is to use `pip`:
-
-``` bash
+```bash
 pip install fundamentals
 ```
 
-Or you can clone the [github
-repo](https://github.com/thespacedoctor/fundamentals) and install from a
-local version of the code:
+Or you can clone the [github repo](https://github.com/thespacedoctor/fundamentals) and install from a local version of the code:
 
-``` bash
+```bash
 git clone git@github.com:thespacedoctor/fundamentals.git
 cd fundamentals
 python setup.py install
@@ -43,47 +30,16 @@ To upgrade to the latest version of fundamentals use the command:
 pip install fundamentals --upgrade
 ```
 
-Development
------------
+## Development
 
-If you want to tinker with the code, then install in development mode.
-This means you can modify the code from your cloned repo:
+If you want to tinker with the code then [fork the repository](https://github.com/thespacedoctor/fundamentals/fork), clone it and install it in development mode. This allows you to modify the code in place from your locally cloned repository:
 
 ``` bash
-git clone git@github.com:thespacedoctor/fundamentals.git
-cd fundamentals
 python setup.py develop
 ```
 
-[Pull requests](https://github.com/thespacedoctor/fundamentals/pulls)
-are welcomed!
+[Pull requests](https://github.com/thespacedoctor/fundamentals/pulls) are welcomed!
 
-Issues
-------
+## Issues
 
-Please report any issues
-[here](https://github.com/thespacedoctor/fundamentals/issues).
-
-License
-=======
-
-Copyright (c) 2018 David Young
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Please report any issues [here](https://github.com/thespacedoctor/fundamentals/issues).

@@ -1,5 +1,1 @@
-| owner  | pet        | address      |
-|:-------|:-----------|:-------------|
-| daisy  | dog        | belfast, uk  |
-| john   | snake      | the moon     |
-| susan  | crocodile  | larne        |
+b'| owner  | pet        | address      |\n|:-------|:-----------|:-------------|\n| daisy  | dog        | belfast, uk  |\n| john   | snake      | the moon     |\n| susan  | crocodile  | larne        |'

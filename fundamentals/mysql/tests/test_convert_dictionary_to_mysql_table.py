@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import nose2
@@ -20,7 +21,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # load settings
-stream = file(
+stream = open(
     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -65,7 +66,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dateModified=False,
             returnInsertOnly=True
         )
-        print message
+        # print(message)
 
     def test_return_inserts_with_datetime_pre_compiled(self):
         dictionary = {"a newKey": "cool", "and another": "super cool",
@@ -82,7 +83,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             returnInsertOnly=True,
             reDatetime=reDatetime
         )
-        print message
+        # print(message)
 
     def test_return_inserts_non_batch(self):
         dictionary = {"a newKey": "cool", "and another": "super cool",
@@ -99,23 +100,6 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             replace=True,
             batchInserts=False
         )
-
-        print inserts
-
-    # def test_convert_dictionary_to_mysql_table_function_exception(self):
-
-    #     from fundamentals import convert_dictionary_to_mysql_table
-    #     try:
-    #         this = convert_dictionary_to_mysql_table(
-    #             log=log,
-    #             settings=settings,
-    #             fakeKey="break the code"
-    #         )
-    #         this.get()
-    #         assert False
-    #     except Exception, e:
-    #         assert True
-    #         print str(e)
 
         # x-print-testpage-for-pessto-marshall-web-object
 

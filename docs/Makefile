@@ -11,9 +11,6 @@ ASDIR         = source/_autosummary
 APIDIR        = source/_api
 INDIR         = source/_includes
 READMERST = ../README.rst
-READMEMD = ../README.md
-BLOGRST = ../blog-post.rst
-BLOGMD = ../blog-post.md
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -51,38 +48,6 @@ clean:
 
 html:
 	
-	@cat $(INDIR)/description.rst > $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/usage.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/documentation.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/installation.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/development.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/issues.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	@cat $(INDIR)/license.rst >> $(READMERST)
-	@echo "" >> $(READMERST)
-	sed -i -e 's/.. include:: \/classes_and_functions.rst/.. include:: \/docs\/classes_and_function.rst/g' $(READMERST)
-
-	@cat $(INDIR)/description.rst > $(BLOGRST)
-	@echo "" >> $(BLOGRST)
-	@cat $(INDIR)/usage.rst >> $(BLOGRST)
-	@echo "" >> $(BLOGRST)
-	@cat $(INDIR)/installation.rst >> $(BLOGRST)
-	@echo "" >> $(BLOGRST)
-	@cat $(INDIR)/documentation.rst >> $(BLOGRST)
-	@echo "" >> $(BLOGRST)
-	@cat $(INDIR)/tutorial.rst >> $(BLOGRST)
-	@echo "" >> $(BLOGRST)
-	sed -i -e 's/.. include:: \/classes_and_functions.rst/.. include:: \/docs\/classes_and_function.rst/g' $(BLOGRST)
-
-	pandoc -s --columns=3000 --wrap=preserve -f rst -t  markdown_mmd+yaml_metadata_block+tex_math_dollars+mmd_link_attributes+raw_html+backtick_code_blocks+smart --output=$(BLOGMD) $(BLOGRST)
-
-	pandoc --from=rst --to=markdown_mmd --output=$(READMEMD) $(READMERST)
-
 	rm -rf $(BUILDDIR)/html/todo.html
 	rm -rf $(ASDIR)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

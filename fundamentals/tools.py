@@ -9,6 +9,8 @@
 :Date Created:
     April 16, 2014
 """
+from __future__ import print_function
+from __future__ import absolute_import
 ################# GLOBAL IMPORTS ####################
 import sys
 import os
@@ -20,7 +22,7 @@ except:
 from collections import OrderedDict
 import shutil
 from subprocess import Popen, PIPE, STDOUT
-import logs as dl
+from . import logs as dl
 import time
 from docopt import docopt
 import psutil
@@ -148,7 +150,7 @@ class tools():
             test = "".join(this[1:])
             if q.pid != os.getpid() and lockname == test:
                 thisId = q.pid
-                print "This command is already running (see PID %(thisId)s)" % locals()
+                print("This command is already running (see PID %(thisId)s)" % locals())
                 sys.exit(0)
 
         try:
@@ -165,17 +167,17 @@ class tools():
         # UNPACK SETTINGS
         stream = False
         if "<settingsFile>" in arguments and arguments["<settingsFile>"]:
-            stream = file(arguments["<settingsFile>"], 'r')
+            stream = open(arguments["<settingsFile>"], 'r')
         elif "<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"]:
-            stream = file(arguments["<pathToSettingsFile>"], 'r')
+            stream = open(arguments["<pathToSettingsFile>"], 'r')
         elif "--settingsFile" in arguments and arguments["--settingsFile"]:
-            stream = file(arguments["--settingsFile"], 'r')
+            stream = open(arguments["--settingsFile"], 'r')
         elif "--settings" in arguments and arguments["--settings"]:
-            stream = file(arguments["--settings"], 'r')
+            stream = open(arguments["--settings"], 'r')
         elif "pathToSettingsFile" in arguments and arguments["pathToSettingsFile"]:
-            stream = file(arguments["pathToSettingsFile"], 'r')
+            stream = open(arguments["pathToSettingsFile"], 'r')
         elif "settingsFile" in arguments and arguments["settingsFile"]:
-            stream = file(arguments["settingsFile"], 'r')
+            stream = open(arguments["settingsFile"], 'r')
         elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None) or ("pathToSettingsFile" in arguments and arguments["pathToSettingsFile"] == None):
 
             if projectName != False:
@@ -198,7 +200,7 @@ class tools():
                         settingsFile, encoding='utf-8', mode='w')
 
                 import yaml
-                astream = file(settingsFile, 'r')
+                astream = open(settingsFile, 'r')
                 if orderedSettings:
                     this = ordered_load(astream, yaml.SafeLoader)
                 else:
@@ -231,7 +233,7 @@ class tools():
                                 pathToReadFile, encoding='utf-8', mode='r')
                             thisData = readFile.read()
                             readFile.close()
-                        except IOError, e:
+                        except IOError as e:
                             message = 'could not open the file %s' % (
                                 pathToReadFile,)
                             raise IOError(message)
@@ -242,13 +244,14 @@ class tools():
                         try:
                             writeFile = codecs.open(
                                 pathToWriteFile, encoding='utf-8', mode='w')
-                        except IOError, e:
+                        except IOError as e:
                             message = 'could not open the file %s' % (
                                 pathToWriteFile,)
                             raise IOError(message)
                         writeFile.write(thisData)
                         writeFile.close()
-                        print "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals()
+                        print(
+                            "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals())
                         try:
                             cmd = """open %(pathToReadFile)s""" % locals()
                             p = Popen(cmd, stdout=PIPE,
@@ -262,7 +265,8 @@ class tools():
                         except:
                             pass
                     except:
-                        print "please add settings to file '%(settingsFile)s'" % locals()
+                        print(
+                            "please add settings to file '%(settingsFile)s'" % locals())
                     # return
         else:
             pass
@@ -312,14 +316,14 @@ class tools():
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically
-        for arg, val in arguments.iteritems():
+        for arg, val in arguments.items():
             if arg[0] == "-":
                 varname = arg.replace("-", "") + "Flag"
             else:
                 varname = arg.replace("<", "").replace(">", "")
             if varname == "import":
                 varname = "iimport"
-            if isinstance(val, str) or isinstance(val, unicode):
+            if isinstance(val, str):
                 val = val.replace("'", "\\'")
                 exec(varname + " = '%s'" % (val,))
             else:
@@ -491,7 +495,7 @@ class tools():
         try:
             s.connect((address, port))
             return True
-        except socket.error, e:
+        except socket.error as e:
             self.log.warning(
                 """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
             return False

@@ -92,7 +92,7 @@ def convert_dictionary_to_mysql_table(
                 batchInserts=True
             )
 
-            print insertCommand, valueTuple
+            print(insertCommand, valueTuple)
 
             # OUT: 'INSERT IGNORE INTO `testing_table`
             # (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES
@@ -113,7 +113,7 @@ def convert_dictionary_to_mysql_table(
                 batchInserts=False
             )
 
-            print inserts
+            print(inserts)
 
             # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1)
             # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")
@@ -155,7 +155,7 @@ def convert_dictionary_to_mysql_table(
                 log.critical(message)
                 raise ValueError(message)
 
-        for k, v in dictionary.iteritems():
+        for k, v in dictionary.items():
             # log.debug('k: %s, v: %s' % (k, v,))
             if isinstance(v, list) and len(v) != 2:
                 message = 'Please make sure the list values in "dictionary" 2 items in length'
@@ -169,7 +169,7 @@ def convert_dictionary_to_mysql_table(
                                  (message, k, v, type(v)))
                     raise ValueError(message)
             else:
-                if not (isinstance(v, str) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, long) or isinstance(v, unicode) or isinstance(v, datetime.date) or v == None):
+                if not (isinstance(v, str) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, datetime.date) or v == None):
                     this = type(v)
                     message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool : %(k)s is a %(this)s' % locals(
                     )
@@ -233,7 +233,7 @@ def convert_dictionary_to_mysql_table(
             del dictionary[key]
     # SORT THE DICTIONARY BY KEY
     odictionary = c.OrderedDict(sorted(dictionary.items()))
-    for (key, value) in odictionary.iteritems():
+    for (key, value) in odictionary.items():
 
         formattedKey = key.replace(" ", "_").replace("-", "_")
         # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
@@ -250,8 +250,6 @@ def convert_dictionary_to_mysql_table(
                 value[0] = yaml.dump(value[0])
                 value[0] = str(value[0])
             # REMOVE CHARACTERS THAT COLLIDE WITH MYSQL
-            # if type(value[0]) == str or type(value[0]) == unicode:
-            #     value[0] = value[0].replace('"', """'""")
             # JOIN THE VALUES TOGETHER IN A LIST - EASIER TO GENERATE THE MYSQL
             # COMMAND LATER
             if isinstance(value, str):
@@ -261,15 +259,11 @@ def convert_dictionary_to_mysql_table(
                     udata = value.decode("utf-8", "ignore")
                     value = udata.encode("ascii", "ignore")
                 except:
-                    log.error('cound not decode value %(value)s' % locals())
+                    pass
 
                 # log.debug('udata: %(udata)s' % locals())
 
-            if isinstance(value, unicode):
-                value = value.replace('"', '\\"')
-                value = value.encode("ascii", "ignore")
-
-            if isinstance(value, list) and isinstance(value[0], unicode):
+            if isinstance(value, list) and isinstance(value[0], str):
                 myValues.extend(['%s' % value[0].strip()])
             elif isinstance(value, list):
                 myValues.extend(['%s' % (value[0], )])
@@ -305,11 +299,11 @@ def convert_dictionary_to_mysql_table(
                     elif formattedKey == 'updated_parsed' or formattedKey == 'published_parsed' or formattedKey \
                             == 'feedName' or formattedKey == 'title':
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif (isinstance(value[0], str) or isinstance(value[0], unicode)) and len(value[0]) < 30:
+                    elif isinstance(value[0], str) and len(value[0]) < 30:
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif (isinstance(value[0], str) or isinstance(value[0], unicode)) and len(value[0]) >= 30 and len(value[0]) < 80:
+                    elif isinstance(value[0], str) and len(value[0]) >= 30 and len(value[0]) < 80:
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif isinstance(value[0], str) or isinstance(value[0], unicode):
+                    elif isinstance(value[0], str):
                         columnLength = 450 + len(value[0]) * 2
                         qCreateColumn += '` varchar(' + str(
                             columnLength) + ') DEFAULT NULL'

@@ -81,6 +81,7 @@ def writequery(
     try:
         if manyValueList == False:
             cursor.execute(sqlQuery)
+
         else:
             # cursor.executemany(sqlQuery, manyValueList)
             # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER BARFING
@@ -96,8 +97,17 @@ def writequery(
                 dbConn.commit()
                 if len(thisList) < batch:
                     stop = 1
-
+    except pymysql.err.ProgrammingError as e:
+        sqlQueryTrim = sqlQuery[:1000]
+        message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
+                                                                                                       str(e))
+        if Force == False:
+            log.error(message)
+            raise
+        else:
+            log.warning(message)
     except pymysql.Error as e:
+
         if e[0] == 1050 and 'already exists' in e[1]:
             log.info(str(e) + '\n')
         elif e[0] == 1062:
@@ -151,8 +161,8 @@ def writequery(
                 log.error(message)
                 raise
             else:
-                log.info(message)
-                return -1
+                log.warning(message)
+
     except pymysql.Warning as e:
         log.info(str(e))
     except Exception as e:

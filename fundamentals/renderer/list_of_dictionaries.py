@@ -109,7 +109,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.csv()
+                print(dataSet.csv())
 
             .. code-block:: text
 
@@ -159,7 +159,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.table()
+                print(dataSet.table())
 
             .. code-block:: text
 
@@ -213,7 +213,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.reST()
+                print(dataSet.reST())
 
             .. code-block:: text
 
@@ -269,7 +269,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.markdown()
+                print(dataSet.markdown())
 
             .. code-block:: markdown
 
@@ -321,7 +321,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.json()
+                print(dataSet.json())
 
             .. code-block:: json
 
@@ -353,7 +353,7 @@ class list_of_dictionaries():
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
         for d in dataCopy:
-            for k, v in d.iteritems():
+            for k, v in d.items():
                 if isinstance(v,  datetime):
                     d[k] = v.strftime("%Y%m%dt%H%M%S")
 
@@ -395,7 +395,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.yaml()
+                print(dataSet.yaml())
 
             .. code-block:: yaml
 
@@ -427,7 +427,7 @@ class list_of_dictionaries():
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            stream = file(filepath, 'w')
+            stream = open(filepath, 'w')
             yaml.dump(dataCopy, stream, default_flow_style=False)
             stream.close()
 
@@ -454,7 +454,7 @@ class list_of_dictionaries():
 
             .. code-block:: python
 
-                print dataSet.mysql("testing_table")
+                print(dataSet.mysql("testing_table"))
 
             this output the following:
 
@@ -516,7 +516,7 @@ class list_of_dictionaries():
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
 
-        tableColumnNames = dataCopy[0].keys()
+        tableColumnNames = list(dataCopy[0].keys())
         columnWidths = []
         columnWidths[:] = [len(tableColumnNames[i])
                            for i in range(len(tableColumnNames))]
@@ -560,8 +560,8 @@ class list_of_dictionaries():
         # set the column widths
         for row in dataCopy:
             for i, c in enumerate(tableColumnNames):
-                if len(unicode(row[c])) > columnWidths[i]:
-                    columnWidths[i] = len(unicode(row[c]))
+                if len(str(row[c])) > columnWidths[i]:
+                    columnWidths[i] = len(str(row[c]))
 
         # table borders for human readable
         if csvType in ["human", "markdown", "reST"]:
@@ -595,8 +595,8 @@ class list_of_dictionaries():
                 if csvType in ["human", "markdown", "reST"]:
                     if row[c] == None:
                         row[c] = ""
-                    row[c] = unicode(unicode(row[c]).ljust(columnWidths[i] + 2)
-                                     .rjust(columnWidths[i] + 3))
+                    row[c] = str(str(row[c]).ljust(columnWidths[i] + 2)
+                                 .rjust(columnWidths[i] + 3))
                 thisRow.append(row[c])
             # table border for human readable
             if csvType in ["human", "markdown", "reST"]:
@@ -627,6 +627,7 @@ class list_of_dictionaries():
 
         output = output.getvalue()
         output = output.strip()
+        output = str(output)
 
         if csvType in ["markdown"]:
             output = output.replace("|--", "|:-")

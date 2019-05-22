@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import nose2
 import shutil
@@ -20,7 +21,7 @@ su = tools(
 arguments, settings, log, dbConn = su.setup()
 
 # # load settings
-# stream = file(
+# stream = open(
 #     "/Users/Dave/.config/fundamentals/fundamentals.yaml", 'r')
 # settings = yaml.load(stream)
 # stream.close()
@@ -32,7 +33,7 @@ log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
 utKit.tearDownModule()
 
 # load settings
-stream = file(
+stream = open(
     pathToInputDir + "/example_settings.yaml", 'r')
 settings = yaml.load(stream)
 stream.close()
@@ -72,7 +73,7 @@ class test_multiprocess(unittest.TestCase):
                                inputArray=inputArray, anotherKeyword="cheese")
 
         took = time.time() - t1
-        print "Multiprocessing took: %(took)s" % locals()
+        print("Multiprocessing took: %(took)s" % locals())
 
         t2 = time.time()
 
@@ -80,7 +81,7 @@ class test_multiprocess(unittest.TestCase):
         for i in inputArray:
             result.append(f(i))
         took = time.time() - t2
-        print "Serial processing took: %(took)s" % locals()
+        print("Serial processing took: %(took)s" % locals())
 
     def test_multiprocess_function_exception(self):
 
@@ -93,9 +94,9 @@ class test_multiprocess(unittest.TestCase):
             )
             this.get()
             assert False
-        except Exception, e:
+        except Exception as e:
             assert True
-            print str(e)
+            print(str(e))
 
         # x-print-testpage-for-pessto-marshall-web-object
 

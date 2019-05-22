@@ -61,7 +61,7 @@ def setup_database_connection(
     try:
         logging.info(
             'importing the yaml database connection dictionary from ' + pathToYamlFile)
-        stream = file(pathToYamlFile, 'r')
+        stream = open(pathToYamlFile, 'r')
         connDict = yaml.load(stream)
     except:
         logging.critical(

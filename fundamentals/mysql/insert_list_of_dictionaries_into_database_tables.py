@@ -9,6 +9,7 @@
 :Date Created:
     June 21, 2016
 """
+from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
 import sys
 import os
@@ -126,7 +127,7 @@ def insert_list_of_dictionaries_into_database_tables(
         totalCount = total + 1
         ltotalCount = totalCount
 
-        print "Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals()
+        print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
 
         if dbSettings == False:
 
@@ -149,7 +150,7 @@ def insert_list_of_dictionaries_into_database_tables(
                           dbSettings=dbSettings, dateModified=dateModified)
 
         sys.stdout.write("\x1b[1A\x1b[2K")
-        print "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals()
+        print("%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals())
 
     log.debug(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')

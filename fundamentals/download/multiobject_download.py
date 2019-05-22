@@ -11,6 +11,7 @@ There are options to rename all the downloaded resource, index the files, set di
 :Date Created:
     March  3, 2016
 """
+from __future__ import print_function
 ################# GLOBAL IMPORTS ####################
 import sys
 import os
@@ -175,7 +176,7 @@ def multiobject_download(
                 # CURSOR UP ONE LINE AND CLEAR LINE
                 sys.stdout.write("\x1b[1A\x1b[2K")
             percent = (float(urlNum) / float(totalCount)) * 100.
-            print "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals()
+            print("  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
 
             if(body):
                 bodies.extend([body])
@@ -192,7 +193,7 @@ def multiobject_download(
                 bodies = []
                 theseUrls = []
             i += 1
-    except Exception, e:
+    except Exception as e:
         log.error(
             "something went wrong with the mutli-threaded download : " + str(e) + "\n")
 

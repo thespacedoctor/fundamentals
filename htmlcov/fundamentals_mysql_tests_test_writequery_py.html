@@ -1,16 +1,10 @@
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    
-    
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
     <title>Coverage for fundamentals/mysql/tests/test_writequery.py: 0%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
-    
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
     <script type="text/javascript" src="jquery.isonscreen.js"></script>
@@ -20,26 +14,20 @@
     </script>
 </head>
 <body class="pyfile">
-
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/tests/test_writequery.py</b> :
             <span class="pc_cov">0%</span>
         </h1>
-
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
-
         <h2 class="stats">
             38 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
             <span class="mis shortkey_m button_toggle_mis">38 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
-
-            
         </h2>
     </div>
 </div>
-
 <div class="help_panel">
     <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
     <p class="legend">Hot-keys on this page</p>
@@ -62,7 +50,6 @@
     </p>
     </div>
 </div>
-
 <div id="source">
     <table>
         <tr>
@@ -163,7 +150,6 @@
 <p id="n94" class="pln"><a href="#n94">94</a></p>
 <p id="n95" class="pln"><a href="#n95">95</a></p>
 <p id="n96" class="pln"><a href="#n96">96</a></p>
-
             </td>
             <td class="text">
 <p id="t1" class="stm mis"><span class="key">import</span> <span class="nam">os</span><span class="strut">&nbsp;</span></p>
@@ -178,16 +164,16 @@
 <p id="t10" class="stm mis"><span class="key">from</span> <span class="nam">fundamentals</span> <span class="key">import</span> <span class="nam">tools</span><span class="strut">&nbsp;</span></p>
 <p id="t11" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t12" class="stm mis"><span class="nam">su</span> <span class="op">=</span> <span class="nam">tools</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
-<p id="t13" class="pln">    <span class="nam">arguments</span><span class="op">=</span><span class="op">{</span><span class="str">"settingsFile"</span><span class="op">:</span> <span class="nam">None</span><span class="op">}</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t13" class="pln">    <span class="nam">arguments</span><span class="op">=</span><span class="op">{</span><span class="str">"settingsFile"</span><span class="op">:</span> <span class="key">None</span><span class="op">}</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t14" class="pln">    <span class="nam">docString</span><span class="op">=</span><span class="nam">__doc__</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t15" class="pln">    <span class="nam">logLevel</span><span class="op">=</span><span class="str">"DEBUG"</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t16" class="pln">    <span class="nam">options_first</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t16" class="pln">    <span class="nam">options_first</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t17" class="pln">    <span class="nam">projectName</span><span class="op">=</span><span class="str">"fundamentals"</span><span class="strut">&nbsp;</span></p>
 <p id="t18" class="pln"><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t19" class="stm mis"><span class="nam">arguments</span><span class="op">,</span> <span class="nam">settings</span><span class="op">,</span> <span class="nam">log</span><span class="op">,</span> <span class="nam">dbConn</span> <span class="op">=</span> <span class="nam">su</span><span class="op">.</span><span class="nam">setup</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t20" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t21" class="pln"><span class="com"># load settings</span><span class="strut">&nbsp;</span></p>
-<p id="t22" class="stm mis"><span class="nam">stream</span> <span class="op">=</span> <span class="nam">file</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
+<p id="t22" class="stm mis"><span class="nam">stream</span> <span class="op">=</span> <span class="nam">open</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t23" class="pln">    <span class="str">"/Users/Dave/.config/fundamentals/fundamentals.yaml"</span><span class="op">,</span> <span class="str">'r'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t24" class="stm mis"><span class="nam">settings</span> <span class="op">=</span> <span class="nam">yaml</span><span class="op">.</span><span class="nam">load</span><span class="op">(</span><span class="nam">stream</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t25" class="stm mis"><span class="nam">stream</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -204,24 +190,24 @@
 <p id="t36" class="stm mis">    <span class="key">def</span> <span class="nam">test_writequery_function</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t37" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t38" class="stm mis">        <span class="key">from</span> <span class="nam">fundamentals</span><span class="op">.</span><span class="nam">mysql</span> <span class="key">import</span> <span class="nam">writequery</span><span class="strut">&nbsp;</span></p>
-<p id="t39" class="stm mis">        <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"</span><span class="strut">&nbsp;</span></p>
+<p id="t39" class="stm mis">        <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"CREATE TABLE  IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"</span><span class="strut">&nbsp;</span></p>
 <p id="t40" class="stm mis">        <span class="nam">writequery</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t41" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t42" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t43" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t44" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t45" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t44" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t45" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
 <p id="t46" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t47" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t48" class="stm mis">    <span class="key">def</span> <span class="nam">test_manyvalue_insert</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t49" class="stm mis">        <span class="key">from</span> <span class="nam">fundamentals</span><span class="op">.</span><span class="nam">mysql</span> <span class="key">import</span> <span class="nam">writequery</span><span class="strut">&nbsp;</span></p>
-<p id="t50" class="stm mis">        <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"</span><span class="strut">&nbsp;</span></p>
+<p id="t50" class="stm mis">        <span class="nam">sqlQuery</span> <span class="op">=</span> <span class="str">"CREATE TABLE  IF NOT EXISTS  `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"</span><span class="strut">&nbsp;</span></p>
 <p id="t51" class="stm mis">        <span class="nam">writequery</span><span class="op">(</span><span class="strut">&nbsp;</span></p>
 <p id="t52" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t53" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t54" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t55" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t56" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t55" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t56" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
 <p id="t57" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t58" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t59" class="stm mis">        <span class="key">from</span> <span class="nam">fundamentals</span><span class="op">.</span><span class="nam">mysql</span> <span class="key">import</span> <span class="nam">writequery</span><span class="strut">&nbsp;</span></p>
@@ -230,7 +216,7 @@
 <p id="t62" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t63" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t64" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t65" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t65" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t66" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="op">[</span><span class="op">(</span><span class="num">1</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">2</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">3</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">4</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">5</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">6</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">7</span><span class="op">,</span><span class="op">)</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t67" class="pln">                           <span class="op">(</span><span class="num">8</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">9</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">10</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">11</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">(</span><span class="num">12</span><span class="op">,</span><span class="op">)</span><span class="op">,</span> <span class="op">]</span><span class="strut">&nbsp;</span></p>
 <p id="t68" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
@@ -243,8 +229,8 @@
 <p id="t75" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t76" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t77" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t78" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="nam">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t79" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t78" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="key">False</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t79" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
 <p id="t80" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t81" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t82" class="stm mis">    <span class="key">def</span> <span class="nam">test_writequery_error_force</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
@@ -255,27 +241,24 @@
 <p id="t87" class="pln">            <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t88" class="pln">            <span class="nam">sqlQuery</span><span class="op">=</span><span class="nam">sqlQuery</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t89" class="pln">            <span class="nam">dbConn</span><span class="op">=</span><span class="nam">dbConn</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t90" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="nam">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t91" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="nam">False</span><span class="strut">&nbsp;</span></p>
+<p id="t90" class="pln">            <span class="nam">Force</span><span class="op">=</span><span class="key">True</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t91" class="pln">            <span class="nam">manyValueList</span><span class="op">=</span><span class="key">False</span><span class="strut">&nbsp;</span></p>
 <p id="t92" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t93" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t94" class="pln">        <span class="com"># x-print-testpage-for-pessto-marshall-web-object</span><span class="strut">&nbsp;</span></p>
 <p id="t95" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t96" class="pln">    <span class="com"># x-class-to-test-named-worker-function</span><span class="strut">&nbsp;</span></p>
-
             </td>
         </tr>
     </table>
 </div>
-
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.3.4</a>,
-            created at 2017-02-07 08:12
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io/en/coverage-5.0a5">coverage.py v5.0a5</a>,
+            created at 2019-05-21 16:52
         </p>
     </div>
 </div>
-
 </body>
 </html>

@@ -41,7 +41,7 @@ setup(
         'pyprof2calltree',
         'nose2',
         'cov-core',
-        'pymysql',
+        'pymysql==0.9.0',
         'multiprocess',
         'pandas',
         'psutil'

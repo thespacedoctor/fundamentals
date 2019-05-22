@@ -38,7 +38,7 @@ def _dump_files_to_local_drive(bodies, theseUrls, log):
                     f.write(body)
                 f.close()
             j += 1
-        except Exception, e:
+        except Exception as e:
             log.error(
                 "could not write downloaded file to local drive - failed with this error %s: " %
                 (str(e),))

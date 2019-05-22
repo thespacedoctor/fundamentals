@@ -1,4 +1,5 @@
 """
 *Render python objects as various list and markup formats *
 """
-from list_of_dictionaries import list_of_dictionaries
+from __future__ import absolute_import
+from .list_of_dictionaries import list_of_dictionaries
