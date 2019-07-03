@@ -68,6 +68,8 @@ def fmultiprocess(
     if chunksize == 0:
         chunksize = 1
 
+    # chunksize = 1
+
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
     if "log" in inspect.getargspec(function)[0]:
         mapfunc = partial(function, log=log, **kwargs)
@@ -79,7 +81,8 @@ def fmultiprocess(
     resultArray = resultArray.get(timeout=timeout)
 
     p.close()
-    p.terminate()
+    p.join()
+    # p.terminate()
 
     log.debug('completed the ``multiprocess`` function')
     return resultArray

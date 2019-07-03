@@ -181,6 +181,7 @@ def writequery(
                 (sqlQuery, str(e)))
             if Force == False:
                 sys.exit(0)
+            cursor.close()
             return -1
     dbConn.commit()
     # CLOSE THE CURSOR
