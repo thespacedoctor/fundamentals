@@ -134,7 +134,6 @@ def insert_list_of_dictionaries_into_database_tables(
         print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
 
         if dbSettings == False:
-
             fmultiprocess(
                 log=log,
                 function=_insert_single_batch_into_database,
@@ -232,7 +231,7 @@ def _insert_single_batch_into_database(
         uniKeys = tmp
 
         myKeys = '`,`'.join(uniKeys)
-        vals = [tuple([None if d[k] in ["None", None] else str(d[k])
+        vals = [tuple([None if d[k] in ["None", None] else unicode(d[k])
                        for k in uniKeys]) for d in batch[0]]
         valueString = ("%s, " * len(vals[0]))[:-2]
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \
@@ -270,7 +269,6 @@ def _insert_single_batch_into_database(
         except:
             theseInserts = []
             for aDict in batch[0]:
-
                 insertCommand, valueTuple = convert_dictionary_to_mysql_table(
                     dbConn=dbConn,
                     log=log,
@@ -424,6 +422,8 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         os.remove('/tmp/%(tmpTable)s' % locals())
     except:
         pass
+
+    dbConn.close()
 
     log.debug(
         'completed the ``_add_dictlist_to_database_via_load_in_file`` function')

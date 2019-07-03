@@ -399,7 +399,7 @@ def convert_dictionary_to_mysql_table(
             """` (`""" + myKeys + """`, dateCreated) VALUES (""" + \
             valueString + """, NOW())"""
         mv = []
-        mv[:] = [None if m == "None" else m for m in myValues]
+        mv[:] = [None if m == u"None" else m for m in myValues]
         valueTuple = tuple(mv)
 
         dup = ""

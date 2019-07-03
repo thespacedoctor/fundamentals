@@ -20,7 +20,6 @@ import pickle
 import time
 from subprocess import Popen, PIPE, STDOUT
 import pymysql as ms
-# import pymysql as ms
 from docopt import docopt
 from fundamentals.mysql import readquery
 
@@ -91,12 +90,13 @@ class database(object):
 
         See the class docstring for usage
         """
-        self.log.debug('starting the ``get`` method')
+        self.log.debug('starting the ``connect`` method')
 
         dbSettings = self.dbSettings
 
         port = False
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
+            print("try tunnel setup")
             port = self._setup_tunnel(
                 tunnelParameters=dbSettings["tunnel"]
             )
@@ -113,7 +113,7 @@ class database(object):
             db=dbName,
             port=port,
             use_unicode=True,
-            charset='utf8',
+            charset='utf8mb4',
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
             connect_timeout=36000,
@@ -122,7 +122,7 @@ class database(object):
         if self.autocommit:
             dbConn.autocommit(True)
 
-        self.log.debug('completed the ``get`` method')
+        self.log.debug('completed the ``connect`` method')
         return dbConn
 
     def _setup_tunnel(
