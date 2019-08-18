@@ -44,10 +44,10 @@ for i in range(100000):
 
 dbSettings = dbSettings = {
     'host': '127.0.0.1',
-    'user': 'unittesting',
+    'user': 'utuser',
     'tunnel': False,
     'password': 'utpass',
-    'db': 'dryx_unit_testing'
+    'db': 'unit_tests'
 }
 
 

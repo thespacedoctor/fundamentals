@@ -1,5 +1,5 @@
-fundamentals.download.\_fetch module
-====================================
+fundamentals\.download\.\_fetch module
+======================================
 
 .. automodule:: fundamentals.download._fetch
     :members:

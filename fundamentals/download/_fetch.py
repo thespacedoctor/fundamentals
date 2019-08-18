@@ -35,6 +35,7 @@ def _fetch(url,):
     import socket
     from eventlet import Timeout
     from eventlet.green import urllib2
+    import urllib
     import sys
 
     # TRY AND DOWNLOAD X TIMES BEFORE QUITING

@@ -1,5 +1,5 @@
-fundamentals.commonutils.getpackagepath module
-==============================================
+fundamentals\.commonutils\.getpackagepath module
+================================================
 
 .. automodule:: fundamentals.commonutils.getpackagepath
     :members:

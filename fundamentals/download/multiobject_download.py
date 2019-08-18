@@ -21,6 +21,7 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
+import urllib
 
 
 def multiobject_download(
@@ -101,8 +102,9 @@ def multiobject_download(
     requestList = []
 
     totalCount = len(urlList)
+
     # IF ONLY ONE DOWNLOAD DIRECORY
-    if isinstance(downloadDirectory, str):
+    if isinstance(downloadDirectory, ("".__class__, u"".__class__)):
         for i, url in enumerate(urlList):
             # EXTRACT THE FILENAME FROM THE URL
             if resetFilename and len(resetFilename):
@@ -136,6 +138,7 @@ def multiobject_download(
             requestList.append(request)
 
     elif isinstance(downloadDirectory, list):
+
         for u, d in zip(urlList, downloadDirectory):
             # EXTRACT THE FILENAME FROM THE URL
             if resetFilename:
@@ -157,6 +160,7 @@ def multiobject_download(
 
             # GENERATE THE REQUESTS
             request = urllib.request.Request(u)
+
             if credentials != False:
                 log.debug('adding the credentials')
                 username = credentials["username"]
@@ -180,7 +184,8 @@ def multiobject_download(
                 # CURSOR UP ONE LINE AND CLEAR LINE
                 sys.stdout.write("\x1b[1A\x1b[2K")
             percent = (float(urlNum) / float(totalCount)) * 100.
-            print("  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
+            print(
+                "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
 
             if(body):
                 bodies.extend([body])

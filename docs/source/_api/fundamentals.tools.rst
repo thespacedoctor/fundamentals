@@ -1,5 +1,5 @@
-fundamentals.tools module
-=========================
+fundamentals\.tools module
+==========================
 
 .. automodule:: fundamentals.tools
     :members:

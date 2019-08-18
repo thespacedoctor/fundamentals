@@ -101,9 +101,9 @@ And finally I also have a ``default-settings.yaml`` file at the root of my pytho
     
     version: 1
     database settings:
-        db: dryx_unit_testing
+        db: unit_tests
         host: localhost
-        user: unittesting
+        user: utuser
         password: utpass
         sshPort: False
         loginPath: unittesting

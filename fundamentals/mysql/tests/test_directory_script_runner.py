@@ -51,7 +51,7 @@ class test_directory_script_runner(unittest.TestCase):
         directory_script_runner(
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            databaseName="dryx_unit_testing",
+            databaseName="unit_tests",
             loginPath="unittesting"
         )
 
@@ -61,7 +61,7 @@ class test_directory_script_runner(unittest.TestCase):
         directory_script_runner(
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            databaseName="dryx_unit_testing",
+            databaseName="unit_tests",
             loginPath="unittesting",
             successRule="passed",
             failureRule="failed"
@@ -73,7 +73,7 @@ class test_directory_script_runner(unittest.TestCase):
         directory_script_runner(
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            databaseName="dryx_unit_testing",
+            databaseName="unit_tests",
             loginPath="unittesting",
             successRule="delete",
             failureRule="failed"
@@ -85,7 +85,7 @@ class test_directory_script_runner(unittest.TestCase):
         directory_script_runner(
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            databaseName="dryx_unit_testing",
+            databaseName="unit_tests",
             loginPath="unittesting",
             successRule="delete",
             failureRule="delete"
@@ -98,7 +98,7 @@ class test_directory_script_runner(unittest.TestCase):
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
             force=True,
-            databaseName="dryx_unit_testing",
+            databaseName="unit_tests",
             loginPath="unittesting",
             successRule="delete",
             failureRule="failed"

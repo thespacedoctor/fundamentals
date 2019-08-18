@@ -1,5 +1,5 @@
-fundamentals.commonutils package
-================================
+fundamentals\.commonutils package
+=================================
 
 .. automodule:: fundamentals.commonutils
     :members:

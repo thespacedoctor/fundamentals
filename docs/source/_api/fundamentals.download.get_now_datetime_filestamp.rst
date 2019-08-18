@@ -1,5 +1,5 @@
-fundamentals.download.get\_now\_datetime\_filestamp module
-==========================================================
+fundamentals\.download\.get\_now\_datetime\_filestamp module
+============================================================
 
 .. automodule:: fundamentals.download.get_now_datetime_filestamp
     :members:

@@ -1,5 +1,5 @@
-fundamentals.files.fileChunker module
-=====================================
+fundamentals\.files\.fileChunker module
+=======================================
 
 .. automodule:: fundamentals.files.fileChunker
     :members:

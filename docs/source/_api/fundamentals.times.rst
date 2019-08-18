@@ -1,5 +1,5 @@
-fundamentals.times module
-=========================
+fundamentals\.times module
+==========================
 
 .. automodule:: fundamentals.times
     :members:

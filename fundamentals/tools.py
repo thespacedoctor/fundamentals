@@ -71,11 +71,11 @@ class tools(object):
 
             version: 1
             database settings:
-                db: dryx_unit_testing
+                db: unit_tests
                 host: localhost
-                user: unittesting
+                user: utuser
                 password: utpass
-                tunnel: True
+                tunnel: true
 
             # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
             # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
@@ -131,10 +131,18 @@ class tools(object):
         self.docString = docString
         self.logLevel = logLevel
 
+        version = None
+        try:
+            import pkg_resources
+            version = pkg_resources.get_distribution(projectName).version
+        except:
+            pass
+
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
         if arguments == None:
-            arguments = docopt(docString, options_first=options_first)
+            arguments = docopt(docString, version=version,
+                               options_first=options_first)
         self.arguments = arguments
 
         # BUILD A STRING FOR THE PROCESS TO MATCH RUNNING PROCESSES AGAINST

@@ -1,5 +1,5 @@
-fundamentals.mysql.database module
-==================================
+fundamentals\.mysql\.database module
+====================================
 
 .. automodule:: fundamentals.mysql.database
     :members:

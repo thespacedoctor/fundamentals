@@ -1,5 +1,5 @@
-fundamentals.mysql.readquery module
-===================================
+fundamentals\.mysql\.readquery module
+=====================================
 
 .. automodule:: fundamentals.mysql.readquery
     :members:

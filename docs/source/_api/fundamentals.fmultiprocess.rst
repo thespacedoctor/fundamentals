@@ -1,5 +1,5 @@
-fundamentals.fmultiprocess module
-=================================
+fundamentals\.fmultiprocess module
+==================================
 
 .. automodule:: fundamentals.fmultiprocess
     :members:

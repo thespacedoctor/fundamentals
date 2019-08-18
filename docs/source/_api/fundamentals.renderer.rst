@@ -1,5 +1,5 @@
-fundamentals.renderer package
-=============================
+fundamentals\.renderer package
+==============================
 
 .. automodule:: fundamentals.renderer
     :members:
