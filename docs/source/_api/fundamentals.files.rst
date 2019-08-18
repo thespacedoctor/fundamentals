@@ -1,5 +1,5 @@
-fundamentals.files package
-==========================
+fundamentals\.files package
+===========================
 
 .. automodule:: fundamentals.files
     :members:

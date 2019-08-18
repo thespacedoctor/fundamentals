@@ -1,5 +1,5 @@
-fundamentals.renderer.list\_of\_dictionaries module
-===================================================
+fundamentals\.renderer\.list\_of\_dictionaries module
+=====================================================
 
 .. automodule:: fundamentals.renderer.list_of_dictionaries
     :members:

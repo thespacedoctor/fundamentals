@@ -40,9 +40,9 @@ def setup_database_connection(
 
         .. code-block:: yaml
 
-            db: dryx_unit_testing
+            db: unit_tests
             host: localhost
-            user: unittesting
+            user: utuser
             password: utpass
 
         And here's how to generate the connection object:

@@ -1,5 +1,5 @@
-fundamentals.download package
-=============================
+fundamentals\.download package
+==============================
 
 .. automodule:: fundamentals.download
     :members:

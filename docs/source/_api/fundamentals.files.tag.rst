@@ -1,5 +1,5 @@
-fundamentals.files.tag module
-=============================
+fundamentals\.files\.tag module
+===============================
 
 .. automodule:: fundamentals.files.tag
     :members:

@@ -49,7 +49,7 @@ if not os.path.exists(pathToOutputDir):
 # xt-setup-unit-testing-files-and-folders
 
 dbSettings = settings["database settings"]["atlasMovers"]
-dbSettings2 = settings["database settings"]["dryx_unit_testing"]
+dbSettings2 = settings["database settings"]["unit_tests"]
 
 
 class test_database(unittest.TestCase):

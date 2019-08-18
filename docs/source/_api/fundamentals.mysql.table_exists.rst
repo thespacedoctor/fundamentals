@@ -1,5 +1,5 @@
-fundamentals.mysql.table\_exists module
-=======================================
+fundamentals\.mysql\.table\_exists module
+=========================================
 
 .. automodule:: fundamentals.mysql.table_exists
     :members:

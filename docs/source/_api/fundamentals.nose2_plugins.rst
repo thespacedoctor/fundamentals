@@ -1,5 +1,5 @@
-fundamentals.nose2\_plugins package
-===================================
+fundamentals\.nose2\_plugins package
+====================================
 
 .. automodule:: fundamentals.nose2_plugins
     :members:

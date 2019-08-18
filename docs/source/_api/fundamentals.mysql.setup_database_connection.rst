@@ -1,5 +1,5 @@
-fundamentals.mysql.setup\_database\_connection module
-=====================================================
+fundamentals\.mysql\.setup\_database\_connection module
+=======================================================
 
 .. automodule:: fundamentals.mysql.setup_database_connection
     :members:

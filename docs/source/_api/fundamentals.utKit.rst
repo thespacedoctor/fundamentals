@@ -1,5 +1,5 @@
-fundamentals.utKit module
-=========================
+fundamentals\.utKit module
+==========================
 
 .. automodule:: fundamentals.utKit
     :members:

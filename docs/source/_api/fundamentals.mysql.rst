@@ -1,5 +1,5 @@
-fundamentals.mysql package
-==========================
+fundamentals\.mysql package
+===========================
 
 .. automodule:: fundamentals.mysql
     :members:

@@ -80,9 +80,9 @@ class utKit(object):
 
         self.dbConfig = """
         version: 1
-        db: dryx_unit_testing
+        db: unit_tests
         host: localhost
-        user: unittesting
+        user: utuser
         password: utpass
         """
 

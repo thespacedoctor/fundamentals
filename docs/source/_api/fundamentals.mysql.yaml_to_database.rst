@@ -1,5 +1,5 @@
-fundamentals.mysql.yaml\_to\_database module
-============================================
+fundamentals\.mysql\.yaml\_to\_database module
+==============================================
 
 .. automodule:: fundamentals.mysql.yaml_to_database
     :members:

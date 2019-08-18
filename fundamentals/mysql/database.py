@@ -96,7 +96,6 @@ class database(object):
 
         port = False
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
-            print("try tunnel setup")
             port = self._setup_tunnel(
                 tunnelParameters=dbSettings["tunnel"]
             )
