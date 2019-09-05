@@ -474,7 +474,7 @@ class list_of_dictionaries(object):
                 dataSet.mysql("testing_table", "/path/to/myfile.sql")
 
         """
-        self.log.debug('starting the ``csv`` method')
+        self.log.debug('starting the ``mysql`` method')
 
         import re
         if createStatement and "create table if not exists" not in createStatement.lower():
@@ -493,11 +493,11 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = open(filepath, mode='w')
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``csv`` method')
+        self.log.debug('completed the ``mysql`` method')
         return renderedData
 
     def _list_of_dictionaries_to_csv(
