@@ -99,7 +99,6 @@ def writequery(
                 if len(thisList) < batch:
                     stop = 1
     except pymysql.err.ProgrammingError as e:
-        sqlQueryTrim = sqlQuery[:1000]
         message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
                                                                                                        str(e))
         if Force == False:
@@ -155,7 +154,6 @@ def writequery(
                 raise
 
         else:
-            sqlQueryTrim = sqlQuery[:1000]
             message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
                                                                                                            str(e))
             if Force == False:
@@ -175,7 +173,6 @@ def writequery(
             log.warning('Duplicate Key error: %s\n' % (str(e), ))
             message = "duplicate key error"
         else:
-            sqlQuery = sqlQuery[:2000]
             log.error(
                 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' %
                 (sqlQuery, str(e)))
