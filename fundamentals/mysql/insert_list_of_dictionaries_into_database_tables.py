@@ -133,7 +133,7 @@ def insert_list_of_dictionaries_into_database_tables(
 
         print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
 
-        if dbSettings == False or 1 == 1:
+        if dbSettings == False:
             fmultiprocess(
                 log=log,
                 function=_insert_single_batch_into_database,
@@ -266,6 +266,8 @@ def _insert_single_batch_into_database(
                 Force=True,
                 manyValueList=vals
             )
+            print(insertCommand)
+            print(vals)
         except:
             theseInserts = []
             for aDict in batch[0]:
