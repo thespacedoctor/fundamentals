@@ -259,6 +259,8 @@ def _insert_single_batch_into_database(
         # log.debug('adding new data to the %s table; query: %s' %
         # (dbTableName, addValue))
         try:
+            print(insertCommand)
+            print(vals)
             message = writequery(
                 log=log,
                 sqlQuery=insertCommand,
@@ -266,8 +268,6 @@ def _insert_single_batch_into_database(
                 Force=True,
                 manyValueList=vals
             )
-            print(insertCommand)
-            print(vals)
         except:
             theseInserts = []
             for aDict in batch[0]:
@@ -284,6 +284,9 @@ def _insert_single_batch_into_database(
                     skipChecks=True
                 )
                 theseInserts.append(valueTuple)
+
+            print(insertCommand)
+            print(theseInserts)
 
             message = ""
             # log.debug('adding new data to the %s table; query: %s' %
