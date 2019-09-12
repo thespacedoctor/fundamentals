@@ -100,6 +100,19 @@ def insert_list_of_dictionaries_into_database_tables(
         return None
 
     if len(dictList):
+        for d in dictList:
+            convert_dictionary_to_mysql_table(
+                dbConn=dbConn,
+                log=log,
+                dictionary=d,
+                dbTableName=dbTableName,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=dateModified,
+                reDatetime=reDate,
+                replace=replace,
+                dateCreated=dateCreated)
+        sys.exit(0)
+
         convert_dictionary_to_mysql_table(
             dbConn=dbConn,
             log=log,
