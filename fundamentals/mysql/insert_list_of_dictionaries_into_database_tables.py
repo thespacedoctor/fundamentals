@@ -101,7 +101,15 @@ def insert_list_of_dictionaries_into_database_tables(
 
     if len(dictList):
         # FIND BUG IN MYSQL QUERY BY UNCOMMENTING
-        for d in dictList:
+        tot = len(dictList)
+        for index, d in enumerate(dictList):
+            if index > 1:
+                # Cursor up one line and clear line
+                sys.stdout.write("\x1b[1A\x1b[2K")
+
+            percent = (float(index) / float(tot)) * 100.
+            print('%(index)s/%(tot)s (%(percent)1.1f%% done)' % locals())
+
             convert_dictionary_to_mysql_table(
                 dbConn=dbConn,
                 log=log,
