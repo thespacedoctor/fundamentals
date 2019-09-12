@@ -100,19 +100,19 @@ def insert_list_of_dictionaries_into_database_tables(
         return None
 
     if len(dictList):
-        # FIND BUG IN MYSQL QUERY BY UNCOMMENTING BELOW
-        # for d in dictList:
-        #     convert_dictionary_to_mysql_table(
-        #         dbConn=dbConn,
-        #         log=log,
-        #         dictionary=d,
-        #         dbTableName=dbTableName,
-        #         uniqueKeyList=uniqueKeyList,
-        #         dateModified=dateModified,
-        #         reDatetime=reDate,
-        #         replace=replace,
-        #         dateCreated=dateCreated)
-        # sys.exit(0)
+        # FIND BUG IN MYSQL QUERY BY UNCOMMENTING
+        for d in dictList:
+            convert_dictionary_to_mysql_table(
+                dbConn=dbConn,
+                log=log,
+                dictionary=d,
+                dbTableName=dbTableName,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=dateModified,
+                reDatetime=reDate,
+                replace=replace,
+                dateCreated=dateCreated)
+        sys.exit(0)
 
         convert_dictionary_to_mysql_table(
             dbConn=dbConn,
@@ -206,8 +206,6 @@ def _insert_single_batch_into_database(
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
-    from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
-    from fundamentals.mysql.database import database
     global totalCount
     global globalDbConn
     global sharedList
