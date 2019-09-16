@@ -241,10 +241,10 @@ def convert_dictionary_to_mysql_table(
 
         formattedKey = key.replace(" ", "_").replace("-", "_")
         # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
-        if formattedKey == "dec":
-            formattedKey = "decl"
-        if formattedKey == "DEC":
-            formattedKey = "DECL"
+        if formattedKey == u"dec":
+            formattedKey = u"decl"
+        if formattedKey == u"DEC":
+            formattedKey = u"DECL"
 
         formattedKeyList.extend([formattedKey])
         if len(key) > 0:
@@ -303,11 +303,11 @@ def convert_dictionary_to_mysql_table(
                     elif formattedKey == 'updated_parsed' or formattedKey == 'published_parsed' or formattedKey \
                             == 'feedName' or formattedKey == 'title':
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif isinstance(value[0], str) and len(value[0]) < 30:
+                    elif isinstance(value[0], ("".__class__, u"".__class__)) and len(value[0]) < 30:
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif isinstance(value[0], str) and len(value[0]) >= 30 and len(value[0]) < 80:
+                    elif isinstance(value[0], ("".__class__, u"".__class__)) and len(value[0]) >= 30 and len(value[0]) < 80:
                         qCreateColumn += '` varchar(100) DEFAULT NULL'
-                    elif isinstance(value[0], str):
+                    elif isinstance(value[0], ("".__class__, u"".__class__)):
                         columnLength = 450 + len(value[0]) * 2
                         qCreateColumn += '` varchar(' + str(
                             columnLength) + ') DEFAULT NULL'
@@ -324,7 +324,7 @@ def convert_dictionary_to_mysql_table(
                     else:
                         # log.debug('Do not know what format to add this key in
                         # MySQL - removing from dictionary: %s, %s'
-                                 # % (key, type(value[0])))
+                        # % (key, type(value[0])))
                         formattedKeyList.pop()
                         myValues.pop()
                         qCreateColumn = None
@@ -356,10 +356,10 @@ def convert_dictionary_to_mysql_table(
             for i in range(len(uniqueKeyList)):
                 uniqueKeyList[i] = uniqueKeyList[
                     i].replace(" ", "_").replace("-", "_")
-                if uniqueKeyList[i] == "dec":
-                    uniqueKeyList[i] = "decl"
-                if uniqueKeyList[i] == "DEC":
-                    uniqueKeyList[i] = "DECL"
+                if uniqueKeyList[i] == u"dec":
+                    uniqueKeyList[i] = u"decl"
+                if uniqueKeyList[i] == u"DEC":
+                    uniqueKeyList[i] = u"DECL"
 
             indexName = uniqueKeyList[0].replace(" ", "_").replace("-", "_")
             for i in range(len(uniqueKeyList) - 1):
@@ -415,6 +415,7 @@ def convert_dictionary_to_mysql_table(
         insertCommand = insertCommand.replace('!!python/unicode:', '')
         insertCommand = insertCommand.replace('!!python/unicode', '')
         insertCommand = insertCommand.replace('"None"', 'null')
+        insertCommand = insertCommand.replace('"null"', 'null')
 
         if not dateCreated:
             insertCommand = insertCommand.replace(
@@ -437,6 +438,7 @@ def convert_dictionary_to_mysql_table(
     myValues = myValues.replace('!!python/unicode:', '')
     myValues = myValues.replace('!!python/unicode', '')
     myValues = myValues.replace('"None"', 'null')
+    myValues = myValues.replace('"null"', 'null')
     # myValues = myValues.replace('"None', 'null')
 
     if myValues[-4:] != 'null':
@@ -481,6 +483,7 @@ def convert_dictionary_to_mysql_table(
     addValue = addValue.replace('!!python/unicode:', '')
     addValue = addValue.replace('!!python/unicode', '')
     addValue = addValue.replace('"None"', 'null')
+    addValue = addValue.replace('"null"', 'null')
     # log.debug(addValue)
 
     if returnInsertOnly == True:
