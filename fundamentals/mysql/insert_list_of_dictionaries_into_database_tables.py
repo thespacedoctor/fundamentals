@@ -19,7 +19,7 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
+from fundamentals.mysql import writequery
 from fundamentals.fmultiprocess import fmultiprocess
 import time
 import re
@@ -110,8 +110,7 @@ def insert_list_of_dictionaries_into_database_tables(
         #     percent = (float(index) / float(tot)) * 100.
         #     print('%(index)s/%(tot)s (%(percent)1.1f%% done)' % locals())
 
-        #     convert_dictionary_to_mysql_table(
-        #         dbConn=dbConn,
+        #             #         dbConn=dbConn,
         #         log=log,
         #         dictionary=d,
         #         dbTableName=dbTableName,
@@ -122,8 +121,7 @@ def insert_list_of_dictionaries_into_database_tables(
         #         dateCreated=dateCreated)
         # sys.exit(0)
 
-        convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
+                    dbConn = dbConn,
             log=log,
             dictionary=dictList[0],
             dbTableName=dbTableName,
@@ -291,8 +289,7 @@ def _insert_single_batch_into_database(
         except:
             theseInserts = []
             for aDict in batch[0]:
-                insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-                    dbConn=dbConn,
+                insertCommand, valueTuple =                     dbConn=dbConn,
                     log=log,
                     dictionary=aDict,
                     dbTableName=dbTableName,
@@ -318,8 +315,7 @@ def _insert_single_batch_into_database(
 
         if message == "unknown column":
             for aDict in batch:
-                convert_dictionary_to_mysql_table(
-                    dbConn=dbConn,
+                                    dbConn=dbConn,
                     log=log,
                     dictionary=aDict,
                     dbTableName=dbTableName,
@@ -339,7 +335,6 @@ def _insert_single_batch_into_database(
 
 def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
-        log,
         dbTablename,
         dbSettings,
         dateModified=False):
@@ -350,7 +345,6 @@ def _add_dictlist_to_database_via_load_in_file(
         - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
         - ``dbTablename`` -- the name of the database table to add the list to
         - ``dbSettings`` -- the dictionary of database settings
-        - ``log`` -- logger
         - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
 
     **Return:**
@@ -366,9 +360,14 @@ def _add_dictlist_to_database_via_load_in_file(
 
             usage code
     """
-    log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
+    from fundamentals.logs import emptyLogger
+    log = emptyLogger()
 
     global sharedList
+    from fundamentals.mysql.database import database
+    from datetime import datetime
+    from fundamentals.mysql import writequery
+    import pandas as pd
 
     dictList = sharedList[masterListIndex][0]
 
@@ -448,8 +447,6 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
 
     dbConn.close()
 
-    log.debug(
-        'completed the ``_add_dictlist_to_database_via_load_in_file`` function')
     return None
 
 # use the tab-trigger below for new function
