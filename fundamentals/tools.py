@@ -27,7 +27,11 @@ from . import logs as dl
 import time
 from docopt import docopt
 import psutil
-
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+from os.path import expanduser
 
 ###################################################################
 # CLASSES                                                         #
@@ -157,7 +161,7 @@ class tools(object):
                 continue
 
             test = "".join(this[1:])
-            if q.pid != os.getpid() and lockname == test:
+            if q.pid != os.getpid() and lockname == test and "--reload" not in test:
                 thisId = q.pid
                 print("This command is already running (see PID %(thisId)s)" % locals())
                 sys.exit(0)
@@ -209,7 +213,14 @@ class tools(object):
                         settingsFile, encoding='utf-8', mode='w')
 
                 import yaml
-                astream = open(settingsFile, 'r')
+                # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY
+                # PATH
+                with open(settingsFile) as f:
+                    content = f.read()
+                home = expanduser("~")
+                content = content.replace("~/", home + "/")
+                astream = StringIO(content)
+
                 if orderedSettings:
                     this = ordered_load(astream, yaml.SafeLoader)
                 else:
