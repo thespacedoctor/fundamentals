@@ -131,12 +131,21 @@ def setup_dryx_logging(yaml_file):
     import logging
     import logging.config
     import yaml
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
+    from os.path import expanduser
 
     # IMPORT CUSTOM HANDLER THAT ALLOWS GROUP WRITING
     handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
 
-    # IMPORT YAML LOGGING DICTIONARY
-    stream = open(yaml_file, 'r')
+    # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY PATH
+    with open(yaml_file) as f:
+        content = f.read()
+    home = expanduser("~")
+    content = content.replace("~/", home + "/")
+    stream = StringIO(content)
     yamlContent = yaml.load(stream)
     stream.close()
 
