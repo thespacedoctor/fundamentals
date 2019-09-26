@@ -339,7 +339,6 @@ def _insert_single_batch_into_database(
 
 def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
-        log,
         dbTablename,
         dbSettings,
         dateModified=False):
@@ -366,6 +365,8 @@ def _add_dictlist_to_database_via_load_in_file(
 
             usage code
     """
+    from fundamentals.logs import emptyLogger
+    log = emptyLogger()
     log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
 
     global sharedList

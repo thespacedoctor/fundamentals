@@ -40,6 +40,43 @@ def get_now_sql_datetime():
     return now
 
 
+def datetime_relative_to_now(date):
+    """
+    *convert date to a relative datetime (e.g. +15m, +2hr, +1w)*
+
+    **Key Arguments:**
+        - ``date`` -- absolute date
+
+    **Return:**
+        - a relative date
+
+    **Usage:**
+        .. code-block:: python 
+
+            from fundamentals import times
+            relTime = times.datetime_relative_to_now(date)
+    """
+    from datetime import datetime
+    diff = datetime.now() - date
+    s = diff.seconds
+    if diff.days == 1:
+        return ' + 1d'
+    elif diff.days > 1:
+        return ' +{0}d'.format(diff.days)
+    elif s <= 1:
+        return ' just now'
+    elif s < 60:
+        return ' +{0}sec'.format(s)
+    elif s < 120:
+        return ' +1min'
+    elif s < 3600:
+        return ' +{0}min'.format(s / 60)
+    elif s < 7200:
+        return ' +1hr'
+    else:
+        return ' +{0}hr'.format(s / 3600)
+
+
 def calculate_time_difference(startDate, endDate):
     """
     *Return the time difference between two dates as a string*
