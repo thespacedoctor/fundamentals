@@ -49,6 +49,7 @@ class tools(object):
         - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]
         - ``options_first`` -- options come before commands in CL usage. Default *False*.
         - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
+        - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by anohter name on PyPi). Default *False*
         - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
         - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
 
@@ -128,6 +129,7 @@ class tools(object):
             logLevel="WARNING",
             options_first=False,
             projectName=False,
+            distributionName=False,
             orderedSettings=False,
             defaultSettingsFile=False
     ):
@@ -135,17 +137,20 @@ class tools(object):
         self.docString = docString
         self.logLevel = logLevel
 
+        if not distributionName:
+            distributionName = projectName
+
         version = None
         try:
             import pkg_resources
-            version = pkg_resources.get_distribution(projectName).version
+            version = pkg_resources.get_distribution(distributionName).version
         except:
             pass
 
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
         if arguments == None:
-            arguments = docopt(docString, version=version,
+            arguments = docopt(docString, version="v" + version,
                                options_first=options_first)
         self.arguments = arguments
 
