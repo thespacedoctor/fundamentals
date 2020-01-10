@@ -80,7 +80,6 @@ def multiobject_download(
     import sys
     import os
     import eventlet
-    from eventlet.green import urllib2
     import socket
     import re
     import base64

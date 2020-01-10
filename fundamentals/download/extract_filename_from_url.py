@@ -45,7 +45,7 @@ def extract_filename_from_url(log, url):
     # EXTRACT THE FILENAME FROM THE URL
     try:
         log.debug("extracting filename from url " + url)
-        reEoURL = re.compile('([\w\.]*)$')
+        reEoURL = re.compile('([\w\.\_\-]*)$')
         filename = reEoURL.findall(url)[0]
         # log.debug(filename)
         if(len(filename) == 0):

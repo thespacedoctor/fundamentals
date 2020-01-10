@@ -140,7 +140,7 @@ class tools(object):
         if not distributionName:
             distributionName = projectName
 
-        version = None
+        version = '0.0.1'
         try:
             import pkg_resources
             version = pkg_resources.get_distribution(distributionName).version
