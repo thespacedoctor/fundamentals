@@ -253,7 +253,7 @@ def _insert_single_batch_into_database(
         uniKeys = tmp
 
         myKeys = '`,`'.join(uniKeys)
-        vals = [tuple([None if d[k] in ["None", None] else unicode(d[k])
+        vals = [tuple([None if d[k] in ["None", None] else d[k]
                        for k in uniKeys]) for d in batch[0]]
         valueString = ("%s, " * len(vals[0]))[:-2]
         insertCommand = insertVerb + """ INTO `""" + dbTableName + \

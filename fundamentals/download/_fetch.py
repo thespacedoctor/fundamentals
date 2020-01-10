@@ -34,7 +34,6 @@ def _fetch(url,):
     import logging as log
     import socket
     from eventlet import Timeout
-    from eventlet.green import urllib2
     import urllib
     import sys
 

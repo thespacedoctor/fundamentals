@@ -173,7 +173,7 @@ def convert_dictionary_to_mysql_table(
                                  (message, k, v, type(v)))
                     raise ValueError(message)
             else:
-                if not (isinstance(v, six.string_types) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, datetime.date) or v == None):
+                if not (isinstance(v, six.string_types) or isinstance(v, int) or isinstance(v, bool) or isinstance(v, float) or isinstance(v, datetime.date) or v == None or "int" in str(type(v))):
                     this = type(v)
                     message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool : %(k)s is a %(this)s' % locals(
                     )

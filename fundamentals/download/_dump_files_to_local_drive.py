@@ -35,7 +35,7 @@ def _dump_files_to_local_drive(bodies, theseUrls, log):
     for body in bodies:
         try:
             if theseUrls[j]:
-                with open(theseUrls[j], 'w') as f:
+                with open(theseUrls[j], 'wb') as f:
                     f.write(body)
                 f.close()
             j += 1

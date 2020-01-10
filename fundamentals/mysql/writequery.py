@@ -108,6 +108,11 @@ def writequery(
             log.warning(message)
     except pymysql.Error as e:
 
+        try:
+            e = e.args
+        except:
+            pass
+
         if e[0] == 1050 and 'already exists' in e[1]:
             log.info(str(e) + '\n')
         elif e[0] == 1062:
