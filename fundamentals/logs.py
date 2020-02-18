@@ -155,6 +155,13 @@ def setup_dryx_logging(yaml_file):
         yamlContent = yamlContent["logging settings"]
         yamlContent["version"] = 1
 
+    if "handlers" in yamlContent and "file" in yamlContent["handlers"] and "filename" in yamlContent["handlers"]["file"]:
+        loggingDir = os.path.dirname(
+            yamlContent["handlers"]["file"]["filename"])
+        # Recursively create missing directories
+        if not os.path.exists(loggingDir):
+            os.makedirs(loggingDir)
+
     logging.config.dictConfig(yamlContent)
     # SET THE ROOT LOGGER
     logger = logging.getLogger(__name__)

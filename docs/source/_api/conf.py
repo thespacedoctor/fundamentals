@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # fundamentals documentation build configuration file, created by
-# sphinx-quickstart on Fri Aug  2 13:54:22 2019.
+# sphinx-quickstart on Mon Jan 13 08:24:23 2020.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -18,7 +18,7 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, u'/Users/Dave/git_repos/fundamentals')
+# sys.path.insert(0, u'/Users/Dave/git_repos/_packages_/python/fundamentals')
 
 
 # -- General configuration ------------------------------------------------
@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'fundamentals'
-copyright = u'2019, Author'
+copyright = u'2020, Author'
 author = u'Author'
 
 # The version info for the project you're documenting, acts as replacement for
