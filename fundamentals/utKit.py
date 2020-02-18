@@ -103,19 +103,22 @@ class utKit(object):
         ## VARIABLES ##
         logging.config.dictConfig(yaml.load(self.loggerConfig))
         log = logging.getLogger(__name__)
-        connDict = yaml.load(self.dbConfig)
-        dbConn = ms.connect(
-            host=connDict['host'],
-            user=connDict['user'],
-            passwd=connDict['password'],
-            db=connDict['db'],
-            use_unicode=True,
-            charset='utf8',
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=3600
-        )
-        dbConn.autocommit(True)
+        if self.dbConfig:
+            connDict = yaml.load(self.dbConfig)
+            dbConn = ms.connect(
+                host=connDict['host'],
+                user=connDict['user'],
+                passwd=connDict['password'],
+                db=connDict['db'],
+                use_unicode=True,
+                charset='utf8',
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=3600
+            )
+            dbConn.autocommit(True)
+        else:
+            dbConn = False
 
         return log, dbConn, self.pathToInputDir, self.pathToOutputDir
 
