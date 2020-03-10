@@ -7,3 +7,5 @@ mdx_include
 lxml
 sphinxcontrib-mermaid
 sphinx_rtd_theme
+psutil
+docopt
