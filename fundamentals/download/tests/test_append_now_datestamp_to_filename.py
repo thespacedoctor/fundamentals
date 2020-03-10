@@ -5,7 +5,7 @@ import unittest
 import shutil
 import unittest
 import yaml
-from soxspipe.utKit import utKit
+from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
 home = expanduser("~")
