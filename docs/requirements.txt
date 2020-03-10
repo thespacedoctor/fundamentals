@@ -9,3 +9,4 @@ sphinxcontrib-mermaid
 sphinx_rtd_theme
 psutil
 docopt
+unicodecsv
