@@ -5,6 +5,7 @@ import unittest
 import shutil
 import unittest
 import yaml
+import pickle
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
