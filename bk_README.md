@@ -1,24 +1,25 @@
 # fundamentals
 
-[![Documentation Status](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge) [![Coverage Status](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/coverage.svg)](https://cdn.rawgit.com/thespacedoctor/fundamentals/master/htmlcov/index.html)
+[![](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge)
+[![](https://cdn.jsdelivr.net/gh/thespacedoctor/fundamentals@master/coverage.svg)](https://cdn.jsdelivr.net/gh/thespacedoctor/fundamentals@master/htmlcov/index.html)
 
-*Some project setup tools including logging, settings and database connections.*
 
-## Documentation
+*A python package and command-line tools for Some project setup tools including logging, settings and database connections.*.
 
-Documentation for *fundamentals* is hosted on [Read the Docs](http://fundamentals.readthedocs.org/en/stable/).
+Documentation for fundamentals is hosted by [Read the Docs](http://fundamentals.readthedocs.org/en/stable/) (last
+[stable version](http://fundamentals.readthedocs.org/en/stable/) and [latest version](http://fundamentals.readthedocs.org/en/latest/)). The code lives on [github](https://github.com/thespacedoctor/fundamentals). Please report any issues you find [here](https://github.com/thespacedoctor/fundamentals/issues).
 
 ## Installation
 
-The easiest way to install *fundamentals* is to use `pip`:
+The easiest way to install fundamentals is to use `pip`:
 
-```bash
+``` bash
 pip install fundamentals
 ```
 
 Or you can clone the [github repo](https://github.com/thespacedoctor/fundamentals) and install from a local version of the code:
 
-```bash
+``` bash
 git clone git@github.com:thespacedoctor/fundamentals.git
 cd fundamentals
 python setup.py install
@@ -32,14 +33,21 @@ pip install fundamentals --upgrade
 
 ## Development
 
-If you want to tinker with the code then [fork the repository](https://github.com/thespacedoctor/fundamentals/fork), clone it and install it in development mode. This allows you to modify the code in place from your locally cloned repository:
+If you want to tinker with the code, then install in development mode. This means you can modify the code from your cloned repo:
 
 ``` bash
+git clone git@github.com:thespacedoctor/fundamentals.git
+cd fundamentals
 python setup.py develop
 ```
 
-[Pull requests](https://github.com/thespacedoctor/fundamentals/pulls) are welcomed!
+[Pull requests](https://github.com/thespacedoctor/fundamentals/pulls) are welcomed! 
 
-## Issues
+<!-- ### Sublime Snippets
 
-Please report any issues [here](https://github.com/thespacedoctor/fundamentals/issues).
+If you use [Sublime Text](https://www.sublimetext.com/) as your code editor, and you're planning to develop your own python code with fundamentals, you might find [my Sublime Snippets](https://github.com/thespacedoctor/fundamentals-Sublime-Snippets) useful. -->
+
+
+
+
+
