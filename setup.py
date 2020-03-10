@@ -11,7 +11,8 @@ def readme():
 
 install_requires = [
     'pyyaml',
-    'fundamentals'
+    'fundamentals',
+    'docopt'
 ]
 
 # READ THE DOCS SERVERS
