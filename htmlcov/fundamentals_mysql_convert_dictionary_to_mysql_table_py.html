@@ -30,9 +30,9 @@
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
 
         <h2 class="stats">
-            240 statements &nbsp;
+            242 statements &nbsp;
             <span class="run hide_run shortkey_r button_toggle_run">0 run</span>
-            <span class="mis shortkey_m button_toggle_mis">240 missing</span>
+            <span class="mis shortkey_m button_toggle_mis">242 missing</span>
             <span class="exc shortkey_x button_toggle_exc">0 excluded</span>
 
             
@@ -571,9 +571,11 @@
 <p id="n502" class="stm mis"><a href="#n502">502</a></p>
 <p id="n503" class="stm mis"><a href="#n503">503</a></p>
 <p id="n504" class="pln"><a href="#n504">504</a></p>
-<p id="n505" class="pln"><a href="#n505">505</a></p>
+<p id="n505" class="stm mis"><a href="#n505">505</a></p>
 <p id="n506" class="stm mis"><a href="#n506">506</a></p>
-<p id="n507" class="stm mis"><a href="#n507">507</a></p>
+<p id="n507" class="pln"><a href="#n507">507</a></p>
+<p id="n508" class="stm mis"><a href="#n508">508</a></p>
+<p id="n509" class="stm mis"><a href="#n509">509</a></p>
 
             </td>
             <td class="text">
@@ -1079,11 +1081,13 @@
 <p id="t500" class="pln">        <span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t501" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t502" class="stm mis">    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
-<p id="t503" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="str">"could not add new data added to the table '"</span> <span class="op">+</span><span class="strut">&nbsp;</span></p>
-<p id="t504" class="pln">                  <span class="nam">dbTableName</span> <span class="op">+</span> <span class="str">"' : "</span> <span class="op">+</span> <span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span> <span class="op">+</span> <span class="str">'\n'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t505" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t506" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``convert_dictionary_to_mysql_table`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
-<p id="t507" class="stm mis">    <span class="key">return</span> <span class="nam">None</span><span class="op">,</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
+<p id="t503" class="stm mis">        <span class="nam">message</span> <span class="op">=</span> <span class="str">"could not add new data added to the table '"</span> <span class="op">+</span> <span class="xx">\</span><span class="strut">&nbsp;</span></p>
+<p id="t504" class="pln">            <span class="nam">dbTableName</span> <span class="op">+</span> <span class="str">"' : "</span> <span class="op">+</span> <span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span> <span class="op">+</span> <span class="str">'\n'</span><span class="strut">&nbsp;</span></p>
+<p id="t505" class="stm mis">        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="nam">message</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t506" class="stm mis">        <span class="key">raise</span> <span class="nam">Exception</span><span class="strut">&nbsp;</span></p>
+<p id="t507" class="pln"><span class="strut">&nbsp;</span></p>
+<p id="t508" class="stm mis">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``convert_dictionary_to_mysql_table`` function'</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
+<p id="t509" class="stm mis">    <span class="key">return</span> <span class="nam">None</span><span class="op">,</span> <span class="nam">None</span><span class="strut">&nbsp;</span></p>
 
             </td>
         </tr>
@@ -1094,7 +1098,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.5.3</a>,
-            created at 2020-03-10 14:32
+            created at 2020-03-10 14:54
         </p>
     </div>
 </div>

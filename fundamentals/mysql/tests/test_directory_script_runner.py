@@ -41,8 +41,8 @@ if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
 
-shutil.copytree(pathToInputDir + "/mysql_scripts",
-                pathToOutputDir + "/mysql_scripts")
+# shutil.copytree(pathToInputDir + "/mysql_scripts",
+#                 pathToOutputDir + "/mysql_scripts")
 
 
 class test_directory_script_runner(unittest.TestCase):

@@ -5,6 +5,7 @@ import unittest
 import shutil
 import unittest
 import yaml
+import re
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -48,7 +49,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def test_convert_dictionary_to_mysql_table_function(self):
         from fundamentals.mysql import writequery
-        sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', PRIMARY KEY (`id`))"
+        sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL  AUTO_INCREMENT,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', `dateCreated` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP, `dateModified` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`) )"
         writequery(
             log=log,
             sqlQuery=sqlQuery,
@@ -67,7 +68,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dbTableName="testing_table",
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
             createHelperTables=False,
-            dateModified=False,
+            dateModified=True,
             returnInsertOnly=False
         )
 

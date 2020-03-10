@@ -1,3 +1,0 @@
-INSERT IGNORE INTO `TNS` (`address`,`owner`,`pet`, dateCreated) VALUES ("belfast, uk" ,"daisy" ,"dog", NOW())  ON DUPLICATE KEY UPDATE  `address`="belfast, uk", `owner`="daisy", `pet`="dog" ;
-INSERT IGNORE INTO `TNS` (`address`,`owner`,`pet`, dateCreated) VALUES ("the moon" ,"john" ,"snake", NOW())  ON DUPLICATE KEY UPDATE  `address`="the moon", `owner`="john", `pet`="snake" ;
-INSERT IGNORE INTO `TNS` (`address`,`owner`,`pet`, dateCreated) VALUES ("larne" ,"susan" ,"crocodile", NOW())  ON DUPLICATE KEY UPDATE  `address`="larne", `owner`="susan", `pet`="crocodile" ;

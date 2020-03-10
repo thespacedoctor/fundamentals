@@ -7,6 +7,14 @@ database settings:
     loginPath: unittesting
     tunnel: False
 
+    unit_tests:
+        db: unit_tests
+        host: localhost
+        user: utuser
+        password: utpass
+        loginPath: unittesting
+        tunnel: False
+    
     atlasMovers:
         db: atlas_moving_objects
         host: 127.0.0.1
