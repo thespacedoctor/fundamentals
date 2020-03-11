@@ -11,7 +11,8 @@ def readme():
 
 install_requires = [
     'pyyaml',
-    'fundamentals'
+    'fundamentals',
+    'future'
 ]
 
 # READ THE DOCS SERVERS

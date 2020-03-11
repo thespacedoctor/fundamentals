@@ -12,3 +12,4 @@ unicodecsv
 psutil
 pymysql==0.9.0
 multiprocess
+future
