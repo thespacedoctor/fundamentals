@@ -7,6 +7,26 @@ database settings:
     loginPath: unittesting
     tunnel: False
 
+    atlasMovers:
+        db: atlas_moving_objects
+        host: 127.0.0.1
+        user: dryx
+        password: dryxPass
+        tunnel:
+            remote user: dry
+            remote ip: starbase2.mp.qub.ac.uk
+            remote datbase host: dormammu
+            port: 9006
+        loginPath: atlasMovers
+
+    unit_tests:
+        db: unit_tests
+        host: localhost
+        user: utuser
+        password: utpass
+        loginPath: unittesting
+        tunnel: False
+
 # # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
 # # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
 # # code, static catalogue database and transient database are all on seperate machines.
