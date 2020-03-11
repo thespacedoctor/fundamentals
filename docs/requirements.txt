@@ -8,3 +8,4 @@ lxml
 sphinxcontrib-mermaid
 sphinx_rtd_theme
 docopt
+unicodecsv
