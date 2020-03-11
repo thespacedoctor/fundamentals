@@ -27,7 +27,7 @@ if exists:
 
 setup(name="fundamentals",
       version=__version__,
-      description="A python package and command-line tools to Some project setup tools including logging, settings and database connections.",
+      description="Some project setup tools including logging, settings and database connections.",
       long_description=readme(),
       long_description_content_type='text/markdown',
       classifiers=[
