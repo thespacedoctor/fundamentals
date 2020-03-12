@@ -228,8 +228,13 @@ primary key(""")
             rows = cur.fetchall()
 
             allRows = []
+            dateCreated = True
             for row in rows:
-                allRows.append(dict(row))
+                thisDict = dict(row)
+                # CHECK FOR DATE-CREATED COLUMN - DON'T WANT TO DUPLICATE
+                if dateCreated and "datecreated" in str(thisDict.keys()).lower():
+                    dateCreated = False
+                allRows.append(thisDict)
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
             if not os.path.exists("/tmp/headjack/"):
@@ -250,7 +255,7 @@ primary key(""")
                 dbTableName=self.tablePrefix + table,
                 uniqueKeyList=[],
                 dateModified=True,
-                dateCreated=True,
+                dateCreated=dateCreated,
                 batchSize=10000,
                 replace=True,
                 dbSettings=self.settings["database settings"]
