@@ -1,30 +1,104 @@
-utKit (*module*)
-==========================================
+utKit (*class*)
+============================
 
+.. currentmodule:: fundamentals
 
-
-.. automodule:: fundamentals.utKit
-    :members:
-    :private-members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
-    :member-order: bysource
-    
-    
-    
-    .. rubric:: Classes
-
-    .. autosummary::
-    
-      ~utKit
-    
-    
+.. autoclass:: utKit
+   :members:
+   :private-members:
+   :show-inheritance:
+   :inherited-members:
+   :member-order: bysource
 
     
-    
-    
 
-    
-    
-    
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+        
+   
+        
+            ~utKit.get_project_root
+       
+   
+        
+            ~utKit.refresh_database
+       
+   
+        
+            ~utKit.setupModule
+       
+   
+        
+            ~utKit.tearDownModule
+       
+   
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+       
+   
+   
+   
+
+   
+   
+   
