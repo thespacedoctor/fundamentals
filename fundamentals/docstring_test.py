@@ -26,20 +26,21 @@ def docsting_test(self):
 
         To setup the sherlock database connections, run the following:
 
-        .. code-block:: python 
+        ```python
+        # SETUP ALL DATABASE CONNECTIONS
+        from sherlock import database
+        db = database(
+            log=log,
+            settings=settings
+        )
+        dbConns, dbVersions = db.connect()
+        transientsDbConn = dbConns["transients"]
+        cataloguesDbConn = dbConns["catalogues"]
+        pmDbConn = dbConns["marshall"]
+        ```
 
-            # SETUP ALL DATABASE CONNECTIONS
-            from sherlock import database
-            db = database(
-                log=log,
-                settings=settings
-            )
-            dbConns, dbVersions = db.connect()
-            transientsDbConn = dbConns["transients"]
-            cataloguesDbConn = dbConns["catalogues"]
-            pmDbConn = dbConns["marshall"]
-
-    .. todo ::
+    ```eval_rst
+    .. todo::
 
         - update key arguments values and definitions with defaults
         - update return values and definitions
@@ -48,6 +49,8 @@ def docsting_test(self):
         - check sublime snippet exists
         - clip any useful text to docs mindmap
         - regenerate the docs and check redendering of this docstring
+    ```
+
 
 
     **Embed reStructuredText**

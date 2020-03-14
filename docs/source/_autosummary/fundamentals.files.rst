@@ -35,13 +35,25 @@ files (*subpackage*)
         
         
             
+                ~list_of_dictionaries_to_mysql_inserts
+           
+        
+        
+            
                 ~recursive_directory_listing
+           
+        
+        
+            
+                ~tag
            
         
         
             
         
     
+        
+        
         
         
         
