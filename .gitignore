@@ -38,3 +38,4 @@ build
 *.gemspec
 Gemfile.lock
 
+/docs/source/_api
