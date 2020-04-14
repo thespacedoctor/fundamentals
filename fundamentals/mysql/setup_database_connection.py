@@ -38,21 +38,25 @@ def setup_database_connection(
 
         The settings file should be in this form, with all keyword values set:
 
-        .. code-block:: yaml
+        ```yaml
+        db: unit_tests
+        host: localhost
+        user: utuser
+        password: utpass
+        ```
 
-            db: unit_tests
-            host: localhost
-            user: utuser
-            password: utpass
+
 
         And here's how to generate the connection object:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import setup_database_connection
+        dbConn = setup_database_connection(
+            pathToYamlFile=pathToMyYamlFile
+        )
+        ```
 
-            from fundamentals.mysql import setup_database_connection
-            dbConn = setup_database_connection(
-                pathToYamlFile=pathToMyYamlFile
-            )
+
     """
     import sys
     import logging

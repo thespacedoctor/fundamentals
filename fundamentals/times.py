@@ -24,13 +24,15 @@ def get_now_sql_datetime():
         - ``now`` -- current time and date in MySQL format
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        from fundamentals import times
+        now = times.get_now_sql_datetime()
+        print now
 
-            from fundamentals import times
-            now = times.get_now_sql_datetime()
-            print now
+        # OUT: 2016-03-18T11:08:23 
+        ```
 
-            # OUT: 2016-03-18T11:08:23 
+
     """
     ## > IMPORTS ##
     from datetime import datetime, date, time
@@ -51,10 +53,12 @@ def datetime_relative_to_now(date):
         - a relative date
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        from fundamentals import times
+        relTime = times.datetime_relative_to_now(date)
+        ```
 
-            from fundamentals import times
-            relTime = times.datetime_relative_to_now(date)
+
     """
     from datetime import datetime
     diff = datetime.now() - date
@@ -89,13 +93,15 @@ def calculate_time_difference(startDate, endDate):
         - ``relTime`` -- the difference between the two dates in Y,M,D,h,m,s (string)
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        from fundamentals import times
+        diff = times.calculate_time_difference(startDate="2015-10-13 10:02:12", endDate="2017-11-04 16:47:05")
+        print diff
 
-            from fundamentals import times
-            diff = times.calculate_time_difference(startDate="2015-10-13 10:02:12", endDate="2017-11-04 16:47:05")
-            print diff
+        # OUT: 2yrs 22dys 6h 44m 53s
+        ```
 
-            # OUT: 2yrs 22dys 6h 44m 53s
+
     """
     ################ > IMPORTS ################
     from datetime import datetime

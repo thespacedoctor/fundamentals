@@ -68,10 +68,12 @@ def directory_script_runner(
 
     As it's insecure to pass in mysql database credentials via the command-line, run the following command from the terminal 
 
-    .. code-block:: bash
+    ```bash
+    mysql_config_editor set --login-path=<uniqueLoginName> --host=localhost --user=<myUsername> --password
+    > Enter password:
+    ```
 
-        mysql_config_editor set --login-path=<uniqueLoginName> --host=localhost --user=<myUsername> --password
-        > Enter password:
+
 
     This will store your credentials in an encrypted file located at '~/.mylogin.cnf'. This function takes advantage of the `--login-path` so as not to compromise the user's credentials. Use `mysql_config_editor print --all` to see all of the login-paths set.
 
@@ -92,44 +94,50 @@ def directory_script_runner(
 
         To run the scripts in the directroy and not act on the script file use something similar to:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import directory_script_runner
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory="/path/to/mysql_scripts",
+            databaseName="imports",
+            loginPath="myLoginDetails"
+        )
+        ```
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails"
-            )
+
 
         To delete successful scripts and archive failed scripts for later inspection:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import directory_script_runner
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory="/path/to/mysql_scripts",
+            databaseName="imports",
+            loginPath="myLoginDetails",
+            successRule="delete",
+            failureRule="failed"
+        )
+        ```
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails",
-                successRule="delete",
-                failureRule="failed"
-            )
+
 
         This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
         Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import directory_script_runner
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory="/path/to/mysql_scripts",
+            databaseName="imports",
+            loginPath="myLoginDetails",
+            waitForResults=False
+        )
+        ```
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails",
-                waitForResults=False
-            )
+
 
         Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
     """

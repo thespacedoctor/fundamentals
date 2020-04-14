@@ -27,14 +27,16 @@ def get_now_datetime_filestamp(longTime=False):
         - ``now`` -- current time and date in filename format
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        from fundamentals.download import get_now_datetime_filestamp
+        get_now_datetime_filestamp(longTime=False)
+        #Out: '20160316t154635'
 
-            from fundamentals.download import get_now_datetime_filestamp
-            get_now_datetime_filestamp(longTime=False)
-            #Out: '20160316t154635'
+        get_now_datetime_filestamp(longTime=True)
+        #Out: '20160316t154644133638' 
+        ```
 
-            get_now_datetime_filestamp(longTime=True)
-            #Out: '20160316t154644133638' 
+
     """
     ## > IMPORTS ##
     from datetime import datetime, date, time

@@ -41,16 +41,18 @@ def tag(
 
         To add any combination of tags, rating and a source URL to a file on macOS, use the following:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.files.tag import tag
+        tag(
+            log=log,
+            filepath="/path/to/my.file",
+            tags="test,tags, fundamentals",
+            rating=3,
+            wherefrom="http://www.thespacedoctor.co.uk"
+        )
+        ```
 
-            from fundamentals.files.tag import tag
-            tag(
-                log=log,
-                filepath="/path/to/my.file",
-                tags="test,tags, fundamentals",
-                rating=3,
-                wherefrom="http://www.thespacedoctor.co.uk"
-            )
+
     """
     log.debug('starting the ``tag`` function')
 

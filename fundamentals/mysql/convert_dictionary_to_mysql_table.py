@@ -65,22 +65,24 @@ def convert_dictionary_to_mysql_table(
 
         To add a python dictionary to a database table, creating the table and/or columns if they don't yet exist:
 
-        .. code-block:: python
+        ```python
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+        dictionary = {"a newKey": "cool", "and another": "super cool",
+                  "uniquekey1": "cheese", "uniqueKey2": "burgers"}
 
-            from fundamentals.mysql import convert_dictionary_to_mysql_table
-            dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            dateModified=False,
+            returnInsertOnly=False,
+            replace=True
+        )
+        ```
 
-            convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
-                dictionary=dictionary,
-                dbTableName="testing_table",
-                uniqueKeyList=["uniquekey1", "uniqueKey2"],
-                dateModified=False,
-                returnInsertOnly=False,
-                replace=True
-            )
+
 
         Or just return the insert statement with a list of value tuples, i.e. do not execute the command on the database:
 

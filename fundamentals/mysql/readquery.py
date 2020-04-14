@@ -35,15 +35,17 @@ def readquery(
 
     **Usage:**
 
-        .. code-block:: python
+        ```python
+        from fundamentals.mysql import readquery
+        rows = readquery(
+            log=log,
+            sqlQuery=sqlQuery,
+            dbConn=dbConn,
+            quiet=False
+        )
+        ```
 
-            from fundamentals.mysql import readquery
-            rows = readquery(
-                log=log,
-                sqlQuery=sqlQuery,
-                dbConn=dbConn,
-                quiet=False
-            )
+
     """
     log.debug('starting the ``readquery`` function')
     import pymysql

@@ -30,15 +30,17 @@ def extract_filename_from_url(log, url):
         - ``filename`` -- the filename
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        from fundamentals.download import extract_filename_from_url
+        name = extract_filename_from_url(
+            log=log,
+            url="https://en.wikipedia.org/wiki/Docstring"
+        )
+        print name
+        # OUT: Docstring.html
+        ```
 
-            from fundamentals.download import extract_filename_from_url
-            name = extract_filename_from_url(
-                log=log,
-                url="https://en.wikipedia.org/wiki/Docstring"
-            )
-            print name
-            # OUT: Docstring.html
+
     """
     ## > IMPORTS ##
     import re

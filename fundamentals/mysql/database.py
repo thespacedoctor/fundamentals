@@ -39,32 +39,36 @@ class database(object):
 
         Given a python dictionary that looks like this:
 
-        .. code-block:: python 
+        ```python
+        dbSettings = {
+            'host': '127.0.0.1', 
+            'loginPath': 'atlasMovers', 
+            'user': 'monster', 
+            'tunnel': {
+                'remote ip': 'psweb.mp.qub.ac.uk', 
+                'remote datbase host': 'dormammu', 
+                'remote user': 'monster', 
+                'port': 9006
+            }, 
+            'password': 'myPass', 
+            'db': 'atlas_moving_objects'
+        }
+        ```
 
-            dbSettings = {
-                'host': '127.0.0.1', 
-                'loginPath': 'atlasMovers', 
-                'user': 'monster', 
-                'tunnel': {
-                    'remote ip': 'psweb.mp.qub.ac.uk', 
-                    'remote datbase host': 'dormammu', 
-                    'remote user': 'monster', 
-                    'port': 9006
-                }, 
-                'password': 'myPass', 
-                'db': 'atlas_moving_objects'
-            }
+
 
         ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
 
-        .. code-block:: python 
+        ```python
+        # SETUP ALL DATABASE CONNECTIONS
+        from fundamentals.mysql import database
+        dbConn = database(
+            log=log,
+            dbSettings=dbSettings
+        ).connect()
+        ```
 
-            # SETUP ALL DATABASE CONNECTIONS
-            from fundamentals.mysql import database
-            dbConn = database(
-                log=log,
-                dbSettings=dbSettings
-            ).connect()
+
     """
     # INITIALISATION
 

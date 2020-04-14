@@ -42,32 +42,34 @@ class list_of_dictionaries(object):
 
         To initialise the dataset object:
 
-        .. code-block:: python
+        ```python
+        dataList = [
+            {
+                "owner": "daisy",
+                "pet": "dog",
+                "address": "belfast, uk"
+            },
+            {
+                "owner": "john",
+                "pet": "snake",
+                "address": "the moon"
+            },
+            {
+                "owner": "susan",
+                "pet": "crocodile",
+                "address": "larne"
+            }
 
-            dataList = [
-                {
-                    "owner": "daisy",
-                    "pet": "dog",
-                    "address": "belfast, uk"
-                },
-                {
-                    "owner": "john",
-                    "pet": "snake",
-                    "address": "the moon"
-                },
-                {
-                    "owner": "susan",
-                    "pet": "crocodile",
-                    "address": "larne"
-                }
+        ]
 
-            ]
+        from fundamentals.renderer import list_of_dictionaries
+        dataSet = list_of_dictionaries(
+            log=log,
+            listOfDictionaries=dataList
+        )
+        ```
 
-            from fundamentals.renderer import list_of_dictionaries
-            dataSet = list_of_dictionaries(
-                log=log,
-                listOfDictionaries=dataList
-            )
+
     """
 
     def __init__(
@@ -110,22 +112,28 @@ class list_of_dictionaries(object):
 
             To render the data set as csv:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.csv())
+            ```
 
-                print(dataSet.csv())
 
-            .. code-block:: text
 
-                owner,pet,address
-                daisy,dog,"belfast, uk"
-                john,snake,the moon
-                susan,crocodile,larne
+            ```text
+            owner,pet,address
+            daisy,dog,"belfast, uk"
+            john,snake,the moon
+            susan,crocodile,larne
+            ```
+
+
 
             and to save the csv rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.csv("/path/to/myfile.csv")
+            ```
 
-                dataSet.csv("/path/to/myfile.csv")
+
         """
         self.log.debug('starting the ``csv`` method')
 
@@ -160,25 +168,31 @@ class list_of_dictionaries(object):
 
             To render the data set as a plain text table:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.table())
+            ```
 
-                print(dataSet.table())
 
-            .. code-block:: text
 
-                +--------+------------+--------------+
-                | owner  | pet        | address      |
-                +========+============+==============+
-                | daisy  | dog        | belfast, uk  |
-                | john   | snake      | the moon     |
-                | susan  | crocodile  | larne        |
-                +--------+------------+--------------+
+            ```text
+            +--------+------------+--------------+
+            | owner  | pet        | address      |
+            +========+============+==============+
+            | daisy  | dog        | belfast, uk  |
+            | john   | snake      | the moon     |
+            | susan  | crocodile  | larne        |
+            +--------+------------+--------------+
+            ```
+
+
 
             and to save the table rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.table("/path/to/myfile.ascii")
+            ```
 
-                dataSet.table("/path/to/myfile.ascii")
+
         """
         self.log.debug('starting the ``table`` method')
 
@@ -214,27 +228,33 @@ class list_of_dictionaries(object):
 
             To render the data set as a resturcturedText table:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.reST())
+            ```
 
-                print(dataSet.reST())
 
-            .. code-block:: text
 
-                +--------+------------+--------------+
-                | owner  | pet        | address      |
-                +========+============+==============+
-                | daisy  | dog        | belfast, uk  |
-                +--------+------------+--------------+
-                | john   | snake      | the moon     |
-                +--------+------------+--------------+
-                | susan  | crocodile  | larne        |
-                +--------+------------+--------------+
+            ```text
+            +--------+------------+--------------+
+            | owner  | pet        | address      |
+            +========+============+==============+
+            | daisy  | dog        | belfast, uk  |
+            +--------+------------+--------------+
+            | john   | snake      | the moon     |
+            +--------+------------+--------------+
+            | susan  | crocodile  | larne        |
+            +--------+------------+--------------+
+            ```
+
+
 
             and to save the table rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.reST("/path/to/myfile.rst")
+            ```
 
-                dataSet.reST("/path/to/myfile.rst")
+
         """
         self.log.debug('starting the ``table`` method')
 
@@ -270,23 +290,29 @@ class list_of_dictionaries(object):
 
             To render the data set as a markdown table:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.markdown())
+            ```
 
-                print(dataSet.markdown())
 
-            .. code-block:: markdown
 
-                | owner  | pet        | address      |
-                |:-------|:-----------|:-------------|
-                | daisy  | dog        | belfast, uk  |
-                | john   | snake      | the moon     |
-                | susan  | crocodile  | larne        |
+            ```markdown
+            | owner  | pet        | address      |
+            |:-------|:-----------|:-------------|
+            | daisy  | dog        | belfast, uk  |
+            | john   | snake      | the moon     |
+            | susan  | crocodile  | larne        |
+            ```
+
+
 
             and to save the markdown table rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.table("/path/to/myfile.md")
+            ```
 
-                dataSet.table("/path/to/myfile.md")
+
         """
         self.log.debug('starting the ``markdown`` method')
 
@@ -322,35 +348,41 @@ class list_of_dictionaries(object):
 
             To render the data set as json:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.json())
+            ```
 
-                print(dataSet.json())
 
-            .. code-block:: json
 
-                [
-                    {
-                        "address": "belfast, uk",
-                        "owner": "daisy",
-                        "pet": "dog"
-                    },
-                    {
-                        "address": "the moon",
-                        "owner": "john",
-                        "pet": "snake"
-                    },
-                    {
-                        "address": "larne",
-                        "owner": "susan",
-                        "pet": "crocodile"
-                    }
-                ]
+            ```json
+            [
+                {
+                    "address": "belfast, uk",
+                    "owner": "daisy",
+                    "pet": "dog"
+                },
+                {
+                    "address": "the moon",
+                    "owner": "john",
+                    "pet": "snake"
+                },
+                {
+                    "address": "larne",
+                    "owner": "susan",
+                    "pet": "crocodile"
+                }
+            ]
+            ```
+
+
 
             and to save the json rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.json("/path/to/myfile.json")
+            ```
 
-                dataSet.json("/path/to/myfile.json")
+
         """
         self.log.debug('starting the ``json`` method')
 
@@ -396,27 +428,33 @@ class list_of_dictionaries(object):
 
             To render the data set as yaml:
 
-            .. code-block:: python
+            ```python
+            print(dataSet.yaml())
+            ```
 
-                print(dataSet.yaml())
 
-            .. code-block:: yaml
 
-                - address: belfast, uk
-                  owner: daisy
-                  pet: dog
-                - address: the moon
-                  owner: john
-                  pet: snake
-                - address: larne
-                  owner: susan
-                  pet: crocodile
+            ```yaml
+            - address: belfast, uk
+              owner: daisy
+              pet: dog
+            - address: the moon
+              owner: john
+              pet: snake
+            - address: larne
+              owner: susan
+              pet: crocodile
+            ```
+
+
 
             and to save the yaml rendering to file:
 
-            .. code-block:: python
+            ```python
+            dataSet.json("/path/to/myfile.yaml")
+            ```
 
-                dataSet.json("/path/to/myfile.yaml")
+
         """
         self.log.debug('starting the ``yaml`` method')
 
@@ -455,23 +493,29 @@ class list_of_dictionaries(object):
 
         **Usage:**
 
-            .. code-block:: python
+            ```python
+            print(dataSet.mysql("testing_table"))
+            ```
 
-                print(dataSet.mysql("testing_table"))
+
 
             this output the following:
 
-            .. code-block:: plain
+            ```plain
+            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
+            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
+            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
+            ```
 
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
+
 
             To save this rendering to file use:
 
-            .. code-block:: python
+            ```python
+            dataSet.mysql("testing_table", "/path/to/myfile.sql")
+            ```
 
-                dataSet.mysql("testing_table", "/path/to/myfile.sql")
+
 
         """
         self.log.debug('starting the ``mysql`` method')

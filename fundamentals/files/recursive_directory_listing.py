@@ -35,33 +35,35 @@ def recursive_directory_listing(
 
     **Usage:**
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.files import recursive_directory_listing
+        theseFiles = recursive_directory_listing(
+            log,
+            baseFolderPath="/tmp"
+        )
 
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp"
-            )
+        # OR JUST FILE  
 
-            # OR JUST FILE  
-
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp",
-                whatToList="files"
-            )
+        from fundamentals.files import recursive_directory_listing
+        theseFiles = recursive_directory_listing(
+            log,
+            baseFolderPath="/tmp",
+            whatToList="files"
+        )
 
 
-            # OR JUST FOLDERS   
+        # OR JUST FOLDERS   
 
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp",
-                whatToList="dirs"
-            )
-            print theseFiles        
+        from fundamentals.files import recursive_directory_listing
+        theseFiles = recursive_directory_listing(
+            log,
+            baseFolderPath="/tmp",
+            whatToList="dirs"
+        )
+        print theseFiles        
+        ```
+
+
     """
     log.debug('starting the ``recursive_directory_listing`` function')
 

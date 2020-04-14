@@ -33,15 +33,17 @@ class fileChunker(object):
 
         To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.files import fileChunker
+        fc = fileChunker(
+            filepath="/path/to/large/file.csv",
+            batchSize=100000
+        )
+        for i in fc:
+            print len(i)
+        ```
 
-            from fundamentals.files import fileChunker
-            fc = fileChunker(
-                filepath="/path/to/large/file.csv",
-                batchSize=100000
-            )
-            for i in fc:
-                print len(i)
+
     """
 
     def __init__(self, filepath, batchSize):

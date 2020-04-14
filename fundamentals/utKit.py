@@ -33,14 +33,16 @@ class utKit(object):
     **Usage:**
         To use this kit within any of your unit-test modules add the following code before your test methods:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.utKit import utKit
+        # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
+        moduleDirectory = os.path.dirname(__file__)
+        utKit = utKit(moduleDirectory)
+        log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
+        utKit.tearDownModule() 
+        ```
 
-            from fundamentals.utKit import utKit
-            # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
-            moduleDirectory = os.path.dirname(__file__)
-            utKit = utKit(moduleDirectory)
-            log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
-            utKit.tearDownModule() 
+
     """
     # Initialisation
 

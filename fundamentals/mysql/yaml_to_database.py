@@ -114,26 +114,30 @@ class yaml_to_database(object):
 
         To initiate a ``yaml2db`` object, use the following:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import yaml_to_database
+        yaml2db = yaml_to_database(
+            log=log,
+            settings=settings,
+            dbConn=dbConn,
+            pathToInputDir="/path/to/yaml/directory",
+            deleteFiles=False
+        ) 
+        ```
 
-            from fundamentals.mysql import yaml_to_database
-            yaml2db = yaml_to_database(
-                log=log,
-                settings=settings,
-                dbConn=dbConn,
-                pathToInputDir="/path/to/yaml/directory",
-                deleteFiles=False
-            ) 
+
 
         And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
 
-        .. code-block:: yaml
+        ```yaml
+        title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
+        url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
+        kind: webpage
+        subtype: article
+        table: web_articles,podcasts 
+        ```
 
-            title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
-            url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
-            kind: webpage
-            subtype: article
-            table: web_articles,podcasts 
+
     """
     # Initialisation
 
@@ -167,17 +171,19 @@ class yaml_to_database(object):
 
             To import an entire directory of yaml files into a database, use the following:
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import yaml_to_database
+        yaml2db = yaml_to_database(
+            log=log,
+            settings=settings,
+            dbConn=dbConn,
+            pathToInputDir="/path/to/yaml/directory",
+            deleteFiles=False
+        ) 
+        yaml2db.ingest() 
+        ```
 
-            from fundamentals.mysql import yaml_to_database
-            yaml2db = yaml_to_database(
-                log=log,
-                settings=settings,
-                dbConn=dbConn,
-                pathToInputDir="/path/to/yaml/directory",
-                deleteFiles=False
-            ) 
-            yaml2db.ingest() 
+
         """
         self.log.debug('starting the ``ingest`` method')
 
@@ -209,19 +215,21 @@ class yaml_to_database(object):
 
             To parse and import the contents of a single yaml file into the database, use the following:
 
-            .. code-block:: python 
+            ```python
+            from fundamentals.mysql import yaml_to_database
+            # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
+            yaml2db = yaml_to_database(
+                log=log,
+                settings=settings,
+                dbConn=dbConn
+            ) 
+            yaml2db.add_yaml_file_content_to_database(
+                filepath=${1:"/path/to/file.yaml"},
+                deleteFile=True
+            )
+            ```
 
-                from fundamentals.mysql import yaml_to_database
-                # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
-                yaml2db = yaml_to_database(
-                    log=log,
-                    settings=settings,
-                    dbConn=dbConn
-                ) 
-                yaml2db.add_yaml_file_content_to_database(
-                    filepath=${1:"/path/to/file.yaml"},
-                    deleteFile=True
-                )
+
         """
         self.log.debug(
             'completed the ````add_yaml_file_content_to_database`` method')

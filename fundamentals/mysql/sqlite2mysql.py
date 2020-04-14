@@ -92,16 +92,18 @@ class sqlite2mysql(object):
 
             - add a tutorial about ``sqlite2mysql`` to documentation
 
-        .. code-block:: python 
+        ```python
+        from fundamentals.mysql import sqlite2mysql
+        converter = sqlite2mysql(
+            log=log,
+            settings=settings,
+            pathToSqlite="/path/to/sqlite.db",
+            tablePrefix="external"
+        )
+        converter.convert_sqlite_to_mysql()
+        ```
 
-            from fundamentals.mysql import sqlite2mysql
-            converter = sqlite2mysql(
-                log=log,
-                settings=settings,
-                pathToSqlite="/path/to/sqlite.db",
-                tablePrefix="external"
-            )
-            converter.convert_sqlite_to_mysql()
+
     """
     # Initialisation
 

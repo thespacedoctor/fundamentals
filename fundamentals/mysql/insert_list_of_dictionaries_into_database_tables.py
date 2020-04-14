@@ -65,18 +65,20 @@ def insert_list_of_dictionaries_into_database_tables(
 
     **Usage:**
 
-        .. code-block:: python
+        ```python
+        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+        insert_list_of_dictionaries_into_database_tables(
+            dbConn=dbConn,
+            log=log,
+            dictList=dictList,
+            dbTableName="test_insert_many",
+            uniqueKeyList=["col1", "col3"],
+            dateModified=False,
+            batchSize=2500
+        )
+        ```
 
-            from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
-            insert_list_of_dictionaries_into_database_tables(
-                dbConn=dbConn,
-                log=log,
-                dictList=dictList,
-                dbTableName="test_insert_many",
-                uniqueKeyList=["col1", "col3"],
-                dateModified=False,
-                batchSize=2500
-            )
+
     """
 
     log.debug(
@@ -208,9 +210,11 @@ def _insert_single_batch_into_database(
             add usage info
             create a sublime snippet for usage
 
-        .. code-block:: python 
+        ```python
+        usage code            
+        ```
 
-            usage code            
+
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
@@ -361,9 +365,11 @@ def _add_dictlist_to_database_via_load_in_file(
             add usage info
             create a sublime snippet for usage
 
-        .. code-block:: python
+        ```python
+        usage code
+        ```
 
-            usage code
+
     """
     from fundamentals.logs import emptyLogger
     log = emptyLogger()

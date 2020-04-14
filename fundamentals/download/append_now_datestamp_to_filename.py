@@ -30,18 +30,20 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
         - ``dsFilename`` -- datestamped filename
 
     **Usage:**
-        .. code-block:: python 
+        ```python
+        # APPEND TIMESTAMP TO THE FILENAME
+        from fundamentals.download import append_now_datestamp_to_filename
+        filename = append_now_datestamp_to_filename(
+                log=log,
+                filename="some_filename.html",
+                longTime=True
+        )
 
-            # APPEND TIMESTAMP TO THE FILENAME
-            from fundamentals.download import append_now_datestamp_to_filename
-            filename = append_now_datestamp_to_filename(
-                    log=log,
-                    filename="some_filename.html",
-                    longTime=True
-            )
+        # OUTPUT
+        # 'some_filename_20160316t154123749472.html'
+        ```
 
-            # OUTPUT
-            # 'some_filename_20160316t154123749472.html'
+
     """
     ## > IMPORTS ##
     from fundamentals.download import get_now_datetime_filestamp
