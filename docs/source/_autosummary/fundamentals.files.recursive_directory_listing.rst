@@ -1,4 +1,4 @@
-recursive_directory_listing (*function*)
+recursive_directory_listing
 ===========================================================
 
 .. currentmodule:: fundamentals.files

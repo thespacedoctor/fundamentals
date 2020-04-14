@@ -1,4 +1,4 @@
-_dump_files_to_local_drive (*function*)
+_dump_files_to_local_drive
 =============================================================
 
 .. currentmodule:: fundamentals.download

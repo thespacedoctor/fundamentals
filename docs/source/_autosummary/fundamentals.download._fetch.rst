@@ -1,4 +1,4 @@
-_fetch (*function*)
+_fetch
 =========================================
 
 .. currentmodule:: fundamentals.download

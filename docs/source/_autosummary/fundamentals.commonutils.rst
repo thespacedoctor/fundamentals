@@ -1,4 +1,4 @@
-commonutils (*subpackage*)
+commonutils
 =======================================
 
 .. automodule:: fundamentals.commonutils

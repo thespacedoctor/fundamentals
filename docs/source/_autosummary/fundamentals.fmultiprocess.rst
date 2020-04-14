@@ -1,4 +1,4 @@
-fmultiprocess (*function*)
+fmultiprocess
 =======================================
 
 .. currentmodule:: fundamentals

@@ -1,4 +1,4 @@
-download (*subpackage*)
+download
 ====================================
 
 .. automodule:: fundamentals.download

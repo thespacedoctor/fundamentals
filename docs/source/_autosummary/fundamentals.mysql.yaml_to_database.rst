@@ -1,4 +1,4 @@
-yaml_to_database (*class*)
+yaml_to_database
 =============================================
 
 .. currentmodule:: fundamentals.mysql

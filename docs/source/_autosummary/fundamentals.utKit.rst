@@ -1,4 +1,4 @@
-utKit (*class*)
+utKit
 ============================
 
 .. currentmodule:: fundamentals

@@ -1,4 +1,4 @@
-readquery (*function*)
+readquery
 =========================================
 
 .. currentmodule:: fundamentals.mysql

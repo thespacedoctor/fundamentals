@@ -1,4 +1,4 @@
-convert_dictionary_to_mysql_table (*function*)
+convert_dictionary_to_mysql_table
 =================================================================
 
 .. currentmodule:: fundamentals.mysql

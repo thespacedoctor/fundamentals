@@ -1,4 +1,4 @@
-GroupWriteRotatingFileHandler (*class*)
+GroupWriteRotatingFileHandler
 =========================================================
 
 .. currentmodule:: fundamentals.logs

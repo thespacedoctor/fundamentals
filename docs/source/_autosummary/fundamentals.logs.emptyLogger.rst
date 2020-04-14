@@ -1,4 +1,4 @@
-emptyLogger (*class*)
+emptyLogger
 =======================================
 
 .. currentmodule:: fundamentals.logs

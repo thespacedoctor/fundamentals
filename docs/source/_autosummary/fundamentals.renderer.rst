@@ -1,4 +1,4 @@
-renderer (*subpackage*)
+renderer
 ====================================
 
 .. automodule:: fundamentals.renderer

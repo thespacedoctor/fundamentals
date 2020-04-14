@@ -1,4 +1,4 @@
-nose2_plugins (*subpackage*)
+nose2_plugins
 =========================================
 
 .. automodule:: fundamentals.nose2_plugins

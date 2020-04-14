@@ -1,4 +1,4 @@
-files (*subpackage*)
+files
 =================================
 
 .. automodule:: fundamentals.files

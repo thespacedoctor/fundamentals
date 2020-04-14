@@ -1,4 +1,4 @@
-sqlite2mysql (*class*)
+sqlite2mysql
 =========================================
 
 .. currentmodule:: fundamentals.mysql

@@ -1,4 +1,4 @@
-directory_script_runner (*function*)
+directory_script_runner
 =======================================================
 
 .. currentmodule:: fundamentals.mysql

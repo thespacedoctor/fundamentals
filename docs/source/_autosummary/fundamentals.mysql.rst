@@ -1,4 +1,4 @@
-mysql (*subpackage*)
+mysql
 =================================
 
 .. automodule:: fundamentals.mysql

@@ -1,4 +1,4 @@
-get_now_datetime_filestamp (*function*)
+get_now_datetime_filestamp
 =============================================================
 
 .. currentmodule:: fundamentals.download

@@ -1,4 +1,4 @@
-writequery (*function*)
+writequery
 ==========================================
 
 .. currentmodule:: fundamentals.mysql
