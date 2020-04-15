@@ -43,23 +43,29 @@ def convert_dictionary_to_mysql_table(
         dateCreated=True):
     """convert dictionary to mysql table
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``dictionary`` -- python dictionary
-        - ``dbConn`` -- the db connection
-        - ``dbTableName`` -- name of the table you wish to add the data to (or create if it does not exist)
-        - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
-        - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
-        - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
-        - ``dateModified`` -- add a modification date and updated flag to the mysql table
-        - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
-        - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``dictionary`` -- python dictionary
+    - ``dbConn`` -- the db connection
+    - ``dbTableName`` -- name of the table you wish to add the data to (or create if it does not exist)
+    - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
+    - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
+    - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
+    - ``dateModified`` -- add a modification date and updated flag to the mysql table
+    - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
+    - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
+    
+
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
         - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
         - ``dateCreated`` -- add a timestamp for dateCreated?
 
-    **Return:**
-        - ``returnInsertOnly`` -- the insert statement if requested
+    **Return**
+
+    - ``returnInsertOnly`` -- the insert statement if requested
+    
+
 
     **Usage**
 

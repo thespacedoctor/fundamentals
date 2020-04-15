@@ -23,9 +23,12 @@ class fileChunker(object):
     """
     *The fileChunker iterator - iterate over large line-based files to reduce memory footprint*
 
-    **Key Arguments:**
-        - ``filepath`` -- path to the large file to iterate over
-        - ``batchSize`` -- size of the chunks to return in lines
+    **Key Arguments**
+
+    - ``filepath`` -- path to the large file to iterate over
+    - ``batchSize`` -- size of the chunks to return in lines
+    
+
 
     **Usage**
 

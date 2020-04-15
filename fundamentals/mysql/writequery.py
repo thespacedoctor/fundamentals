@@ -27,14 +27,20 @@ def writequery(
 ):
     """*Execute a MySQL write command given a sql query*
 
-    **Key Arguments:**
-        - ``sqlQuery`` -- the MySQL command to execute
-        - ``dbConn`` -- the db connection
-        - ``Force`` -- do not exit code if error occurs, move onto the next command
-        - ``manyValueList`` -- a list of value tuples if executing more than one insert
+    **Key Arguments**
 
-    **Return:**
-        - ``message`` -- error/warning message
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``Force`` -- do not exit code if error occurs, move onto the next command
+    - ``manyValueList`` -- a list of value tuples if executing more than one insert
+    
+
+
+    **Return**
+
+    - ``message`` -- error/warning message
+    
+
 
     **Usage**
 

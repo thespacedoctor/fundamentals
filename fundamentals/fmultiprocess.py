@@ -31,15 +31,21 @@ def fmultiprocess(
         **kwargs):
     """multiprocess pool
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``function`` -- the function to multiprocess
-        - ``inputArray`` -- the array to be iterated over
-        - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
-        - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
+    **Key Arguments**
 
-    **Return:**
-        - ``resultArray`` -- the array of results
+    - ``log`` -- logger
+    - ``function`` -- the function to multiprocess
+    - ``inputArray`` -- the array to be iterated over
+    - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
+    - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
+    
+
+
+    **Return**
+
+    - ``resultArray`` -- the array of results
+    
+
 
     **Usage**
 

@@ -75,12 +75,15 @@ class sqlite2mysql(object):
     """
     *Take a sqlite database file and copy the tables within it to a MySQL database*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``settings`` -- the settings dictionary
-        - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
-        - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
-        - ``dbConn`` -- mysql database connection 
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``settings`` -- the settings dictionary
+    - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
+    - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
+    - ``dbConn`` -- mysql database connection 
+    
+
 
     **Usage**
 

@@ -39,7 +39,10 @@ def multiobject_download(
     """
     *get multiple url documents and place them in specified download directory/directories*
 
-    **Key Arguments:**
+    **Key Arguments**
+
+
+    
       - ``urlList`` -- list of document urls
       - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
       - ``log`` -- the logger
@@ -51,7 +54,10 @@ def multiobject_download(
       - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
       - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
-    **Return:**
+    **Return**
+
+
+    
       - list of timestamped documents (same order as the input urlList)
 
     **Usage**

@@ -101,12 +101,15 @@ class yaml_to_database(object):
     """
     *Take key-values from yaml files including a tablename(s) and add them to a mysql database table*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``settings`` -- the settings dictionary
-        - ``pathToInputDir`` -- path to the directory containing the yaml files that will be added to the database table(s). Default *False*
-        - ``dbConn`` -- connection to database to add the content to
-        - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``settings`` -- the settings dictionary
+    - ``pathToInputDir`` -- path to the directory containing the yaml files that will be added to the database table(s). Default *False*
+    - ``dbConn`` -- connection to database to add the content to
+    - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
+    
+
 
     **Usage**
 
@@ -166,8 +169,11 @@ class yaml_to_database(object):
         """
         *ingest the contents of the directory of yaml files into a database*
 
-        **Return:**
-            - None
+        **Return**
+
+        - None
+        
+
 
         **Usage**
 
@@ -208,12 +214,18 @@ class yaml_to_database(object):
     ):
         """*given a file to a yaml file, add yaml file content to database*
 
-        **Key Arguments:**
-            - ``filepath`` -- the path to the yaml file
-            - ``deleteFile`` -- delete the yaml file when its content has been added to the database. Default *False*
+        **Key Arguments**
 
-        **Return:**
-            - None
+        - ``filepath`` -- the path to the yaml file
+        - ``deleteFile`` -- delete the yaml file when its content has been added to the database. Default *False*
+        
+
+
+        **Return**
+
+        - None
+        
+
 
         **Usage**
 

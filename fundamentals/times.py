@@ -20,8 +20,11 @@ def get_now_sql_datetime():
     """
     *A datetime stamp in MySQL format: ``YYYY-MM-DDTHH:MM:SS``*
 
-    **Return:**
-        - ``now`` -- current time and date in MySQL format
+    **Return**
+
+    - ``now`` -- current time and date in MySQL format
+    
+
 
     **Usage**
 
@@ -49,11 +52,17 @@ def datetime_relative_to_now(date):
     """
     *convert date to a relative datetime (e.g. +15m, +2hr, +1w)*
 
-    **Key Arguments:**
-        - ``date`` -- absolute date
+    **Key Arguments**
 
-    **Return:**
-        - a relative date
+    - ``date`` -- absolute date
+    
+
+
+    **Return**
+
+    - a relative date
+    
+
 
     **Usage**
 
@@ -91,12 +100,18 @@ def calculate_time_difference(startDate, endDate):
     """
     *Return the time difference between two dates as a string*
 
-    **Key Arguments:**
-        - ``startDate`` -- the first date in YYYY-MM-DDTHH:MM:SS format
-        - ``endDate`` -- the final date YYYY-MM-DDTHH:MM:SS format
+    **Key Arguments**
 
-    **Return:**
-        - ``relTime`` -- the difference between the two dates in Y,M,D,h,m,s (string)
+    - ``startDate`` -- the first date in YYYY-MM-DDTHH:MM:SS format
+    - ``endDate`` -- the final date YYYY-MM-DDTHH:MM:SS format
+    
+
+
+    **Return**
+
+    - ``relTime`` -- the difference between the two dates in Y,M,D,h,m,s (string)
+    
+
 
     **Usage**
 

@@ -27,13 +27,19 @@ def list_of_dictionaries_to_mysql_inserts(
         tableName):
     """Convert a python list of dictionaries to pretty csv output
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``datalist`` -- a list of dictionaries
-        - ``tableName`` -- the name of the table to create the insert statements for
+    **Key Arguments**
 
-    **Return:**
-        - ``output`` -- the mysql insert statements (as a string)
+    - ``log`` -- logger
+    - ``datalist`` -- a list of dictionaries
+    - ``tableName`` -- the name of the table to create the insert statements for
+    
+
+
+    **Return**
+
+    - ``output`` -- the mysql insert statements (as a string)
+    
+
 
     **Usage**
 

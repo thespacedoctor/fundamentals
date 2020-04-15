@@ -23,8 +23,11 @@ def extract_filename_from_url(log, url):
 
     *Will return 'untitled.html', if no filename is found.*
 
-    **Key Arguments:**
-        - ``url`` -- the url to extract filename from
+    **Key Arguments**
+
+    - ``url`` -- the url to extract filename from
+    
+
 
     Returns:
         - ``filename`` -- the filename

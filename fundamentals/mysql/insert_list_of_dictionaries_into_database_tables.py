@@ -48,20 +48,26 @@ def insert_list_of_dictionaries_into_database_tables(
         dbSettings=False):
     """insert list of dictionaries into database tables
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dictList`` -- list of python dictionaries to add to the database table
-        - ``dbTableName`` -- name of the database table
-        - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
-        - ``dateModified`` -- add the modification date as a column in the database
-        - ``dateCreated`` -- add the created date as a column in the database
-        - ``batchSize`` -- batch the insert commands into *batchSize* batches
-        - ``replace`` -- repalce row if a duplicate is found
-        - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dictList`` -- list of python dictionaries to add to the database table
+    - ``dbTableName`` -- name of the database table
+    - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
+    - ``dateModified`` -- add the modification date as a column in the database
+    - ``dateCreated`` -- add the created date as a column in the database
+    - ``batchSize`` -- batch the insert commands into *batchSize* batches
+    - ``replace`` -- repalce row if a duplicate is found
+    - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
+    
+
+
+    **Return**
+
+    - None
+    
+
 
     **Usage**
 
@@ -198,13 +204,19 @@ def _insert_single_batch_into_database(
         dateCreated):
     """*summary of function*
 
-    **Key Arguments:**
-        - ``batchIndex`` -- the index of the batch to insert
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``batchIndex`` -- the index of the batch to insert
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    
+
+
+    **Return**
+
+    - None
+    
+
 
     **Usage**
 
@@ -353,16 +365,21 @@ def _add_dictlist_to_database_via_load_in_file(
         dateModified=False):
     """*load a list of dictionaries into a database table with load data infile*
 
-    **Key Arguments:**
+    **Key Arguments**
 
-        - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
-        - ``dbTablename`` -- the name of the database table to add the list to
-        - ``dbSettings`` -- the dictionary of database settings
-        - ``log`` -- logger
-        - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
+    - ``dbTablename`` -- the name of the database table to add the list to
+    - ``dbSettings`` -- the dictionary of database settings
+    - ``log`` -- logger
+    - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    
 
-    **Return:**
-        - None
+
+    **Return**
+
+    - None
+    
+
 
     **Usage**
 

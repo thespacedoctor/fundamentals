@@ -23,13 +23,19 @@ def table_exists(
         dbTableName):
     """*Probe a database to determine if a given table exists*
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dbTableName`` -- the database tablename
+    **Key Arguments**
 
-    **Return:**
-        - ``tableExists`` -- True or False
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dbTableName`` -- the database tablename
+    
+
+
+    **Return**
+
+    - ``tableExists`` -- True or False
+    
+
 
     **Usage**
 

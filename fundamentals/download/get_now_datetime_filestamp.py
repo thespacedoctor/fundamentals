@@ -20,11 +20,17 @@ def get_now_datetime_filestamp(longTime=False):
     """
     *A datetime stamp to be appended to the end of filenames: ``YYYYMMDDtHHMMSS``*
 
-    **Key Arguments:**
-        - ``longTime`` -- make time string longer (more change of filenames being unique)
+    **Key Arguments**
 
-    **Return:**
-        - ``now`` -- current time and date in filename format
+    - ``longTime`` -- make time string longer (more change of filenames being unique)
+
+
+
+    **Return**
+
+    - ``now`` -- current time and date in filename format
+
+
 
     **Usage**
 
@@ -36,7 +42,7 @@ def get_now_datetime_filestamp(longTime=False):
     get_now_datetime_filestamp(longTime=True)
     #Out: '20160316t154644133638' 
     ```
-    
+
 
 
 

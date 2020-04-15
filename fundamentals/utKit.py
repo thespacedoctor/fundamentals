@@ -27,8 +27,11 @@ class utKit(object):
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*
 
-    **Key Arguments:**
-        - ``moduleDirectory`` -- the directory to the unit-testing test file
+    **Key Arguments**
+
+    - ``moduleDirectory`` -- the directory to the unit-testing test file
+    
+
 
     **Usage**
 
@@ -98,11 +101,14 @@ class utKit(object):
         """
         *The setupModule method*
 
-        **Return:**
-            - ``log`` -- a logger
-            - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
-            - ``pathToInputDir`` -- path to modules own test input directory
-            - ``pathToOutputDir`` -- path to modules own test output directory
+        **Return**
+
+        - ``log`` -- a logger
+        - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
+        - ``pathToInputDir`` -- path to modules own test input directory
+        - ``pathToOutputDir`` -- path to modules own test output directory
+        
+
         """
         import pymysql as ms
         ## VARIABLES ##
@@ -132,11 +138,17 @@ class utKit(object):
         """
         *The tearDownModule method*
 
-        **Key Arguments:**
-            # -
+        **Key Arguments**
 
-        **Return:**
-            - None
+        # -
+        
+
+
+        **Return**
+
+        - None
+        
+
         """
 
         return None
@@ -145,8 +157,11 @@ class utKit(object):
         """
         *Get the root of the `python` package - useful for getting files in the root directory of a project*
 
-        **Return:**
-            - ``rootPath`` -- the root path of a project
+        **Return**
+
+        - ``rootPath`` -- the root path of a project
+        
+
         """
         import os
         rootPath = os.path.dirname(__file__)

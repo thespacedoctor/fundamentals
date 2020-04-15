@@ -21,10 +21,13 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     """
     *append the current datestamp to the end of the filename (before the extension).*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``filename`` -- the filename
-        - ``longTime`` -- use a longer time-stmap. Default *False*
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``filename`` -- the filename
+    - ``longTime`` -- use a longer time-stmap. Default *False*
+
+
 
     Return:
         - ``dsFilename`` -- datestamped filename
@@ -43,7 +46,7 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     # OUTPUT
     # 'some_filename_20160316t154123749472.html'
     ```
-    
+
 
 
 

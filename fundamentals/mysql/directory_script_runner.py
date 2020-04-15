@@ -77,18 +77,24 @@ def directory_script_runner(
 
     This will store your credentials in an encrypted file located at '~/.mylogin.cnf'. This function takes advantage of the `--login-path` so as not to compromise the user's credentials. Use `mysql_config_editor print --all` to see all of the login-paths set.
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
-        - ``databaseName`` -- the name of the database 
-        - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
-        - ``loginPath`` -- the local-path as set with `mysql_config_editor`
-        - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
-        - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
-        - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``log`` -- logger
+    - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
+    - ``databaseName`` -- the name of the database 
+    - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
+    - ``loginPath`` -- the local-path as set with `mysql_config_editor`
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
+    - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
+    
+
+
+    **Return**
+
+    - None
+    
+
 
     **Usage**
 

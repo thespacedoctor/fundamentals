@@ -28,11 +28,17 @@ def setup_database_connection(
 
     Given the location of a YAML dictionary containing database credientials, this function will setup and return the connection*
 
-    **Key Arguments:**
-        - ``pathToYamlFile`` -- path to the YAML dictionary.
+    **Key Arguments**
 
-    **Return:**
-        - ``dbConn`` -- connection to the MySQL database.
+    - ``pathToYamlFile`` -- path to the YAML dictionary.
+    
+
+
+    **Return**
+
+    - ``dbConn`` -- connection to the MySQL database.
+    
+
 
     **Usage**
 

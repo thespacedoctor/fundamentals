@@ -33,10 +33,13 @@ class list_of_dictionaries(object):
     """
     *The dataset object is a list of python dictionaries. Using this class, the data can be rendered as various list and markup formats*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``listOfDictionaries`` -- the list of dictionaries to render
-        - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``listOfDictionaries`` -- the list of dictionaries to render
+    - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
+    
+
 
     **Usage**
 
@@ -106,11 +109,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in CSV format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the csv content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered in csv format
+        - ``filepath`` -- path to the file to write the csv content to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered in csv format
+        
+
 
         **Usage**
 
@@ -164,11 +173,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a  plain text table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the table to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a plain text table
+        - ``filepath`` -- path to the file to write the table to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered as a plain text table
+        
+
 
         **Usage**
 
@@ -226,11 +241,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a  resturcturedText table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the table to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a resturcturedText table
+        - ``filepath`` -- path to the file to write the table to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered as a resturcturedText table
+        
+
 
         **Usage**
 
@@ -290,11 +311,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a markdown table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the markdown to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a markdown table
+        - ``filepath`` -- path to the file to write the markdown to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered as a markdown table
+        
+
 
         **Usage**
 
@@ -350,11 +377,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in json format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the json content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as json
+        - ``filepath`` -- path to the file to write the json content to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered as json
+        
+
 
         **Usage**
 
@@ -432,11 +465,17 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in yaml format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the yaml content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as yaml
+        - ``filepath`` -- path to the file to write the yaml content to. Default *None*
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered as yaml
+        
+
 
         **Usage**
 
@@ -499,13 +538,19 @@ class list_of_dictionaries(object):
     ):
         """*Render the dataset as a series of mysql insert statements*
 
-        **Key Arguments:**
-            - ``tableName`` -- the name of the mysql db table to assign the insert statements to.
-            - ``filepath`` -- path to the file to write the mysql inserts content to. Default *None*
-            createStatement
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered mysql insert statements (string format)
+        - ``tableName`` -- the name of the mysql db table to assign the insert statements to.
+        - ``filepath`` -- path to the file to write the mysql inserts content to. Default *None*
+        createStatement
+        
+
+
+        **Return**
+
+        - ``renderedData`` -- the data rendered mysql insert statements (string format)
+        
+
 
         **Usage**
 
@@ -567,11 +612,17 @@ class list_of_dictionaries(object):
             csvType="human"):
         """Convert a python list of dictionaries to pretty csv output
 
-        **Key Arguments:**
-            - ``csvType`` -- human, machine or reST
+        **Key Arguments**
 
-        **Return:**
-            - ``output`` -- the contents of a CSV file
+        - ``csvType`` -- human, machine or reST
+        
+
+
+        **Return**
+
+        - ``output`` -- the contents of a CSV file
+        
+
         """
         self.log.debug(
             'starting the ``_list_of_dictionaries_to_csv`` function')
@@ -710,12 +761,18 @@ class list_of_dictionaries(object):
             createStatement=None):
         """Convert a python list of dictionaries to pretty csv output
 
-        **Key Arguments:**
-            - ``tableName`` -- the name of the table to create the insert statements for
-            - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``output`` -- the mysql insert statements (as a string)
+        - ``tableName`` -- the name of the table to create the insert statements for
+        - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
+        
+
+
+        **Return**
+
+        - ``output`` -- the mysql insert statements (as a string)
+        
+
         """
         self.log.debug(
             'completed the ````_list_of_dictionaries_to_mysql_inserts`` function')

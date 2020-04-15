@@ -15,12 +15,18 @@ def docsting_test(self):
         - ``catalogues`` -- connection to the database hosting the contextual catalogues the transients are to be crossmatched against
         - ``marshall`` -- connection to the PESSTO Marshall database
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``settings`` -- the settings dictionary
+    **Key Arguments**
 
-    **Return:**
-        - ``dbConns`` -- a dictionary of the database connections required by sherlock
+    - ``log`` -- logger
+    - ``settings`` -- the settings dictionary
+    
+
+
+    **Return**
+
+    - ``dbConns`` -- a dictionary of the database connections required by sherlock
+    
+
 
     **Usage**
 

@@ -22,11 +22,17 @@ def console_logger(
     """
     *Setup and return a console logger*
 
-    **Key Arguments:**
-        - ``level`` -- the level of logging required
+    **Key Arguments**
 
-    **Return:**
-        - ``logger`` -- the console logger
+    - ``level`` -- the level of logging required
+    
+
+
+    **Return**
+
+    - ``logger`` -- the console logger
+    
+
 
     **Usage**
 
@@ -82,11 +88,17 @@ def setup_dryx_logging(yaml_file):
     """
     *setup dryx style python logging*
 
-    **Key Arguments:**
-        - ``level`` -- the level of logging required
+    **Key Arguments**
 
-    **Return:**
-        - ``logger`` -- the console logger
+    - ``level`` -- the level of logging required
+    
+
+
+    **Return**
+
+    - ``logger`` -- the console logger
+    
+
 
     **Usage**
 

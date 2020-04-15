@@ -28,12 +28,18 @@ class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``dbSettings`` -- a dictionary of database settings
+    **Key Arguments**
 
-    **Return:**
-        - ``dbConns`` -- a database connection
+    - ``log`` -- logger
+    - ``dbSettings`` -- a dictionary of database settings
+    
+
+
+    **Return**
+
+    - ``dbConns`` -- a database connection
+    
+
 
     **Usage**
 
@@ -91,8 +97,11 @@ class database(object):
     def connect(self):
         """connect to the database
 
-        **Return:**
-            - ``dbConn`` -- the database connection
+        **Return**
+
+        - ``dbConn`` -- the database connection
+        
+
 
         See the class docstring for usage
         """
@@ -136,11 +145,17 @@ class database(object):
         """
         *setup a ssh tunnel for a database connection to port through*
 
-        **Key Arguments:**
-            - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
+        **Key Arguments**
 
-        **Return:**
-            - ``sshPort`` -- the port the ssh tunnel is connected via
+        - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
+        
+
+
+        **Return**
+
+        - ``sshPort`` -- the port the ssh tunnel is connected via
+        
+
         """
         self.log.debug('starting the ``_setup_tunnel`` method')
 

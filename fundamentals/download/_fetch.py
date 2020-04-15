@@ -24,10 +24,16 @@ def _fetch(url,):
     """
     *Retrieve an HTML document or file from the web at a given URL*
 
-    **Key Arguments:**
+    **Key Arguments**
+
+
+    
       - ``url`` -- the URL of the document or file
 
-    **Return:**
+    **Return**
+
+
+    
       - ``url`` -- the URL of the document or file, or None if an error occured
       - ``body`` -- the text content of the HTML document.
     """

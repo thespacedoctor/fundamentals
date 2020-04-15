@@ -25,13 +25,19 @@ def get_database_table_column_names(
 ):
     """get database table column names
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dbTable`` -- database tablename
+    **Key Arguments**
 
-    **Return:**
-        - ``columnNames`` -- table column names
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dbTable`` -- database tablename
+    
+
+
+    **Return**
+
+    - ``columnNames`` -- table column names
+    
+
 
     **Usage**
 

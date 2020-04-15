@@ -27,15 +27,21 @@ def tag(
         wherefrom=False):
     """Add tags and ratings to your macOS files and folders
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``filepath`` -- the path to the file needing tagged
-        - ``tags`` -- comma or space-separated string, or list of tags. Use `False` to leave file tags as they are. Use "" or [] to remove tags. Default *False*.
-        - ``rating`` -- a rating to add to the file. Use 0 to remove rating or `False` to leave file rating as it is. Default *False*.
-        - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``log`` -- logger
+    - ``filepath`` -- the path to the file needing tagged
+    - ``tags`` -- comma or space-separated string, or list of tags. Use `False` to leave file tags as they are. Use "" or [] to remove tags. Default *False*.
+    - ``rating`` -- a rating to add to the file. Use 0 to remove rating or `False` to leave file rating as it is. Default *False*.
+    - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
+    
+
+
+    **Return**
+
+    - None
+    
+
 
     **Usage**
 

@@ -25,13 +25,19 @@ def recursive_directory_listing(
 
     Options to list only files or only directories.
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
-        - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
+    **Key Arguments**
 
-    **Return:**
-        - ``matchedPathList`` -- the matched paths
+    - ``log`` -- logger
+    - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
+    - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
+    
+
+
+    **Return**
+
+    - ``matchedPathList`` -- the matched paths
+    
+
 
     **Usage**
 
