@@ -27,21 +27,23 @@ class fileChunker(object):
         - ``filepath`` -- path to the large file to iterate over
         - ``batchSize`` -- size of the chunks to return in lines
 
-    **Usage:**
+    **Usage**
 
-        To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
+    To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
 
-        ```python
-        from fundamentals.files import fileChunker
-        fc = fileChunker(
-            filepath="/path/to/large/file.csv",
-            batchSize=100000
-        )
-        for i in fc:
-            print len(i)
-        ```
+    ```python
+    from fundamentals.files import fileChunker
+    fc = fileChunker(
+        filepath="/path/to/large/file.csv",
+        batchSize=100000
+    )
+    for i in fc:
+        print len(i)
+    ```
+    
+
 
 
     """

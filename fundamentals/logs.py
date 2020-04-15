@@ -28,14 +28,17 @@ def console_logger(
     **Return:**
         - ``logger`` -- the console logger
 
-    **Usage:**
-        ```python
-        from fundamentals import logs
-        log = logs.console_logger(
-            level="DEBUG"
-        )
-        log.debug("Testing console logger")
-        ```
+    **Usage**
+
+    ```python
+    from fundamentals import logs
+    log = logs.console_logger(
+        level="DEBUG"
+    )
+    log.debug("Testing console logger")
+    ```
+    
+
 
 
     """
@@ -85,51 +88,54 @@ def setup_dryx_logging(yaml_file):
     **Return:**
         - ``logger`` -- the console logger
 
-    **Usage:**
-        ```python
-        from fundamentals import logs
-        log = logs.setup_dryx_logging(
-            yaml_file="/Users/Dave/.config/fundamentals/fundamentals.yaml"
-        )
-        log.error("test error")
-        ```
+    **Usage**
+
+    ```python
+    from fundamentals import logs
+    log = logs.setup_dryx_logging(
+        yaml_file="/Users/Dave/.config/fundamentals/fundamentals.yaml"
+    )
+    log.error("test error")
+    ```
 
 
 
-        Here is an example of the settings in the yaml file:
+    Here is an example of the settings in the yaml file:
 
-        ```yaml
-        version: 1
+    ```yaml
+    version: 1
 
-        logging settings:
-            formatters:
-                file_style:
-                    format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
-                    datefmt: '%Y/%m/%d %H:%M:%S'
-                console_style:
-                    format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
-                    datefmt: '%H:%M:%S'
-                html_style:
-                    format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
-                    datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
-            handlers:
-                console:
-                    class: logging.StreamHandler
-                    level: DEBUG
-                    formatter: console_style
-                    stream: ext://sys.stdout
-                file:
-                    class: logging.handlers.GroupWriteRotatingFileHandler
-                    level: WARNING
-                    formatter: file_style
-                    filename: /Users/Dave/.config/fundamentals/fundamentals.log
-                    mode: w+
-                    maxBytes: 102400
-                    backupCount: 1
-            root:
+    logging settings:
+        formatters:
+            file_style:
+                format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
+                datefmt: '%Y/%m/%d %H:%M:%S'
+            console_style:
+                format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
+                datefmt: '%H:%M:%S'
+            html_style:
+                format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
+                datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
+        handlers:
+            console:
+                class: logging.StreamHandler
+                level: DEBUG
+                formatter: console_style
+                stream: ext://sys.stdout
+            file:
+                class: logging.handlers.GroupWriteRotatingFileHandler
                 level: WARNING
-                handlers: [file,console]
-        ```
+                formatter: file_style
+                filename: /Users/Dave/.config/fundamentals/fundamentals.log
+                mode: w+
+                maxBytes: 102400
+                backupCount: 1
+        root:
+            level: WARNING
+            handlers: [file,console]
+    ```
+    
+
 
 
 
@@ -213,12 +219,15 @@ class emptyLogger(object):
     """
     *A fake logger object so user can set ``log=False`` if required*
 
-    **Usage:**
-        ```python
-        if log == False:
-            from fundamentals.logs import emptyLogger
-            log = emptyLogger()
-        ```
+    **Usage**
+
+    ```python
+    if log == False:
+        from fundamentals.logs import emptyLogger
+        log = emptyLogger()
+    ```
+    
+
 
 
     """

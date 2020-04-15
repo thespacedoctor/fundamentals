@@ -90,56 +90,58 @@ def directory_script_runner(
     **Return:**
         - None
 
-    **Usage:**
+    **Usage**
 
-        To run the scripts in the directroy and not act on the script file use something similar to:
+    To run the scripts in the directroy and not act on the script file use something similar to:
 
-        ```python
-        from fundamentals.mysql import directory_script_runner
-        directory_script_runner(
-            log=log,
-            pathToScriptDirectory="/path/to/mysql_scripts",
-            databaseName="imports",
-            loginPath="myLoginDetails"
-        )
-        ```
-
-
-
-        To delete successful scripts and archive failed scripts for later inspection:
-
-        ```python
-        from fundamentals.mysql import directory_script_runner
-        directory_script_runner(
-            log=log,
-            pathToScriptDirectory="/path/to/mysql_scripts",
-            databaseName="imports",
-            loginPath="myLoginDetails",
-            successRule="delete",
-            failureRule="failed"
-        )
-        ```
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails"
+    )
+    ```
 
 
 
-        This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
+    To delete successful scripts and archive failed scripts for later inspection:
 
-        Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
-
-        ```python
-        from fundamentals.mysql import directory_script_runner
-        directory_script_runner(
-            log=log,
-            pathToScriptDirectory="/path/to/mysql_scripts",
-            databaseName="imports",
-            loginPath="myLoginDetails",
-            waitForResults=False
-        )
-        ```
-
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails",
+        successRule="delete",
+        failureRule="failed"
+    )
+    ```
 
 
-        Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+
+    This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
+
+    Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails",
+        waitForResults=False
+    )
+    ```
+
+
+
+    Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+    
+
     """
     log.debug('starting the ``directory_script_runner`` function')
 

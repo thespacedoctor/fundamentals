@@ -35,38 +35,40 @@ class database(object):
     **Return:**
         - ``dbConns`` -- a database connection
 
-    **Usage:**
+    **Usage**
 
-        Given a python dictionary that looks like this:
+    Given a python dictionary that looks like this:
 
-        ```python
-        dbSettings = {
-            'host': '127.0.0.1', 
-            'loginPath': 'atlasMovers', 
-            'user': 'monster', 
-            'tunnel': {
-                'remote ip': 'psweb.mp.qub.ac.uk', 
-                'remote datbase host': 'dormammu', 
-                'remote user': 'monster', 
-                'port': 9006
-            }, 
-            'password': 'myPass', 
-            'db': 'atlas_moving_objects'
-        }
-        ```
+    ```python
+    dbSettings = {
+        'host': '127.0.0.1', 
+        'loginPath': 'atlasMovers', 
+        'user': 'monster', 
+        'tunnel': {
+            'remote ip': 'psweb.mp.qub.ac.uk', 
+            'remote datbase host': 'dormammu', 
+            'remote user': 'monster', 
+            'port': 9006
+        }, 
+        'password': 'myPass', 
+        'db': 'atlas_moving_objects'
+    }
+    ```
 
 
 
-        ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
+    ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
 
-        ```python
-        # SETUP ALL DATABASE CONNECTIONS
-        from fundamentals.mysql import database
-        dbConn = database(
-            log=log,
-            dbSettings=dbSettings
-        ).connect()
-        ```
+    ```python
+    # SETUP ALL DATABASE CONNECTIONS
+    from fundamentals.mysql import database
+    dbConn = database(
+        log=log,
+        dbSettings=dbSettings
+    ).connect()
+    ```
+    
+
 
 
     """

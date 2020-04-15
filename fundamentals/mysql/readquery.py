@@ -33,17 +33,19 @@ def readquery(
     **Return:**
         - ``rows`` -- the rows returned by the sql query
 
-    **Usage:**
+    **Usage**
 
-        ```python
-        from fundamentals.mysql import readquery
-        rows = readquery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            quiet=False
-        )
-        ```
+    ```python
+    from fundamentals.mysql import readquery
+    rows = readquery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        quiet=False
+    )
+    ```
+    
+
 
 
     """

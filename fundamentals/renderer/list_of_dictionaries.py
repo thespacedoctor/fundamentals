@@ -38,36 +38,38 @@ class list_of_dictionaries(object):
         - ``listOfDictionaries`` -- the list of dictionaries to render
         - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
 
-    **Usage:**
+    **Usage**
 
-        To initialise the dataset object:
+    To initialise the dataset object:
 
-        ```python
-        dataList = [
-            {
-                "owner": "daisy",
-                "pet": "dog",
-                "address": "belfast, uk"
-            },
-            {
-                "owner": "john",
-                "pet": "snake",
-                "address": "the moon"
-            },
-            {
-                "owner": "susan",
-                "pet": "crocodile",
-                "address": "larne"
-            }
+    ```python
+    dataList = [
+        {
+            "owner": "daisy",
+            "pet": "dog",
+            "address": "belfast, uk"
+        },
+        {
+            "owner": "john",
+            "pet": "snake",
+            "address": "the moon"
+        },
+        {
+            "owner": "susan",
+            "pet": "crocodile",
+            "address": "larne"
+        }
 
-        ]
+    ]
 
-        from fundamentals.renderer import list_of_dictionaries
-        dataSet = list_of_dictionaries(
-            log=log,
-            listOfDictionaries=dataList
-        )
-        ```
+    from fundamentals.renderer import list_of_dictionaries
+    dataSet = list_of_dictionaries(
+        log=log,
+        listOfDictionaries=dataList
+    )
+    ```
+    
+
 
 
     """
@@ -90,9 +92,11 @@ class list_of_dictionaries(object):
             self):
         """*Returns the original list of dictionaries*
 
-        **Usage:**
+        **Usage**
 
-            dataSet.list
+        dataSet.list
+        
+
         """
         return self.listOfDictionaries
 
@@ -108,30 +112,32 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered in csv format
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as csv:
+        To render the data set as csv:
 
-            ```python
-            print(dataSet.csv())
-            ```
-
-
-
-            ```text
-            owner,pet,address
-            daisy,dog,"belfast, uk"
-            john,snake,the moon
-            susan,crocodile,larne
-            ```
+        ```python
+        print(dataSet.csv())
+        ```
 
 
 
-            and to save the csv rendering to file:
+        ```text
+        owner,pet,address
+        daisy,dog,"belfast, uk"
+        john,snake,the moon
+        susan,crocodile,larne
+        ```
 
-            ```python
-            dataSet.csv("/path/to/myfile.csv")
-            ```
+
+
+        and to save the csv rendering to file:
+
+        ```python
+        dataSet.csv("/path/to/myfile.csv")
+        ```
+        
+
 
 
         """
@@ -164,33 +170,35 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered as a plain text table
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as a plain text table:
+        To render the data set as a plain text table:
 
-            ```python
-            print(dataSet.table())
-            ```
-
-
-
-            ```text
-            +--------+------------+--------------+
-            | owner  | pet        | address      |
-            +========+============+==============+
-            | daisy  | dog        | belfast, uk  |
-            | john   | snake      | the moon     |
-            | susan  | crocodile  | larne        |
-            +--------+------------+--------------+
-            ```
+        ```python
+        print(dataSet.table())
+        ```
 
 
 
-            and to save the table rendering to file:
+        ```text
+        +--------+------------+--------------+
+        | owner  | pet        | address      |
+        +========+============+==============+
+        | daisy  | dog        | belfast, uk  |
+        | john   | snake      | the moon     |
+        | susan  | crocodile  | larne        |
+        +--------+------------+--------------+
+        ```
 
-            ```python
-            dataSet.table("/path/to/myfile.ascii")
-            ```
+
+
+        and to save the table rendering to file:
+
+        ```python
+        dataSet.table("/path/to/myfile.ascii")
+        ```
+        
+
 
 
         """
@@ -224,35 +232,37 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered as a resturcturedText table
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as a resturcturedText table:
+        To render the data set as a resturcturedText table:
 
-            ```python
-            print(dataSet.reST())
-            ```
-
-
-
-            ```text
-            +--------+------------+--------------+
-            | owner  | pet        | address      |
-            +========+============+==============+
-            | daisy  | dog        | belfast, uk  |
-            +--------+------------+--------------+
-            | john   | snake      | the moon     |
-            +--------+------------+--------------+
-            | susan  | crocodile  | larne        |
-            +--------+------------+--------------+
-            ```
+        ```python
+        print(dataSet.reST())
+        ```
 
 
 
-            and to save the table rendering to file:
+        ```text
+        +--------+------------+--------------+
+        | owner  | pet        | address      |
+        +========+============+==============+
+        | daisy  | dog        | belfast, uk  |
+        +--------+------------+--------------+
+        | john   | snake      | the moon     |
+        +--------+------------+--------------+
+        | susan  | crocodile  | larne        |
+        +--------+------------+--------------+
+        ```
 
-            ```python
-            dataSet.reST("/path/to/myfile.rst")
-            ```
+
+
+        and to save the table rendering to file:
+
+        ```python
+        dataSet.reST("/path/to/myfile.rst")
+        ```
+        
+
 
 
         """
@@ -286,31 +296,33 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered as a markdown table
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as a markdown table:
+        To render the data set as a markdown table:
 
-            ```python
-            print(dataSet.markdown())
-            ```
-
-
-
-            ```markdown
-            | owner  | pet        | address      |
-            |:-------|:-----------|:-------------|
-            | daisy  | dog        | belfast, uk  |
-            | john   | snake      | the moon     |
-            | susan  | crocodile  | larne        |
-            ```
+        ```python
+        print(dataSet.markdown())
+        ```
 
 
 
-            and to save the markdown table rendering to file:
+        ```markdown
+        | owner  | pet        | address      |
+        |:-------|:-----------|:-------------|
+        | daisy  | dog        | belfast, uk  |
+        | john   | snake      | the moon     |
+        | susan  | crocodile  | larne        |
+        ```
 
-            ```python
-            dataSet.table("/path/to/myfile.md")
-            ```
+
+
+        and to save the markdown table rendering to file:
+
+        ```python
+        dataSet.table("/path/to/myfile.md")
+        ```
+        
+
 
 
         """
@@ -344,43 +356,45 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered as json
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as json:
+        To render the data set as json:
 
-            ```python
-            print(dataSet.json())
-            ```
-
-
-
-            ```json
-            [
-                {
-                    "address": "belfast, uk",
-                    "owner": "daisy",
-                    "pet": "dog"
-                },
-                {
-                    "address": "the moon",
-                    "owner": "john",
-                    "pet": "snake"
-                },
-                {
-                    "address": "larne",
-                    "owner": "susan",
-                    "pet": "crocodile"
-                }
-            ]
-            ```
+        ```python
+        print(dataSet.json())
+        ```
 
 
 
-            and to save the json rendering to file:
+        ```json
+        [
+            {
+                "address": "belfast, uk",
+                "owner": "daisy",
+                "pet": "dog"
+            },
+            {
+                "address": "the moon",
+                "owner": "john",
+                "pet": "snake"
+            },
+            {
+                "address": "larne",
+                "owner": "susan",
+                "pet": "crocodile"
+            }
+        ]
+        ```
 
-            ```python
-            dataSet.json("/path/to/myfile.json")
-            ```
+
+
+        and to save the json rendering to file:
+
+        ```python
+        dataSet.json("/path/to/myfile.json")
+        ```
+        
+
 
 
         """
@@ -424,35 +438,37 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered as yaml
 
-        **Usage:**
+        **Usage**
 
-            To render the data set as yaml:
+        To render the data set as yaml:
 
-            ```python
-            print(dataSet.yaml())
-            ```
-
-
-
-            ```yaml
-            - address: belfast, uk
-              owner: daisy
-              pet: dog
-            - address: the moon
-              owner: john
-              pet: snake
-            - address: larne
-              owner: susan
-              pet: crocodile
-            ```
+        ```python
+        print(dataSet.yaml())
+        ```
 
 
 
-            and to save the yaml rendering to file:
+        ```yaml
+        - address: belfast, uk
+          owner: daisy
+          pet: dog
+        - address: the moon
+          owner: john
+          pet: snake
+        - address: larne
+          owner: susan
+          pet: crocodile
+        ```
 
-            ```python
-            dataSet.json("/path/to/myfile.yaml")
-            ```
+
+
+        and to save the yaml rendering to file:
+
+        ```python
+        dataSet.json("/path/to/myfile.yaml")
+        ```
+        
+
 
 
         """
@@ -491,29 +507,31 @@ class list_of_dictionaries(object):
         **Return:**
             - ``renderedData`` -- the data rendered mysql insert statements (string format)
 
-        **Usage:**
+        **Usage**
 
-            ```python
-            print(dataSet.mysql("testing_table"))
-            ```
-
-
-
-            this output the following:
-
-            ```plain
-            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
-            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
-            INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
-            ```
+        ```python
+        print(dataSet.mysql("testing_table"))
+        ```
 
 
 
-            To save this rendering to file use:
+        this output the following:
 
-            ```python
-            dataSet.mysql("testing_table", "/path/to/myfile.sql")
-            ```
+        ```plain
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
+        ```
+
+
+
+        To save this rendering to file use:
+
+        ```python
+        dataSet.mysql("testing_table", "/path/to/myfile.sql")
+        ```
+        
+
 
 
 

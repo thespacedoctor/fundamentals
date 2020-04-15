@@ -29,16 +29,19 @@ def extract_filename_from_url(log, url):
     Returns:
         - ``filename`` -- the filename
 
-    **Usage:**
-        ```python
-        from fundamentals.download import extract_filename_from_url
-        name = extract_filename_from_url(
-            log=log,
-            url="https://en.wikipedia.org/wiki/Docstring"
-        )
-        print name
-        # OUT: Docstring.html
-        ```
+    **Usage**
+
+    ```python
+    from fundamentals.download import extract_filename_from_url
+    name = extract_filename_from_url(
+        log=log,
+        url="https://en.wikipedia.org/wiki/Docstring"
+    )
+    print name
+    # OUT: Docstring.html
+    ```
+    
+
 
 
     """

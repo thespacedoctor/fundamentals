@@ -35,27 +35,29 @@ def list_of_dictionaries_to_mysql_inserts(
     **Return:**
         - ``output`` -- the mysql insert statements (as a string)
 
-    **Usage:**
+    **Usage**
 
-        ```python
-        from fundamentals.files import list_of_dictionaries_to_mysql_inserts
-        mysqlInserts = list_of_dictionaries_to_mysql_inserts(
-            log=log,
-            datalist=dataList,
-            tableName="my_new_table"
-        )
-        print mysqlInserts
-        ```
+    ```python
+    from fundamentals.files import list_of_dictionaries_to_mysql_inserts
+    mysqlInserts = list_of_dictionaries_to_mysql_inserts(
+        log=log,
+        datalist=dataList,
+        tableName="my_new_table"
+    )
+    print mysqlInserts
+    ```
 
 
 
-        this output the following:
+    this output the following:
 
-        ```plain
-        INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES ("cool" ,"super cool" ,"2016-09-14T13:17:26" ,"burgers" ,"cheese")  ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super cool", dateCreated="2016-09-14T13:17:26", uniqueKey2="burgers", uniquekey1="cheese" ;
-        ...
-        ...
-        ```
+    ```plain
+    INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES ("cool" ,"super cool" ,"2016-09-14T13:17:26" ,"burgers" ,"cheese")  ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super cool", dateCreated="2016-09-14T13:17:26", uniqueKey2="burgers", uniquekey1="cheese" ;
+    ...
+    ...
+    ```
+    
+
 
 
     """

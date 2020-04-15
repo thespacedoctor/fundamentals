@@ -31,22 +31,24 @@ def table_exists(
     **Return:**
         - ``tableExists`` -- True or False
 
-    **Usage:**
+    **Usage**
 
-        To test if a table exists in a database:
+    To test if a table exists in a database:
 
-        ```python
-        from fundamentals.mysql import table_exists
-        exists = table_exists(
-            dbConn=dbConn,
-            log=log,
-            dbTableName="stupid_named_table"
-        )
+    ```python
+    from fundamentals.mysql import table_exists
+    exists = table_exists(
+        dbConn=dbConn,
+        log=log,
+        dbTableName="stupid_named_table"
+    )
 
-        print exists
+    print exists
 
-        # OUTPUT: False
-        ```
+    # OUTPUT: False
+    ```
+    
+
 
 
     """

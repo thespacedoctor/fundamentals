@@ -108,34 +108,36 @@ class yaml_to_database(object):
         - ``dbConn`` -- connection to database to add the content to
         - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
 
-    **Usage:**
+    **Usage**
 
-        To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        To initiate a ``yaml2db`` object, use the following:
+    To initiate a ``yaml2db`` object, use the following:
 
-        ```python
-        from fundamentals.mysql import yaml_to_database
-        yaml2db = yaml_to_database(
-            log=log,
-            settings=settings,
-            dbConn=dbConn,
-            pathToInputDir="/path/to/yaml/directory",
-            deleteFiles=False
-        ) 
-        ```
+    ```python
+    from fundamentals.mysql import yaml_to_database
+    yaml2db = yaml_to_database(
+        log=log,
+        settings=settings,
+        dbConn=dbConn,
+        pathToInputDir="/path/to/yaml/directory",
+        deleteFiles=False
+    ) 
+    ```
 
 
 
-        And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
+    And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
 
-        ```yaml
-        title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
-        url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
-        kind: webpage
-        subtype: article
-        table: web_articles,podcasts 
-        ```
+    ```yaml
+    title: Why you should do most of your text editing in : Sublime Text | Sublime Text Tips
+    url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
+    kind: webpage
+    subtype: article
+    table: web_articles,podcasts 
+    ```
+    
+
 
 
     """
@@ -167,9 +169,11 @@ class yaml_to_database(object):
         **Return:**
             - None
 
-        **Usage:**
+        **Usage**
 
-            To import an entire directory of yaml files into a database, use the following:
+        To import an entire directory of yaml files into a database, use the following:
+        
+
 
         ```python
         from fundamentals.mysql import yaml_to_database
@@ -211,23 +215,25 @@ class yaml_to_database(object):
         **Return:**
             - None
 
-        **Usage:**
+        **Usage**
 
-            To parse and import the contents of a single yaml file into the database, use the following:
+        To parse and import the contents of a single yaml file into the database, use the following:
 
-            ```python
-            from fundamentals.mysql import yaml_to_database
-            # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
-            yaml2db = yaml_to_database(
-                log=log,
-                settings=settings,
-                dbConn=dbConn
-            ) 
-            yaml2db.add_yaml_file_content_to_database(
-                filepath=${1:"/path/to/file.yaml"},
-                deleteFile=True
-            )
-            ```
+        ```python
+        from fundamentals.mysql import yaml_to_database
+        # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
+        yaml2db = yaml_to_database(
+            log=log,
+            settings=settings,
+            dbConn=dbConn
+        ) 
+        yaml2db.add_yaml_file_content_to_database(
+            filepath=${1:"/path/to/file.yaml"},
+            deleteFile=True
+        )
+        ```
+        
+
 
 
         """

@@ -36,38 +36,40 @@ def writequery(
     **Return:**
         - ``message`` -- error/warning message
 
-    **Usage:**
+    **Usage**
 
-        Here's an example of how to create a table using the database connection passed to the function:
+    Here's an example of how to create a table using the database connection passed to the function:
 
-        ```python
-        from fundamentals.mysql import writequery
-        sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
-        message = writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
-        )
-        ```
+    ```python
+    from fundamentals.mysql import writequery
+    sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+    message = writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        Force=False,
+        manyValueList=False
+    )
+    ```
 
 
 
-        Here's a many value insert example:
+    Here's a many value insert example:
 
-        ```python
-        from fundamentals.mysql import writequery
-        sqlQuery = "INSERT INTO testing_table (id) values (%s)"
-        message = writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=[(1,), (2,), (3,), (4,), (5,), (6,), (7,),
-                           (8,), (9,), (10,), (11,), (12,), ]
-        )
-        ```
+    ```python
+    from fundamentals.mysql import writequery
+    sqlQuery = "INSERT INTO testing_table (id) values (%s)"
+    message = writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        Force=False,
+        manyValueList=[(1,), (2,), (3,), (4,), (5,), (6,), (7,),
+                       (8,), (9,), (10,), (11,), (12,), ]
+    )
+    ```
+    
+
 
 
 

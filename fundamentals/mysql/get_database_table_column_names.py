@@ -33,18 +33,20 @@ def get_database_table_column_names(
     **Return:**
         - ``columnNames`` -- table column names
 
-    **Usage:**
+    **Usage**
 
-        To get the column names of a table in a given database:
+    To get the column names of a table in a given database:
 
-        ```python
-        from fundamentals.mysql import get_database_table_column_names
-        columnNames = get_database_table_column_names(
-            dbConn=dbConn,
-            log=log,
-            dbTable="test_table"
-        )
-        ```
+    ```python
+    from fundamentals.mysql import get_database_table_column_names
+    columnNames = get_database_table_column_names(
+        dbConn=dbConn,
+        log=log,
+        dbTable="test_table"
+    )
+    ```
+    
+
 
 
     """

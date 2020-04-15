@@ -54,29 +54,32 @@ def multiobject_download(
     **Return:**
       - list of timestamped documents (same order as the input urlList)
 
-    **Usage:**
-        ```python
-        # download the pages linked from the main list page
-        from fundamentals.download import multiobject_download
-        localUrls = multiobject_download(
-            urlList=["https://www.python.org/dev/peps/pep-0257/","https://en.wikipedia.org/wiki/Docstring"],
-            downloadDirectory="/tmp",
-            log="log",
-            timeStamp=True,
-            timeout=180,
-            concurrentDownloads=2,
-            resetFilename=False,
-            credentials=False,  # { 'username' : "...", "password", "..." }
-            longTime=True
-        )
+    **Usage**
 
-        print localUrls
-        # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
-        ```
+    ```python
+    # download the pages linked from the main list page
+    from fundamentals.download import multiobject_download
+    localUrls = multiobject_download(
+        urlList=["https://www.python.org/dev/peps/pep-0257/","https://en.wikipedia.org/wiki/Docstring"],
+        downloadDirectory="/tmp",
+        log="log",
+        timeStamp=True,
+        timeout=180,
+        concurrentDownloads=2,
+        resetFilename=False,
+        credentials=False,  # { 'username' : "...", "password", "..." }
+        longTime=True
+    )
+
+    print localUrls
+    # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
+    ```
 
 
 
-        .. image:: https://i.imgur.com/QYoMm24.png width=600px
+    .. image:: https://i.imgur.com/QYoMm24.png width=600px
+    
+
     """
     ## > IMPORTS ##
     import sys

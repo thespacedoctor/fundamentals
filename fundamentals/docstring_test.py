@@ -22,22 +22,24 @@ def docsting_test(self):
     **Return:**
         - ``dbConns`` -- a dictionary of the database connections required by sherlock
 
-    **Usage:**
+    **Usage**
 
-        To setup the sherlock database connections, run the following:
+    To setup the sherlock database connections, run the following:
 
-        ```python
-        # SETUP ALL DATABASE CONNECTIONS
-        from sherlock import database
-        db = database(
-            log=log,
-            settings=settings
-        )
-        dbConns, dbVersions = db.connect()
-        transientsDbConn = dbConns["transients"]
-        cataloguesDbConn = dbConns["catalogues"]
-        pmDbConn = dbConns["marshall"]
-        ```
+    ```python
+    # SETUP ALL DATABASE CONNECTIONS
+    from sherlock import database
+    db = database(
+        log=log,
+        settings=settings
+    )
+    dbConns, dbVersions = db.connect()
+    transientsDbConn = dbConns["transients"]
+    cataloguesDbConn = dbConns["catalogues"]
+    pmDbConn = dbConns["marshall"]
+    ```
+    
+
 
     ```eval_rst
     .. todo::

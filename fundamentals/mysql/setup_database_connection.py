@@ -34,27 +34,29 @@ def setup_database_connection(
     **Return:**
         - ``dbConn`` -- connection to the MySQL database.
 
-    **Usage:**
+    **Usage**
 
-        The settings file should be in this form, with all keyword values set:
+    The settings file should be in this form, with all keyword values set:
 
-        ```yaml
-        db: unit_tests
-        host: localhost
-        user: utuser
-        password: utpass
-        ```
+    ```yaml
+    db: unit_tests
+    host: localhost
+    user: utuser
+    password: utpass
+    ```
 
 
 
-        And here's how to generate the connection object:
+    And here's how to generate the connection object:
 
-        ```python
-        from fundamentals.mysql import setup_database_connection
-        dbConn = setup_database_connection(
-            pathToYamlFile=pathToMyYamlFile
-        )
-        ```
+    ```python
+    from fundamentals.mysql import setup_database_connection
+    dbConn = setup_database_connection(
+        pathToYamlFile=pathToMyYamlFile
+    )
+    ```
+    
+
 
 
     """

@@ -63,20 +63,22 @@ def insert_list_of_dictionaries_into_database_tables(
     **Return:**
         - None
 
-    **Usage:**
+    **Usage**
 
-        ```python
-        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
-        insert_list_of_dictionaries_into_database_tables(
-            dbConn=dbConn,
-            log=log,
-            dictList=dictList,
-            dbTableName="test_insert_many",
-            uniqueKeyList=["col1", "col3"],
-            dateModified=False,
-            batchSize=2500
-        )
-        ```
+    ```python
+    from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+    insert_list_of_dictionaries_into_database_tables(
+        dbConn=dbConn,
+        log=log,
+        dictList=dictList,
+        dbTableName="test_insert_many",
+        uniqueKeyList=["col1", "col3"],
+        dateModified=False,
+        batchSize=2500
+    )
+    ```
+    
+
 
 
     """
@@ -204,15 +206,18 @@ def _insert_single_batch_into_database(
     **Return:**
         - None
 
-    **Usage:**
-        .. todo::
+    **Usage**
 
-            add usage info
-            create a sublime snippet for usage
+    .. todo::
 
-        ```python
-        usage code            
-        ```
+        add usage info
+        create a sublime snippet for usage
+
+    ```python
+    usage code            
+    ```
+    
+
 
 
     """
@@ -359,15 +364,18 @@ def _add_dictlist_to_database_via_load_in_file(
     **Return:**
         - None
 
-    **Usage:**
-        .. todo::
+    **Usage**
 
-            add usage info
-            create a sublime snippet for usage
+    .. todo::
 
-        ```python
-        usage code
-        ```
+        add usage info
+        create a sublime snippet for usage
+
+    ```python
+    usage code
+    ```
+    
+
 
 
     """

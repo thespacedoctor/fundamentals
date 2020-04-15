@@ -82,26 +82,28 @@ class sqlite2mysql(object):
         - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
         - ``dbConn`` -- mysql database connection 
 
-    **Usage:**
+    **Usage**
 
-        To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        To convert and import the content of a sqlite database into MySQL run the following:
+    To convert and import the content of a sqlite database into MySQL run the following:
 
-        .. todo::
+    .. todo::
 
-            - add a tutorial about ``sqlite2mysql`` to documentation
+        - add a tutorial about ``sqlite2mysql`` to documentation
 
-        ```python
-        from fundamentals.mysql import sqlite2mysql
-        converter = sqlite2mysql(
-            log=log,
-            settings=settings,
-            pathToSqlite="/path/to/sqlite.db",
-            tablePrefix="external"
-        )
-        converter.convert_sqlite_to_mysql()
-        ```
+    ```python
+    from fundamentals.mysql import sqlite2mysql
+    converter = sqlite2mysql(
+        log=log,
+        settings=settings,
+        pathToSqlite="/path/to/sqlite.db",
+        tablePrefix="external"
+    )
+    converter.convert_sqlite_to_mysql()
+    ```
+    
+
 
 
     """

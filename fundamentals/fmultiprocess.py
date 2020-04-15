@@ -41,15 +41,17 @@ def fmultiprocess(
     **Return:**
         - ``resultArray`` -- the array of results
 
-    **Usage:**
+    **Usage**
 
-        ```python
-        from fundamentals import multiprocess
-        # DEFINE AN INPUT ARRAY
-        inputArray = range(10000)
-        results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
-                              inputArray=inputArray, otherFunctionKeyword="cheese")
-        ```
+    ```python
+    from fundamentals import multiprocess
+    # DEFINE AN INPUT ARRAY
+    inputArray = range(10000)
+    results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
+                          inputArray=inputArray, otherFunctionKeyword="cheese")
+    ```
+    
+
 
 
     """
