@@ -5,18 +5,13 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import time
-
 
 def writequery(
     log,
@@ -35,12 +30,10 @@ def writequery(
     - ``manyValueList`` -- a list of value tuples if executing more than one insert
     
 
-
     **Return**
 
     - ``message`` -- error/warning message
     
-
 
     **Usage**
 
@@ -58,8 +51,6 @@ def writequery(
     )
     ```
 
-
-
     Here's a many value insert example:
 
     ```python
@@ -75,10 +66,6 @@ def writequery(
     )
     ```
     
-
-
-
-
     """
     log.debug('starting the ``writequery`` function')
     import pymysql

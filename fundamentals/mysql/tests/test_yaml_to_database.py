@@ -42,7 +42,6 @@ if not os.path.exists(pathToOutputDir):
 
 # xt-setup-unit-testing-files-and-folders
 
-
 class test_yaml_to_database(unittest.TestCase):
 
     def test_single_yaml_to_database_function(self):

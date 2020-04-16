@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -26,8 +22,6 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     - ``log`` -- logger
     - ``filename`` -- the filename
     - ``longTime`` -- use a longer time-stmap. Default *False*
-
-
 
     Return:
         - ``dsFilename`` -- datestamped filename
@@ -46,12 +40,7 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     # OUTPUT
     # 'some_filename_20160316t154123749472.html'
     ```
-
-
-
-
     """
-    ## > IMPORTS ##
     from fundamentals.download import get_now_datetime_filestamp
 
     try:

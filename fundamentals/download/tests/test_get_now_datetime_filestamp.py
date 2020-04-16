@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # class test_get_now_datetime_filestamp(unittest.TestCase):
 
 #     def test_get_now_datetime_filestamp_function(self):

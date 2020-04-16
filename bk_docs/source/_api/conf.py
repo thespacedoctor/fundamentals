@@ -20,7 +20,6 @@
 # import sys
 # sys.path.insert(0, u'/Users/Dave/git_repos/_packages_/python/fundamentals')
 
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -80,7 +79,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -114,12 +112,10 @@ html_sidebars = {
     ]
 }
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'fundamentalsdoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -149,7 +145,6 @@ latex_documents = [
      u'Author', 'manual'),
 ]
 
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -158,7 +153,6 @@ man_pages = [
     (master_doc, 'fundamentals', u'fundamentals Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -170,8 +164,6 @@ texinfo_documents = [
      author, 'fundamentals', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
 
 # -- Options for Epub output ----------------------------------------------
 
@@ -192,5 +184,4 @@ epub_copyright = copyright
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
-
 

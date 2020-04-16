@@ -7,12 +7,8 @@ There are options to rename all the downloaded resource, index the files, set di
 
 :Author:
     David Young
-
-:Date Created:
-    March  3, 2016
 """
 from __future__ import print_function
-################# GLOBAL IMPORTS ####################
 from future import standard_library
 standard_library.install_aliases()
 from builtins import zip
@@ -22,7 +18,6 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import urllib
-
 
 def multiobject_download(
     urlList,
@@ -41,7 +36,6 @@ def multiobject_download(
 
     **Key Arguments**
 
-
     
       - ``urlList`` -- list of document urls
       - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
@@ -55,7 +49,6 @@ def multiobject_download(
       - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
     **Return**
-
 
     
       - list of timestamped documents (same order as the input urlList)
@@ -81,13 +74,9 @@ def multiobject_download(
     # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
     ```
 
-
-
     .. image:: https://i.imgur.com/QYoMm24.png width=600px
     
-
     """
-    ## > IMPORTS ##
     import sys
     import os
     import eventlet

@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # class test_extract_filename_from_url(unittest.TestCase):
 
 #     def test_extract_filename_from_url_function(self):

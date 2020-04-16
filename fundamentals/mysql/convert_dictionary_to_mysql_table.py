@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -25,7 +21,6 @@ import pymysql as mdb
 from fundamentals import tools, times
 from fundamentals.mysql import writequery, table_exists, readquery
 import six
-
 
 def convert_dictionary_to_mysql_table(
         log,
@@ -66,7 +61,6 @@ def convert_dictionary_to_mysql_table(
     - ``returnInsertOnly`` -- the insert statement if requested
     
 
-
     **Usage**
 
     To add a python dictionary to a database table, creating the table and/or columns if they don't yet exist:
@@ -87,8 +81,6 @@ def convert_dictionary_to_mysql_table(
         replace=True
     )
     ```
-
-
 
     Or just return the insert statement with a list of value tuples, i.e. do not execute the command on the database:
 
@@ -133,7 +125,6 @@ def convert_dictionary_to_mysql_table(
         # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
         # uniquekey1="cheese"
     
-
     """
 
     log.debug('starting the ``convert_dictionary_to_mysql_table`` function')

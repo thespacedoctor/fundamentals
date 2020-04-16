@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 16, 2017
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -17,7 +13,6 @@ from fundamentals import tools
 from subprocess import Popen, PIPE, STDOUT
 from datetime import datetime, date, time
 import codecs
-
 
 def tag(
         log,
@@ -36,12 +31,10 @@ def tag(
     - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
     
 
-
     **Return**
 
     - None
     
-
 
     **Usage**
 
@@ -58,9 +51,6 @@ def tag(
     )
     ```
     
-
-
-
     """
     log.debug('starting the ``tag`` function')
 

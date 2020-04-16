@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 class test_setup_database_connection(unittest.TestCase):
 
     def test_setup_database_connection_function(self):

@@ -5,12 +5,8 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
 from __future__ import print_function
-################# GLOBAL IMPORTS ####################
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -19,19 +15,16 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
-
 def _fetch(url,):
     """
     *Retrieve an HTML document or file from the web at a given URL*
 
     **Key Arguments**
 
-
     
       - ``url`` -- the URL of the document or file
 
     **Return**
-
 
     
       - ``url`` -- the URL of the document or file, or None if an error occured

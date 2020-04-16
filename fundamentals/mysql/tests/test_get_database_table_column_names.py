@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 class test_get_database_table_column_names(unittest.TestCase):
 
     def test_get_database_table_column_names_function(self):

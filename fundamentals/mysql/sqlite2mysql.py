@@ -16,7 +16,6 @@ Options:
     -v, --version         show version
     -s, --settings        the settings file
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -26,7 +25,6 @@ from fundamentals import tools
 from fundamentals.mysql import writequery
 
 from datetime import datetime, date, time
-
 
 def main(arguments=None):
     """
@@ -70,7 +68,6 @@ def main(arguments=None):
 
     return
 
-
 class sqlite2mysql(object):
     """
     *Take a sqlite database file and copy the tables within it to a MySQL database*
@@ -83,7 +80,6 @@ class sqlite2mysql(object):
     - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
     - ``dbConn`` -- mysql database connection 
     
-
 
     **Usage**
 
@@ -106,9 +102,6 @@ class sqlite2mysql(object):
     converter.convert_sqlite_to_mysql()
     ```
     
-
-
-
     """
     # Initialisation
 

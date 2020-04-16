@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def readquery(
         sqlQuery,
@@ -32,12 +27,10 @@ def readquery(
     - ``quiet`` -- ignore mysql warnings and errors and move on. Be careful when setting this to true - damaging errors can easily be missed. Default *False*.
     
 
-
     **Return**
 
     - ``rows`` -- the rows returned by the sql query
     
-
 
     **Usage**
 
@@ -51,9 +44,6 @@ def readquery(
     )
     ```
     
-
-
-
     """
     log.debug('starting the ``readquery`` function')
     import pymysql

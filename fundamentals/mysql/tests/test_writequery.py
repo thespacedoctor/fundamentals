@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 class test_writequery(unittest.TestCase):
 
     def test_writequery_function(self):

@@ -4,7 +4,6 @@ import os
 moduleDirectory = os.path.dirname(os.path.realpath(__file__))
 exec(open(moduleDirectory + "/fundamentals/__version__.py").read())
 
-
 def readme():
     with open(moduleDirectory + '/README.md') as f:
         return f.read()
@@ -28,7 +27,7 @@ if exists:
 
 setup(name="fundamentals",
       version=__version__,
-      description="Some project setup tools including logging, settings and database connections.",
+      description="Some fundamental tools required by most self-respecting python-packages bundled in one place. Very opinionated project setup tools including logging, plain-text settings files and database connections.",
       long_description=readme(),
       long_description_content_type='text/markdown',
       classifiers=[

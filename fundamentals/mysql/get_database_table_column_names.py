@@ -5,18 +5,13 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import readquery
-
 
 def get_database_table_column_names(
     dbConn,
@@ -32,12 +27,10 @@ def get_database_table_column_names(
     - ``dbTable`` -- database tablename
     
 
-
     **Return**
 
     - ``columnNames`` -- table column names
     
-
 
     **Usage**
 
@@ -52,9 +45,6 @@ def get_database_table_column_names(
     )
     ```
     
-
-
-
     """
     log.debug('starting the ``get_database_table_column_names`` function')
 

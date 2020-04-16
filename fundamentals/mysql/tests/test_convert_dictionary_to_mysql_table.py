@@ -41,9 +41,7 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
-
 
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 

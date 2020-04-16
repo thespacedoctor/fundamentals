@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    November 22, 2017
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -23,7 +19,6 @@ import pymysql as ms
 from docopt import docopt
 from fundamentals.mysql import readquery
 
-
 class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
@@ -34,12 +29,10 @@ class database(object):
     - ``dbSettings`` -- a dictionary of database settings
     
 
-
     **Return**
 
     - ``dbConns`` -- a database connection
     
-
 
     **Usage**
 
@@ -61,8 +54,6 @@ class database(object):
     }
     ```
 
-
-
     ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
 
     ```python
@@ -74,9 +65,6 @@ class database(object):
     ).connect()
     ```
     
-
-
-
     """
     # INITIALISATION
 
@@ -101,7 +89,6 @@ class database(object):
 
         - ``dbConn`` -- the database connection
         
-
 
         See the class docstring for usage
         """
@@ -150,12 +137,10 @@ class database(object):
         - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
         
 
-
         **Return**
 
         - ``sshPort`` -- the port the ssh tunnel is connected via
         
-
         """
         self.log.debug('starting the ``_setup_tunnel`` method')
 

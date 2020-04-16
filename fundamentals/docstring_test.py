@@ -4,7 +4,6 @@
 Check the API output here: file:///Users/Dave/git_repos/_templates_/python-package-template/fundamentals/docs/build/html/_api/fundamentals.docstring_test.html
 """
 
-
 def docsting_test(self):
     """
     *the database object for sherlock, setting up ssh tunnels and various database connections*
@@ -21,12 +20,10 @@ def docsting_test(self):
     - ``settings`` -- the settings dictionary
     
 
-
     **Return**
 
     - ``dbConns`` -- a dictionary of the database connections required by sherlock
     
-
 
     **Usage**
 
@@ -46,7 +43,6 @@ def docsting_test(self):
     ```
     
 
-
     ```eval_rst
     .. todo::
 
@@ -58,8 +54,6 @@ def docsting_test(self):
         - clip any useful text to docs mindmap
         - regenerate the docs and check redendering of this docstring
     ```
-
-
 
     **Embed reStructuredText**
 
@@ -161,7 +155,6 @@ def docsting_test(self):
 
     C~6~H~12~O~6
 
-
     **Citations**
 
     Cite a source.[p. 42][#source]
@@ -192,7 +185,6 @@ def docsting_test(self):
     Strikethrough ~~deleted~~.
 
     **Lists**
-
 
     1. First ordered list item
     2. Another item
@@ -240,7 +232,6 @@ def docsting_test(self):
 
     *[HTML]: Hyper Text Markup Language
     *[W3C]:  World Wide Web Consortium
-
 
     **Horizontal Rule**
 

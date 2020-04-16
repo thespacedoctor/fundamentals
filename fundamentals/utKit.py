@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    April 16, 2014
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -21,9 +17,7 @@ try:
 except:
     pass
 
-
 class utKit(object):
-
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*
 
@@ -31,7 +25,6 @@ class utKit(object):
 
     - ``moduleDirectory`` -- the directory to the unit-testing test file
     
-
 
     **Usage**
 
@@ -46,9 +39,6 @@ class utKit(object):
     utKit.tearDownModule() 
     ```
     
-
-
-
     """
     # Initialisation
 
@@ -108,7 +98,6 @@ class utKit(object):
         - ``pathToInputDir`` -- path to modules own test input directory
         - ``pathToOutputDir`` -- path to modules own test output directory
         
-
         """
         import pymysql as ms
         ## VARIABLES ##
@@ -143,12 +132,10 @@ class utKit(object):
         # -
         
 
-
         **Return**
 
         - None
         
-
         """
 
         return None
@@ -161,7 +148,6 @@ class utKit(object):
 
         - ``rootPath`` -- the root path of a project
         
-
         """
         import os
         rootPath = os.path.dirname(__file__)
@@ -195,7 +181,6 @@ class utKit(object):
             successRule=None,
             failureRule=None
         )
-
 
 if __name__ == '__main__':
     main()

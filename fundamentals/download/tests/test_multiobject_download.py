@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # class test_multiobject_download(unittest.TestCase):
 
 #     def test_multiobject_download_function(self):

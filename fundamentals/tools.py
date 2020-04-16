@@ -5,13 +5,9 @@
 
 :Author:
     David Young
-
-:Date Created:
-    April 16, 2014
 """
 from __future__ import print_function
 from __future__ import absolute_import
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -37,7 +33,6 @@ from os.path import expanduser
 # CLASSES                                                         #
 ###################################################################
 
-
 class tools(object):
     """
     *common setup methods & attributes of the main function in cl-util*
@@ -55,7 +50,6 @@ class tools(object):
     - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
     
 
-
     **Usage**
 
     Add this to the ``__main__`` function of your command-line module
@@ -72,8 +66,6 @@ class tools(object):
     )
     arguments, settings, log, dbConn = su.setup()
     ```
-
-
 
     Here is a template settings file content you could use:
 
@@ -126,8 +118,6 @@ class tools(object):
                 level: WARNING
                 handlers: [file,console]
         ```
-
-
     """
     # Initialisation
 
@@ -539,7 +529,6 @@ class tools(object):
     # use the tab-trigger below for new method
     # xt-class-method
 
-
 ###################################################################
 # PUBLIC FUNCTIONS                                                #
 ###################################################################
@@ -554,7 +543,6 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
     return yaml.load(stream, OrderedLoader)
-
 
 if __name__ == '__main__':
     main()

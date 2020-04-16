@@ -36,7 +36,6 @@ from fundamentals.mysql import convert_dictionary_to_mysql_table
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
 
-
 def main(arguments=None):
     """
     The main function used when ``yaml_to_database.py`` when installed as a cl tool
@@ -96,7 +95,6 @@ def main(arguments=None):
 
     return
 
-
 class yaml_to_database(object):
     """
     *Take key-values from yaml files including a tablename(s) and add them to a mysql database table*
@@ -109,7 +107,6 @@ class yaml_to_database(object):
     - ``dbConn`` -- connection to database to add the content to
     - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
     
-
 
     **Usage**
 
@@ -128,8 +125,6 @@ class yaml_to_database(object):
     ) 
     ```
 
-
-
     And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
 
     ```yaml
@@ -140,9 +135,6 @@ class yaml_to_database(object):
     table: web_articles,podcasts 
     ```
     
-
-
-
     """
     # Initialisation
 
@@ -174,12 +166,10 @@ class yaml_to_database(object):
         - None
         
 
-
         **Usage**
 
         To import an entire directory of yaml files into a database, use the following:
         
-
 
         ```python
         from fundamentals.mysql import yaml_to_database
@@ -192,8 +182,6 @@ class yaml_to_database(object):
         ) 
         yaml2db.ingest() 
         ```
-
-
         """
         self.log.debug('starting the ``ingest`` method')
 
@@ -220,12 +208,10 @@ class yaml_to_database(object):
         - ``deleteFile`` -- delete the yaml file when its content has been added to the database. Default *False*
         
 
-
         **Return**
 
         - None
         
-
 
         **Usage**
 
@@ -245,9 +231,6 @@ class yaml_to_database(object):
         )
         ```
         
-
-
-
         """
         self.log.debug(
             'completed the ````add_yaml_file_content_to_database`` method')
@@ -325,7 +308,6 @@ class yaml_to_database(object):
 
     # use the tab-trigger below for new method
     # xt-class-method
-
 
 if __name__ == '__main__':
     main()

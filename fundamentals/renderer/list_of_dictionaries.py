@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    September 14, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 from builtins import range
 from builtins import object
@@ -28,7 +24,6 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
-
 class list_of_dictionaries(object):
     """
     *The dataset object is a list of python dictionaries. Using this class, the data can be rendered as various list and markup formats*
@@ -39,7 +34,6 @@ class list_of_dictionaries(object):
     - ``listOfDictionaries`` -- the list of dictionaries to render
     - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
     
-
 
     **Usage**
 
@@ -72,9 +66,6 @@ class list_of_dictionaries(object):
     )
     ```
     
-
-
-
     """
 
     def __init__(
@@ -99,7 +90,6 @@ class list_of_dictionaries(object):
 
         dataSet.list
         
-
         """
         return self.listOfDictionaries
 
@@ -114,12 +104,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the csv content to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered in csv format
         
-
 
         **Usage**
 
@@ -129,8 +117,6 @@ class list_of_dictionaries(object):
         print(dataSet.csv())
         ```
 
-
-
         ```text
         owner,pet,address
         daisy,dog,"belfast, uk"
@@ -138,17 +124,12 @@ class list_of_dictionaries(object):
         susan,crocodile,larne
         ```
 
-
-
         and to save the csv rendering to file:
 
         ```python
         dataSet.csv("/path/to/myfile.csv")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``csv`` method')
 
@@ -178,12 +159,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the table to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered as a plain text table
         
-
 
         **Usage**
 
@@ -192,8 +171,6 @@ class list_of_dictionaries(object):
         ```python
         print(dataSet.table())
         ```
-
-
 
         ```text
         +--------+------------+--------------+
@@ -205,17 +182,12 @@ class list_of_dictionaries(object):
         +--------+------------+--------------+
         ```
 
-
-
         and to save the table rendering to file:
 
         ```python
         dataSet.table("/path/to/myfile.ascii")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``table`` method')
 
@@ -246,12 +218,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the table to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered as a resturcturedText table
         
-
 
         **Usage**
 
@@ -260,8 +230,6 @@ class list_of_dictionaries(object):
         ```python
         print(dataSet.reST())
         ```
-
-
 
         ```text
         +--------+------------+--------------+
@@ -275,17 +243,12 @@ class list_of_dictionaries(object):
         +--------+------------+--------------+
         ```
 
-
-
         and to save the table rendering to file:
 
         ```python
         dataSet.reST("/path/to/myfile.rst")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``table`` method')
 
@@ -316,12 +279,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the markdown to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered as a markdown table
         
-
 
         **Usage**
 
@@ -331,8 +292,6 @@ class list_of_dictionaries(object):
         print(dataSet.markdown())
         ```
 
-
-
         ```markdown
         | owner  | pet        | address      |
         |:-------|:-----------|:-------------|
@@ -341,17 +300,12 @@ class list_of_dictionaries(object):
         | susan  | crocodile  | larne        |
         ```
 
-
-
         and to save the markdown table rendering to file:
 
         ```python
         dataSet.table("/path/to/myfile.md")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``markdown`` method')
 
@@ -382,12 +336,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the json content to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered as json
         
-
 
         **Usage**
 
@@ -396,8 +348,6 @@ class list_of_dictionaries(object):
         ```python
         print(dataSet.json())
         ```
-
-
 
         ```json
         [
@@ -419,17 +369,12 @@ class list_of_dictionaries(object):
         ]
         ```
 
-
-
         and to save the json rendering to file:
 
         ```python
         dataSet.json("/path/to/myfile.json")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``json`` method')
 
@@ -470,12 +415,10 @@ class list_of_dictionaries(object):
         - ``filepath`` -- path to the file to write the yaml content to. Default *None*
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered as yaml
         
-
 
         **Usage**
 
@@ -484,8 +427,6 @@ class list_of_dictionaries(object):
         ```python
         print(dataSet.yaml())
         ```
-
-
 
         ```yaml
         - address: belfast, uk
@@ -499,17 +440,12 @@ class list_of_dictionaries(object):
           pet: crocodile
         ```
 
-
-
         and to save the yaml rendering to file:
 
         ```python
         dataSet.json("/path/to/myfile.yaml")
         ```
         
-
-
-
         """
         self.log.debug('starting the ``yaml`` method')
 
@@ -545,20 +481,16 @@ class list_of_dictionaries(object):
         createStatement
         
 
-
         **Return**
 
         - ``renderedData`` -- the data rendered mysql insert statements (string format)
         
-
 
         **Usage**
 
         ```python
         print(dataSet.mysql("testing_table"))
         ```
-
-
 
         this output the following:
 
@@ -568,18 +500,12 @@ class list_of_dictionaries(object):
         INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
         ```
 
-
-
         To save this rendering to file use:
 
         ```python
         dataSet.mysql("testing_table", "/path/to/myfile.sql")
         ```
         
-
-
-
-
         """
         self.log.debug('starting the ``mysql`` method')
 
@@ -617,12 +543,10 @@ class list_of_dictionaries(object):
         - ``csvType`` -- human, machine or reST
         
 
-
         **Return**
 
         - ``output`` -- the contents of a CSV file
         
-
         """
         self.log.debug(
             'starting the ``_list_of_dictionaries_to_csv`` function')
@@ -767,12 +691,10 @@ class list_of_dictionaries(object):
         - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
         
 
-
         **Return**
 
         - ``output`` -- the mysql insert statements (as a string)
         
-
         """
         self.log.debug(
             'completed the ````_list_of_dictionaries_to_mysql_inserts`` function')

@@ -5,12 +5,8 @@
 
 :Author:
     David Young
-
-:Date Created:
-    November  9, 2017
 """
 from __future__ import division
-################# GLOBAL IMPORTS ####################
 from past.utils import old_div
 import sys
 import os
@@ -20,7 +16,6 @@ from multiprocess import cpu_count, Pool
 from functools import partial
 import inspect
 import psutil
-
 
 def fmultiprocess(
         log,
@@ -40,12 +35,10 @@ def fmultiprocess(
     - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
     
 
-
     **Return**
 
     - ``resultArray`` -- the array of results
     
-
 
     **Usage**
 
@@ -57,9 +50,6 @@ def fmultiprocess(
                           inputArray=inputArray, otherFunctionKeyword="cheese")
     ```
     
-
-
-
     """
     log.debug('starting the ``multiprocess`` function')
 

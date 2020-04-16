@@ -1,40 +1,34 @@
-```eval_rst
-.. toctree::
-   :hidden:
-   :maxdepth: 4
-   :caption: Getting Started
 
-   readme_link
-```
 
 {{../../README.md}}
 
-## Getting Started
-
 ```eval_rst
 .. toctree::
    :maxdepth: 4
+   :caption: Table of Contents
 
-   quickstart
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 4
-   :caption: Add Content Here
-
+   install
    _template_
+   todolist
+   changes_link
 ```
 
-## API
+## API Reference
 
 ```eval_rst
 .. toctree::
    :hidden:
    :maxdepth: 30
-   :caption: API
+   :caption: API reference
 
    autosummary
+```
+
+```eval_rst
+.. toctree::
+   :hidden:
+
+   genindex
 ```
 
 
@@ -42,11 +36,8 @@
 .. include:: /autosummary_include.rst
 ```
 
-
 ```eval_rst
-.. toctree::
-   :maxdepth: 30
-   :caption: Misc
-
-   todolist
+.. include:: /genindex.rst
 ```
+
+{{../../CHANGES.md}}

@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def extract_filename_from_url(log, url):
     """
@@ -27,7 +22,6 @@ def extract_filename_from_url(log, url):
 
     - ``url`` -- the url to extract filename from
     
-
 
     Returns:
         - ``filename`` -- the filename
@@ -44,11 +38,7 @@ def extract_filename_from_url(log, url):
     # OUT: Docstring.html
     ```
     
-
-
-
     """
-    ## > IMPORTS ##
     import re
     # EXTRACT THE FILENAME FROM THE URL
     try:

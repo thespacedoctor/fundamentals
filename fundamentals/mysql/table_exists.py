@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import readquery
-
 
 def table_exists(
         dbConn,
@@ -30,12 +25,10 @@ def table_exists(
     - ``dbTableName`` -- the database tablename
     
 
-
     **Return**
 
     - ``tableExists`` -- True or False
     
-
 
     **Usage**
 
@@ -54,9 +47,6 @@ def table_exists(
     # OUTPUT: False
     ```
     
-
-
-
     """
     log.debug('starting the ``table_exists`` function')
 

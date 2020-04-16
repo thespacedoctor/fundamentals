@@ -5,26 +5,19 @@
 
 :Author:
     David Young
-
-:Date Created:
-    February 26, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 
-
 def get_now_sql_datetime():
     """
-    *A datetime stamp in MySQL format: ``YYYY-MM-DDTHH:MM:SS``*
+    *A datetime stamp in MySQL format: 'YYYY-MM-DDTHH:MM:SS'*
 
     **Return**
 
     - ``now`` -- current time and date in MySQL format
-    
-
 
     **Usage**
 
@@ -35,18 +28,12 @@ def get_now_sql_datetime():
 
     # OUT: 2016-03-18T11:08:23 
     ```
-    
-
-
-
     """
-    ## > IMPORTS ##
     from datetime import datetime, date, time
     now = datetime.now()
     now = now.strftime("%Y-%m-%dT%H:%M:%S")
 
     return now
-
 
 def datetime_relative_to_now(date):
     """
@@ -55,14 +42,10 @@ def datetime_relative_to_now(date):
     **Key Arguments**
 
     - ``date`` -- absolute date
-    
-
 
     **Return**
 
     - a relative date
-    
-
 
     **Usage**
 
@@ -70,10 +53,6 @@ def datetime_relative_to_now(date):
     from fundamentals import times
     relTime = times.datetime_relative_to_now(date)
     ```
-    
-
-
-
     """
     from datetime import datetime
     diff = datetime.now() - date
@@ -95,7 +74,6 @@ def datetime_relative_to_now(date):
     else:
         return ' +{0}hr'.format(s / 3600)
 
-
 def calculate_time_difference(startDate, endDate):
     """
     *Return the time difference between two dates as a string*
@@ -104,14 +82,10 @@ def calculate_time_difference(startDate, endDate):
 
     - ``startDate`` -- the first date in YYYY-MM-DDTHH:MM:SS format
     - ``endDate`` -- the final date YYYY-MM-DDTHH:MM:SS format
-    
-
 
     **Return**
 
     - ``relTime`` -- the difference between the two dates in Y,M,D,h,m,s (string)
-    
-
 
     **Usage**
 
@@ -122,12 +96,7 @@ def calculate_time_difference(startDate, endDate):
 
     # OUT: 2yrs 22dys 6h 44m 53s
     ```
-    
-
-
-
     """
-    ################ > IMPORTS ################
     from datetime import datetime
     from dateutil import relativedelta
 

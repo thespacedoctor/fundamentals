@@ -1,7 +1,7 @@
 tags: #multimarkdown #markdown
 category: template durable dynamic
 
-# Syntax for Docs
+# Syntax for Docs - REMOVE FROM LIVE DOCS
 
 This is a template document giving an overview of the syntax that can be used throughout these docs.
 

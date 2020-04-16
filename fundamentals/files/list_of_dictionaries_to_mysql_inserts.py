@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 28, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 import io
@@ -19,7 +15,6 @@ from datetime import datetime
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
-
 
 def list_of_dictionaries_to_mysql_inserts(
         log,
@@ -34,12 +29,10 @@ def list_of_dictionaries_to_mysql_inserts(
     - ``tableName`` -- the name of the table to create the insert statements for
     
 
-
     **Return**
 
     - ``output`` -- the mysql insert statements (as a string)
     
-
 
     **Usage**
 
@@ -53,8 +46,6 @@ def list_of_dictionaries_to_mysql_inserts(
     print mysqlInserts
     ```
 
-
-
     this output the following:
 
     ```plain
@@ -63,9 +54,6 @@ def list_of_dictionaries_to_mysql_inserts(
     ...
     ```
     
-
-
-
     """
     log.debug('starting the ``list_of_dictionaries_to_mysql_inserts`` function')
 

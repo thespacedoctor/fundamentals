@@ -10,7 +10,6 @@ Run the following code once to set a login-path for your mysql server:
 This store's your credentials in an encrypted file located at '~/.mylogin.cnf'. 
 Use `mysql_config_editor print --all` to see all of the login-paths set.
 
-
 Usage:
     mysqlSucker <pathToDirectory> <loginPath> <databaseName> [-s successRule -f failureRule]
 
@@ -39,11 +38,7 @@ Options:
 
 :Author:
     David Young
-
-:Date Created:
-    September 22, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -53,7 +48,6 @@ import datetime
 from subprocess import Popen, PIPE, STDOUT
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def directory_script_runner(
         log,
@@ -73,8 +67,6 @@ def directory_script_runner(
     > Enter password:
     ```
 
-
-
     This will store your credentials in an encrypted file located at '~/.mylogin.cnf'. This function takes advantage of the `--login-path` so as not to compromise the user's credentials. Use `mysql_config_editor print --all` to see all of the login-paths set.
 
     **Key Arguments**
@@ -89,12 +81,10 @@ def directory_script_runner(
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
     
 
-
     **Return**
 
     - None
     
-
 
     **Usage**
 
@@ -110,8 +100,6 @@ def directory_script_runner(
     )
     ```
 
-
-
     To delete successful scripts and archive failed scripts for later inspection:
 
     ```python
@@ -125,8 +113,6 @@ def directory_script_runner(
         failureRule="failed"
     )
     ```
-
-
 
     This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
@@ -143,11 +129,8 @@ def directory_script_runner(
     )
     ```
 
-
-
     Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
     
-
     """
     log.debug('starting the ``directory_script_runner`` function')
 
@@ -227,7 +210,6 @@ def directory_script_runner(
 
     log.debug('completed the ``directory_script_runner`` function')
     return None
-
 
 def main(arguments=None):
     """

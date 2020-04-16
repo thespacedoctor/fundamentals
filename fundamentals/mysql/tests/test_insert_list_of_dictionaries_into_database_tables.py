@@ -41,7 +41,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 dictList = []
 
 for i in range(100000):
@@ -60,7 +59,6 @@ dbSettings = dbSettings = {
     'password': 'utpass',
     'db': 'unit_tests'
 }
-
 
 class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 

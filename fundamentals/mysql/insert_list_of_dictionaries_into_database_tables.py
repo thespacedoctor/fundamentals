@@ -5,13 +5,9 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
 from __future__ import print_function
 from __future__ import division
-################# GLOBAL IMPORTS ####################
 from builtins import str
 from builtins import range
 from past.utils import old_div
@@ -28,12 +24,10 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 
-
 count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
-
 
 def insert_list_of_dictionaries_into_database_tables(
         dbConn,
@@ -62,12 +56,10 @@ def insert_list_of_dictionaries_into_database_tables(
     - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
     
 
-
     **Return**
 
     - None
     
-
 
     **Usage**
 
@@ -84,9 +76,6 @@ def insert_list_of_dictionaries_into_database_tables(
     )
     ```
     
-
-
-
     """
 
     log.debug(
@@ -191,7 +180,6 @@ def insert_list_of_dictionaries_into_database_tables(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
     return None
 
-
 def _insert_single_batch_into_database(
         batchIndex,
         log,
@@ -211,12 +199,10 @@ def _insert_single_batch_into_database(
     - ``log`` -- logger
     
 
-
     **Return**
 
     - None
     
-
 
     **Usage**
 
@@ -229,9 +215,6 @@ def _insert_single_batch_into_database(
     usage code            
     ```
     
-
-
-
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
@@ -357,7 +340,6 @@ def _insert_single_batch_into_database(
     log.debug('completed the ``_insert_single_batch_into_database`` function')
     return "None"
 
-
 def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
         dbTablename,
@@ -374,12 +356,10 @@ def _add_dictlist_to_database_via_load_in_file(
     - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
     
 
-
     **Return**
 
     - None
     
-
 
     **Usage**
 
@@ -392,9 +372,6 @@ def _add_dictlist_to_database_via_load_in_file(
     usage code
     ```
     
-
-
-
     """
     from fundamentals.logs import emptyLogger
     log = emptyLogger()

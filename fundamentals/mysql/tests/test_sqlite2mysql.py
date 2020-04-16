@@ -40,11 +40,9 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # xt-setup-unit-testing-files-and-folders
 
 pathToSqlite = pathToInputDir + "/test.sqlite"
-
 
 class test_sqlite2mysql(unittest.TestCase):
 

@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -20,7 +16,6 @@ except:
     pass
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def setup_database_connection(
         pathToYamlFile):
@@ -33,12 +28,10 @@ def setup_database_connection(
     - ``pathToYamlFile`` -- path to the YAML dictionary.
     
 
-
     **Return**
 
     - ``dbConn`` -- connection to the MySQL database.
     
-
 
     **Usage**
 
@@ -51,8 +44,6 @@ def setup_database_connection(
     password: utpass
     ```
 
-
-
     And here's how to generate the connection object:
 
     ```python
@@ -62,9 +53,6 @@ def setup_database_connection(
     )
     ```
     
-
-
-
     """
     import sys
     import logging
@@ -100,7 +88,6 @@ def setup_database_connection(
         logging.critical('could not connect to the ' + connDict['db'] + ' database on ' + connDict['host'] + ' : '
                          + str(e) + '\n')
     return dbConn
-
 
 # use the tab-trigger below for new function
 # xt-def-function

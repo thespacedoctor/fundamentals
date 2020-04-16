@@ -16,7 +16,6 @@ os.environ['PATH'] += ':/usr/local/bin'
 
 log = logging.getLogger('.'.join(('nose2', 'plugins', __package__)))
 
-
 class Profiler(nose2.events.Plugin):
     '''Profile the test run using cProfile'''
 

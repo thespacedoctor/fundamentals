@@ -5,16 +5,11 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def get_now_datetime_filestamp(longTime=False):
     """
@@ -24,13 +19,9 @@ def get_now_datetime_filestamp(longTime=False):
 
     - ``longTime`` -- make time string longer (more change of filenames being unique)
 
-
-
     **Return**
 
     - ``now`` -- current time and date in filename format
-
-
 
     **Usage**
 
@@ -42,12 +33,7 @@ def get_now_datetime_filestamp(longTime=False):
     get_now_datetime_filestamp(longTime=True)
     #Out: '20160316t154644133638' 
     ```
-
-
-
-
     """
-    ## > IMPORTS ##
     from datetime import datetime, date, time
     now = datetime.now()
     if longTime:

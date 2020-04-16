@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    December  4, 2017
 """
-################# GLOBAL IMPORTS ####################
 from builtins import range
 from builtins import object
 import sys
@@ -17,7 +13,6 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import codecs
-
 
 class fileChunker(object):
     """
@@ -28,7 +23,6 @@ class fileChunker(object):
     - ``filepath`` -- path to the large file to iterate over
     - ``batchSize`` -- size of the chunks to return in lines
     
-
 
     **Usage**
 
@@ -46,9 +40,6 @@ class fileChunker(object):
         print len(i)
     ```
     
-
-
-
     """
 
     def __init__(self, filepath, batchSize):

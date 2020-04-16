@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 class test_recursive_directory_listing(unittest.TestCase):
 
     def test_recursive_directory_listing_function(self):

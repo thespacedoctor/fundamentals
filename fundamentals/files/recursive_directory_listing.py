@@ -5,16 +5,11 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 17, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def recursive_directory_listing(
     log,
@@ -32,12 +27,10 @@ def recursive_directory_listing(
     - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
     
 
-
     **Return**
 
     - ``matchedPathList`` -- the matched paths
     
-
 
     **Usage**
 
@@ -57,7 +50,6 @@ def recursive_directory_listing(
         whatToList="files"
     )
 
-
     # OR JUST FOLDERS   
 
     from fundamentals.files import recursive_directory_listing
@@ -68,10 +60,6 @@ def recursive_directory_listing(
     )
     print theseFiles        
     ```
-
-
-
-
     """
     log.debug('starting the ``recursive_directory_listing`` function')
 

@@ -24,12 +24,10 @@ MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.colors',
                 'matplotlib.pyplot', 'matplotlib.cm', 'matplotlib.path', 'matplotlib.patches', 'matplotlib.projections', 'matplotlib.projections.geo', 'healpy', 'astropy', 'astropy.io', 'pylibmc', 'HMpTy', 'HMpTy.mysql', 'ligo', 'ligo.gracedb', 'ligo.gracedb.rest', 'pandas']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
-
 # WHERE DOES THIS conf.py FILE LIVE?
 moduleDirectory = os.path.dirname(os.path.realpath(__file__))
 # GET PACKAGE __version__ INTO locals()
 exec(open(moduleDirectory + "/../../fundamentals/__version__.py").read())
-
 
 autosummary_generate = True
 autodoc_member_order = 'bysource'
@@ -43,8 +41,21 @@ html_theme = 'sphinx_rtd_theme'
 html_logo = "_images/thespacedoctor_icon_white_circle.png"
 html_favicon = "_images/favicon.ico"
 html_show_sourcelink = True
-# html_theme_options = {}
-# html_theme_path = []
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'vcs_pageview_mode': '',
+    'style_nav_header_background': 'white',
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
+html_theme_path = ['_static/whistles-theme/sphinx/_themes']
 # html_title = None
 # html_short_title = None
 # html_sidebars = {}
@@ -61,7 +72,6 @@ rst_epilog = u"""
 .. |tsd| replace:: thespacedoctor
 """ % locals()
 link_resolver_url = "https://github.com/thespacedoctor/python-package-template/tree/master"
-
 
 # General information about the project.
 now = datetime.now()
@@ -191,6 +201,7 @@ def generateAutosummaryIndex():
     allModules = []
     allClasses = []
     allFunctions = []
+    allMethods = []
     for sp in allSubpackages:
         for name, obj in inspect.getmembers(__import__(sp, fromlist=[''])):
             if inspect.ismodule(obj):
@@ -212,6 +223,10 @@ def generateAutosummaryIndex():
                 thisFunction = spm + "." + name
                 if (spm == obj.__module__ or obj.__module__ == thisFunction) and len(name) and name != "main" and name[0:2] != "__":
                     allFunctions.append(thisFunction)
+            if inspect.ismethod(obj):
+                thisMethod = spm + "." + name
+                if (spm == obj.__module__ or obj.__module__ == thisMethod) and len(name) and name != "main" and name[0:2] != "__":
+                    allMethods.append(thisMethod)
 
     allSubpackages = allSubpackages[1:]
     allSubpackages.sort(reverse=False)
@@ -225,23 +240,8 @@ def generateAutosummaryIndex():
 
     # FOR SUBPACKAGES USE THE SUBPACKAGE TEMPLATE INSTEAD OF DEFAULT MODULE
     # TEMPLATE
-    thisText = u""
-    if len(allSubpackages):
-        thisText += """
-Subpackages
------------
-
-.. autosummary::
-   :toctree: _autosummary
-   :nosignatures:
-   :template: autosummary/subpackage.rst
-
-   %(allSubpackages)s 
-
-""" % locals()
-
     if len(allModules):
-        thisText += """
+        thisText  = """
 Modules
 -------
 
@@ -249,6 +249,7 @@ Modules
    :toctree: _autosummary
    :nosignatures:
 
+   %(allSubpackages)s 
    %(allModules)s 
 
 """ % locals()
@@ -276,10 +277,6 @@ Functions
    :nosignatures:
 
    %(allFunctions)s 
-
-:ref:`Index<genindex>`
-----------------------
-
 """ % locals()
 
     moduleDirectory = os.path.dirname(__file__)
@@ -292,19 +289,12 @@ Functions
     allClasses = regex.sub("\n", allClasses)
 
     autosummaryInclude = u"""
-**Subpackages**
-
-.. autosummary::
-   :nosignatures:
-   :template: autosummary/subpackage.rst
-
-   %(allSubpackages)s
-
 **Modules**
 
 .. autosummary::
    :nosignatures:
 
+   %(allSubpackages)s 
    %(allModules)s
 
 **Classes**
@@ -320,8 +310,6 @@ Functions
    :nosignatures:
 
    %(allFunctions)s 
-
-:ref:`Index<genindex>`
 """ % locals()
 
     moduleDirectory = os.path.dirname(__file__)

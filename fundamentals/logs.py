@@ -5,16 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    October 10, 2012
 """
 from builtins import object
 import os
 import sys
 import logging
 from logging import handlers
-
 
 def console_logger(
     level="WARNING"
@@ -27,12 +23,10 @@ def console_logger(
     - ``level`` -- the level of logging required
     
 
-
     **Return**
 
     - ``logger`` -- the console logger
     
-
 
     **Usage**
 
@@ -44,11 +38,7 @@ def console_logger(
     log.debug("Testing console logger")
     ```
     
-
-
-
     """
-    ################ > IMPORTS ################
     ## STANDARD LIB ##
 
     import logging
@@ -83,7 +73,6 @@ def console_logger(
 
     return logger
 
-
 def setup_dryx_logging(yaml_file):
     """
     *setup dryx style python logging*
@@ -93,12 +82,10 @@ def setup_dryx_logging(yaml_file):
     - ``level`` -- the level of logging required
     
 
-
     **Return**
 
     - ``logger`` -- the console logger
     
-
 
     **Usage**
 
@@ -109,8 +96,6 @@ def setup_dryx_logging(yaml_file):
     )
     log.error("test error")
     ```
-
-
 
     Here is an example of the settings in the yaml file:
 
@@ -147,10 +132,6 @@ def setup_dryx_logging(yaml_file):
             handlers: [file,console]
     ```
     
-
-
-
-
     """
     import logging
     import logging.config
@@ -194,9 +175,7 @@ def setup_dryx_logging(yaml_file):
 
     return logger
 
-
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
-
     """
     *rotating file handler for logging*
     """
@@ -213,9 +192,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         os.chmod(self.baseFilename, currMode | stat.S_IWGRP |
                  stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
 
-
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
-
     """
     *rotating file handler for logging*
     """
@@ -225,7 +202,6 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         rtv = logging.handlers.RotatingFileHandler._open(self)
         os.umask(prevumask)
         return rtv
-
 
 class emptyLogger(object):
     """
@@ -239,9 +215,6 @@ class emptyLogger(object):
         log = emptyLogger()
     ```
     
-
-
-
     """
 
     def info(self, argu):
