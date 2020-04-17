@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 16, 2017
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -17,7 +13,6 @@ from fundamentals import tools
 from subprocess import Popen, PIPE, STDOUT
 from datetime import datetime, date, time
 import codecs
-
 
 def tag(
         log,
@@ -27,30 +22,35 @@ def tag(
         wherefrom=False):
     """Add tags and ratings to your macOS files and folders
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``filepath`` -- the path to the file needing tagged
-        - ``tags`` -- comma or space-separated string, or list of tags. Use `False` to leave file tags as they are. Use "" or [] to remove tags. Default *False*.
-        - ``rating`` -- a rating to add to the file. Use 0 to remove rating or `False` to leave file rating as it is. Default *False*.
-        - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``log`` -- logger
+    - ``filepath`` -- the path to the file needing tagged
+    - ``tags`` -- comma or space-separated string, or list of tags. Use `False` to leave file tags as they are. Use "" or [] to remove tags. Default *False*.
+    - ``rating`` -- a rating to add to the file. Use 0 to remove rating or `False` to leave file rating as it is. Default *False*.
+    - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
+    
 
-    **Usage:**
+    **Return**
 
-        To add any combination of tags, rating and a source URL to a file on macOS, use the following:
+    - None
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.files.tag import tag
-            tag(
-                log=log,
-                filepath="/path/to/my.file",
-                tags="test,tags, fundamentals",
-                rating=3,
-                wherefrom="http://www.thespacedoctor.co.uk"
-            )
+    To add any combination of tags, rating and a source URL to a file on macOS, use the following:
+
+    ```python
+    from fundamentals.files.tag import tag
+    tag(
+        log=log,
+        filepath="/path/to/my.file",
+        tags="test,tags, fundamentals",
+        rating=3,
+        wherefrom="http://www.thespacedoctor.co.uk"
+    )
+    ```
+    
     """
     log.debug('starting the ``tag`` function')
 

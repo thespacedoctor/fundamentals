@@ -1,37 +1,47 @@
-commonutils (*subpackage*)
-=======================================
+commonutils *(module)*
+===================================
+
+
 
 .. automodule:: fundamentals.commonutils
     :members:
-    :private-members:
+    :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
+    
+    
+    
+    
 
     
     
-    .. rubric:: Subpackage Members
+    
+
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
 
     .. autosummary::
     
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
         
-        
-        
-        
-        
-        
-        
-        
-        
+            ~getpackagepath (nice)
+       
+    
+    
     
     

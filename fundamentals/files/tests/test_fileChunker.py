@@ -42,7 +42,6 @@ if not os.path.exists(pathToOutputDir):
 
 largeFile = pathToInputDir + "/ppmxl-head.csv"
 
-
 class test_fileChunker(unittest.TestCase):
 
     def test_fileChunker_function(self):

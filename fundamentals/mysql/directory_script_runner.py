@@ -10,7 +10,6 @@ Run the following code once to set a login-path for your mysql server:
 This store's your credentials in an encrypted file located at '~/.mylogin.cnf'. 
 Use `mysql_config_editor print --all` to see all of the login-paths set.
 
-
 Usage:
     mysqlSucker <pathToDirectory> <loginPath> <databaseName> [-s successRule -f failureRule]
 
@@ -39,11 +38,7 @@ Options:
 
 :Author:
     David Young
-
-:Date Created:
-    September 22, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -53,7 +48,6 @@ import datetime
 from subprocess import Popen, PIPE, STDOUT
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def directory_script_runner(
         log,
@@ -68,70 +62,75 @@ def directory_script_runner(
 
     As it's insecure to pass in mysql database credentials via the command-line, run the following command from the terminal 
 
-    .. code-block:: bash
-
-        mysql_config_editor set --login-path=<uniqueLoginName> --host=localhost --user=<myUsername> --password
-        > Enter password:
+    ```bash
+    mysql_config_editor set --login-path=<uniqueLoginName> --host=localhost --user=<myUsername> --password
+    > Enter password:
+    ```
 
     This will store your credentials in an encrypted file located at '~/.mylogin.cnf'. This function takes advantage of the `--login-path` so as not to compromise the user's credentials. Use `mysql_config_editor print --all` to see all of the login-paths set.
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
-        - ``databaseName`` -- the name of the database 
-        - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
-        - ``loginPath`` -- the local-path as set with `mysql_config_editor`
-        - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
-        - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
-        - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``log`` -- logger
+    - ``pathToScriptDirectory`` -- the path to the directory containing the sql script to be run
+    - ``databaseName`` -- the name of the database 
+    - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
+    - ``loginPath`` -- the local-path as set with `mysql_config_editor`
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
+    - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
+    
 
-    **Usage:**
+    **Return**
 
-        To run the scripts in the directroy and not act on the script file use something similar to:
+    - None
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails"
-            )
+    To run the scripts in the directroy and not act on the script file use something similar to:
 
-        To delete successful scripts and archive failed scripts for later inspection:
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails"
+    )
+    ```
 
-        .. code-block:: python 
+    To delete successful scripts and archive failed scripts for later inspection:
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails",
-                successRule="delete",
-                failureRule="failed"
-            )
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails",
+        successRule="delete",
+        failureRule="failed"
+    )
+    ```
 
-        This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
+    This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
-        Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+    Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
 
-        .. code-block:: python 
+    ```python
+    from fundamentals.mysql import directory_script_runner
+    directory_script_runner(
+        log=log,
+        pathToScriptDirectory="/path/to/mysql_scripts",
+        databaseName="imports",
+        loginPath="myLoginDetails",
+        waitForResults=False
+    )
+    ```
 
-            from fundamentals.mysql import directory_script_runner
-            directory_script_runner(
-                log=log,
-                pathToScriptDirectory="/path/to/mysql_scripts",
-                databaseName="imports",
-                loginPath="myLoginDetails",
-                waitForResults=False
-            )
-
-        Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+    Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+    
     """
     log.debug('starting the ``directory_script_runner`` function')
 
@@ -211,7 +210,6 @@ def directory_script_runner(
 
     log.debug('completed the ``directory_script_runner`` function')
     return None
-
 
 def main(arguments=None):
     """

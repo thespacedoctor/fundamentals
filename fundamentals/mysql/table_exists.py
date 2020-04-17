@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import readquery
-
 
 def table_exists(
         dbConn,
@@ -23,30 +18,35 @@ def table_exists(
         dbTableName):
     """*Probe a database to determine if a given table exists*
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dbTableName`` -- the database tablename
+    **Key Arguments**
 
-    **Return:**
-        - ``tableExists`` -- True or False
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dbTableName`` -- the database tablename
+    
 
-    **Usage:**
+    **Return**
 
-        To test if a table exists in a database:
+    - ``tableExists`` -- True or False
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.mysql import table_exists
-            exists = table_exists(
-                dbConn=dbConn,
-                log=log,
-                dbTableName="stupid_named_table"
-            )
+    To test if a table exists in a database:
 
-            print exists
+    ```python
+    from fundamentals.mysql import table_exists
+    exists = table_exists(
+        dbConn=dbConn,
+        log=log,
+        dbTableName="stupid_named_table"
+    )
 
-            # OUTPUT: False
+    print exists
+
+    # OUTPUT: False
+    ```
+    
     """
     log.debug('starting the ``table_exists`` function')
 

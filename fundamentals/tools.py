@@ -5,13 +5,9 @@
 
 :Author:
     David Young
-
-:Date Created:
-    April 16, 2014
 """
 from __future__ import print_function
 from __future__ import absolute_import
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -37,88 +33,91 @@ from os.path import expanduser
 # CLASSES                                                         #
 ###################################################################
 
-
 class tools(object):
     """
     *common setup methods & attributes of the main function in cl-util*
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``arguments`` -- the arguments read in from the command-line
-        - ``docString`` -- pass the docstring from the host module so that docopt can work on the usage text to generate the required arguments
-        - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]
-        - ``options_first`` -- options come before commands in CL usage. Default *False*.
-        - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
-        - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by anohter name on PyPi). Default *False*
-        - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
-        - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
+    **Key Arguments**
 
-    **Usage:**
+    - ``dbConn`` -- mysql database connection
+    - ``arguments`` -- the arguments read in from the command-line
+    - ``docString`` -- pass the docstring from the host module so that docopt can work on the usage text to generate the required arguments
+    - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]
+    - ``options_first`` -- options come before commands in CL usage. Default *False*.
+    - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
+    - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by anohter name on PyPi). Default *False*
+    - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
+    - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
+    
 
-        Add this to the ``__main__`` function of your command-line module
+    **Usage**
 
-        .. code-block:: python 
+    Add this to the ``__main__`` function of your command-line module
 
-            # setup the command-line util settings
-            from fundamentals import tools
-            su = tools(
-                arguments=arguments,
-                docString=__doc__,
-                logLevel="DEBUG",
-                options_first=False,
-                projectName="myprojectName"
-            )
-            arguments, settings, log, dbConn = su.setup()
+    ```python
+    # setup the command-line util settings
+    from fundamentals import tools
+    su = tools(
+        arguments=arguments,
+        docString=__doc__,
+        logLevel="DEBUG",
+        options_first=False,
+        projectName="myprojectName"
+    )
+    arguments, settings, log, dbConn = su.setup()
+    ```
 
-        Here is a template settings file content you could use:
+    Here is a template settings file content you could use:
 
-        .. code-block:: yaml
+    ```yaml
+    version: 1
+    database settings:
+        db: unit_tests
+        host: localhost
+        user: utuser
+        password: utpass
+        tunnel: true
 
-            version: 1
-            database settings:
-                db: unit_tests
-                host: localhost
-                user: utuser
-                password: utpass
-                tunnel: true
+    # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
+    # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
+    # code, static catalogue database and transient database are all on seperate machines.
+    ssh tunnel:
+        remote user: username
+        remote ip: mydomain.co.uk
+        remote datbase host: mydatabaseName
+        port: 9002
 
-            # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
-            # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if 
-            # code, static catalogue database and transient database are all on seperate machines.
-            ssh tunnel:
-                remote user: username
-                remote ip: mydomain.co.uk
-                remote datbase host: mydatabaseName
-                port: 9002
+    logging settings:
+        formatters:
+            file_style:
+                format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
+                datefmt: '%Y/%m/%d %H:%M:%S'
+            console_style:
+                format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
+                datefmt: '%H:%M:%S'
+            html_style:
+                format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
+                datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
+        handlers:
+            console:
+                class: logging.StreamHandler
+                level: DEBUG
+                formatter: console_style
+                stream: ext://sys.stdout
+            file:
+                class: logging.handlers.GroupWriteRotatingFileHandler
+                level: WARNING
+                formatter: file_style
+    
 
-            logging settings:
-                formatters:
-                    file_style:
-                        format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
-                        datefmt: '%Y/%m/%d %H:%M:%S'
-                    console_style:
-                        format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
-                        datefmt: '%H:%M:%S'
-                    html_style:
-                        format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
-                        datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
-                handlers:
-                    console:
-                        class: logging.StreamHandler
-                        level: DEBUG
-                        formatter: console_style
-                        stream: ext://sys.stdout
-                    file:
-                        class: logging.handlers.GroupWriteRotatingFileHandler
-                        level: WARNING
-                        formatter: file_style
-                        filename: /Users/Dave/.config/myprojectName/myprojectName.log
-                        mode: w+
-                        maxBytes: 102400
-                        backupCount: 1
-                root:
-                    level: WARNING
-                    handlers: [file,console]
+                    filename: /Users/Dave/.config/myprojectName/myprojectName.log
+                    mode: w+
+                    maxBytes: 102400
+                    backupCount: 1
+            root:
+                level: WARNING
+                handlers: [file,console]
+        ```
     """
     # Initialisation
 
@@ -530,7 +529,6 @@ class tools(object):
     # use the tab-trigger below for new method
     # xt-class-method
 
-
 ###################################################################
 # PUBLIC FUNCTIONS                                                #
 ###################################################################
@@ -545,7 +543,6 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
     return yaml.load(stream, OrderedLoader)
-
 
 if __name__ == '__main__':
     main()

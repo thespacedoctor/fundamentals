@@ -42,7 +42,6 @@ if not os.path.exists(pathToOutputDir):
 
 # xt-setup-unit-testing-files-and-folders
 
-
 class test_tag(unittest.TestCase):
 
     def test_tag_function(self):

@@ -5,13 +5,9 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
 from __future__ import print_function
 from __future__ import division
-################# GLOBAL IMPORTS ####################
 from builtins import str
 from builtins import range
 from past.utils import old_div
@@ -28,12 +24,10 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 
-
 count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
-
 
 def insert_list_of_dictionaries_into_database_tables(
         dbConn,
@@ -48,35 +42,40 @@ def insert_list_of_dictionaries_into_database_tables(
         dbSettings=False):
     """insert list of dictionaries into database tables
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dictList`` -- list of python dictionaries to add to the database table
-        - ``dbTableName`` -- name of the database table
-        - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
-        - ``dateModified`` -- add the modification date as a column in the database
-        - ``dateCreated`` -- add the created date as a column in the database
-        - ``batchSize`` -- batch the insert commands into *batchSize* batches
-        - ``replace`` -- repalce row if a duplicate is found
-        - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dictList`` -- list of python dictionaries to add to the database table
+    - ``dbTableName`` -- name of the database table
+    - ``uniqueKeyList`` -- a list of column names to append as a unique constraint on the database
+    - ``dateModified`` -- add the modification date as a column in the database
+    - ``dateCreated`` -- add the created date as a column in the database
+    - ``batchSize`` -- batch the insert commands into *batchSize* batches
+    - ``replace`` -- repalce row if a duplicate is found
+    - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
+    
 
-    **Usage:**
+    **Return**
 
-        .. code-block:: python
+    - None
+    
 
-            from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
-            insert_list_of_dictionaries_into_database_tables(
-                dbConn=dbConn,
-                log=log,
-                dictList=dictList,
-                dbTableName="test_insert_many",
-                uniqueKeyList=["col1", "col3"],
-                dateModified=False,
-                batchSize=2500
-            )
+    **Usage**
+
+    ```python
+    from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+    insert_list_of_dictionaries_into_database_tables(
+        dbConn=dbConn,
+        log=log,
+        dictList=dictList,
+        dbTableName="test_insert_many",
+        uniqueKeyList=["col1", "col3"],
+        dateModified=False,
+        batchSize=2500
+    )
+    ```
+    
     """
 
     log.debug(
@@ -181,7 +180,6 @@ def insert_list_of_dictionaries_into_database_tables(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
     return None
 
-
 def _insert_single_batch_into_database(
         batchIndex,
         log,
@@ -194,23 +192,29 @@ def _insert_single_batch_into_database(
         dateCreated):
     """*summary of function*
 
-    **Key Arguments:**
-        - ``batchIndex`` -- the index of the batch to insert
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
+    **Key Arguments**
 
-    **Return:**
-        - None
+    - ``batchIndex`` -- the index of the batch to insert
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    
 
-    **Usage:**
-        .. todo::
+    **Return**
 
-            add usage info
-            create a sublime snippet for usage
+    - None
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            usage code            
+    .. todo::
+
+        add usage info
+        create a sublime snippet for usage
+
+    ```python
+    usage code            
+    ```
+    
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
@@ -336,7 +340,6 @@ def _insert_single_batch_into_database(
     log.debug('completed the ``_insert_single_batch_into_database`` function')
     return "None"
 
-
 def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
         dbTablename,
@@ -344,26 +347,31 @@ def _add_dictlist_to_database_via_load_in_file(
         dateModified=False):
     """*load a list of dictionaries into a database table with load data infile*
 
-    **Key Arguments:**
+    **Key Arguments**
 
-        - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
-        - ``dbTablename`` -- the name of the database table to add the list to
-        - ``dbSettings`` -- the dictionary of database settings
-        - ``log`` -- logger
-        - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
+    - ``dbTablename`` -- the name of the database table to add the list to
+    - ``dbSettings`` -- the dictionary of database settings
+    - ``log`` -- logger
+    - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    
 
-    **Return:**
-        - None
+    **Return**
 
-    **Usage:**
-        .. todo::
+    - None
+    
 
-            add usage info
-            create a sublime snippet for usage
+    **Usage**
 
-        .. code-block:: python
+    .. todo::
 
-            usage code
+        add usage info
+        create a sublime snippet for usage
+
+    ```python
+    usage code
+    ```
+    
     """
     from fundamentals.logs import emptyLogger
     log = emptyLogger()

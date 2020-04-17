@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    November 22, 2017
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -28,43 +24,48 @@ class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``dbSettings`` -- a dictionary of database settings
+    **Key Arguments**
 
-    **Return:**
-        - ``dbConns`` -- a database connection
+    - ``log`` -- logger
+    - ``dbSettings`` -- a dictionary of database settings
 
-    **Usage:**
 
-        Given a python dictionary that looks like this:
+    **Return**
 
-        .. code-block:: python 
+    - ``dbConns`` -- a database connection
 
-            dbSettings = {
-                'host': '127.0.0.1', 
-                'loginPath': 'atlasMovers', 
-                'user': 'monster', 
-                'tunnel': {
-                    'remote ip': 'psweb.mp.qub.ac.uk', 
-                    'remote datbase host': 'dormammu', 
-                    'remote user': 'monster', 
-                    'port': 9006
-                }, 
-                'password': 'myPass', 
-                'db': 'atlas_moving_objects'
-            }
 
-        ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
+    **Usage**
 
-        .. code-block:: python 
+    Given a python dictionary that looks like this:
 
-            # SETUP ALL DATABASE CONNECTIONS
-            from fundamentals.mysql import database
-            dbConn = database(
-                log=log,
-                dbSettings=dbSettings
-            ).connect()
+    ```python
+    dbSettings = {
+        'host': '127.0.0.1', 
+        'loginPath': 'atlasMovers', 
+        'user': 'monster', 
+        'tunnel': {
+            'remote ip': 'psweb.mp.qub.ac.uk', 
+            'remote datbase host': 'dormammu', 
+            'remote user': 'monster', 
+            'port': 9006
+        }, 
+        'password': 'myPass', 
+        'db': 'atlas_moving_objects'
+    }
+    ```
+
+    ``loginPath`` and ``tunnel`` are optional, to setup the a database connection, run the following:
+
+    ```python
+    # SETUP ALL DATABASE CONNECTIONS
+    from fundamentals.mysql import database
+    dbConn = database(
+        log=log,
+        dbSettings=dbSettings
+    ).connect()
+    ```
+
     """
     # INITIALISATION
 
@@ -83,10 +84,12 @@ class database(object):
         return None
 
     def connect(self):
-        """connect to the database
+        """*Connect to the database*
 
-        **Return:**
-            - ``dbConn`` -- the database connection
+        **Return**
+
+        - ``dbConn`` -- the database connection
+
 
         See the class docstring for usage
         """
@@ -128,13 +131,17 @@ class database(object):
             self,
             tunnelParameters):
         """
-        *setup a ssh tunnel for a database connection to port through*
+        *Setup a ssh tunnel for a database connection to port through*
 
-        **Key Arguments:**
-            - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
+        **Key Arguments**
 
-        **Return:**
-            - ``sshPort`` -- the port the ssh tunnel is connected via
+        - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
+
+
+        **Return**
+
+        - ``sshPort`` -- the port the ssh tunnel is connected via
+
         """
         self.log.debug('starting the ``_setup_tunnel`` method')
 
@@ -170,7 +177,7 @@ class database(object):
         return sshPort
 
     def _checkServer(self, address, port):
-        """Check that the TCP Port we've decided to use for tunnelling is available
+        """*Check that the TCP Port we've decided to use for tunnelling is available*
         """
         self.log.debug('starting the ``_checkServer`` method')
 

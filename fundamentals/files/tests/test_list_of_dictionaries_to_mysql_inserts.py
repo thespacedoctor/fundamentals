@@ -41,11 +41,9 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 pathToPickleFile = pathToInputDir + "/list-of-dictionaries.p"
 
 listOfDictionaries = pickle.load(open(pathToPickleFile, "rb"))
-
 
 class test_list_of_dictionaries_to_mysql(unittest.TestCase):
 

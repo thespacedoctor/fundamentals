@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    September 14, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 from builtins import range
 from builtins import object
@@ -28,46 +24,48 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
-
 class list_of_dictionaries(object):
     """
     *The dataset object is a list of python dictionaries. Using this class, the data can be rendered as various list and markup formats*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``listOfDictionaries`` -- the list of dictionaries to render
-        - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
+    **Key Arguments**
 
-    **Usage:**
+    - ``log`` -- logger
+    - ``listOfDictionaries`` -- the list of dictionaries to render
+    - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
+    
 
-        To initialise the dataset object:
+    **Usage**
 
-        .. code-block:: python
+    To initialise the dataset object:
 
-            dataList = [
-                {
-                    "owner": "daisy",
-                    "pet": "dog",
-                    "address": "belfast, uk"
-                },
-                {
-                    "owner": "john",
-                    "pet": "snake",
-                    "address": "the moon"
-                },
-                {
-                    "owner": "susan",
-                    "pet": "crocodile",
-                    "address": "larne"
-                }
+    ```python
+    dataList = [
+        {
+            "owner": "daisy",
+            "pet": "dog",
+            "address": "belfast, uk"
+        },
+        {
+            "owner": "john",
+            "pet": "snake",
+            "address": "the moon"
+        },
+        {
+            "owner": "susan",
+            "pet": "crocodile",
+            "address": "larne"
+        }
 
-            ]
+    ]
 
-            from fundamentals.renderer import list_of_dictionaries
-            dataSet = list_of_dictionaries(
-                log=log,
-                listOfDictionaries=dataList
-            )
+    from fundamentals.renderer import list_of_dictionaries
+    dataSet = list_of_dictionaries(
+        log=log,
+        listOfDictionaries=dataList
+    )
+    ```
+    
     """
 
     def __init__(
@@ -88,9 +86,10 @@ class list_of_dictionaries(object):
             self):
         """*Returns the original list of dictionaries*
 
-        **Usage:**
+        **Usage**
 
-            dataSet.list
+        dataSet.list
+        
         """
         return self.listOfDictionaries
 
@@ -100,32 +99,37 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in CSV format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the csv content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered in csv format
+        - ``filepath`` -- path to the file to write the csv content to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as csv:
+        - ``renderedData`` -- the data rendered in csv format
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.csv())
+        To render the data set as csv:
 
-            .. code-block:: text
+        ```python
+        print(dataSet.csv())
+        ```
 
-                owner,pet,address
-                daisy,dog,"belfast, uk"
-                john,snake,the moon
-                susan,crocodile,larne
+        ```text
+        owner,pet,address
+        daisy,dog,"belfast, uk"
+        john,snake,the moon
+        susan,crocodile,larne
+        ```
 
-            and to save the csv rendering to file:
+        and to save the csv rendering to file:
 
-            .. code-block:: python
-
-                dataSet.csv("/path/to/myfile.csv")
+        ```python
+        dataSet.csv("/path/to/myfile.csv")
+        ```
+        
         """
         self.log.debug('starting the ``csv`` method')
 
@@ -150,35 +154,40 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a  plain text table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the table to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a plain text table
+        - ``filepath`` -- path to the file to write the table to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as a plain text table:
+        - ``renderedData`` -- the data rendered as a plain text table
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.table())
+        To render the data set as a plain text table:
 
-            .. code-block:: text
+        ```python
+        print(dataSet.table())
+        ```
 
-                +--------+------------+--------------+
-                | owner  | pet        | address      |
-                +========+============+==============+
-                | daisy  | dog        | belfast, uk  |
-                | john   | snake      | the moon     |
-                | susan  | crocodile  | larne        |
-                +--------+------------+--------------+
+        ```text
+        +--------+------------+--------------+
+        | owner  | pet        | address      |
+        +========+============+==============+
+        | daisy  | dog        | belfast, uk  |
+        | john   | snake      | the moon     |
+        | susan  | crocodile  | larne        |
+        +--------+------------+--------------+
+        ```
 
-            and to save the table rendering to file:
+        and to save the table rendering to file:
 
-            .. code-block:: python
-
-                dataSet.table("/path/to/myfile.ascii")
+        ```python
+        dataSet.table("/path/to/myfile.ascii")
+        ```
+        
         """
         self.log.debug('starting the ``table`` method')
 
@@ -204,37 +213,42 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a  resturcturedText table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the table to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a resturcturedText table
+        - ``filepath`` -- path to the file to write the table to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as a resturcturedText table:
+        - ``renderedData`` -- the data rendered as a resturcturedText table
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.reST())
+        To render the data set as a resturcturedText table:
 
-            .. code-block:: text
+        ```python
+        print(dataSet.reST())
+        ```
 
-                +--------+------------+--------------+
-                | owner  | pet        | address      |
-                +========+============+==============+
-                | daisy  | dog        | belfast, uk  |
-                +--------+------------+--------------+
-                | john   | snake      | the moon     |
-                +--------+------------+--------------+
-                | susan  | crocodile  | larne        |
-                +--------+------------+--------------+
+        ```text
+        +--------+------------+--------------+
+        | owner  | pet        | address      |
+        +========+============+==============+
+        | daisy  | dog        | belfast, uk  |
+        +--------+------------+--------------+
+        | john   | snake      | the moon     |
+        +--------+------------+--------------+
+        | susan  | crocodile  | larne        |
+        +--------+------------+--------------+
+        ```
 
-            and to save the table rendering to file:
+        and to save the table rendering to file:
 
-            .. code-block:: python
-
-                dataSet.reST("/path/to/myfile.rst")
+        ```python
+        dataSet.reST("/path/to/myfile.rst")
+        ```
+        
         """
         self.log.debug('starting the ``table`` method')
 
@@ -260,33 +274,38 @@ class list_of_dictionaries(object):
     ):
         """*Render the data as a markdown table*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the markdown to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as a markdown table
+        - ``filepath`` -- path to the file to write the markdown to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as a markdown table:
+        - ``renderedData`` -- the data rendered as a markdown table
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.markdown())
+        To render the data set as a markdown table:
 
-            .. code-block:: markdown
+        ```python
+        print(dataSet.markdown())
+        ```
 
-                | owner  | pet        | address      |
-                |:-------|:-----------|:-------------|
-                | daisy  | dog        | belfast, uk  |
-                | john   | snake      | the moon     |
-                | susan  | crocodile  | larne        |
+        ```markdown
+        | owner  | pet        | address      |
+        |:-------|:-----------|:-------------|
+        | daisy  | dog        | belfast, uk  |
+        | john   | snake      | the moon     |
+        | susan  | crocodile  | larne        |
+        ```
 
-            and to save the markdown table rendering to file:
+        and to save the markdown table rendering to file:
 
-            .. code-block:: python
-
-                dataSet.table("/path/to/myfile.md")
+        ```python
+        dataSet.table("/path/to/myfile.md")
+        ```
+        
         """
         self.log.debug('starting the ``markdown`` method')
 
@@ -312,45 +331,50 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in json format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the json content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as json
+        - ``filepath`` -- path to the file to write the json content to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as json:
+        - ``renderedData`` -- the data rendered as json
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.json())
+        To render the data set as json:
 
-            .. code-block:: json
+        ```python
+        print(dataSet.json())
+        ```
 
-                [
-                    {
-                        "address": "belfast, uk",
-                        "owner": "daisy",
-                        "pet": "dog"
-                    },
-                    {
-                        "address": "the moon",
-                        "owner": "john",
-                        "pet": "snake"
-                    },
-                    {
-                        "address": "larne",
-                        "owner": "susan",
-                        "pet": "crocodile"
-                    }
-                ]
+        ```json
+        [
+            {
+                "address": "belfast, uk",
+                "owner": "daisy",
+                "pet": "dog"
+            },
+            {
+                "address": "the moon",
+                "owner": "john",
+                "pet": "snake"
+            },
+            {
+                "address": "larne",
+                "owner": "susan",
+                "pet": "crocodile"
+            }
+        ]
+        ```
 
-            and to save the json rendering to file:
+        and to save the json rendering to file:
 
-            .. code-block:: python
-
-                dataSet.json("/path/to/myfile.json")
+        ```python
+        dataSet.json("/path/to/myfile.json")
+        ```
+        
         """
         self.log.debug('starting the ``json`` method')
 
@@ -386,37 +410,42 @@ class list_of_dictionaries(object):
     ):
         """*Render the data in yaml format*
 
-        **Key Arguments:**
-            - ``filepath`` -- path to the file to write the yaml content to. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered as yaml
+        - ``filepath`` -- path to the file to write the yaml content to. Default *None*
+        
 
-        **Usage:**
+        **Return**
 
-            To render the data set as yaml:
+        - ``renderedData`` -- the data rendered as yaml
+        
 
-            .. code-block:: python
+        **Usage**
 
-                print(dataSet.yaml())
+        To render the data set as yaml:
 
-            .. code-block:: yaml
+        ```python
+        print(dataSet.yaml())
+        ```
 
-                - address: belfast, uk
-                  owner: daisy
-                  pet: dog
-                - address: the moon
-                  owner: john
-                  pet: snake
-                - address: larne
-                  owner: susan
-                  pet: crocodile
+        ```yaml
+        - address: belfast, uk
+          owner: daisy
+          pet: dog
+        - address: the moon
+          owner: john
+          pet: snake
+        - address: larne
+          owner: susan
+          pet: crocodile
+        ```
 
-            and to save the yaml rendering to file:
+        and to save the yaml rendering to file:
 
-            .. code-block:: python
-
-                dataSet.json("/path/to/myfile.yaml")
+        ```python
+        dataSet.json("/path/to/myfile.yaml")
+        ```
+        
         """
         self.log.debug('starting the ``yaml`` method')
 
@@ -445,34 +474,38 @@ class list_of_dictionaries(object):
     ):
         """*Render the dataset as a series of mysql insert statements*
 
-        **Key Arguments:**
-            - ``tableName`` -- the name of the mysql db table to assign the insert statements to.
-            - ``filepath`` -- path to the file to write the mysql inserts content to. Default *None*
-            createStatement
+        **Key Arguments**
 
-        **Return:**
-            - ``renderedData`` -- the data rendered mysql insert statements (string format)
+        - ``tableName`` -- the name of the mysql db table to assign the insert statements to.
+        - ``filepath`` -- path to the file to write the mysql inserts content to. Default *None*
+        createStatement
+        
 
-        **Usage:**
+        **Return**
 
-            .. code-block:: python
+        - ``renderedData`` -- the data rendered mysql insert statements (string format)
+        
 
-                print(dataSet.mysql("testing_table"))
+        **Usage**
 
-            this output the following:
+        ```python
+        print(dataSet.mysql("testing_table"))
+        ```
 
-            .. code-block:: plain
+        this output the following:
 
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
-                INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
+        ```plain
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
+        INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;
+        ```
 
-            To save this rendering to file use:
+        To save this rendering to file use:
 
-            .. code-block:: python
-
-                dataSet.mysql("testing_table", "/path/to/myfile.sql")
-
+        ```python
+        dataSet.mysql("testing_table", "/path/to/myfile.sql")
+        ```
+        
         """
         self.log.debug('starting the ``mysql`` method')
 
@@ -505,11 +538,15 @@ class list_of_dictionaries(object):
             csvType="human"):
         """Convert a python list of dictionaries to pretty csv output
 
-        **Key Arguments:**
-            - ``csvType`` -- human, machine or reST
+        **Key Arguments**
 
-        **Return:**
-            - ``output`` -- the contents of a CSV file
+        - ``csvType`` -- human, machine or reST
+        
+
+        **Return**
+
+        - ``output`` -- the contents of a CSV file
+        
         """
         self.log.debug(
             'starting the ``_list_of_dictionaries_to_csv`` function')
@@ -648,12 +685,16 @@ class list_of_dictionaries(object):
             createStatement=None):
         """Convert a python list of dictionaries to pretty csv output
 
-        **Key Arguments:**
-            - ``tableName`` -- the name of the table to create the insert statements for
-            - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
+        **Key Arguments**
 
-        **Return:**
-            - ``output`` -- the mysql insert statements (as a string)
+        - ``tableName`` -- the name of the table to create the insert statements for
+        - ``createStatement`` -- add this create statement to the top of the file. Will only be executed if no table of that name exists in database. Default *None*
+        
+
+        **Return**
+
+        - ``output`` -- the mysql insert statements (as a string)
+        
         """
         self.log.debug(
             'completed the ````_list_of_dictionaries_to_mysql_inserts`` function')

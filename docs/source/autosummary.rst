@@ -1,20 +1,4 @@
 
-Subpackages
------------
-
-.. autosummary::
-   :toctree: _autosummary
-   :nosignatures:
-   :template: autosummary/subpackage.rst
-
-   fundamentals.commonutils
-   fundamentals.download
-   fundamentals.files
-   fundamentals.mysql
-   fundamentals.nose2_plugins
-   fundamentals.renderer 
-
-
 Modules
 -------
 
@@ -22,6 +6,12 @@ Modules
    :toctree: _autosummary
    :nosignatures:
 
+   fundamentals.commonutils
+   fundamentals.download
+   fundamentals.files
+   fundamentals.mysql
+   fundamentals.nose2_plugins
+   fundamentals.renderer 
    fundamentals.logs
    fundamentals.times 
 
@@ -51,8 +41,7 @@ Functions
    :toctree: _autosummary
    :nosignatures:
 
-   fundamentals.download._dump_files_to_local_drive
-   fundamentals.download._fetch
+   fundamentals.commonutils.getpackagepath
    fundamentals.download.append_now_datestamp_to_filename
    fundamentals.download.extract_filename_from_url
    fundamentals.download.get_now_datetime_filestamp
@@ -72,7 +61,3 @@ Functions
    fundamentals.times.calculate_time_difference
    fundamentals.times.datetime_relative_to_now
    fundamentals.times.get_now_sql_datetime 
-
-:ref:`Index<genindex>`
-----------------------
-

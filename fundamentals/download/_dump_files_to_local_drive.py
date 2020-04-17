@@ -5,28 +5,27 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
-
 def _dump_files_to_local_drive(bodies, theseUrls, log):
     """
     *takes the files stored in memory and dumps them to the local drive*
 
-    ****Key Arguments:****
+    **Key Arguments**
+
+    
       - ``bodies`` -- array of file data (currently stored in memory)
       - ``theseUrls`` -- array of local files paths to dump the file data into
       - ``log`` -- the logger
 
-    **Return:**
+    **Return**
+
+    
       - ``None``
     """
     j = 0

@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 class test_logs(unittest.TestCase):
 
     def test_logs_function(self):
@@ -52,7 +51,6 @@ class test_logs(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
-
 
 # class test_logs(unittest.TestCase):
 

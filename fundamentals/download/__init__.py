@@ -2,7 +2,6 @@
 *Tools used to perform download of files and HTML pages from the web*
 """
 from __future__ import absolute_import
-
 from ._fetch import _fetch
 from ._dump_files_to_local_drive import _dump_files_to_local_drive
 from .get_now_datetime_filestamp import get_now_datetime_filestamp

@@ -42,16 +42,13 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # xt-setup-unit-testing-files-and-folders
-
 
 def f(n, anotherKeyword="nothing"):
     result = 0
     for x in range(10000):
         result += n * n * x
     return result
-
 
 class test_multiprocess(unittest.TestCase):
 

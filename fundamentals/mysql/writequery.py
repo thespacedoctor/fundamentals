@@ -5,18 +5,13 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import time
-
 
 def writequery(
     log,
@@ -27,46 +22,50 @@ def writequery(
 ):
     """*Execute a MySQL write command given a sql query*
 
-    **Key Arguments:**
-        - ``sqlQuery`` -- the MySQL command to execute
-        - ``dbConn`` -- the db connection
-        - ``Force`` -- do not exit code if error occurs, move onto the next command
-        - ``manyValueList`` -- a list of value tuples if executing more than one insert
+    **Key Arguments**
 
-    **Return:**
-        - ``message`` -- error/warning message
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``Force`` -- do not exit code if error occurs, move onto the next command
+    - ``manyValueList`` -- a list of value tuples if executing more than one insert
+    
 
-    **Usage:**
+    **Return**
 
-        Here's an example of how to create a table using the database connection passed to the function:
+    - ``message`` -- error/warning message
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.mysql import writequery
-            sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
-            message = writequery(
-                log=log,
-                sqlQuery=sqlQuery,
-                dbConn=dbConn,
-                Force=False,
-                manyValueList=False
-            )
+    Here's an example of how to create a table using the database connection passed to the function:
 
-        Here's a many value insert example:
+    ```python
+    from fundamentals.mysql import writequery
+    sqlQuery = "CREATE TABLE `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+    message = writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        Force=False,
+        manyValueList=False
+    )
+    ```
 
-        .. code-block:: python 
+    Here's a many value insert example:
 
-            from fundamentals.mysql import writequery
-            sqlQuery = "INSERT INTO testing_table (id) values (%s)"
-            message = writequery(
-                log=log,
-                sqlQuery=sqlQuery,
-                dbConn=dbConn,
-                Force=False,
-                manyValueList=[(1,), (2,), (3,), (4,), (5,), (6,), (7,),
-                               (8,), (9,), (10,), (11,), (12,), ]
-            )
-
+    ```python
+    from fundamentals.mysql import writequery
+    sqlQuery = "INSERT INTO testing_table (id) values (%s)"
+    message = writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        Force=False,
+        manyValueList=[(1,), (2,), (3,), (4,), (5,), (6,), (7,),
+                       (8,), (9,), (10,), (11,), (12,), ]
+    )
+    ```
+    
     """
     log.debug('starting the ``writequery`` function')
     import pymysql

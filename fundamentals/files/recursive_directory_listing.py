@@ -5,16 +5,11 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 17, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def recursive_directory_listing(
     log,
@@ -25,43 +20,46 @@ def recursive_directory_listing(
 
     Options to list only files or only directories.
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
-        - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
+    **Key Arguments**
 
-    **Return:**
-        - ``matchedPathList`` -- the matched paths
+    - ``log`` -- logger
+    - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
+    - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
+    
 
-    **Usage:**
+    **Return**
 
-        .. code-block:: python 
+    - ``matchedPathList`` -- the matched paths
+    
 
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp"
-            )
+    **Usage**
 
-            # OR JUST FILE  
+    ```python
+    from fundamentals.files import recursive_directory_listing
+    theseFiles = recursive_directory_listing(
+        log,
+        baseFolderPath="/tmp"
+    )
 
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp",
-                whatToList="files"
-            )
+    # OR JUST FILE  
 
+    from fundamentals.files import recursive_directory_listing
+    theseFiles = recursive_directory_listing(
+        log,
+        baseFolderPath="/tmp",
+        whatToList="files"
+    )
 
-            # OR JUST FOLDERS   
+    # OR JUST FOLDERS   
 
-            from fundamentals.files import recursive_directory_listing
-            theseFiles = recursive_directory_listing(
-                log,
-                baseFolderPath="/tmp",
-                whatToList="dirs"
-            )
-            print theseFiles        
+    from fundamentals.files import recursive_directory_listing
+    theseFiles = recursive_directory_listing(
+        log,
+        baseFolderPath="/tmp",
+        whatToList="dirs"
+    )
+    print theseFiles        
+    ```
     """
     log.debug('starting the ``recursive_directory_listing`` function')
 

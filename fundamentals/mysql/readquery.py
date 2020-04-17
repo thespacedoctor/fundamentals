@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def readquery(
         sqlQuery,
@@ -24,26 +19,31 @@ def readquery(
         quiet=False):
     """Given a mysql query, read the data from the database and return the results as a list of dictionaries (database rows)
 
-    **Key Arguments:**
-        - ``log`` -- the logger.
-        - ``sqlQuery`` -- the MySQL command to execute
-        - ``dbConn`` -- the db connection
-        - ``quiet`` -- ignore mysql warnings and errors and move on. Be careful when setting this to true - damaging errors can easily be missed. Default *False*.
+    **Key Arguments**
 
-    **Return:**
-        - ``rows`` -- the rows returned by the sql query
+    - ``log`` -- the logger.
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``quiet`` -- ignore mysql warnings and errors and move on. Be careful when setting this to true - damaging errors can easily be missed. Default *False*.
+    
 
-    **Usage:**
+    **Return**
 
-        .. code-block:: python
+    - ``rows`` -- the rows returned by the sql query
+    
 
-            from fundamentals.mysql import readquery
-            rows = readquery(
-                log=log,
-                sqlQuery=sqlQuery,
-                dbConn=dbConn,
-                quiet=False
-            )
+    **Usage**
+
+    ```python
+    from fundamentals.mysql import readquery
+    rows = readquery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        quiet=False
+    )
+    ```
+    
     """
     log.debug('starting the ``readquery`` function')
     import pymysql

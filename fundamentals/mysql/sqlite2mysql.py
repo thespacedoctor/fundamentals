@@ -16,7 +16,6 @@ Options:
     -v, --version         show version
     -s, --settings        the settings file
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -26,7 +25,6 @@ from fundamentals import tools
 from fundamentals.mysql import writequery
 
 from datetime import datetime, date, time
-
 
 def main(arguments=None):
     """
@@ -70,38 +68,40 @@ def main(arguments=None):
 
     return
 
-
 class sqlite2mysql(object):
     """
     *Take a sqlite database file and copy the tables within it to a MySQL database*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``settings`` -- the settings dictionary
-        - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
-        - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
-        - ``dbConn`` -- mysql database connection 
+    **Key Arguments**
 
-    **Usage:**
+    - ``log`` -- logger
+    - ``settings`` -- the settings dictionary
+    - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
+    - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
+    - ``dbConn`` -- mysql database connection 
+    
 
-        To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    **Usage**
 
-        To convert and import the content of a sqlite database into MySQL run the following:
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        .. todo::
+    To convert and import the content of a sqlite database into MySQL run the following:
 
-            - add a tutorial about ``sqlite2mysql`` to documentation
+    .. todo::
 
-        .. code-block:: python 
+        - add a tutorial about ``sqlite2mysql`` to documentation
 
-            from fundamentals.mysql import sqlite2mysql
-            converter = sqlite2mysql(
-                log=log,
-                settings=settings,
-                pathToSqlite="/path/to/sqlite.db",
-                tablePrefix="external"
-            )
-            converter.convert_sqlite_to_mysql()
+    ```python
+    from fundamentals.mysql import sqlite2mysql
+    converter = sqlite2mysql(
+        log=log,
+        settings=settings,
+        pathToSqlite="/path/to/sqlite.db",
+        tablePrefix="external"
+    )
+    converter.convert_sqlite_to_mysql()
+    ```
+    
     """
     # Initialisation
 

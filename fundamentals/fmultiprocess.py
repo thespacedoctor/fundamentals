@@ -5,12 +5,8 @@
 
 :Author:
     David Young
-
-:Date Created:
-    November  9, 2017
 """
 from __future__ import division
-################# GLOBAL IMPORTS ####################
 from past.utils import old_div
 import sys
 import os
@@ -21,7 +17,6 @@ from functools import partial
 import inspect
 import psutil
 
-
 def fmultiprocess(
         log,
         function,
@@ -31,25 +26,30 @@ def fmultiprocess(
         **kwargs):
     """multiprocess pool
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``function`` -- the function to multiprocess
-        - ``inputArray`` -- the array to be iterated over
-        - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
-        - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
+    **Key Arguments**
 
-    **Return:**
-        - ``resultArray`` -- the array of results
+    - ``log`` -- logger
+    - ``function`` -- the function to multiprocess
+    - ``inputArray`` -- the array to be iterated over
+    - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
+    - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
+    
 
-    **Usage:**
+    **Return**
 
-        .. code-block:: python 
+    - ``resultArray`` -- the array of results
+    
 
-            from fundamentals import multiprocess
-            # DEFINE AN INPUT ARRAY
-            inputArray = range(10000)
-            results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
-                                  inputArray=inputArray, otherFunctionKeyword="cheese")
+    **Usage**
+
+    ```python
+    from fundamentals import multiprocess
+    # DEFINE AN INPUT ARRAY
+    inputArray = range(10000)
+    results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
+                          inputArray=inputArray, otherFunctionKeyword="cheese")
+    ```
+    
     """
     log.debug('starting the ``multiprocess`` function')
 

@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -18,25 +14,27 @@ from fundamentals import tools
 
 def get_now_datetime_filestamp(longTime=False):
     """
-    *A datetime stamp to be appended to the end of filenames: ``YYYYMMDDtHHMMSS``*
+    *A datetime stamp to be appended to the end of filenames: 'YYYYMMDDtHHMMSS'*
 
-    **Key Arguments:**
-        - ``longTime`` -- make time string longer (more change of filenames being unique)
+    **Key Arguments**
 
-    **Return:**
-        - ``now`` -- current time and date in filename format
+    - ``longTime`` -- make time string longer (more change of filenames being unique)
 
-    **Usage:**
-        .. code-block:: python 
+    **Return**
 
-            from fundamentals.download import get_now_datetime_filestamp
-            get_now_datetime_filestamp(longTime=False)
-            #Out: '20160316t154635'
+    - ``now`` -- current time and date in filename format
 
-            get_now_datetime_filestamp(longTime=True)
-            #Out: '20160316t154644133638' 
+    **Usage**
+
+    ```python
+    from fundamentals.download import get_now_datetime_filestamp
+    get_now_datetime_filestamp(longTime=False)
+    #Out: '20160316t154635'
+
+    get_now_datetime_filestamp(longTime=True)
+    #Out: '20160316t154644133638' 
+    ```
     """
-    ## > IMPORTS ##
     from datetime import datetime, date, time
     now = datetime.now()
     if longTime:

@@ -5,9 +5,6 @@
 
 :Author:
     David Young
-
-:Date Created:
-    October 10, 2012
 """
 from builtins import object
 import os
@@ -15,29 +12,33 @@ import sys
 import logging
 from logging import handlers
 
-
 def console_logger(
     level="WARNING"
 ):
     """
     *Setup and return a console logger*
 
-    **Key Arguments:**
-        - ``level`` -- the level of logging required
+    **Key Arguments**
 
-    **Return:**
-        - ``logger`` -- the console logger
+    - ``level`` -- the level of logging required
+    
 
-    **Usage:**
-        .. code-block:: python 
+    **Return**
 
-            from fundamentals import logs
-            log = logs.console_logger(
-                level="DEBUG"
-            )
-            log.debug("Testing console logger")
+    - ``logger`` -- the console logger
+    
+
+    **Usage**
+
+    ```python
+    from fundamentals import logs
+    log = logs.console_logger(
+        level="DEBUG"
+    )
+    log.debug("Testing console logger")
+    ```
+    
     """
-    ################ > IMPORTS ################
     ## STANDARD LIB ##
 
     import logging
@@ -72,61 +73,65 @@ def console_logger(
 
     return logger
 
-
 def setup_dryx_logging(yaml_file):
     """
     *setup dryx style python logging*
 
-    **Key Arguments:**
-        - ``level`` -- the level of logging required
+    **Key Arguments**
 
-    **Return:**
-        - ``logger`` -- the console logger
+    - ``level`` -- the level of logging required
+    
 
-    **Usage:**
-        .. code-block:: python 
+    **Return**
 
-            from fundamentals import logs
-            log = logs.setup_dryx_logging(
-                yaml_file="/Users/Dave/.config/fundamentals/fundamentals.yaml"
-            )
-            log.error("test error")
+    - ``logger`` -- the console logger
+    
 
-        Here is an example of the settings in the yaml file:
+    **Usage**
 
-        .. code-block:: yaml
+    ```python
+    from fundamentals import logs
+    log = logs.setup_dryx_logging(
+        yaml_file="/Users/Dave/.config/fundamentals/fundamentals.yaml"
+    )
+    log.error("test error")
+    ```
 
-            version: 1
+    Here is an example of the settings in the yaml file:
 
-            logging settings:
-                formatters:
-                    file_style:
-                        format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
-                        datefmt: '%Y/%m/%d %H:%M:%S'
-                    console_style:
-                        format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
-                        datefmt: '%H:%M:%S'
-                    html_style:
-                        format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
-                        datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
-                handlers:
-                    console:
-                        class: logging.StreamHandler
-                        level: DEBUG
-                        formatter: console_style
-                        stream: ext://sys.stdout
-                    file:
-                        class: logging.handlers.GroupWriteRotatingFileHandler
-                        level: WARNING
-                        formatter: file_style
-                        filename: /Users/Dave/.config/fundamentals/fundamentals.log
-                        mode: w+
-                        maxBytes: 102400
-                        backupCount: 1
-                root:
-                    level: WARNING
-                    handlers: [file,console]
+    ```yaml
+    version: 1
 
+    logging settings:
+        formatters:
+            file_style:
+                format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '
+                datefmt: '%Y/%m/%d %H:%M:%S'
+            console_style:
+                format: '* %(asctime)s - %(levelname)s: %(pathname)s:%(funcName)s:%(lineno)d > %(message)s'
+                datefmt: '%H:%M:%S'
+            html_style:
+                format: '<div id="row" class="%(levelname)s"><span class="date">%(asctime)s</span>   <span class="label">file:</span><span class="filename">%(filename)s</span>   <span class="label">method:</span><span class="funcName">%(funcName)s</span>   <span class="label">line#:</span><span class="lineno">%(lineno)d</span> <span class="pathname">%(pathname)s</span>  <div class="right"><span class="message">%(message)s</span><span class="levelname">%(levelname)s</span></div></div>'
+                datefmt: '%Y-%m-%d <span class= "time">%H:%M <span class= "seconds">%Ss</span></span>'
+        handlers:
+            console:
+                class: logging.StreamHandler
+                level: DEBUG
+                formatter: console_style
+                stream: ext://sys.stdout
+            file:
+                class: logging.handlers.GroupWriteRotatingFileHandler
+                level: WARNING
+                formatter: file_style
+                filename: /Users/Dave/.config/fundamentals/fundamentals.log
+                mode: w+
+                maxBytes: 102400
+                backupCount: 1
+        root:
+            level: WARNING
+            handlers: [file,console]
+    ```
+    
     """
     import logging
     import logging.config
@@ -170,9 +175,7 @@ def setup_dryx_logging(yaml_file):
 
     return logger
 
-
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
-
     """
     *rotating file handler for logging*
     """
@@ -189,9 +192,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         os.chmod(self.baseFilename, currMode | stat.S_IWGRP |
                  stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
 
-
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
-
     """
     *rotating file handler for logging*
     """
@@ -202,17 +203,18 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         os.umask(prevumask)
         return rtv
 
-
 class emptyLogger(object):
     """
     *A fake logger object so user can set ``log=False`` if required*
 
-    **Usage:**
-        .. code-block:: python 
+    **Usage**
 
-            if log == False:
-                from fundamentals.logs import emptyLogger
-                log = emptyLogger()
+    ```python
+    if log == False:
+        from fundamentals.logs import emptyLogger
+        log = emptyLogger()
+    ```
+    
     """
 
     def info(self, argu):

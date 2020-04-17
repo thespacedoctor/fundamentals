@@ -5,18 +5,13 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 from fundamentals.mysql import readquery
-
 
 def get_database_table_column_names(
     dbConn,
@@ -25,26 +20,31 @@ def get_database_table_column_names(
 ):
     """get database table column names
 
-    **Key Arguments:**
-        - ``dbConn`` -- mysql database connection
-        - ``log`` -- logger
-        - ``dbTable`` -- database tablename
+    **Key Arguments**
 
-    **Return:**
-        - ``columnNames`` -- table column names
+    - ``dbConn`` -- mysql database connection
+    - ``log`` -- logger
+    - ``dbTable`` -- database tablename
+    
 
-    **Usage:**
+    **Return**
 
-        To get the column names of a table in a given database:
+    - ``columnNames`` -- table column names
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.mysql import get_database_table_column_names
-            columnNames = get_database_table_column_names(
-                dbConn=dbConn,
-                log=log,
-                dbTable="test_table"
-            )
+    To get the column names of a table in a given database:
+
+    ```python
+    from fundamentals.mysql import get_database_table_column_names
+    columnNames = get_database_table_column_names(
+        dbConn=dbConn,
+        log=log,
+        dbTable="test_table"
+    )
+    ```
+    
     """
     log.debug('starting the ``get_database_table_column_names`` function')
 

@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -21,38 +17,42 @@ except:
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
-
 def setup_database_connection(
         pathToYamlFile):
     """*Start a database connection using settings in yaml file* 
 
     Given the location of a YAML dictionary containing database credientials, this function will setup and return the connection*
 
-    **Key Arguments:**
-        - ``pathToYamlFile`` -- path to the YAML dictionary.
+    **Key Arguments**
 
-    **Return:**
-        - ``dbConn`` -- connection to the MySQL database.
+    - ``pathToYamlFile`` -- path to the YAML dictionary.
+    
 
-    **Usage:**
+    **Return**
 
-        The settings file should be in this form, with all keyword values set:
+    - ``dbConn`` -- connection to the MySQL database.
+    
 
-        .. code-block:: yaml
+    **Usage**
 
-            db: unit_tests
-            host: localhost
-            user: utuser
-            password: utpass
+    The settings file should be in this form, with all keyword values set:
 
-        And here's how to generate the connection object:
+    ```yaml
+    db: unit_tests
+    host: localhost
+    user: utuser
+    password: utpass
+    ```
 
-        .. code-block:: python 
+    And here's how to generate the connection object:
 
-            from fundamentals.mysql import setup_database_connection
-            dbConn = setup_database_connection(
-                pathToYamlFile=pathToMyYamlFile
-            )
+    ```python
+    from fundamentals.mysql import setup_database_connection
+    dbConn = setup_database_connection(
+        pathToYamlFile=pathToMyYamlFile
+    )
+    ```
+    
     """
     import sys
     import logging
@@ -88,7 +88,6 @@ def setup_database_connection(
         logging.critical('could not connect to the ' + connDict['db'] + ' database on ' + connDict['host'] + ' : '
                          + str(e) + '\n')
     return dbConn
-
 
 # use the tab-trigger below for new function
 # xt-def-function

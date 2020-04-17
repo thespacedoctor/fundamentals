@@ -40,10 +40,8 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 dbSettings = settings["database settings"]["atlasMovers"]
 dbSettings2 = settings["database settings"]["unit_tests"]
-
 
 class test_database(unittest.TestCase):
 

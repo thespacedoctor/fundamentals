@@ -5,17 +5,12 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-
 
 def extract_filename_from_url(log, url):
     """
@@ -23,24 +18,27 @@ def extract_filename_from_url(log, url):
 
     *Will return 'untitled.html', if no filename is found.*
 
-    **Key Arguments:**
-        - ``url`` -- the url to extract filename from
+    **Key Arguments**
+
+    - ``url`` -- the url to extract filename from
+    
 
     Returns:
         - ``filename`` -- the filename
 
-    **Usage:**
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.download import extract_filename_from_url
-            name = extract_filename_from_url(
-                log=log,
-                url="https://en.wikipedia.org/wiki/Docstring"
-            )
-            print name
-            # OUT: Docstring.html
+    ```python
+    from fundamentals.download import extract_filename_from_url
+    name = extract_filename_from_url(
+        log=log,
+        url="https://en.wikipedia.org/wiki/Docstring"
+    )
+    print name
+    # OUT: Docstring.html
+    ```
+    
     """
-    ## > IMPORTS ##
     import re
     # EXTRACT THE FILENAME FROM THE URL
     try:

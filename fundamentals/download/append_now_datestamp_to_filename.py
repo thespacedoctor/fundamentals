@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    March 16, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import str
 import sys
 import os
@@ -21,29 +17,30 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     """
     *append the current datestamp to the end of the filename (before the extension).*
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``filename`` -- the filename
-        - ``longTime`` -- use a longer time-stmap. Default *False*
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``filename`` -- the filename
+    - ``longTime`` -- use a longer time-stmap. Default *False*
 
     Return:
         - ``dsFilename`` -- datestamped filename
 
-    **Usage:**
-        .. code-block:: python 
+    **Usage**
 
-            # APPEND TIMESTAMP TO THE FILENAME
-            from fundamentals.download import append_now_datestamp_to_filename
-            filename = append_now_datestamp_to_filename(
-                    log=log,
-                    filename="some_filename.html",
-                    longTime=True
-            )
+    ```python
+    # APPEND TIMESTAMP TO THE FILENAME
+    from fundamentals.download import append_now_datestamp_to_filename
+    filename = append_now_datestamp_to_filename(
+            log=log,
+            filename="some_filename.html",
+            longTime=True
+    )
 
-            # OUTPUT
-            # 'some_filename_20160316t154123749472.html'
+    # OUTPUT
+    # 'some_filename_20160316t154123749472.html'
+    ```
     """
-    ## > IMPORTS ##
     from fundamentals.download import get_now_datetime_filestamp
 
     try:

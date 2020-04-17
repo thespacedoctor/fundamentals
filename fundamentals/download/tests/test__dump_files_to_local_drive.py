@@ -40,7 +40,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-
 # class test__dump_files_to_local_drive(unittest.TestCase):
 
 #     def test__dump_files_to_local_drive_function(self):

@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    April 16, 2014
 """
-################# GLOBAL IMPORTS ####################
 from builtins import object
 import sys
 import os
@@ -21,26 +17,28 @@ try:
 except:
     pass
 
-
 class utKit(object):
-
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*
 
-    **Key Arguments:**
-        - ``moduleDirectory`` -- the directory to the unit-testing test file
+    **Key Arguments**
 
-    **Usage:**
-        To use this kit within any of your unit-test modules add the following code before your test methods:
+    - ``moduleDirectory`` -- the directory to the unit-testing test file
+    
 
-        .. code-block:: python 
+    **Usage**
 
-            from fundamentals.utKit import utKit
-            # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
-            moduleDirectory = os.path.dirname(__file__)
-            utKit = utKit(moduleDirectory)
-            log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
-            utKit.tearDownModule() 
+    To use this kit within any of your unit-test modules add the following code before your test methods:
+
+    ```python
+    from fundamentals.utKit import utKit
+    # SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
+    moduleDirectory = os.path.dirname(__file__)
+    utKit = utKit(moduleDirectory)
+    log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
+    utKit.tearDownModule() 
+    ```
+    
     """
     # Initialisation
 
@@ -93,11 +91,13 @@ class utKit(object):
         """
         *The setupModule method*
 
-        **Return:**
-            - ``log`` -- a logger
-            - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
-            - ``pathToInputDir`` -- path to modules own test input directory
-            - ``pathToOutputDir`` -- path to modules own test output directory
+        **Return**
+
+        - ``log`` -- a logger
+        - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
+        - ``pathToInputDir`` -- path to modules own test input directory
+        - ``pathToOutputDir`` -- path to modules own test output directory
+        
         """
         import pymysql as ms
         ## VARIABLES ##
@@ -127,11 +127,15 @@ class utKit(object):
         """
         *The tearDownModule method*
 
-        **Key Arguments:**
-            # -
+        **Key Arguments**
 
-        **Return:**
-            - None
+        # -
+        
+
+        **Return**
+
+        - None
+        
         """
 
         return None
@@ -140,8 +144,10 @@ class utKit(object):
         """
         *Get the root of the `python` package - useful for getting files in the root directory of a project*
 
-        **Return:**
-            - ``rootPath`` -- the root path of a project
+        **Return**
+
+        - ``rootPath`` -- the root path of a project
+        
         """
         import os
         rootPath = os.path.dirname(__file__)
@@ -175,7 +181,6 @@ class utKit(object):
             successRule=None,
             failureRule=None
         )
-
 
 if __name__ == '__main__':
     main()

@@ -7,12 +7,8 @@ There are options to rename all the downloaded resource, index the files, set di
 
 :Author:
     David Young
-
-:Date Created:
-    March  3, 2016
 """
 from __future__ import print_function
-################# GLOBAL IMPORTS ####################
 from future import standard_library
 standard_library.install_aliases()
 from builtins import zip
@@ -22,7 +18,6 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import urllib
-
 
 def multiobject_download(
     urlList,
@@ -39,7 +34,9 @@ def multiobject_download(
     """
     *get multiple url documents and place them in specified download directory/directories*
 
-    **Key Arguments:**
+    **Key Arguments**
+
+    
       - ``urlList`` -- list of document urls
       - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
       - ``log`` -- the logger
@@ -51,32 +48,35 @@ def multiobject_download(
       - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
       - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
-    **Return:**
+    **Return**
+
+    
       - list of timestamped documents (same order as the input urlList)
 
-    **Usage:**
-        .. code-block:: python 
+    **Usage**
 
-            # download the pages linked from the main list page
-            from fundamentals.download import multiobject_download
-            localUrls = multiobject_download(
-                urlList=["https://www.python.org/dev/peps/pep-0257/","https://en.wikipedia.org/wiki/Docstring"],
-                downloadDirectory="/tmp",
-                log="log",
-                timeStamp=True,
-                timeout=180,
-                concurrentDownloads=2,
-                resetFilename=False,
-                credentials=False,  # { 'username' : "...", "password", "..." }
-                longTime=True
-            )
+    ```python
+    # download the pages linked from the main list page
+    from fundamentals.download import multiobject_download
+    localUrls = multiobject_download(
+        urlList=["https://www.python.org/dev/peps/pep-0257/","https://en.wikipedia.org/wiki/Docstring"],
+        downloadDirectory="/tmp",
+        log="log",
+        timeStamp=True,
+        timeout=180,
+        concurrentDownloads=2,
+        resetFilename=False,
+        credentials=False,  # { 'username' : "...", "password", "..." }
+        longTime=True
+    )
 
-            print localUrls
-            # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
+    print localUrls
+    # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
+    ```
 
-        .. image:: https://i.imgur.com/QYoMm24.png width=600px
+    .. image:: https://i.imgur.com/QYoMm24.png width=600px
+    
     """
-    ## > IMPORTS ##
     import sys
     import os
     import eventlet

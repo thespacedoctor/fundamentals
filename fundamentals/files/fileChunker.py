@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    December  4, 2017
 """
-################# GLOBAL IMPORTS ####################
 from builtins import range
 from builtins import object
 import sys
@@ -18,30 +14,32 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import codecs
 
-
 class fileChunker(object):
     """
     *The fileChunker iterator - iterate over large line-based files to reduce memory footprint*
 
-    **Key Arguments:**
-        - ``filepath`` -- path to the large file to iterate over
-        - ``batchSize`` -- size of the chunks to return in lines
+    **Key Arguments**
 
-    **Usage:**
+    - ``filepath`` -- path to the large file to iterate over
+    - ``batchSize`` -- size of the chunks to return in lines
+    
 
-        To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    **Usage**
 
-        To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
 
-        .. code-block:: python 
+    To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
 
-            from fundamentals.files import fileChunker
-            fc = fileChunker(
-                filepath="/path/to/large/file.csv",
-                batchSize=100000
-            )
-            for i in fc:
-                print len(i)
+    ```python
+    from fundamentals.files import fileChunker
+    fc = fileChunker(
+        filepath="/path/to/large/file.csv",
+        batchSize=100000
+    )
+    for i in fc:
+        print len(i)
+    ```
+    
     """
 
     def __init__(self, filepath, batchSize):

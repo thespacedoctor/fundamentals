@@ -5,11 +5,7 @@
 
 :Author:
     David Young
-
-:Date Created:
-    June 21, 2016
 """
-################# GLOBAL IMPORTS ####################
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -25,7 +21,6 @@ import pymysql as mdb
 from fundamentals import tools, times
 from fundamentals.mysql import writequery, table_exists, readquery
 import six
-
 
 def convert_dictionary_to_mysql_table(
         log,
@@ -43,87 +38,93 @@ def convert_dictionary_to_mysql_table(
         dateCreated=True):
     """convert dictionary to mysql table
 
-    **Key Arguments:**
-        - ``log`` -- logger
-        - ``dictionary`` -- python dictionary
-        - ``dbConn`` -- the db connection
-        - ``dbTableName`` -- name of the table you wish to add the data to (or create if it does not exist)
-        - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
-        - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
-        - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
-        - ``dateModified`` -- add a modification date and updated flag to the mysql table
-        - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
-        - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
+    **Key Arguments**
+
+    - ``log`` -- logger
+    - ``dictionary`` -- python dictionary
+    - ``dbConn`` -- the db connection
+    - ``dbTableName`` -- name of the table you wish to add the data to (or create if it does not exist)
+    - ``uniqueKeyList`` - a lists column names that need combined to create the primary key
+    - ``createHelperTables`` -- create some helper tables with the main table, detailing original keywords etc
+    - ``returnInsertOnly`` -- returns only the insert command (does not execute it)
+    - ``dateModified`` -- add a modification date and updated flag to the mysql table
+    - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
+    - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
+    
+
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
         - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
         - ``dateCreated`` -- add a timestamp for dateCreated?
 
-    **Return:**
-        - ``returnInsertOnly`` -- the insert statement if requested
+    **Return**
 
-    **Usage:**
+    - ``returnInsertOnly`` -- the insert statement if requested
+    
 
-        To add a python dictionary to a database table, creating the table and/or columns if they don't yet exist:
+    **Usage**
 
-        .. code-block:: python
+    To add a python dictionary to a database table, creating the table and/or columns if they don't yet exist:
 
-            from fundamentals.mysql import convert_dictionary_to_mysql_table
-            dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+    ```python
+    from fundamentals.mysql import convert_dictionary_to_mysql_table
+    dictionary = {"a newKey": "cool", "and another": "super cool",
+              "uniquekey1": "cheese", "uniqueKey2": "burgers"}
 
-            convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
-                dictionary=dictionary,
-                dbTableName="testing_table",
-                uniqueKeyList=["uniquekey1", "uniqueKey2"],
-                dateModified=False,
-                returnInsertOnly=False,
-                replace=True
-            )
+    convert_dictionary_to_mysql_table(
+        dbConn=dbConn,
+        log=log,
+        dictionary=dictionary,
+        dbTableName="testing_table",
+        uniqueKeyList=["uniquekey1", "uniqueKey2"],
+        dateModified=False,
+        returnInsertOnly=False,
+        replace=True
+    )
+    ```
 
-        Or just return the insert statement with a list of value tuples, i.e. do not execute the command on the database:
+    Or just return the insert statement with a list of value tuples, i.e. do not execute the command on the database:
 
-            insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
-                dictionary=dictionary,
-                dbTableName="testing_table",
-                uniqueKeyList=["uniquekey1", "uniqueKey2"],
-                dateModified=False,
-                returnInsertOnly=True,
-                replace=False,
-                batchInserts=True
-            )
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            dateModified=False,
+            returnInsertOnly=True,
+            replace=False,
+            batchInserts=True
+        )
 
-            print(insertCommand, valueTuple)
+        print(insertCommand, valueTuple)
 
-            # OUT: 'INSERT IGNORE INTO `testing_table`
-            # (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES
-            # (%s, %s, %s, %s, %s)', ('cool', 'super cool',
-            # '2016-06-21T12:08:59', 'burgers', 'cheese')
+        # OUT: 'INSERT IGNORE INTO `testing_table`
+        # (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES
+        # (%s, %s, %s, %s, %s)', ('cool', 'super cool',
+        # '2016-06-21T12:08:59', 'burgers', 'cheese')
 
-        You can also return a list of single insert statements using ``batchInserts = False``. Using ``replace = True`` will also add instructions about how to replace duplicate entries in the database table if found:
+    You can also return a list of single insert statements using ``batchInserts = False``. Using ``replace = True`` will also add instructions about how to replace duplicate entries in the database table if found:
 
-            inserts = convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
-                dictionary=dictionary,
-                dbTableName="testing_table",
-                uniqueKeyList=["uniquekey1", "uniqueKey2"],
-                dateModified=False,
-                returnInsertOnly=True,
-                replace=True,
-                batchInserts=False
-            )
+        inserts = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            dateModified=False,
+            returnInsertOnly=True,
+            replace=True,
+            batchInserts=False
+        )
 
-            print(inserts)
+        print(inserts)
 
-            # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1)
-            # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")
-            # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super
-            # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
-            # uniquekey1="cheese"
+        # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1)
+        # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")
+        # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super
+        # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
+        # uniquekey1="cheese"
+    
     """
 
     log.debug('starting the ``convert_dictionary_to_mysql_table`` function')
