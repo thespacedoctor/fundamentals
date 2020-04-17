@@ -1,15 +1,14 @@
-renderer
+renderer *(module)*
 ================================
 
 
 
 .. automodule:: fundamentals.renderer
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -19,6 +18,34 @@ renderer
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+            ~list_of_dictionaries (nice)
+       
+    
+    
+        
+    
     
     
     

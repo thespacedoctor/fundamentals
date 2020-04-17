@@ -1,4 +1,4 @@
-console_logger
+console_logger (*function*)
 =============================================
 
 .. currentmodule:: fundamentals.logs

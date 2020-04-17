@@ -8,7 +8,8 @@
    :caption: Table of Contents
 
    install
-   _template_
+   initialisation
+   project_setup
    todolist
    changes_link
 ```

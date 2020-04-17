@@ -53,7 +53,10 @@ html_theme_options = {
     'sticky_navigation': True,
     'navigation_depth': 4,
     'includehidden': True,
-    'titles_only': False
+    'titles_only': False,
+    'github_user': 'thespacedoctor',
+    'github_repo': 'fundamentals',
+    'strap_line': 'Fundamental tools required by most self-respecting python-packages bundled together in one place'
 }
 html_theme_path = ['_static/whistles-theme/sphinx/_themes']
 # html_title = None
@@ -208,7 +211,7 @@ def generateAutosummaryIndex():
                 if name in ["numpy"]:
                     continue
                 thisMod = sp + "." + name
-                if thisMod not in allSubpackages and len(name) and name[0:2] != "__" and name[-5:] != "tests" and "cl_util" not in name:
+                if thisMod not in allSubpackages and len(name) and name[0:1] != "_" and name[-5:] != "tests" and "cl_util" not in name:
                     allModules.append(sp + "." + name)
                 # if thisMod not in allSubpackages and len(name) and name[0:2] != "__" and name[-5:] != "tests" and name != "cl_utils" and name != "utKit":
                 #     allModules.append(sp + "." + name)
@@ -217,15 +220,15 @@ def generateAutosummaryIndex():
         for name, obj in inspect.getmembers(__import__(spm, fromlist=[''])):
             if inspect.isclass(obj):
                 thisClass = spm + "." + name
-                if (thisClass == obj.__module__ or spm == obj.__module__) and len(name) and name[0:2] != "__":
+                if (thisClass == obj.__module__ or spm == obj.__module__) and len(name) and name[0:1] != "_":
                     allClasses.append(thisClass)
             if inspect.isfunction(obj):
                 thisFunction = spm + "." + name
-                if (spm == obj.__module__ or obj.__module__ == thisFunction) and len(name) and name != "main" and name[0:2] != "__":
+                if (spm == obj.__module__ or obj.__module__ == thisFunction) and len(name) and name != "main" and name[0:1] != "_":
                     allFunctions.append(thisFunction)
             if inspect.ismethod(obj):
                 thisMethod = spm + "." + name
-                if (spm == obj.__module__ or obj.__module__ == thisMethod) and len(name) and name != "main" and name[0:2] != "__":
+                if (spm == obj.__module__ or obj.__module__ == thisMethod) and len(name) and name != "main" and name[0:1] != "_":
                     allMethods.append(thisMethod)
 
     allSubpackages = allSubpackages[1:]

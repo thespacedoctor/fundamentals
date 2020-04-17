@@ -1,4 +1,4 @@
-get_now_sql_datetime
+get_now_sql_datetime (*function*)
 ====================================================
 
 .. currentmodule:: fundamentals.times

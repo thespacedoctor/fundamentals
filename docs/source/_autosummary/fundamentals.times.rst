@@ -1,15 +1,14 @@
-times
+times *(module)*
 =============================
 
 
 
 .. automodule:: fundamentals.times
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -27,6 +26,54 @@ times
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+            ~calculate_time_difference (nice)
+       
+    
+    
+        
+            ~datetime_relative_to_now (nice)
+       
+    
+    
+        
+            ~get_now_sql_datetime (nice)
+       
+    
+    
+        
+            ~os (nice)
+       
+    
+    
+        
+            ~str (nice)
+       
+    
+    
+        
+            ~sys (nice)
+       
+    
     
     
     

@@ -1,4 +1,4 @@
-multiobject_download
+multiobject_download (*function*)
 =======================================================
 
 .. currentmodule:: fundamentals.download

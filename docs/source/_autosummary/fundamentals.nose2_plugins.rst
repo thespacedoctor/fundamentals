@@ -1,15 +1,14 @@
-nose2_plugins
+nose2_plugins *(module)*
 =====================================
 
 
 
 .. automodule:: fundamentals.nose2_plugins
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -19,6 +18,28 @@ nose2_plugins
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+    
     
     
     

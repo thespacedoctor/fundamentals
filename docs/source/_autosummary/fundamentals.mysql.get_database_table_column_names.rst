@@ -1,4 +1,4 @@
-get_database_table_column_names
+get_database_table_column_names (*function*)
 ===============================================================
 
 .. currentmodule:: fundamentals.mysql

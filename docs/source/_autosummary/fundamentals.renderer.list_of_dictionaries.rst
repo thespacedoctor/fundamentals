@@ -1,14 +1,13 @@
-list_of_dictionaries
+list_of_dictionaries *(class)*
 ====================================================
 
 .. currentmodule:: fundamentals.renderer
 
 .. autoclass:: list_of_dictionaries
    :members:
-   :private-members:
    :show-inheritance:
    :inherited-members:
-   :member-order: bysource
+   :member-order: groupwise
 
     
 
@@ -47,89 +46,89 @@ list_of_dictionaries
             ~list_of_dictionaries.yaml
        
    
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-            ~list_of_dictionaries._list_of_dictionaries_to_csv
-        
-   
-       
-            ~list_of_dictionaries._list_of_dictionaries_to_mysql_inserts
-        
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
-       
-   
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   ..          ~list_of_dictionaries._list_of_dictionaries_to_csv
+   ..      
+   .. 
+   ..     
+   ..          ~list_of_dictionaries._list_of_dictionaries_to_mysql_inserts
+   ..      
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
    
    
 
    
    
-   .. rubric:: Attributes
+   .. rubric:: Properties
 
    .. autosummary::
    

@@ -19,6 +19,7 @@ import pymysql as ms
 from docopt import docopt
 from fundamentals.mysql import readquery
 
+
 class database(object):
     """
     *a database object that can setup up a ssh tunnel (optional) and a database connection*
@@ -27,12 +28,12 @@ class database(object):
 
     - ``log`` -- logger
     - ``dbSettings`` -- a dictionary of database settings
-    
+
 
     **Return**
 
     - ``dbConns`` -- a database connection
-    
+
 
     **Usage**
 
@@ -64,7 +65,7 @@ class database(object):
         dbSettings=dbSettings
     ).connect()
     ```
-    
+
     """
     # INITIALISATION
 
@@ -83,12 +84,12 @@ class database(object):
         return None
 
     def connect(self):
-        """connect to the database
+        """*Connect to the database*
 
         **Return**
 
         - ``dbConn`` -- the database connection
-        
+
 
         See the class docstring for usage
         """
@@ -130,17 +131,17 @@ class database(object):
             self,
             tunnelParameters):
         """
-        *setup a ssh tunnel for a database connection to port through*
+        *Setup a ssh tunnel for a database connection to port through*
 
         **Key Arguments**
 
         - ``tunnelParameters`` -- the tunnel parameters found associated with the database settings
-        
+
 
         **Return**
 
         - ``sshPort`` -- the port the ssh tunnel is connected via
-        
+
         """
         self.log.debug('starting the ``_setup_tunnel`` method')
 
@@ -176,7 +177,7 @@ class database(object):
         return sshPort
 
     def _checkServer(self, address, port):
-        """Check that the TCP Port we've decided to use for tunnelling is available
+        """*Check that the TCP Port we've decided to use for tunnelling is available*
         """
         self.log.debug('starting the ``_checkServer`` method')
 

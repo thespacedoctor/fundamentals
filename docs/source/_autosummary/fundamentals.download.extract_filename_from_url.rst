@@ -1,4 +1,4 @@
-extract_filename_from_url
+extract_filename_from_url (*function*)
 ============================================================
 
 .. currentmodule:: fundamentals.download

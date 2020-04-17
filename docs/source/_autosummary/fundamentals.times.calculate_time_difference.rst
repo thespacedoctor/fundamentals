@@ -1,4 +1,4 @@
-calculate_time_difference
+calculate_time_difference (*function*)
 =========================================================
 
 .. currentmodule:: fundamentals.times

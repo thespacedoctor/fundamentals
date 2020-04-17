@@ -1,4 +1,4 @@
-setup_database_connection
+setup_database_connection (*function*)
 =========================================================
 
 .. currentmodule:: fundamentals.mysql

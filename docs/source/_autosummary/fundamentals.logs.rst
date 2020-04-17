@@ -1,15 +1,14 @@
-logs
+logs *(module)*
 ============================
 
 
 
 .. automodule:: fundamentals.logs
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -33,6 +32,69 @@ logs
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+        
+            ~GroupWriteRotatingFileHandler (nice)
+       
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+            ~console_logger (nice)
+       
+    
+    
+        
+            ~emptyLogger (nice)
+       
+    
+    
+        
+            ~handlers (nice)
+       
+    
+    
+        
+            ~logging (nice)
+       
+    
+    
+        
+            ~object (nice)
+       
+    
+    
+        
+            ~os (nice)
+       
+    
+    
+        
+            ~setup_dryx_logging (nice)
+       
+    
+    
+        
+            ~sys (nice)
+       
+    
     
     
     

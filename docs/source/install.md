@@ -22,6 +22,7 @@ To upgrade to the latest version of fundamentals use the command:
 pip install fundamentals --upgrade
 ```
 
+To check installation was successful run `fundamentals -v`. This should return the version number of the install.
 
 ## Development
 

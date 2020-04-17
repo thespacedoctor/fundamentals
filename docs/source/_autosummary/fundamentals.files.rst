@@ -1,15 +1,14 @@
-files
+files *(module)*
 =============================
 
 
 
 .. automodule:: fundamentals.files
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -19,6 +18,39 @@ files
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+            ~fileChunker (nice)
+       
+    
+    
+        
+            ~recursive_directory_listing (nice)
+       
+    
+    
+        
+    
     
     
     

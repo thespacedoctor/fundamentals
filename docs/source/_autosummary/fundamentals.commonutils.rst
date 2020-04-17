@@ -1,15 +1,14 @@
-commonutils
+commonutils *(module)*
 ===================================
 
 
 
 .. automodule:: fundamentals.commonutils
     :members:
-    :private-members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
-    :member-order: bysource
+    :member-order: groupwise
     
     
     
@@ -19,6 +18,30 @@ commonutils
     
     
 
+    
+    
+    
+
+    
+    
+    .. rubric:: Sub-modules
+
+    .. autosummary::
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+            ~getpackagepath (nice)
+       
+    
     
     
     

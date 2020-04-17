@@ -11,9 +11,10 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
+
 def get_now_datetime_filestamp(longTime=False):
     """
-    *A datetime stamp to be appended to the end of filenames: ``YYYYMMDDtHHMMSS``*
+    *A datetime stamp to be appended to the end of filenames: 'YYYYMMDDtHHMMSS'*
 
     **Key Arguments**
 

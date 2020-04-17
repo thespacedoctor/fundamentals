@@ -1,4 +1,4 @@
-setup_dryx_logging
+setup_dryx_logging (*function*)
 =================================================
 
 .. currentmodule:: fundamentals.logs
