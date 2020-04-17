@@ -6,7 +6,6 @@ m2r
 mdx_include
 lxml
 sphinxcontrib-mermaid
-sphinx_rtd_theme
 docopt
 unicodecsv
 psutil
