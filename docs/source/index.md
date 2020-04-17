@@ -9,7 +9,6 @@
 
    install
    initialisation
-   project_setup
    todolist
    changes_link
 ```
