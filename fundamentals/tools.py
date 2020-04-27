@@ -22,7 +22,6 @@ from subprocess import Popen, PIPE, STDOUT
 from . import logs as dl
 import time
 from docopt import docopt
-import psutil
 try:
     from StringIO import StringIO
 except ImportError:
@@ -32,6 +31,7 @@ from os.path import expanduser
 ###################################################################
 # CLASSES                                                         #
 ###################################################################
+
 
 class tools(object):
     """
@@ -48,7 +48,7 @@ class tools(object):
     - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by anohter name on PyPi). Default *False*
     - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
     - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
-    
+
 
     **Usage**
 
@@ -108,7 +108,7 @@ class tools(object):
                 class: logging.handlers.GroupWriteRotatingFileHandler
                 level: WARNING
                 formatter: file_style
-    
+
 
                     filename: /Users/Dave/.config/myprojectName/myprojectName.log
                     mode: w+
@@ -135,6 +135,8 @@ class tools(object):
         self.arguments = arguments
         self.docString = docString
         self.logLevel = logLevel
+
+        import psutil
 
         if not distributionName:
             distributionName = projectName
@@ -532,6 +534,8 @@ class tools(object):
 ###################################################################
 # PUBLIC FUNCTIONS                                                #
 ###################################################################
+
+
 def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass

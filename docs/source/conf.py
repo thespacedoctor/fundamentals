@@ -12,7 +12,7 @@ import m2r
 import codecs
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo',
-              'sphinx.ext.mathjax', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.linkcode', 'sphinxcontrib.mermaid']
+              'sphinx.ext.mathjax', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.linkcode', 'sphinxcontrib.mermaid', 'sphinx_search.extension']
 
 
 class Mock(MagicMock):
@@ -74,7 +74,8 @@ trim_footnote_reference_space = True
 rst_epilog = u"""
 .. |tsd| replace:: thespacedoctor
 """ % locals()
-link_resolver_url = "https://github.com/thespacedoctor/python-package-template/tree/master"
+link_resolver_url = "https://github.com/thespacedoctor/fundamentals/blob/master"
+
 
 # General information about the project.
 now = datetime.now()
@@ -346,7 +347,9 @@ def linkcode_resolve(domain, info):
     if not info['module']:
         return None
     filename = info['module'].replace('.', '/')
-    return link_resolver_url + "/" + filename + ".py"
+    if info['fullname']:
+        filename += "/" + info['fullname'] + ".py"
+    return link_resolver_url + "/" + filename
 
 
 def docstring(app, what, name, obj, options, lines):

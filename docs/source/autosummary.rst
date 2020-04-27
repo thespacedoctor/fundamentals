@@ -46,7 +46,9 @@ Functions
    fundamentals.download.extract_filename_from_url
    fundamentals.download.get_now_datetime_filestamp
    fundamentals.download.multiobject_download
+   fundamentals.files.list_of_dictionaries_to_mysql_inserts
    fundamentals.files.recursive_directory_listing
+   fundamentals.files.tag
    fundamentals.fmultiprocess
    fundamentals.logs.console_logger
    fundamentals.logs.setup_dryx_logging

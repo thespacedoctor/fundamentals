@@ -20,7 +20,6 @@ from fundamentals.fmultiprocess import fmultiprocess
 import time
 import re
 from fundamentals.mysql.database import database
-import pandas as pd
 from datetime import datetime
 import numpy as np
 
@@ -28,6 +27,7 @@ count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
+
 
 def insert_list_of_dictionaries_into_database_tables(
         dbConn,
@@ -54,12 +54,12 @@ def insert_list_of_dictionaries_into_database_tables(
     - ``batchSize`` -- batch the insert commands into *batchSize* batches
     - ``replace`` -- repalce row if a duplicate is found
     - ``dbSettings`` -- pass in the database settings so multiprocessing can establish one connection per process (might not be faster)
-    
+
 
     **Return**
 
     - None
-    
+
 
     **Usage**
 
@@ -75,7 +75,7 @@ def insert_list_of_dictionaries_into_database_tables(
         batchSize=2500
     )
     ```
-    
+
     """
 
     log.debug(
@@ -180,6 +180,7 @@ def insert_list_of_dictionaries_into_database_tables(
         'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
     return None
 
+
 def _insert_single_batch_into_database(
         batchIndex,
         log,
@@ -197,12 +198,12 @@ def _insert_single_batch_into_database(
     - ``batchIndex`` -- the index of the batch to insert
     - ``dbConn`` -- mysql database connection
     - ``log`` -- logger
-    
+
 
     **Return**
 
     - None
-    
+
 
     **Usage**
 
@@ -214,7 +215,7 @@ def _insert_single_batch_into_database(
     ```python
     usage code            
     ```
-    
+
     """
     log.debug('starting the ``_insert_single_batch_into_database`` function')
 
@@ -340,6 +341,7 @@ def _insert_single_batch_into_database(
     log.debug('completed the ``_insert_single_batch_into_database`` function')
     return "None"
 
+
 def _add_dictlist_to_database_via_load_in_file(
         masterListIndex,
         dbTablename,
@@ -354,12 +356,12 @@ def _add_dictlist_to_database_via_load_in_file(
     - ``dbSettings`` -- the dictionary of database settings
     - ``log`` -- logger
     - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
-    
+
 
     **Return**
 
     - None
-    
+
 
     **Usage**
 
@@ -371,9 +373,10 @@ def _add_dictlist_to_database_via_load_in_file(
     ```python
     usage code
     ```
-    
+
     """
     from fundamentals.logs import emptyLogger
+    import pandas as pd
     log = emptyLogger()
     log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
 

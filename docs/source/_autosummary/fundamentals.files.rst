@@ -45,7 +45,17 @@ files *(module)*
     
     
         
+            ~list_of_dictionaries_to_mysql_inserts (nice)
+       
+    
+    
+        
             ~recursive_directory_listing (nice)
+       
+    
+    
+        
+            ~tag (nice)
        
     
     

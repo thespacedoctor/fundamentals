@@ -12,10 +12,9 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-from multiprocess import cpu_count, Pool
 from functools import partial
 import inspect
-import psutil
+
 
 def fmultiprocess(
         log,
@@ -33,12 +32,12 @@ def fmultiprocess(
     - ``inputArray`` -- the array to be iterated over
     - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
     - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
-    
+
 
     **Return**
 
     - ``resultArray`` -- the array of results
-    
+
 
     **Usage**
 
@@ -49,9 +48,11 @@ def fmultiprocess(
     results = multiprocess(log=log, function=functionName, poolSize=10, timeout=300,
                           inputArray=inputArray, otherFunctionKeyword="cheese")
     ```
-    
+
     """
     log.debug('starting the ``multiprocess`` function')
+    import psutil
+    from multiprocess import cpu_count, Pool
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
     if not poolSize:
