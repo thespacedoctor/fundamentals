@@ -38,6 +38,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 # pygments_style = 'monokai'
 html_theme = 'sphinx_dryx_rtd_theme'
+new_theme = True
 html_logo = "_images/thespacedoctor_icon_white_circle.png"
 html_favicon = "_images/favicon.ico"
 html_show_sourcelink = True
