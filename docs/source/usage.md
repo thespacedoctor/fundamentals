@@ -2,7 +2,7 @@
 
 ```bash 
     
-    Documentation for fundamentals can be found here: http://fundamentals.readthedocs.org/en/stable
+    Documentation for fundamentals can be found here: http://fundamentals.readthedocs.org
     
     Usage:
         fundamentals init
