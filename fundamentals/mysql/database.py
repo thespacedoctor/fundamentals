@@ -15,7 +15,6 @@ import glob
 import pickle
 import time
 from subprocess import Popen, PIPE, STDOUT
-import pymysql as ms
 from docopt import docopt
 from fundamentals.mysql import readquery
 
@@ -67,6 +66,7 @@ class database(object):
     ```
 
     """
+
     # INITIALISATION
 
     def __init__(
@@ -80,6 +80,8 @@ class database(object):
         log.debug("instansiating a new '_database' object")
         self.dbSettings = dbSettings
         self.autocommit = autocommit
+
+        import pymysql as ms
 
         return None
 
