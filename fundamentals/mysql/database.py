@@ -81,8 +81,6 @@ class database(object):
         self.dbSettings = dbSettings
         self.autocommit = autocommit
 
-        import pymysql as ms
-
         return None
 
     def connect(self):
@@ -95,8 +93,10 @@ class database(object):
 
         See the class docstring for usage
         """
+
         self.log.debug('starting the ``connect`` method')
 
+        import pymysql as ms
         dbSettings = self.dbSettings
 
         port = False
