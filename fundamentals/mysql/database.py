@@ -15,7 +15,6 @@ import glob
 import pickle
 import time
 from subprocess import Popen, PIPE, STDOUT
-import pymysql as ms
 from docopt import docopt
 from fundamentals.mysql import readquery
 
@@ -67,6 +66,7 @@ class database(object):
     ```
 
     """
+
     # INITIALISATION
 
     def __init__(
@@ -93,8 +93,10 @@ class database(object):
 
         See the class docstring for usage
         """
+
         self.log.debug('starting the ``connect`` method')
 
+        import pymysql as ms
         dbSettings = self.dbSettings
 
         port = False

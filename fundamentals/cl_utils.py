@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-Documentation for fundamentals can be found here: http://fundamentals.readthedocs.org/en/stable
+Documentation for fundamentals can be found here: http://fundamentals.readthedocs.org
 
 Usage:
     fundamentals init
@@ -23,8 +23,10 @@ from docopt import docopt
 from fundamentals import tools, times
 from subprocess import Popen, PIPE, STDOUT
 
+
 def tab_complete(text, state):
     return (glob.glob(text + '*') + [None])[state]
+
 
 def main(arguments=None):
     """

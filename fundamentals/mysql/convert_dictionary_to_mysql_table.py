@@ -17,10 +17,10 @@ import yaml
 import time
 import datetime
 import collections as c
-import pymysql as mdb
 from fundamentals import tools, times
 from fundamentals.mysql import writequery, table_exists, readquery
 import six
+
 
 def convert_dictionary_to_mysql_table(
         log,
@@ -50,7 +50,7 @@ def convert_dictionary_to_mysql_table(
     - ``dateModified`` -- add a modification date and updated flag to the mysql table
     - ``replace`` -- use replace instead of mysql insert statements (useful when updates are required)
     - ``batchInserts`` -- if returning insert statements return separate insert commands and value tuples
-    
+
 
         - ``reDatetime`` -- compiled regular expression matching datetime (passing this in cuts down on execution time as it doesn't have to be recompiled everytime during multiple iterations of ``convert_dictionary_to_mysql_table``)
         - ``skipChecks`` -- skip reliability checks. Less robust but a little faster.
@@ -59,7 +59,7 @@ def convert_dictionary_to_mysql_table(
     **Return**
 
     - ``returnInsertOnly`` -- the insert statement if requested
-    
+
 
     **Usage**
 
@@ -124,7 +124,7 @@ def convert_dictionary_to_mysql_table(
         # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super
         # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
         # uniquekey1="cheese"
-    
+
     """
 
     log.debug('starting the ``convert_dictionary_to_mysql_table`` function')
