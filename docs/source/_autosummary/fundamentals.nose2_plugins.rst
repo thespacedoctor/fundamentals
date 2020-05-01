@@ -38,8 +38,5 @@ nose2_plugins *(module)*
     
     
     
-        
-    
-    
     
     
