@@ -85,9 +85,6 @@ mysql *(module)*
     
     
         
-    
-    
-        
             ~writequery (nice)
        
     

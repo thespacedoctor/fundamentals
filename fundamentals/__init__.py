@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 from .__version__ import __version__
-from . import logs
 from .tools import tools
 from .utKit import utKit
 from . import times
@@ -9,3 +8,4 @@ from . import renderer
 from . import files
 from .fmultiprocess import fmultiprocess
 from . import cl_utils
+from . import logs

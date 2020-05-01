@@ -15,15 +15,6 @@
 [![](https://readthedocs.org/projects/fundamentals/badge/)](http://fundamentals.readthedocs.io/en/latest/?badge)  
 [![](https://img.shields.io/github/issues/thespacedoctor/fundamentals/type:%20bug?label=bug%20issues)](https://github.com/thespacedoctor/fundamentals/issues?q=is%3Aissue+is%3Aopen+label%3A%22type%3A+bug%22+)  
 
-
-
-
-
-
-
-
-
-
 *Some fundamental tools required by most self-respecting python-packages bundled in one place. Very opinionated project setup tools including logging, plain-text settings files and database connections*.
 
 Documentation for fundamentals is hosted by [Read the Docs](http://fundamentals.readthedocs.org/en/stable/) (last

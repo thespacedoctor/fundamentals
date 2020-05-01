@@ -27,14 +27,13 @@ from builtins import object
 import sys
 import os
 import yaml
-import requests
+
 import re
 import glob
 import docopt
 from fundamentals import tools, times
 from fundamentals.mysql import convert_dictionary_to_mysql_table
-import requests.packages.urllib3
-requests.packages.urllib3.disable_warnings()
+
 
 def main(arguments=None):
     """
@@ -95,6 +94,7 @@ def main(arguments=None):
 
     return
 
+
 class yaml_to_database(object):
     """
     *Take key-values from yaml files including a tablename(s) and add them to a mysql database table*
@@ -106,7 +106,7 @@ class yaml_to_database(object):
     - ``pathToInputDir`` -- path to the directory containing the yaml files that will be added to the database table(s). Default *False*
     - ``dbConn`` -- connection to database to add the content to
     - ``deleteFiles`` - - delete the yamls files once their content has been added to the database. Default * False*
-    
+
 
     **Usage**
 
@@ -134,7 +134,7 @@ class yaml_to_database(object):
     subtype: article
     table: web_articles,podcasts 
     ```
-    
+
     """
     # Initialisation
 
@@ -164,12 +164,12 @@ class yaml_to_database(object):
         **Return**
 
         - None
-        
+
 
         **Usage**
 
         To import an entire directory of yaml files into a database, use the following:
-        
+
 
         ```python
         from fundamentals.mysql import yaml_to_database
@@ -206,12 +206,12 @@ class yaml_to_database(object):
 
         - ``filepath`` -- the path to the yaml file
         - ``deleteFile`` -- delete the yaml file when its content has been added to the database. Default *False*
-        
+
 
         **Return**
 
         - None
-        
+
 
         **Usage**
 
@@ -230,12 +230,16 @@ class yaml_to_database(object):
             deleteFile=True
         )
         ```
-        
+
         """
         self.log.debug(
             'completed the ````add_yaml_file_content_to_database`` method')
 
         import codecs
+        import requests
+        import requests.packages.urllib3
+        requests.packages.urllib3.disable_warnings()
+
         try:
             self.log.debug("attempting to open the file %s" % (filepath,))
             readFile = codecs.open(filepath, encoding='utf-8', mode='r')
