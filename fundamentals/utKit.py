@@ -17,6 +17,7 @@ try:
 except:
     pass
 
+
 class utKit(object):
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*
@@ -24,7 +25,7 @@ class utKit(object):
     **Key Arguments**
 
     - ``moduleDirectory`` -- the directory to the unit-testing test file
-    
+
 
     **Usage**
 
@@ -38,7 +39,7 @@ class utKit(object):
     log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
     utKit.tearDownModule() 
     ```
-    
+
     """
     # Initialisation
 
@@ -97,13 +98,14 @@ class utKit(object):
         - ``dbConn`` -- a database connection to a test database (details from yaml settings file)
         - ``pathToInputDir`` -- path to modules own test input directory
         - ``pathToOutputDir`` -- path to modules own test output directory
-        
+
         """
-        import pymysql as ms
+
         ## VARIABLES ##
         logging.config.dictConfig(yaml.load(self.loggerConfig))
         log = logging.getLogger(__name__)
         if self.dbConfig:
+            import pymysql as ms
             connDict = yaml.load(self.dbConfig)
             dbConn = ms.connect(
                 host=connDict['host'],
@@ -130,12 +132,12 @@ class utKit(object):
         **Key Arguments**
 
         # -
-        
+
 
         **Return**
 
         - None
-        
+
         """
 
         return None
@@ -147,7 +149,7 @@ class utKit(object):
         **Return**
 
         - ``rootPath`` -- the root path of a project
-        
+
         """
         import os
         rootPath = os.path.dirname(__file__)
