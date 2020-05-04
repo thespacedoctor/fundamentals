@@ -504,6 +504,7 @@ def convert_dictionary_to_mysql_table(
         message = "could not add new data added to the table '" + \
             dbTableName + "' : " + str(e) + '\n'
         log.error(message)
+        print(message)
         raise Exception
 
     log.debug('completed the ``convert_dictionary_to_mysql_table`` function')
