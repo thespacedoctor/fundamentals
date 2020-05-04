@@ -72,7 +72,15 @@ def fmultiprocess(
     # chunksize = 1
 
     # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
-    if "log" in inspect.getargspec(function)[0]:
+    logFound = False
+    # PYTHON 3 VS 2 ..
+    try:
+        if "log" in inspect.getfullargspec(function)[0]:
+            logFound = True
+    except:
+        if "log" in inspect.getargspec(function)[0]:
+            logFound = True
+    if logFound:
         mapfunc = partial(function, log=log, **kwargs)
         resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
     else:

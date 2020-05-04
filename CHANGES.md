@@ -1,7 +1,10 @@
 
 ## Release Notes
 
-<!-- **vx.x.x - xxdatexx** -->
+**v2.1.7 - May 4, 2020**
+
+* **FIXED:** inspect module depreciation warnings stopped
+* **FIXED:** MySQL error messages printed to stdout (previously hidden)
 
 **v2.1.3 - April 17, 2020**
 
