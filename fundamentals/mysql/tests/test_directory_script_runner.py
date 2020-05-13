@@ -119,7 +119,7 @@ class test_directory_script_runner(unittest.TestCase):
             failureRule="failed"
         )
 
-    def test_execute_mysql_script_function_01(self):
+    def test_01_execute_mysql_script_function_01(self):
 
         pathToScript = pathToOutputDir + \
             "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot copy.sql"
