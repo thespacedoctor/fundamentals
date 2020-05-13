@@ -17,8 +17,7 @@
 
 *Some fundamental tools required by most self-respecting python-packages bundled in one place. Very opinionated project setup tools including logging, plain-text settings files and database connections*.
 
-Documentation for fundamentals is hosted by [Read the Docs](https://fundamentals.readthedocs.io/en/master/) (
-[development version](https://fundamentals.readthedocs.io/en/develop/) and [master version](https://fundamentals.readthedocs.io/en/master/)). The code lives on [github](https://github.com/thespacedoctor/fundamentals). Please report any issues you find [here](https://github.com/thespacedoctor/fundamentals/issues).
+Documentation for fundamentals is hosted by [Read the Docs](https://fundamentals.readthedocs.io/en/master/) ([development version](https://fundamentals.readthedocs.io/en/develop/) and [master version](https://fundamentals.readthedocs.io/en/master/)). The code lives on [github](https://github.com/thespacedoctor/fundamentals). Please report any issues you find [here](https://github.com/thespacedoctor/fundamentals/issues).
 
 ## Features
 
