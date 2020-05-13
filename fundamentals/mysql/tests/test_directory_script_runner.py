@@ -5,6 +5,7 @@ import unittest
 import shutil
 import unittest
 import yaml
+import sys
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -42,6 +43,7 @@ if not os.path.exists(pathToOutputDir):
 
 # shutil.copytree(pathToInputDir + "/mysql_scripts",
 #                 pathToOutputDir + "/mysql_scripts")
+
 
 class test_directory_script_runner(unittest.TestCase):
 
@@ -102,6 +104,41 @@ class test_directory_script_runner(unittest.TestCase):
             loginPath="unittesting",
             successRule="delete",
             failureRule="failed"
+        )
+
+    def test_directory_script_runner_function_06(self):
+
+        from fundamentals.mysql import directory_script_runner
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            force=True,
+            databaseName="unit_tests",
+            dbConn=dbConn,
+            successRule="delete",
+            failureRule="failed"
+        )
+
+    def test_execute_mysql_script_function_01(self):
+
+        pathToScript = pathToOutputDir + \
+            "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot copy.sql"
+
+        from fundamentals.mysql import execute_mysql_script
+        exception = execute_mysql_script(
+            pathToScript=pathToScript,
+            log=log,
+            dbConn=dbConn
+        )
+
+        pathToScript = pathToOutputDir + \
+            "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot.sql"
+
+        from fundamentals.mysql import execute_mysql_script
+        exception = execute_mysql_script(
+            pathToScript=pathToScript,
+            log=log,
+            dbConn=dbConn
         )
 
     def test_directory_script_runner_function_exception(self):

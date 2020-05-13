@@ -53,6 +53,9 @@ setup(name="fundamentals",
       test_suite='nose2.collector.collector',
       tests_require=['nose2', 'cov-core'],
       entry_points={
-          'console_scripts': ['fundamentals=fundamentals.cl_utils:main'],
+          'console_scripts': ['mysqlSucker=fundamentals.mysql.directory_script_runner:main',
+                              'yaml2db=fundamentals.mysql.yaml_to_database:main',
+                              # 'fundamentals=fundamentals.cl_utils:main',
+                              'sqlite2mysql=fundamentals.mysql.sqlite2mysql:main'],
       },
       zip_safe=False)
