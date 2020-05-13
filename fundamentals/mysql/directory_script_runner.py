@@ -53,13 +53,13 @@ from fundamentals import tools
 def directory_script_runner(
         log,
         pathToScriptDirectory,
-        databaseName,
-        loginPath=False,
         dbConn=False,
-        force=True,
         waitForResult=True,
         successRule=None,
-        failureRule=None):
+        failureRule=None,
+        loginPath=False,
+        databaseName=False,
+        force=True):
     """A function to run all mysql scripts in a given directory (in a modified date order, oldest first) and then act on the script files in accordance with the succcess or failure of their execution
 
     The function can be run with either with an established database connection (`dbConn`) or with a mysql generated `login-path` name (`loginPath`).

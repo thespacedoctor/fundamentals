@@ -112,8 +112,6 @@ class test_directory_script_runner(unittest.TestCase):
         directory_script_runner(
             log=log,
             pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            force=True,
-            databaseName="unit_tests",
             dbConn=dbConn,
             successRule="delete",
             failureRule="failed"

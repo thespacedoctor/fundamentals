@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for fundamentals/mysql/writequery.py: 17%</title>
+    <title>Coverage for fundamentals/mysql/writequery.py: 0%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
@@ -17,13 +17,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/mysql/writequery.py</b> :
-            <span class="pc_cov">17%</span>
+            <span class="pc_cov">0%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             115 statements &nbsp;
-            <span class="run shortkey_r button_toggle_run">19 run</span>
-            <span class="mis show_mis shortkey_m button_toggle_mis">96 missing</span>
+            <span class="run shortkey_r button_toggle_run">0 run</span>
+            <span class="mis show_mis shortkey_m button_toggle_mis">115 missing</span>
             <span class="exc show_exc shortkey_x button_toggle_exc">0 excluded</span>
         </h2>
     </div>
@@ -120,20 +120,20 @@
     <p id="t67" class="pln"><span class="n"><a href="#t67">67</a></span><span class="t"><span class="str">    ```</span>&nbsp;</span><span class="r"></span></p>
     <p id="t68" class="pln"><span class="n"><a href="#t68">68</a></span><span class="t"><span class="str">    </span>&nbsp;</span><span class="r"></span></p>
     <p id="t69" class="pln"><span class="n"><a href="#t69">69</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t70" class="run"><span class="n"><a href="#t70">70</a></span><span class="t">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``writequery`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t71" class="run"><span class="n"><a href="#t71">71</a></span><span class="t">    <span class="key">import</span> <span class="nam">pymysql</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t72" class="run"><span class="n"><a href="#t72">72</a></span><span class="t">    <span class="key">import</span> <span class="nam">warnings</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t73" class="run"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="nam">warnings</span><span class="op">.</span><span class="nam">filterwarnings</span><span class="op">(</span><span class="str">'error'</span><span class="op">,</span> <span class="nam">category</span><span class="op">=</span><span class="nam">pymysql</span><span class="op">.</span><span class="nam">Warning</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t74" class="run"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="nam">message</span> <span class="op">=</span> <span class="str">""</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t75" class="run"><span class="n"><a href="#t75">75</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t76" class="run"><span class="n"><a href="#t76">76</a></span><span class="t">        <span class="nam">cursor</span> <span class="op">=</span> <span class="nam">dbConn</span><span class="op">.</span><span class="nam">cursor</span><span class="op">(</span><span class="nam">pymysql</span><span class="op">.</span><span class="nam">cursors</span><span class="op">.</span><span class="nam">DictCursor</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t70" class="mis show_mis"><span class="n"><a href="#t70">70</a></span><span class="t">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'starting the ``writequery`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t71" class="mis show_mis"><span class="n"><a href="#t71">71</a></span><span class="t">    <span class="key">import</span> <span class="nam">pymysql</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t72" class="mis show_mis"><span class="n"><a href="#t72">72</a></span><span class="t">    <span class="key">import</span> <span class="nam">warnings</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t73" class="mis show_mis"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="nam">warnings</span><span class="op">.</span><span class="nam">filterwarnings</span><span class="op">(</span><span class="str">'error'</span><span class="op">,</span> <span class="nam">category</span><span class="op">=</span><span class="nam">pymysql</span><span class="op">.</span><span class="nam">Warning</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t74" class="mis show_mis"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="nam">message</span> <span class="op">=</span> <span class="str">""</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t75" class="mis show_mis"><span class="n"><a href="#t75">75</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t76" class="mis show_mis"><span class="n"><a href="#t76">76</a></span><span class="t">        <span class="nam">cursor</span> <span class="op">=</span> <span class="nam">dbConn</span><span class="op">.</span><span class="nam">cursor</span><span class="op">(</span><span class="nam">pymysql</span><span class="op">.</span><span class="nam">cursors</span><span class="op">.</span><span class="nam">DictCursor</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t77" class="mis show_mis"><span class="n"><a href="#t77">77</a></span><span class="t">    <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t78" class="mis show_mis"><span class="n"><a href="#t78">78</a></span><span class="t">        <span class="nam">log</span><span class="op">.</span><span class="nam">error</span><span class="op">(</span><span class="str">'could not create the database cursor.'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t79" class="pln"><span class="n"><a href="#t79">79</a></span><span class="t">    <span class="com"># EXECUTE THE SQL COMMAND</span>&nbsp;</span><span class="r"></span></p>
     <p id="t80" class="pln"><span class="n"><a href="#t80">80</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t81" class="run"><span class="n"><a href="#t81">81</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t82" class="run"><span class="n"><a href="#t82">82</a></span><span class="t">        <span class="key">if</span> <span class="nam">manyValueList</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t83" class="run"><span class="n"><a href="#t83">83</a></span><span class="t">            <span class="nam">cursor</span><span class="op">.</span><span class="nam">execute</span><span class="op">(</span><span class="nam">sqlQuery</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t81" class="mis show_mis"><span class="n"><a href="#t81">81</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t82" class="mis show_mis"><span class="n"><a href="#t82">82</a></span><span class="t">        <span class="key">if</span> <span class="nam">manyValueList</span> <span class="op">==</span> <span class="key">False</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t83" class="mis show_mis"><span class="n"><a href="#t83">83</a></span><span class="t">            <span class="nam">cursor</span><span class="op">.</span><span class="nam">execute</span><span class="op">(</span><span class="nam">sqlQuery</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t84" class="pln"><span class="n"><a href="#t84">84</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t85" class="pln"><span class="n"><a href="#t85">85</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t86" class="pln"><span class="n"><a href="#t86">86</a></span><span class="t">            <span class="com"># cursor.executemany(sqlQuery, manyValueList)</span>&nbsp;</span><span class="r"></span></p>
@@ -237,14 +237,14 @@
     <p id="t184" class="mis show_mis"><span class="n"><a href="#t184">184</a></span><span class="t">                <span class="nam">sys</span><span class="op">.</span><span class="nam">exit</span><span class="op">(</span><span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t185" class="mis show_mis"><span class="n"><a href="#t185">185</a></span><span class="t">            <span class="nam">cursor</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t186" class="mis show_mis"><span class="n"><a href="#t186">186</a></span><span class="t">            <span class="key">return</span> <span class="op">-</span><span class="num">1</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t187" class="run"><span class="n"><a href="#t187">187</a></span><span class="t">    <span class="nam">dbConn</span><span class="op">.</span><span class="nam">commit</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t187" class="mis show_mis"><span class="n"><a href="#t187">187</a></span><span class="t">    <span class="nam">dbConn</span><span class="op">.</span><span class="nam">commit</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t188" class="pln"><span class="n"><a href="#t188">188</a></span><span class="t">    <span class="com"># CLOSE THE CURSOR</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t189" class="run"><span class="n"><a href="#t189">189</a></span><span class="t">    <span class="nam">cOpen</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t190" class="run"><span class="n"><a href="#t190">190</a></span><span class="t">    <span class="nam">count</span> <span class="op">=</span> <span class="num">0</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t191" class="run"><span class="n"><a href="#t191">191</a></span><span class="t">    <span class="key">while</span> <span class="nam">cOpen</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t192" class="run"><span class="n"><a href="#t192">192</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t193" class="run"><span class="n"><a href="#t193">193</a></span><span class="t">            <span class="nam">cursor</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t194" class="run"><span class="n"><a href="#t194">194</a></span><span class="t">            <span class="nam">cOpen</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t189" class="mis show_mis"><span class="n"><a href="#t189">189</a></span><span class="t">    <span class="nam">cOpen</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t190" class="mis show_mis"><span class="n"><a href="#t190">190</a></span><span class="t">    <span class="nam">count</span> <span class="op">=</span> <span class="num">0</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t191" class="mis show_mis"><span class="n"><a href="#t191">191</a></span><span class="t">    <span class="key">while</span> <span class="nam">cOpen</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t192" class="mis show_mis"><span class="n"><a href="#t192">192</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t193" class="mis show_mis"><span class="n"><a href="#t193">193</a></span><span class="t">            <span class="nam">cursor</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t194" class="mis show_mis"><span class="n"><a href="#t194">194</a></span><span class="t">            <span class="nam">cOpen</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p id="t195" class="mis show_mis"><span class="n"><a href="#t195">195</a></span><span class="t">        <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t196" class="mis show_mis"><span class="n"><a href="#t196">196</a></span><span class="t">            <span class="nam">time</span><span class="op">.</span><span class="nam">sleep</span><span class="op">(</span><span class="num">1</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t197" class="mis show_mis"><span class="n"><a href="#t197">197</a></span><span class="t">            <span class="nam">count</span> <span class="op">+=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
@@ -253,14 +253,14 @@
     <p id="t200" class="mis show_mis"><span class="n"><a href="#t200">200</a></span><span class="t">                <span class="key">raise</span> <span class="nam">e</span>&nbsp;</span><span class="r"></span></p>
     <p id="t201" class="mis show_mis"><span class="n"><a href="#t201">201</a></span><span class="t">                <span class="nam">count</span> <span class="op">=</span> <span class="num">0</span>&nbsp;</span><span class="r"></span></p>
     <p id="t202" class="pln"><span class="n"><a href="#t202">202</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t203" class="run"><span class="n"><a href="#t203">203</a></span><span class="t">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``writequery`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t204" class="run"><span class="n"><a href="#t204">204</a></span><span class="t">    <span class="key">return</span> <span class="nam">message</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t203" class="mis show_mis"><span class="n"><a href="#t203">203</a></span><span class="t">    <span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span><span class="str">'completed the ``writequery`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t204" class="mis show_mis"><span class="n"><a href="#t204">204</a></span><span class="t">    <span class="key">return</span> <span class="nam">message</span>&nbsp;</span><span class="r"></span></p>
 </div>
 <div id="footer">
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.1</a>,
-            created at 2020-05-13 09:35
+            created at 2020-05-13 11:12
         </p>
     </div>
 </div>
