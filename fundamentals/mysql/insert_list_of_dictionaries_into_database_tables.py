@@ -21,7 +21,7 @@ import time
 import re
 from fundamentals.mysql.database import database
 from datetime import datetime
-import numpy as np
+
 
 count = 0
 totalCount = 0
@@ -377,6 +377,7 @@ def _add_dictlist_to_database_via_load_in_file(
     """
     from fundamentals.logs import emptyLogger
     import pandas as pd
+    import numpy as np
     log = emptyLogger()
     log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
 

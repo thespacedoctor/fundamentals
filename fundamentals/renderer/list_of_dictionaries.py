@@ -668,7 +668,10 @@ class list_of_dictionaries(object):
 
         output = output.getvalue()
         output = output.strip()
-        output = str(output)
+        try:
+            output = output.decode("UTF-8")
+        except:
+            output = str(output)
 
         if csvType in ["markdown"]:
             output = output.replace("|--", "|:-")
