@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.2.3 - May 26, 2020**
+
+* **fixed:** delimiters catered for in sql scripts
+
 **v2.2.2 - May 25, 2020**
 
 * **refactor:** `list_of_dictionaries` now returns bytes decoded into UTF-8 string when rendered to other mark-up flavour.
