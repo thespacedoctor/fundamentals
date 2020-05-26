@@ -120,6 +120,18 @@ class test_directory_script_runner(unittest.TestCase):
     def test_01_execute_mysql_script_function_01(self):
 
         pathToScript = pathToOutputDir + \
+            "/mysql_scripts/marshall_schema.sql"
+
+        from fundamentals.mysql import execute_mysql_script
+        exception = execute_mysql_script(
+            pathToScript=pathToScript,
+            log=log,
+            dbConn=dbConn
+        )
+        if exception:
+            print(exception)
+
+        pathToScript = pathToOutputDir + \
             "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot copy.sql"
 
         from fundamentals.mysql import execute_mysql_script
@@ -128,6 +140,8 @@ class test_directory_script_runner(unittest.TestCase):
             log=log,
             dbConn=dbConn
         )
+        if exception:
+            print(exception)
 
         pathToScript = pathToOutputDir + \
             "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot.sql"
@@ -138,6 +152,8 @@ class test_directory_script_runner(unittest.TestCase):
             log=log,
             dbConn=dbConn
         )
+        if exception:
+            print(exception)
 
     def test_directory_script_runner_function_exception(self):
 

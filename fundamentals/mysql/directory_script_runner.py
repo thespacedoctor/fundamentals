@@ -275,6 +275,8 @@ def execute_mysql_script(
         log.critical(message)
         raise IOError(message)
 
+    thisData = thisData.replace(";;", ";").replace("DELIMITER ;", "")
+
     # EXECUTE AND RETURN NONE IF SUCCESSFUL OR THE EXCEPTION IF NOT
     try:
         writequery(
