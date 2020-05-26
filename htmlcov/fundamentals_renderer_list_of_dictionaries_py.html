@@ -22,13 +22,8 @@
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             226 statements &nbsp;
-<<<<<<< Updated upstream
             <span class="run shortkey_r button_toggle_run">191 run</span>
             <span class="mis show_mis shortkey_m button_toggle_mis">35 missing</span>
-=======
-            <span class="run shortkey_r button_toggle_run">0 run</span>
-            <span class="mis show_mis shortkey_m button_toggle_mis">226 missing</span>
->>>>>>> Stashed changes
             <span class="exc show_exc shortkey_x button_toggle_exc">0 excluded</span>
         </h2>
     </div>
@@ -724,7 +719,6 @@
     <p id="t666" class="run"><span class="n"><a href="#t666">666</a></span><span class="t">        <span class="key">if</span> <span class="nam">csvType</span> <span class="key">in</span> <span class="op">[</span><span class="str">"human"</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t667" class="run"><span class="n"><a href="#t667">667</a></span><span class="t">            <span class="nam">dividerWriter</span><span class="op">.</span><span class="nam">writerow</span><span class="op">(</span><span class="nam">divider</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t668" class="pln"><span class="n"><a href="#t668">668</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-<<<<<<< Updated upstream
     <p id="t669" class="run"><span class="n"><a href="#t669">669</a></span><span class="t">        <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">getvalue</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t670" class="run"><span class="n"><a href="#t670">670</a></span><span class="t">        <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">strip</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t671" class="run"><span class="n"><a href="#t671">671</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -743,26 +737,6 @@
     <p id="t684" class="run"><span class="n"><a href="#t684">684</a></span><span class="t">        <span class="key">return</span> <span class="nam">output</span>&nbsp;</span><span class="r"></span></p>
     <p id="t685" class="pln"><span class="n"><a href="#t685">685</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t686" class="run"><span class="n"><a href="#t686">686</a></span><span class="t">    <span class="key">def</span> <span class="nam">_list_of_dictionaries_to_mysql_inserts</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-=======
-    <p id="t669" class="mis show_mis"><span class="n"><a href="#t669">669</a></span><span class="t">        <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">getvalue</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t670" class="mis show_mis"><span class="n"><a href="#t670">670</a></span><span class="t">        <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">strip</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t671" class="mis show_mis"><span class="n"><a href="#t671">671</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t672" class="mis show_mis"><span class="n"><a href="#t672">672</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">decode</span><span class="op">(</span><span class="str">"UTF-8"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t673" class="mis show_mis"><span class="n"><a href="#t673">673</a></span><span class="t">        <span class="key">except</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t674" class="mis show_mis"><span class="n"><a href="#t674">674</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="nam">str</span><span class="op">(</span><span class="nam">output</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t675" class="pln"><span class="n"><a href="#t675">675</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t676" class="mis show_mis"><span class="n"><a href="#t676">676</a></span><span class="t">        <span class="key">if</span> <span class="nam">csvType</span> <span class="key">in</span> <span class="op">[</span><span class="str">"markdown"</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t677" class="mis show_mis"><span class="n"><a href="#t677">677</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"|--"</span><span class="op">,</span> <span class="str">"|:-"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t678" class="mis show_mis"><span class="n"><a href="#t678">678</a></span><span class="t">        <span class="key">if</span> <span class="nam">csvType</span> <span class="key">in</span> <span class="op">[</span><span class="str">"reST"</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t679" class="mis show_mis"><span class="n"><a href="#t679">679</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="nam">output</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"|--"</span><span class="op">,</span> <span class="str">"+--"</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"--|"</span><span class="op">,</span> <span class="str">"--+"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t680" class="pln"><span class="n"><a href="#t680">680</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t681" class="mis show_mis"><span class="n"><a href="#t681">681</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t682" class="pln"><span class="n"><a href="#t682">682</a></span><span class="t">            <span class="str">'completed the ``_list_of_dictionaries_to_csv`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t683" class="pln"><span class="n"><a href="#t683">683</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t684" class="mis show_mis"><span class="n"><a href="#t684">684</a></span><span class="t">        <span class="key">return</span> <span class="nam">output</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t685" class="pln"><span class="n"><a href="#t685">685</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t686" class="mis show_mis"><span class="n"><a href="#t686">686</a></span><span class="t">    <span class="key">def</span> <span class="nam">_list_of_dictionaries_to_mysql_inserts</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
->>>>>>> Stashed changes
     <p id="t687" class="pln"><span class="n"><a href="#t687">687</a></span><span class="t">            <span class="nam">self</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t688" class="pln"><span class="n"><a href="#t688">688</a></span><span class="t">            <span class="nam">tableName</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t689" class="pln"><span class="n"><a href="#t689">689</a></span><span class="t">            <span class="nam">createStatement</span><span class="op">=</span><span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -779,7 +753,6 @@
     <p id="t700" class="pln"><span class="n"><a href="#t700">700</a></span><span class="t"><span class="str">        - ``output`` -- the mysql insert statements (as a string)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t701" class="pln"><span class="n"><a href="#t701">701</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t702" class="pln"><span class="n"><a href="#t702">702</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-<<<<<<< Updated upstream
     <p id="t703" class="run"><span class="n"><a href="#t703">703</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p id="t704" class="pln"><span class="n"><a href="#t704">704</a></span><span class="t">            <span class="str">'completed the ````_list_of_dictionaries_to_mysql_inserts`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t705" class="pln"><span class="n"><a href="#t705">705</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -803,42 +776,12 @@
     <p id="t723" class="run"><span class="n"><a href="#t723">723</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p id="t724" class="pln"><span class="n"><a href="#t724">724</a></span><span class="t">            <span class="str">'completed the ``_list_of_dictionaries_to_mysql_inserts`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t725" class="run"><span class="n"><a href="#t725">725</a></span><span class="t">        <span class="key">return</span> <span class="nam">output</span>&nbsp;</span><span class="r"></span></p>
-=======
-    <p id="t703" class="mis show_mis"><span class="n"><a href="#t703">703</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t704" class="pln"><span class="n"><a href="#t704">704</a></span><span class="t">            <span class="str">'completed the ````_list_of_dictionaries_to_mysql_inserts`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t705" class="pln"><span class="n"><a href="#t705">705</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t706" class="mis show_mis"><span class="n"><a href="#t706">706</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">len</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">listOfDictionaries</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t707" class="mis show_mis"><span class="n"><a href="#t707">707</a></span><span class="t">            <span class="key">return</span> <span class="str">"NO MATCH"</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t708" class="pln"><span class="n"><a href="#t708">708</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t709" class="mis show_mis"><span class="n"><a href="#t709">709</a></span><span class="t">        <span class="nam">dataCopy</span> <span class="op">=</span> <span class="nam">copy</span><span class="op">.</span><span class="nam">deepcopy</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">listOfDictionaries</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t710" class="pln"><span class="n"><a href="#t710">710</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t711" class="mis show_mis"><span class="n"><a href="#t711">711</a></span><span class="t">        <span class="key">if</span> <span class="nam">createStatement</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t712" class="mis show_mis"><span class="n"><a href="#t712">712</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="nam">createStatement</span> <span class="op">+</span> <span class="str">"\n"</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t713" class="pln"><span class="n"><a href="#t713">713</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t714" class="mis show_mis"><span class="n"><a href="#t714">714</a></span><span class="t">            <span class="nam">output</span> <span class="op">=</span> <span class="str">""</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t715" class="pln"><span class="n"><a href="#t715">715</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t716" class="mis show_mis"><span class="n"><a href="#t716">716</a></span><span class="t">        <span class="nam">inserts</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t717" class="pln"><span class="n"><a href="#t717">717</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t718" class="mis show_mis"><span class="n"><a href="#t718">718</a></span><span class="t">        <span class="nam">inserts</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t719" class="mis show_mis"><span class="n"><a href="#t719">719</a></span><span class="t">        <span class="nam">inserts</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="nam">convert_dictionary_to_mysql_table</span><span class="op">(</span><span class="nam">log</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">,</span> <span class="nam">dictionary</span><span class="op">=</span><span class="nam">d</span><span class="op">,</span> <span class="nam">dbTableName</span><span class="op">=</span><span class="nam">tableName</span><span class="op">,</span> <span class="nam">uniqueKeyList</span><span class="op">=</span><span class="op">[</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t720" class="pln"><span class="n"><a href="#t720">720</a></span><span class="t">        <span class="op">]</span><span class="op">,</span> <span class="nam">dateModified</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">returnInsertOnly</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">replace</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">batchInserts</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">reDatetime</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">reDatetime</span><span class="op">)</span> <span class="key">for</span> <span class="nam">d</span> <span class="key">in</span> <span class="nam">dataCopy</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t721" class="mis show_mis"><span class="n"><a href="#t721">721</a></span><span class="t">        <span class="nam">output</span> <span class="op">+=</span> <span class="str">";\n"</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">inserts</span><span class="op">)</span> <span class="op">+</span> <span class="str">";"</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t722" class="pln"><span class="n"><a href="#t722">722</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t723" class="mis show_mis"><span class="n"><a href="#t723">723</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">log</span><span class="op">.</span><span class="nam">debug</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t724" class="pln"><span class="n"><a href="#t724">724</a></span><span class="t">            <span class="str">'completed the ``_list_of_dictionaries_to_mysql_inserts`` function'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t725" class="mis show_mis"><span class="n"><a href="#t725">725</a></span><span class="t">        <span class="key">return</span> <span class="nam">output</span>&nbsp;</span><span class="r"></span></p>
->>>>>>> Stashed changes
 </div>
 <div id="footer">
     <div class="content">
         <p>
-<<<<<<< Updated upstream
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.0</a>,
-            created at 2020-05-25 10:07
-=======
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.1</a>,
-            created at 2020-05-26 12:29
->>>>>>> Stashed changes
+            created at 2020-05-26 11:47
         </p>
     </div>
 </div>
