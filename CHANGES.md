@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.2.4 - May 28, 2020**
+
+* **enhancement:** allowing '~' as home directory for filepaths in all settings file parameters - will be converted when initially read
+
 **v2.2.3 - May 26, 2020**
 
 * **fixed:** delimiters catered for in sql scripts
