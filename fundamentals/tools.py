@@ -298,11 +298,16 @@ class tools(object):
             pass
 
         if stream is not False:
+
+            astream = stream.read()
+            home = expanduser("~")
+            astream = astream.replace("~/", home + "/")
+
             import yaml
             if orderedSettings:
-                settings = ordered_load(stream, yaml.SafeLoader)
+                settings = ordered_load(astream, yaml.SafeLoader)
             else:
-                settings = yaml.load(stream)
+                settings = yaml.load(astream)
 
         # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
         # SETTINGS
