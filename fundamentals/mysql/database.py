@@ -104,6 +104,8 @@ class database(object):
             port = self._setup_tunnel(
                 tunnelParameters=dbSettings["tunnel"]
             )
+        elif "port" in dbSettings and dbSettings["port"]:
+            port = int(dbSettings["port"])
 
         # SETUP A DATABASE CONNECTION
         host = dbSettings["host"]
