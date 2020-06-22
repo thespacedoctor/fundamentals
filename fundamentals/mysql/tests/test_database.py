@@ -43,20 +43,21 @@ if not os.path.exists(pathToOutputDir):
 dbSettings = settings["database settings"]["atlasMovers"]
 dbSettings2 = settings["database settings"]["unit_tests"]
 
+
 class test_database(unittest.TestCase):
 
-    def test_tunnel(self):
+    # def test_tunnel(self):
 
-        from fundamentals.mysql import database
-        db = database(
-            log=log,
-            dbSettings=dbSettings
-        )
-        sshPort = db._setup_tunnel(
-            tunnelParameters=dbSettings["tunnel"]
-        )
+    #     from fundamentals.mysql import database
+    #     db = database(
+    #         log=log,
+    #         dbSettings=dbSettings
+    #     )
+    #     sshPort = db._setup_tunnel(
+    #         tunnelParameters=dbSettings["tunnel"]
+    #     )
 
-        return
+    #     return
 
     def test_no_tunnel(self):
 
