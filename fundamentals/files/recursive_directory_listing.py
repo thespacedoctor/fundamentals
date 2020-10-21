@@ -11,6 +11,7 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
+
 def recursive_directory_listing(
     log,
     baseFolderPath,
@@ -25,12 +26,12 @@ def recursive_directory_listing(
     - ``log`` -- logger
     - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
     - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
-    
+
 
     **Return**
 
     - ``matchedPathList`` -- the matched paths
-    
+
 
     **Usage**
 
@@ -83,11 +84,11 @@ def recursive_directory_listing(
                 for d in thisDirList:
                     fullPath = os.path.join(parentDir, d)
 
-                    if whatToList is "all":
+                    if whatToList == "all":
                         matched = True
-                    elif whatToList is "dirs":
+                    elif whatToList == "dirs":
                         matched = os.path.isdir(fullPath)
-                    elif whatToList is "files":
+                    elif whatToList == "files":
                         matched = os.path.isfile(fullPath)
                     else:
                         log.error(
