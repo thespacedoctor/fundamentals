@@ -312,11 +312,11 @@ def convert_dictionary_to_mysql_table(
                         columnLength = 450 + len(value[0]) * 2
                         qCreateColumn += '` varchar(' + str(
                             columnLength) + ') DEFAULT NULL'
-                    elif isinstance(value[0], int) and abs(value[0]) <= 9:
+                    elif isinstance(value[0], int) and not isinstance(value[0], bool) and abs(value[0]) <= 9:
                         qCreateColumn += '` tinyint DEFAULT NULL'
-                    elif isinstance(value[0], int):
+                    elif isinstance(value[0], int) and not isinstance(value[0], bool):
                         qCreateColumn += '` int DEFAULT NULL'
-                    elif isinstance(value[0], float) or isinstance(value[0], int):
+                    elif (isinstance(value[0], float) or isinstance(value[0], int)) and not isinstance(value[0], bool):
                         qCreateColumn += '` double DEFAULT NULL'
                     elif isinstance(value[0], bool):
                         qCreateColumn += '` tinyint DEFAULT NULL'

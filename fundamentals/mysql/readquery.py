@@ -12,6 +12,7 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
+
 def readquery(
         sqlQuery,
         dbConn,
@@ -25,12 +26,12 @@ def readquery(
     - ``sqlQuery`` -- the MySQL command to execute
     - ``dbConn`` -- the db connection
     - ``quiet`` -- ignore mysql warnings and errors and move on. Be careful when setting this to true - damaging errors can easily be missed. Default *False*.
-    
+
 
     **Return**
 
     - ``rows`` -- the rows returned by the sql query
-    
+
 
     **Usage**
 
@@ -43,7 +44,7 @@ def readquery(
         quiet=False
     )
     ```
-    
+
     """
     log.debug('starting the ``readquery`` function')
     import pymysql
