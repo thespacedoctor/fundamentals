@@ -14,7 +14,8 @@ install_requires = [
     'fundamentals',
     'future',
     'docopt',
-    'psutil'
+    'psutil',
+    'python-dateutil'
 ]
 
 # READ THE DOCS SERVERS

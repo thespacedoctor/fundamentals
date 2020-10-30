@@ -128,16 +128,6 @@ class utKit(object):
             self):
         """
         *The tearDownModule method*
-
-        **Key Arguments**
-
-        # -
-
-
-        **Return**
-
-        - None
-
         """
 
         return None

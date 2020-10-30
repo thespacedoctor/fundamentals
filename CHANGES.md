@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+replacing depreciated 'is" syntax with ==
+
 **v2.2.4 - May 28, 2020**
 
 * **enhancement:** allowing '~' as home directory for filepaths in all settings file parameters - will be converted when initially read
