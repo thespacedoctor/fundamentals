@@ -1,7 +1,10 @@
 
 ## Release Notes
 
-replacing depreciated 'is" syntax with ==
+**v2.2.5 - October 30, 2020**
+
+* **enhancement:** addition of port in database connection settings
+* **fixed:** replacing depreciated 'is" syntax with ==
 
 **v2.2.4 - May 28, 2020**
 
