@@ -1,8 +1,9 @@
 
 ## Release Notes
 
-**v2.2.5 - October 30, 2020**
+**v2.2.5 - November 2, 2020**
 
+* **enhancement:** adding colour to logs
 * **enhancement:** addition of port in database connection settings
 * **fixed:** replacing depreciated 'is" syntax with ==
 
