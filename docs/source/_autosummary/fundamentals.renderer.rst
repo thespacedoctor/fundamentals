@@ -1,4 +1,4 @@
-renderer *(module)*
+﻿renderer *(module)*
 ================================
 
 
@@ -11,6 +11,12 @@ renderer *(module)*
     :member-order: groupwise
     
     
+    
+    .. rubric:: Classes
+
+    .. autosummary::
+    
+      ~list_of_dictionaries
     
     
 

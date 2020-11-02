@@ -1,4 +1,4 @@
-list_of_dictionaries *(class)*
+﻿list_of_dictionaries *(class)*
 ====================================================
 
 .. currentmodule:: fundamentals.renderer

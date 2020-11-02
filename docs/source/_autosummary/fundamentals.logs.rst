@@ -1,4 +1,4 @@
-logs *(module)*
+﻿logs *(module)*
 ============================
 
 
@@ -18,6 +18,7 @@ logs *(module)*
     
       ~GroupWriteRotatingFileHandler
       ~emptyLogger
+      ~object
     
     
 
@@ -54,6 +55,11 @@ logs *(module)*
     
     
     
+    
+    
+        
+            ~coloredlogs (nice)
+       
     
     
         

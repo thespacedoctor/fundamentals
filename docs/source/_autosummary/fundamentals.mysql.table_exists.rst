@@ -1,4 +1,4 @@
-table_exists (*function*)
+﻿table_exists (*function*)
 ============================================
 
 .. currentmodule:: fundamentals.mysql

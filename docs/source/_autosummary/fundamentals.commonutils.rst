@@ -1,4 +1,4 @@
-commonutils *(module)*
+﻿commonutils *(module)*
 ===================================
 
 
@@ -15,6 +15,12 @@ commonutils *(module)*
     
 
     
+    
+    .. rubric:: Functions
+
+    .. autosummary::
+    
+      ~getpackagepath
     
     
 

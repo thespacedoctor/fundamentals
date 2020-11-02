@@ -1,4 +1,4 @@
-times *(module)*
+﻿times *(module)*
 =============================
 
 
@@ -11,6 +11,12 @@ times *(module)*
     :member-order: groupwise
     
     
+    
+    .. rubric:: Classes
+
+    .. autosummary::
+    
+      ~str
     
     
 
