@@ -15,21 +15,23 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
+
 def _fetch(url,):
     """
     *Retrieve an HTML document or file from the web at a given URL*
 
     **Key Arguments**
 
-    
+
       - ``url`` -- the URL of the document or file
 
     **Return**
 
-    
+
       - ``url`` -- the URL of the document or file, or None if an error occured
       - ``body`` -- the text content of the HTML document.
     """
+    import coloredlogs
     import logging as log
     import socket
     from eventlet import Timeout

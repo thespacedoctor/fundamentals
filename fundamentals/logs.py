@@ -10,7 +10,9 @@ from builtins import object
 import os
 import sys
 import logging
+import coloredlogs
 from logging import handlers
+
 
 def console_logger(
     level="WARNING"
@@ -21,12 +23,12 @@ def console_logger(
     **Key Arguments**
 
     - ``level`` -- the level of logging required
-    
+
 
     **Return**
 
     - ``logger`` -- the console logger
-    
+
 
     **Usage**
 
@@ -37,12 +39,13 @@ def console_logger(
     )
     log.debug("Testing console logger")
     ```
-    
+
     """
     ## STANDARD LIB ##
 
     import logging
     import logging.config
+    import coloredlogs
     ## THIRD PARTY ##
     import yaml
     try:
@@ -73,6 +76,7 @@ def console_logger(
 
     return logger
 
+
 def setup_dryx_logging(yaml_file):
     """
     *setup dryx style python logging*
@@ -80,12 +84,12 @@ def setup_dryx_logging(yaml_file):
     **Key Arguments**
 
     - ``level`` -- the level of logging required
-    
+
 
     **Return**
 
     - ``logger`` -- the console logger
-    
+
 
     **Usage**
 
@@ -131,9 +135,10 @@ def setup_dryx_logging(yaml_file):
             level: WARNING
             handlers: [file,console]
     ```
-    
+
     """
     import logging
+    import coloredlogs
     import logging.config
     import yaml
     try:
@@ -173,7 +178,25 @@ def setup_dryx_logging(yaml_file):
 
     logging.captureWarnings(True)
 
+    coloredlogs.DEFAULT_FIELD_STYLES = {
+        'asctime': {'color': 'green', 'faint': True},
+        'levelname': {'color': 'white'},
+        'pathname': {'color': 'cyan', 'faint': True},
+        'funcName': {'color': 'magenta', },
+        'lineno': {'color': 'cyan', 'faint': True}
+    }
+    coloredlogs.DEFAULT_LEVEL_STYLES = {
+        'debug': {'color': 'black', 'bright': True},
+        'info': {'color': 'white', 'bright': True},
+        'warning': {'color': 'yellow'},
+        'error': {'color': 'red'},
+        'critical': {'color': 'white', 'background': 'red'}}
+    coloredlogs.install(level='DEBUG', logger=logger, fmt=yamlContent[
+                        "formatters"]["console_style"]["format"], datefmt=yamlContent[
+                        "formatters"]["console_style"]["datefmt"])
+
     return logger
+
 
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
     """
@@ -192,6 +215,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         os.chmod(self.baseFilename, currMode | stat.S_IWGRP |
                  stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
 
+
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
     """
     *rotating file handler for logging*
@@ -202,6 +226,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         rtv = logging.handlers.RotatingFileHandler._open(self)
         os.umask(prevumask)
         return rtv
+
 
 class emptyLogger(object):
     """
@@ -214,7 +239,7 @@ class emptyLogger(object):
         from fundamentals.logs import emptyLogger
         log = emptyLogger()
     ```
-    
+
     """
 
     def info(self, argu):

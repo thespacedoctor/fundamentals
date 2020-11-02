@@ -17,6 +17,7 @@ except:
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 
+
 def setup_database_connection(
         pathToYamlFile):
     """*Start a database connection using settings in yaml file* 
@@ -26,12 +27,12 @@ def setup_database_connection(
     **Key Arguments**
 
     - ``pathToYamlFile`` -- path to the YAML dictionary.
-    
+
 
     **Return**
 
     - ``dbConn`` -- connection to the MySQL database.
-    
+
 
     **Usage**
 
@@ -52,10 +53,11 @@ def setup_database_connection(
         pathToYamlFile=pathToMyYamlFile
     )
     ```
-    
+
     """
     import sys
     import logging
+    import coloredlogs
     import pymysql as ms
 
     # IMPORT THE YAML CONNECTION DICTIONARY
