@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.2.6 - November 9, 2020**
+
+* **fixed:** syntax error
+
 **v2.2.5 - November 2, 2020**
 
 * **enhancement:** adding colour to logs
