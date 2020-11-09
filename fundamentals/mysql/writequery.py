@@ -79,7 +79,7 @@ def writequery(
         log.error('could not create the database cursor.')
     # EXECUTE THE SQL COMMAND
 
-    log.debug(f"SQLQUERY:\n{sqlQuery}\n")
+    log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
 
     try:
         if manyValueList == False:

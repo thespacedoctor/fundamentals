@@ -53,7 +53,7 @@ def readquery(
 
     rows = []
 
-    log.debug(f"SQLQUERY:\n{sqlQuery}\n")
+    log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
 
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
