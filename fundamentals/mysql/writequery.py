@@ -13,6 +13,7 @@ os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import time
 
+
 def writequery(
     log,
     sqlQuery,
@@ -28,12 +29,12 @@ def writequery(
     - ``dbConn`` -- the db connection
     - ``Force`` -- do not exit code if error occurs, move onto the next command
     - ``manyValueList`` -- a list of value tuples if executing more than one insert
-    
+
 
     **Return**
 
     - ``message`` -- error/warning message
-    
+
 
     **Usage**
 
@@ -65,7 +66,7 @@ def writequery(
                        (8,), (9,), (10,), (11,), (12,), ]
     )
     ```
-    
+
     """
     log.debug('starting the ``writequery`` function')
     import pymysql
@@ -77,6 +78,8 @@ def writequery(
     except Exception as e:
         log.error('could not create the database cursor.')
     # EXECUTE THE SQL COMMAND
+
+    log.debug(f"SQLQUERY:\n{sqlQuery}\n")
 
     try:
         if manyValueList == False:
