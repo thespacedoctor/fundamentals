@@ -53,6 +53,8 @@ def readquery(
 
     rows = []
 
+    log.debug(f"SQLQUERY:\n{sqlQuery}\n")
+
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
     except Exception as e:
