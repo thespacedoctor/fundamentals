@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.2.7 - November 10, 2020**
+
+* **fixed:** mysql port connection issue (with MaxScale proxy)
+
 **v2.2.6 - November 9, 2020**
 
 * **fixed:** syntax error
