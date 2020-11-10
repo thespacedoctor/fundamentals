@@ -380,6 +380,9 @@ class tools(object):
             if "tunnel" in settings["database settings"] and settings["database settings"]["tunnel"]:
                 tunnel = True
             dbConn = True
+            port = False
+            if "port" in settings["database settings"] and settings["database settings"]["port"]:
+                port = int(settings["database settings"]["port"])
         else:
             pass
 
@@ -399,6 +402,7 @@ class tools(object):
                 user=user,
                 passwd=passwd,
                 db=dbName,
+                port=port,
                 use_unicode=True,
                 charset='utf8',
                 local_infile=1,
