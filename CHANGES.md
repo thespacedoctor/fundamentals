@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+fixes to logging levels
+
 **v2.2.7 - November 10, 2020**
 
 * **fixed:** mysql port connection issue (with MaxScale proxy)
