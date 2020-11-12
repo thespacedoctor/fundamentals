@@ -172,6 +172,9 @@ def setup_dryx_logging(yaml_file):
         if not os.path.exists(loggingDir):
             os.makedirs(loggingDir)
 
+    if "root" in yamlContent and "level" in yamlContent["root"]:
+        level = yamlContent["root"]["level"]
+
     logging.config.dictConfig(yamlContent)
     # SET THE ROOT LOGGER
     logger = logging.getLogger(__name__)
@@ -191,7 +194,7 @@ def setup_dryx_logging(yaml_file):
         'warning': {'color': 'yellow'},
         'error': {'color': 'red'},
         'critical': {'color': 'white', 'background': 'red'}}
-    coloredlogs.install(level='DEBUG', logger=logger, fmt=yamlContent[
+    coloredlogs.install(level=level, logger=logger, fmt=yamlContent[
                         "formatters"]["console_style"]["format"], datefmt=yamlContent[
                         "formatters"]["console_style"]["datefmt"])
 

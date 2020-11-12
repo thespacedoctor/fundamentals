@@ -52,6 +52,8 @@ def fmultiprocess(
     """
     log.debug('starting the ``multiprocess`` function')
     import psutil
+    # import multiprocess as mp
+    # mp.set_start_method('forkserver')
     from multiprocess import cpu_count, Pool
 
     # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
