@@ -1,7 +1,9 @@
 
 ## Release Notes
 
-fixes to logging levels
+**v2.2.8 - November 12, 2020**
+
+* **fixed:** logging levels
 
 **v2.2.7 - November 10, 2020**
 
