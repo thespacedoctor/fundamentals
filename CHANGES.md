@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.2.9 - December 3, 2020**
+
+* **fixed:** relative time reporting (python 2>3ism)
+
 **v2.2.8 - November 12, 2020**
 
 * **fixed:** logging levels
