@@ -11,6 +11,7 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 
+
 def get_now_sql_datetime():
     """
     *A datetime stamp in MySQL format: 'YYYY-MM-DDTHH:MM:SS'*
@@ -34,6 +35,7 @@ def get_now_sql_datetime():
     now = now.strftime("%Y-%m-%dT%H:%M:%S")
 
     return now
+
 
 def datetime_relative_to_now(date):
     """
@@ -68,11 +70,12 @@ def datetime_relative_to_now(date):
     elif s < 120:
         return ' +1min'
     elif s < 3600:
-        return ' +{0}min'.format(s / 60)
+        return ' +{0}min'.format(int(s / 3600))
     elif s < 7200:
         return ' +1hr'
     else:
-        return ' +{0}hr'.format(s / 3600)
+        return ' +{0}hr'.format(int(s / 3600))
+
 
 def calculate_time_difference(startDate, endDate):
     """
