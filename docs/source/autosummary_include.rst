@@ -9,7 +9,8 @@
    fundamentals.files
    fundamentals.mysql
    fundamentals.nose2_plugins
-   fundamentals.renderer 
+   fundamentals.renderer
+   fundamentals.stats 
    fundamentals.logs
    fundamentals.times
 
@@ -52,6 +53,7 @@
    fundamentals.mysql.setup_database_connection
    fundamentals.mysql.table_exists
    fundamentals.mysql.writequery
+   fundamentals.stats.rolling_window_sigma_clip
    fundamentals.times.calculate_time_difference
    fundamentals.times.datetime_relative_to_now
    fundamentals.times.get_now_sql_datetime 
