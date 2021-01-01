@@ -9,3 +9,4 @@ from . import files
 from .fmultiprocess import fmultiprocess
 from . import cl_utils
 from . import logs
+from . import stats
