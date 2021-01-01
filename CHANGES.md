@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.3.0 - January 1, 2021**
+
+* **FEATURE:** added a stats subpackage with a `rolling_window_sigma_clip` function 
+
 **v2.2.9 - December 3, 2020**
 
 * **fixed:** relative time reporting (python 2>3ism)
