@@ -14,7 +14,6 @@ import sys
 import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
-from astropy.stats import sigma_clip, mad_std
 
 
 def rolling_window_sigma_clip(
@@ -50,6 +49,8 @@ def rolling_window_sigma_clip(
     ```           
     """
     log.debug('starting the ``rolling_window_sigma_clip`` function')
+
+    from astropy.stats import sigma_clip, mad_std
 
     midWindow = int((windowSize + 1) / 2)
     # ACCOMODATE SMALL LIST SIZES
