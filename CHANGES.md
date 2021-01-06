@@ -1,13 +1,17 @@
 
 ## Release Notes
 
+**v2.3.1 - January 6, 2021**
+
+* **FIXED:** astropy import causing grief with other package installs. Move to with function instead of module level import.
+
 **v2.3.0 - January 1, 2021**
 
 * **FEATURE:** added a stats subpackage with a `rolling_window_sigma_clip` function 
 
 **v2.2.9 - December 3, 2020**
 
-* **fixed:** relative time reporting (python 2>3ism)
+* **FIXED:** relative time reporting (python 2>3ism)
 
 **v2.2.8 - November 12, 2020**
 
