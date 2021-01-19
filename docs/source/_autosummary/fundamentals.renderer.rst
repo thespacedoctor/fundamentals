@@ -1,4 +1,4 @@
-﻿renderer *(module)*
+renderer *(module)*
 ================================
 
 

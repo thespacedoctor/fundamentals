@@ -1,4 +1,4 @@
-﻿fileChunker *(class)*
+fileChunker *(class)*
 ========================================
 
 .. currentmodule:: fundamentals.files

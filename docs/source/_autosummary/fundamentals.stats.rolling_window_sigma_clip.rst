@@ -1,4 +1,4 @@
-﻿rolling_window_sigma_clip (*function*)
+rolling_window_sigma_clip (*function*)
 =========================================================
 
 .. currentmodule:: fundamentals.stats

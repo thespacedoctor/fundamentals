@@ -1,4 +1,4 @@
-﻿getpackagepath (*function*)
+getpackagepath (*function*)
 ====================================================
 
 .. currentmodule:: fundamentals.commonutils

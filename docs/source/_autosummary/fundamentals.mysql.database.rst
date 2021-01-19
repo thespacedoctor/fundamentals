@@ -1,4 +1,4 @@
-﻿database *(class)*
+database *(class)*
 =====================================
 
 .. currentmodule:: fundamentals.mysql

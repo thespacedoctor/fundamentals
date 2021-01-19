@@ -1,4 +1,4 @@
-﻿nose2_plugins *(module)*
+nose2_plugins *(module)*
 =====================================
 
 
@@ -36,6 +36,11 @@
     
     
     
+    
+    
+        
+            ~cprof (nice)
+       
     
     
     

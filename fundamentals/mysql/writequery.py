@@ -80,6 +80,8 @@ def writequery(
     # EXECUTE THE SQL COMMAND
 
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
+    if sqlQuery[-1] == ",":
+        sqlQuery = sqlQuery[:-1]
 
     try:
         if manyValueList == False:

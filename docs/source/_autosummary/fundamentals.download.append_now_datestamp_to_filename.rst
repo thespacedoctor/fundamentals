@@ -1,4 +1,4 @@
-﻿append_now_datestamp_to_filename (*function*)
+append_now_datestamp_to_filename (*function*)
 ===================================================================
 
 .. currentmodule:: fundamentals.download
