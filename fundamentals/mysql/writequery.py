@@ -83,20 +83,6 @@ def writequery(
     if sqlQuery[-1] == ",":
         sqlQuery = sqlQuery[:-1]
 
-    if manyValueList != False:
-        batch = 100000
-        offset = 0
-        stop = 0
-
-        while stop == 0:
-            thisList = manyValueList[offset:offset + batch]
-            offset += batch
-            a = len(thisList)
-            cursor.executemany(sqlQuery, thisList)
-            dbConn.commit()
-            if len(thisList) < batch:
-                stop = 1
-
     try:
         if manyValueList == False:
             cursor.execute(sqlQuery)
