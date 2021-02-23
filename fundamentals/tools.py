@@ -178,7 +178,7 @@ class tools(object):
         except:
             pass
 
-        if defaultSettingsFile and "settingsFile" not in arguments and os.path.exists(os.getenv(
+        if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments and os.path.exists(os.getenv(
                 "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
             arguments["settingsFile"] = settingsFile = os.getenv(
                 "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()

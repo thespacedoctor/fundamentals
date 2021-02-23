@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+* **FIXED:** Logger was being set from default settings file even if a custom settings file given from command line
+
 **v2.3.1 - January 6, 2021**
 
 * **FIXED:** astropy import causing grief with other package installs. Move to with function instead of module level import.
