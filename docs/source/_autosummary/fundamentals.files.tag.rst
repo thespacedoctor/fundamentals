@@ -1,4 +1,4 @@
-tag (*function*)
+﻿tag (*function*)
 ===================================
 
 .. currentmodule:: fundamentals.files

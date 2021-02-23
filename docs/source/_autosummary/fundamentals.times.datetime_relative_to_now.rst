@@ -1,4 +1,4 @@
-datetime_relative_to_now (*function*)
+﻿datetime_relative_to_now (*function*)
 ========================================================
 
 .. currentmodule:: fundamentals.times

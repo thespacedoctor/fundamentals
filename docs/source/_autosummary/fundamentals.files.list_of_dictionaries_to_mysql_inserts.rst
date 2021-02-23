@@ -1,4 +1,4 @@
-list_of_dictionaries_to_mysql_inserts (*function*)
+﻿list_of_dictionaries_to_mysql_inserts (*function*)
 =====================================================================
 
 .. currentmodule:: fundamentals.files
