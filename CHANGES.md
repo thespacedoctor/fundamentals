@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+**v2.3.2 - February 23, 2021**
+
 * **FIXED:** Logger was being set from default settings file even if a custom settings file given from command line
 
 **v2.3.1 - January 6, 2021**
