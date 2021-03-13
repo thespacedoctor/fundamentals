@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.3.3 - March 13, 2021**
+
+* **ENHANCEMENT:** added loop to reattempt timed-out queries (up to 5 times)
+
 **v2.3.2 - February 23, 2021**
 
 * **FIXED:** Logger was being set from default settings file even if a custom settings file given from command line
