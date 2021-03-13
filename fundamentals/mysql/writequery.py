@@ -83,86 +83,38 @@ def writequery(
     if sqlQuery[-1] == ",":
         sqlQuery = sqlQuery[:-1]
 
-    try:
-        if manyValueList == False:
-            cursor.execute(sqlQuery)
-
-        else:
-            # cursor.executemany(sqlQuery, manyValueList)
-            # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER BARFING
-            batch = 100000
-            offset = 0
-            stop = 0
-
-            while stop == 0:
-                thisList = manyValueList[offset:offset + batch]
-                offset += batch
-                a = len(thisList)
-                cursor.executemany(sqlQuery, thisList)
-                dbConn.commit()
-                if len(thisList) < batch:
-                    stop = 1
-    except pymysql.err.ProgrammingError as e:
-        message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
-                                                                                                       str(e))
-        if Force == False:
-            log.error(message)
-            raise
-        else:
-            log.warning(message)
-    except pymysql.Error as e:
-
+    tryAgain = True
+    tries = 1
+    while tryAgain:
+        tryAgain = False
         try:
-            e = e.args
-        except:
-            pass
+            if manyValueList == False:
+                cursor.execute(sqlQuery)
+            else:
+                # cursor.executemany(sqlQuery, manyValueList)
+                # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER BARFING
+                batch = 100000
+                offset = 0
+                stop = 0
 
-        if e[0] == 1050 and 'already exists' in e[1]:
-            log.info(str(e) + '\n')
-        elif e[0] == 1062:
-                           # Duplicate Key error
-            log.debug('Duplicate Key error: %s\n' % (str(e), ))
-            message = "duplicate key error"
-        elif e[0] == 1061:
-                           # Duplicate Key error
-            log.debug('index already exists: %s\n' % (str(e), ))
-            message = "index already exists"
-        elif "Duplicate entry" in str(e):
-            log.debug('Duplicate Key error: %s\n' % (str(e), ))
-            message = "duplicate key error"
-        elif "Deadlock" in str(e):
-            i = 0
-            while i < 10:
-                time.sleep(1)
-                i += 1
-                try:
-                    if manyValueList == False:
-                        cursor.execute(sqlQuery)
-                    else:
-                        # cursor.executemany(sqlQuery, manyValueList)
-                        # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER
-                        # BARFING
-                        batch = 100000
-                        offset = 0
-                        stop = 0
-
-                        while stop == 0:
-                            thisList = manyValueList[offset:offset + batch]
-                            offset += batch
-                            a = len(thisList)
-                            cursor.executemany(sqlQuery, thisList)
-                            dbConn.commit()
-                            if len(thisList) < batch:
-                                stop = 1
-                    i = 20
-                except:
-                    pass
-            if i == 10:
-                log.error('Deadlock: %s\n' % (str(e), ))
-                message = "Deadlock error"
+                while stop == 0:
+                    thisList = manyValueList[offset:offset + batch]
+                    offset += batch
+                    a = len(thisList)
+                    cursor.executemany(sqlQuery, thisList)
+                    dbConn.commit()
+                    if len(thisList) < batch:
+                        stop = 1
+        except pymysql.err.InternalError as e:
+            if tries < 6:
+                tryAgain = True
+                log.warning(f"MySQL error: {e}. Attempt {tries}/5.")
+                tries += 1
+            else:
+                log.warning(f"MySQL error: {e}. Attempt {tries}/5 failed. ")
                 raise
 
-        else:
+        except pymysql.err.ProgrammingError as e:
             message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
                                                                                                            str(e))
             if Force == False:
@@ -170,25 +122,85 @@ def writequery(
                 raise
             else:
                 log.warning(message)
+        except pymysql.Error as e:
+            try:
+                e = e.args
+            except:
+                pass
 
-    except pymysql.Warning as e:
-        log.info(str(e))
-    except Exception as e:
-        if "truncated" in str(e):
-            log.error('%s\n Here is the sqlquery:\n%s\n' % (str(e), sqlQuery))
-            if manyValueList:
-                log.error('... and the values:\n%s\n' % (thisList, ))
-        elif "Duplicate entry" in str(e):
-            log.warning('Duplicate Key error: %s\n' % (str(e), ))
-            message = "duplicate key error"
-        else:
-            log.error(
-                'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' %
-                (sqlQuery, str(e)))
-            if Force == False:
-                sys.exit(0)
-            cursor.close()
-            return -1
+            if e[0] == 1050 and 'already exists' in e[1]:
+                log.info(str(e) + '\n')
+            elif e[0] == 1062:
+                               # Duplicate Key error
+                log.debug('Duplicate Key error: %s\n' % (str(e), ))
+                message = "duplicate key error"
+            elif e[0] == 1061:
+                               # Duplicate Key error
+                log.debug('index already exists: %s\n' % (str(e), ))
+                message = "index already exists"
+            elif "Duplicate entry" in str(e):
+                log.debug('Duplicate Key error: %s\n' % (str(e), ))
+                message = "duplicate key error"
+            elif "Deadlock" in str(e):
+                i = 0
+                while i < 10:
+                    time.sleep(1)
+                    i += 1
+                    try:
+                        if manyValueList == False:
+                            cursor.execute(sqlQuery)
+                        else:
+                            # cursor.executemany(sqlQuery, manyValueList)
+                            # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER
+                            # BARFING
+                            batch = 100000
+                            offset = 0
+                            stop = 0
+
+                            while stop == 0:
+                                thisList = manyValueList[offset:offset + batch]
+                                offset += batch
+                                a = len(thisList)
+                                cursor.executemany(sqlQuery, thisList)
+                                dbConn.commit()
+                                if len(thisList) < batch:
+                                    stop = 1
+                        i = 20
+                    except:
+                        pass
+                if i == 10:
+                    log.error('Deadlock: %s\n' % (str(e), ))
+                    message = "Deadlock error"
+                    raise
+
+            else:
+                message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
+                                                                                                               str(e))
+                if Force == False:
+                    log.error(message)
+                    raise
+                else:
+                    log.warning(message)
+
+        except pymysql.Warning as e:
+            log.info(str(e))
+        except Exception as e:
+            if "truncated" in str(e):
+                log.error('%s\n Here is the sqlquery:\n%s\n' %
+                          (str(e), sqlQuery))
+                if manyValueList:
+                    log.error('... and the values:\n%s\n' % (thisList, ))
+            elif "Duplicate entry" in str(e):
+                log.warning('Duplicate Key error: %s\n' % (str(e), ))
+                message = "duplicate key error"
+            else:
+                log.error(
+                    'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' %
+                    (sqlQuery, str(e)))
+                if Force == False:
+                    sys.exit(0)
+                cursor.close()
+                return -1
     dbConn.commit()
     # CLOSE THE CURSOR
     cOpen = True

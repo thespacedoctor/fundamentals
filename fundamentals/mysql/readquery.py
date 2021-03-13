@@ -61,19 +61,31 @@ def readquery(
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
     # EXECUTE THE SQL COMMAND
-    try:
-        cursor.execute(sqlQuery)
-        rows = cursor.fetchall()
-    except Exception as e:
-        sqlQuery = sqlQuery[:1000]
-        if quiet == False:
-            log.warning(
-                'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
-            raise e
-        else:
-            log.warning(
-                'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
-            pass
+    tryAgain = True
+    tries = 1
+    while tryAgain:
+        tryAgain = False
+        try:
+            cursor.execute(sqlQuery)
+            rows = cursor.fetchall()
+        except pymysql.err.InternalError as e:
+            if tries < 6:
+                tryAgain = True
+                log.warning(f"MySQL error: {e}. Attempt {tries}/5.")
+                tries += 1
+            else:
+                log.warning(f"MySQL error: {e}. Attempt {tries}/5 failed. ")
+                raise
+        except Exception as e:
+            sqlQuery = sqlQuery[:1000]
+            if quiet == False:
+                log.warning(
+                    'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
+                raise e
+            else:
+                log.warning(
+                    'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
+                pass
 
     # CLOSE THE CURSOR
     try:
