@@ -3,7 +3,7 @@
 
 **v2.3.3 - March 13, 2021**
 
-* **ENHANCEMENT:** added loop to reattempt timed-out queries (up to 5 times)
+* **ENHANCEMENT:** added loop to reattempt timed-out queries (up to 60 times)
 
 **v2.3.2 - February 23, 2021**
 
