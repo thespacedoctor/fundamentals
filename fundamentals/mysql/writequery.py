@@ -106,12 +106,12 @@ def writequery(
                     if len(thisList) < batch:
                         stop = 1
         except pymysql.err.InternalError as e:
-            if tries < 6:
+            if tries < 61:
                 tryAgain = True
-                log.warning(f"MySQL error: {e}. Attempt {tries}/5.")
+                log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
                 tries += 1
             else:
-                log.warning(f"MySQL error: {e}. Attempt {tries}/5 failed. ")
+                log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
                 raise
 
         except pymysql.err.ProgrammingError as e:
