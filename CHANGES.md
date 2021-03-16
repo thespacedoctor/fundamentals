@@ -1,7 +1,7 @@
 
 ## Release Notes
 
-**v2.3.3 - March 13, 2021**
+**v2.3.4 - March 16, 2021**
 
 * **ENHANCEMENT:** added loop to reattempt timed-out queries (up to 60 times)
 
