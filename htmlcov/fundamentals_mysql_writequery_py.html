@@ -160,12 +160,12 @@
     <p id="t106" class="run"><span class="n"><a href="#t106">106</a></span><span class="t">                    <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">thisList</span><span class="op">)</span> <span class="op">&lt;</span> <span class="nam">batch</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t107" class="run"><span class="n"><a href="#t107">107</a></span><span class="t">                        <span class="nam">stop</span> <span class="op">=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
     <p id="t108" class="run"><span class="n"><a href="#t108">108</a></span><span class="t">        <span class="key">except</span> <span class="nam">pymysql</span><span class="op">.</span><span class="nam">err</span><span class="op">.</span><span class="nam">InternalError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t109" class="mis show_mis"><span class="n"><a href="#t109">109</a></span><span class="t">            <span class="key">if</span> <span class="nam">tries</span> <span class="op">&lt;</span> <span class="num">6</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t109" class="mis show_mis"><span class="n"><a href="#t109">109</a></span><span class="t">            <span class="key">if</span> <span class="nam">tries</span> <span class="op">&lt;</span> <span class="num">61</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t110" class="mis show_mis"><span class="n"><a href="#t110">110</a></span><span class="t">                <span class="nam">tryAgain</span> <span class="op">=</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t111" class="mis show_mis"><span class="n"><a href="#t111">111</a></span><span class="t">                <span class="nam">log</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="str">f"MySQL error: {e}. Attempt {tries}/5."</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t111" class="mis show_mis"><span class="n"><a href="#t111">111</a></span><span class="t">                <span class="nam">log</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="str">f"MySQL error: {e}. Attempt {tries}/60."</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t112" class="mis show_mis"><span class="n"><a href="#t112">112</a></span><span class="t">                <span class="nam">tries</span> <span class="op">+=</span> <span class="num">1</span>&nbsp;</span><span class="r"></span></p>
     <p id="t113" class="pln"><span class="n"><a href="#t113">113</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t114" class="mis show_mis"><span class="n"><a href="#t114">114</a></span><span class="t">                <span class="nam">log</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="str">f"MySQL error: {e}. Attempt {tries}/5 failed. "</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t114" class="mis show_mis"><span class="n"><a href="#t114">114</a></span><span class="t">                <span class="nam">log</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span><span class="str">f"MySQL error: {e}. Attempt {tries}/60 failed. "</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t115" class="mis show_mis"><span class="n"><a href="#t115">115</a></span><span class="t">                <span class="key">raise</span>&nbsp;</span><span class="r"></span></p>
     <p id="t116" class="pln"><span class="n"><a href="#t116">116</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t117" class="run"><span class="n"><a href="#t117">117</a></span><span class="t">        <span class="key">except</span> <span class="nam">pymysql</span><span class="op">.</span><span class="nam">err</span><span class="op">.</span><span class="nam">ProgrammingError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -278,7 +278,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-03-13 22:03 +0000
+            created at 2021-03-16 09:27 +0000
         </p>
     </div>
 </div>
