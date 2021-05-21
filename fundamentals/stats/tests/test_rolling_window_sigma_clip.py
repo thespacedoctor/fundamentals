@@ -52,7 +52,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         import random
         normalDist = np.random.normal(loc=100, scale=3.0, size=[200])
         for i in range(1, 7):
-            randNum = random.randint(1, 201)
+            randNum = random.randint(1, 200)
             normalDist[randNum] = normalDist[randNum] * 4.5
         normalDist = list(normalDist)
 

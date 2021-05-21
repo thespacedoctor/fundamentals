@@ -3,8 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for fundamentals/stats/tests/test_rolling_window_sigma_clip.py: 90%</title>
-    <link rel="icon" sizes="32x32" href="favicon_32.png">
+    <title>Coverage for fundamentals/stats/tests/test_rolling_window_sigma_clip.py: 73%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
@@ -18,14 +17,14 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>fundamentals/stats/tests/test_rolling_window_sigma_clip.py</b> :
-            <span class="pc_cov">90%</span>
+            <span class="pc_cov">73%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             49 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">44 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">5 missing</button>
-            <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
+            <span class="run shortkey_r button_toggle_run">36 run</span>
+            <span class="mis show_mis shortkey_m button_toggle_mis">13 missing</span>
+            <span class="exc show_exc shortkey_x button_toggle_exc">0 excluded</span>
         </h2>
     </div>
 </div>
@@ -86,8 +85,8 @@
     <p id="t32" class="pln"><span class="n"><a href="#t32">32</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t33" class="run"><span class="n"><a href="#t33">33</a></span><span class="t"><span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t34" class="run"><span class="n"><a href="#t34">34</a></span><span class="t">    <span class="nam">shutil</span><span class="op">.</span><span class="nam">rmtree</span><span class="op">(</span><span class="nam">pathToOutputDir</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t35" class="run"><span class="n"><a href="#t35">35</a></span><span class="t"><span class="key">except</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t36" class="run"><span class="n"><a href="#t36">36</a></span><span class="t">    <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t35" class="mis show_mis"><span class="n"><a href="#t35">35</a></span><span class="t"><span class="key">except</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t36" class="mis show_mis"><span class="n"><a href="#t36">36</a></span><span class="t">    <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
     <p id="t37" class="pln"><span class="n"><a href="#t37">37</a></span><span class="t"><span class="com"># COPY INPUT TO OUTPUT DIR</span>&nbsp;</span><span class="r"></span></p>
     <p id="t38" class="run"><span class="n"><a href="#t38">38</a></span><span class="t"><span class="nam">shutil</span><span class="op">.</span><span class="nam">copytree</span><span class="op">(</span><span class="nam">pathToInputDir</span><span class="op">,</span> <span class="nam">pathToOutputDir</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t39" class="pln"><span class="n"><a href="#t39">39</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -126,18 +125,18 @@
     <p id="t72" class="pln"><span class="n"><a href="#t72">72</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t73" class="run"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="key">def</span> <span class="nam">test_rolling_window_sigma_clip_function_exception</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t74" class="pln"><span class="n"><a href="#t74">74</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t75" class="run"><span class="n"><a href="#t75">75</a></span><span class="t">        <span class="key">from</span> <span class="nam">fundamentals</span><span class="op">.</span><span class="nam">stats</span> <span class="key">import</span> <span class="nam">rolling_window_sigma_clip</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t76" class="run"><span class="n"><a href="#t76">76</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t77" class="run"><span class="n"><a href="#t77">77</a></span><span class="t">            <span class="nam">this</span> <span class="op">=</span> <span class="nam">rolling_window_sigma_clip</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t75" class="mis show_mis"><span class="n"><a href="#t75">75</a></span><span class="t">        <span class="key">from</span> <span class="nam">fundamentals</span><span class="op">.</span><span class="nam">stats</span> <span class="key">import</span> <span class="nam">rolling_window_sigma_clip</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t76" class="mis show_mis"><span class="n"><a href="#t76">76</a></span><span class="t">        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t77" class="mis show_mis"><span class="n"><a href="#t77">77</a></span><span class="t">            <span class="nam">this</span> <span class="op">=</span> <span class="nam">rolling_window_sigma_clip</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p id="t78" class="pln"><span class="n"><a href="#t78">78</a></span><span class="t">                <span class="nam">log</span><span class="op">=</span><span class="nam">log</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t79" class="pln"><span class="n"><a href="#t79">79</a></span><span class="t">                <span class="nam">settings</span><span class="op">=</span><span class="nam">settings</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t80" class="pln"><span class="n"><a href="#t80">80</a></span><span class="t">                <span class="nam">fakeKey</span><span class="op">=</span><span class="str">"break the code"</span>&nbsp;</span><span class="r"></span></p>
     <p id="t81" class="pln"><span class="n"><a href="#t81">81</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t82" class="mis show_mis"><span class="n"><a href="#t82">82</a></span><span class="t">            <span class="nam">this</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t83" class="mis show_mis"><span class="n"><a href="#t83">83</a></span><span class="t">            <span class="key">assert</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t84" class="run"><span class="n"><a href="#t84">84</a></span><span class="t">        <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t85" class="run"><span class="n"><a href="#t85">85</a></span><span class="t">            <span class="key">assert</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t86" class="run"><span class="n"><a href="#t86">86</a></span><span class="t">            <span class="nam">print</span><span class="op">(</span><span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t84" class="mis show_mis"><span class="n"><a href="#t84">84</a></span><span class="t">        <span class="key">except</span> <span class="nam">Exception</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t85" class="mis show_mis"><span class="n"><a href="#t85">85</a></span><span class="t">            <span class="key">assert</span> <span class="key">True</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t86" class="mis show_mis"><span class="n"><a href="#t86">86</a></span><span class="t">            <span class="nam">print</span><span class="op">(</span><span class="nam">str</span><span class="op">(</span><span class="nam">e</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t87" class="pln"><span class="n"><a href="#t87">87</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t88" class="pln"><span class="n"><a href="#t88">88</a></span><span class="t">        <span class="com"># x-print-testpage-for-pessto-marshall-web-object</span>&nbsp;</span><span class="r"></span></p>
     <p id="t89" class="pln"><span class="n"><a href="#t89">89</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -146,8 +145,8 @@
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-03-16 09:27 +0000
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.1</a>,
+            created at 2021-05-21 14:25
         </p>
     </div>
 </div>
