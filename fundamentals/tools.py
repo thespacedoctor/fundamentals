@@ -27,6 +27,9 @@ try:
 except ImportError:
     from io import StringIO
 from os.path import expanduser
+import inspect
+import psutil
+
 
 ###################################################################
 # CLASSES                                                         #
@@ -136,8 +139,6 @@ class tools(object):
         self.docString = docString
         self.logLevel = logLevel
 
-        import psutil
-
         if not distributionName:
             distributionName = projectName
 
@@ -177,6 +178,24 @@ class tools(object):
                 del arguments["<pathToSettingsFile>"]
         except:
             pass
+
+        # GET ADVANCED SETTINGS IF AVAILABLE
+        advs = os.getcwd() + "/rubbish.yaml"
+        level = 0
+        exists = False
+        count = 1
+        while not exists and len(advs) and count < 10:
+            count += 1
+            level -= 1
+            exists = os.path.exists(advs)
+            if not exists:
+                advs = "/".join(inspect.stack()
+                                [1][1].split("/")[:level]) + "/advanced_settings.yaml"
+        if not exists:
+            advs = {}
+        else:
+            with open(advs, 'r') as stream:
+                advs = yaml.load(stream)
 
         if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments and os.path.exists(os.getenv(
                 "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
@@ -218,7 +237,6 @@ class tools(object):
                     writeFile = codecs.open(
                         settingsFile, encoding='utf-8', mode='w')
 
-                import yaml
                 # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY
                 # PATH
                 with open(settingsFile) as f:
@@ -236,7 +254,6 @@ class tools(object):
                     settings = this
                     arguments["<settingsFile>"] = settingsFile
                 else:
-                    import inspect
                     ds = os.getcwd() + "/rubbish.yaml"
                     level = 0
                     exists = False
@@ -297,17 +314,20 @@ class tools(object):
         else:
             pass
 
+        # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
         if stream is not False:
 
             astream = stream.read()
             home = expanduser("~")
             astream = astream.replace("~/", home + "/")
 
-            import yaml
             if orderedSettings:
                 settings = ordered_load(astream, yaml.SafeLoader)
             else:
                 settings = yaml.load(astream)
+
+        # MERGE ADVANCED SETTINGS AND USER SETTINGS (USER SETTINGS OVERRIDE)
+        settings = {**advs, **settings}
 
         # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
         # SETTINGS
