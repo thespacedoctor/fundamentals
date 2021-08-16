@@ -327,7 +327,10 @@ class tools(object):
                 settings = yaml.load(astream)
 
         # MERGE ADVANCED SETTINGS AND USER SETTINGS (USER SETTINGS OVERRIDE)
-        settings = {**advs, **settings}
+        if 'settings' not in locals():
+            settings = advs
+        else:
+            settings = {**advs, **settings}
 
         # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
         # SETTINGS
@@ -385,13 +388,16 @@ class tools(object):
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
         tunnel = False
-        if ("hostFlag" in locals() and "dbNameFlag" in locals() and hostFlag):
+
+        if ("--host" in arguments and "--dbName" in arguments and arguments["--host"]):
             # SETUP DB CONNECTION
             dbConn = True
             host = arguments["--host"]
             user = arguments["--user"]
             passwd = arguments["--passwd"]
             dbName = arguments["--dbName"]
+            port = False
+
         elif 'settings' in locals() and "database settings" in settings and "host" in settings["database settings"]:
             host = settings["database settings"]["host"]
             user = settings["database settings"]["user"]

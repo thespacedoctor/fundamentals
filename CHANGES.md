@@ -1,6 +1,11 @@
 
 ## Release Notes
 
+**v2.3.6 - August 16, 2021**
+
+* **FIXED:** no longer crashing for scripts where no settings file is passed in via CL arguments
+* **FIXED:** database credentials can now be passed to the command-line again
+
 **v2.3.5 - July 30, 2021**
 
 * **FEATURE:** code bases using fundamentals can now include a 'advanced_settings.yaml' file at the root of the project which will be read before the user settings file. User settings trump settings in this 'advanced\_settings.yaml' file. The purpose is to be able to have hidden/development settings.
