@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.3.7 - September 27, 2021**
+
+* **ENHANCEMENT:** some speed improvements in multi-downloads
+
 **v2.3.6 - August 16, 2021**
 
 * **FIXED:** no longer crashing for scripts where no settings file is passed in via CL arguments
