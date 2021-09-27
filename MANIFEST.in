@@ -1,0 +1,14 @@
+include README.md
+include *.yaml
+include *.txt
+include *.md
+include *.rst
+include LICENSE
+recursive-include fundmentals *
+global-exclude *.pyo
+global-exclude *.pyc
+recursive-exclude tests *
+recursive-exclude */tests *
+recursive-exclude */*/tests *
+recursive-exclude */*/*/tests *
+recursive-exclude tests
