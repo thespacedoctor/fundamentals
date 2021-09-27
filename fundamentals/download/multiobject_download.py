@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 """
-*Download resources from a list of URLs. 
+*Download resources from a list of URLs.
 
 There are options to rename all the downloaded resource, index the files, set differing download locations and pass basic authentication credentials.*
 
@@ -18,6 +18,13 @@ import os
 os.environ['TERM'] = 'vt100'
 from fundamentals import tools
 import urllib
+import requests
+from multiprocessing.pool import ThreadPool
+gtimeout = 10.
+llog = ""
+import random
+import time
+
 
 def multiobject_download(
     urlList,
@@ -36,7 +43,6 @@ def multiobject_download(
 
     **Key Arguments**
 
-    
       - ``urlList`` -- list of document urls
       - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
       - ``log`` -- the logger
@@ -50,7 +56,6 @@ def multiobject_download(
 
     **Return**
 
-    
       - list of timestamped documents (same order as the input urlList)
 
     **Usage**
@@ -71,28 +76,24 @@ def multiobject_download(
     )
 
     print localUrls
-    # OUT: ['/tmp/untitled_20160316t160650610780.html', '/tmp/Docstring_20160316t160650611136.html']
+    # OUT: ['/tmp/untitled_20160316t160650610780.html',
+    # '/tmp/Docstring_20160316t160650611136.html']
     ```
 
     .. image:: https://i.imgur.com/QYoMm24.png width=600px
-    
+
     """
     import sys
     import os
-    import eventlet
-    import socket
     import re
-    import base64
-    from fundamentals.download import _fetch, _dump_files_to_local_drive, append_now_datestamp_to_filename, extract_filename_from_url
+    from fundamentals.download import append_now_datestamp_to_filename, extract_filename_from_url
 
-    ## >SETTINGS ##
     # TIMEOUT IN SECONDS
-    timeout = float(timeout)
-    socket.setdefaulttimeout(timeout)
+    global gtimeout
+    global llog
+    llog = log
+    gtimeout = float(timeout)
 
-    ###########################################################
-    # >ACTION(S)                                              #
-    ###########################################################
     # BUILD THE 2D ARRAY FOR MULTI_THREADED DOWNLOADS
     thisArray = []
     bodies = []
@@ -103,7 +104,7 @@ def multiobject_download(
     totalCount = len(urlList)
 
     # IF ONLY ONE DOWNLOAD DIRECORY
-    if isinstance(downloadDirectory, ("".__class__, u"".__class__)):
+    if not isinstance(downloadDirectory, list):
         for i, url in enumerate(urlList):
             # EXTRACT THE FILENAME FROM THE URL
             if resetFilename and len(resetFilename):
@@ -124,21 +125,18 @@ def multiobject_download(
                     log, filename, longTime=longTime)
             # GENERATE THE LOCAL FILE URL
             localFilepath = downloadDirectory + "/" + filename
+
+            # ADD BASIC AUTH TO THE URLS
+            if credentials != False:
+                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
+                if "://" in url:
+                    url = url.replace("://", "://" + url_pass)
+                else:
+                    url = url_pass + url
             thisArray.extend([[url, localFilepath]])
 
-            # GENERATE THE REQUESTS
-            request = urllib.request.Request(url)
-            if credentials != False:
-                username = credentials["username"]
-                password = credentials["password"]
-                base64string = base64.encodestring(
-                    '%s:%s' % (username, password)).replace('\n', '')
-                request.add_header("Authorization", "Basic %s" % base64string)
-            requestList.append(request)
-
-    elif isinstance(downloadDirectory, list):
-
-        for u, d in zip(urlList, downloadDirectory):
+    else:
+        for url, d in zip(urlList, downloadDirectory):
             # EXTRACT THE FILENAME FROM THE URL
             if resetFilename:
                 filename = resetFilename
@@ -154,59 +152,64 @@ def multiobject_download(
                     log, filename)
             # GENERATE THE LOCAL FILE URL
             localFilepath = d + "/" + filename
-            thisArray.extend([[u, localFilepath]])
-            log.debug(" about to download %s" % (u,))
+            thisArray.extend([[url, localFilepath]])
 
-            # GENERATE THE REQUESTS
-            request = urllib.request.Request(u)
-
+            # ADD BASIC AUTH TO THE URLS
             if credentials != False:
-                log.debug('adding the credentials')
-                username = credentials["username"]
-                password = credentials["password"]
-                base64string = base64.encodestring(
-                    '%s:%s' % (username, password)).replace('\n', '')
-                request.add_header("Authorization", "Basic %s" % base64string)
-            requestList.append(request)
+                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
+                if "://" in url:
+                    url = url.replace("://", "://" + url_pass)
+                else:
+                    url = url_pass + url
 
-    pool = eventlet.GreenPool(concurrentDownloads)
-    i = 0
-    try:
+    # CONCURRENTLY DOWNLOAD URLS
+    results = ThreadPool(concurrentDownloads).imap_unordered(
+        fetch_url, thisArray)
+    urlNum = 0
+    returnPaths = []
+    for path in results:
+        returnPaths.append(path)
+        urlNum += 1
+        if urlNum > 1:
+            # CURSOR UP ONE LINE AND CLEAR LINE
+            sys.stdout.write("\x1b[1A\x1b[2K")
+        percent = (float(urlNum) / float(totalCount)) * 100.
+        print("  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
 
-        log.debug(
-            "starting mutli-threaded download batch - %s concurrent downloads" %
-            (concurrentDownloads,))
-        log.debug('len(requestList): %s' % (len(requestList),))
-        for url, body in pool.imap(_fetch, requestList):
-            urlNum = i + 1
-            if urlNum > 1:
-                # CURSOR UP ONE LINE AND CLEAR LINE
-                sys.stdout.write("\x1b[1A\x1b[2K")
-            percent = (float(urlNum) / float(totalCount)) * 100.
-            print(
-                "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
+    localPaths = []
+    localPaths[:] = [o[1] for o in thisArray if o[1] in returnPaths]
 
-            if(body):
-                bodies.extend([body])
-                theseUrls.extend([thisArray[i][1]])
-            else:
-                theseUrls.extend([None])
-                bodies.extend([None])
+    return localPaths
 
-            # DUMP THE FILES FROM MEMORY EVERY CONCURRENT DOWNLOAD CYCLE
-            if i % concurrentDownloads == 0:
-                _dump_files_to_local_drive(bodies, theseUrls, log)
-                localUrls.extend(theseUrls)
-                # RESET THE TMP ARRAYS
-                bodies = []
-                theseUrls = []
-            i += 1
-    except Exception as e:
-        log.error(
-            "something went wrong with the mutli-threaded download : " + str(e) + "\n")
 
-    # DUMP REMAINING FILES TO THE LOCAL DRIVE
-    _dump_files_to_local_drive(bodies, theseUrls, log)
-    localUrls.extend(theseUrls)
+def fetch_url(entry):
+    downloaded = False
+    tries = 5
+    count = 0
+    uri, path = entry
+    timeout = gtimeout
 
-    return localUrls
+    randSleep = random.randint(1, 101) / 20.
+
+    time.sleep(randSleep)
+
+    while not downloaded and count < tries:
+        try:
+            r = requests.get(uri, stream=True, timeout=timeout)
+        except:
+            count += 1
+            timeout *= 2
+            llog.warning(f"timeout on attempt number {count}/{tries}. Increasing to {timeout}s")
+            continue
+
+        if r.status_code == 200:
+            with open(path, 'wb') as f:
+                for chunk in r:
+                    f.write(chunk)
+            return path
+        else:
+            count += 1
+            llog.warning(f"Getting status code {r.status_code} on download attempt {count}/{tries}.")
+            downloaded = False
+
+    return None

@@ -22,11 +22,9 @@ def _fetch(url,):
 
     **Key Arguments**
 
-
       - ``url`` -- the URL of the document or file
 
     **Return**
-
 
       - ``url`` -- the URL of the document or file, or None if an error occured
       - ``body`` -- the text content of the HTML document.
