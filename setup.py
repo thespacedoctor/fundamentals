@@ -16,7 +16,8 @@ install_requires = [
     'docopt',
     'psutil',
     'python-dateutil',
-    'coloredlogs'
+    'coloredlogs',
+    'requests'
 ]
 
 # READ THE DOCS SERVERS
