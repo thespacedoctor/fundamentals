@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.3.8 - September 29, 2021**
+
+* **ENHANCEMENT:** fundamentals is now on conda-forge
+
 **v2.3.7 - September 27, 2021**
 
 * **ENHANCEMENT:** some speed improvements in multi-downloads
