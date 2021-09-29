@@ -2,7 +2,7 @@
 
 <!-- INFO BADGES -->  
 
-[![](https://img.shields.io/pypi/pyversions/fundamentals)](https://pypi.org/project/fundamentals/)  
+[![](https://img.shields.io/pypi/pyversions/fundamentals)](https://pypi.org/project/fundamentals/)
 [![image](https://img.shields.io/conda/vn/conda-forge/fundamentals.svg)](https://anaconda.org/conda-forge/fundamentals)
 [![image](https://pepy.tech/badge/fundamentals)](https://pepy.tech/project/fundamentals)
 [![](https://img.shields.io/pypi/v/fundamentals)](https://pypi.org/project/fundamentals/)  
