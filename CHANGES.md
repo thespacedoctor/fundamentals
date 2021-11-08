@@ -1,7 +1,9 @@
 
 ## Release Notes
 
-move depreciated calls to yaml `load` to `safe_load`
+**v2.3.9 - November 8, 2021**
+
+* **FIXED:** moved depreciated calls to yaml `load` to `safe_load`
 
 **v2.3.8 - September 29, 2021**
 
