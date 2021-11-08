@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+move depreciated calls to yaml `load` to `safe_load`
+
 **v2.3.8 - September 29, 2021**
 
 * **ENHANCEMENT:** fundamentals is now on conda-forge

@@ -102,11 +102,11 @@ class utKit(object):
         """
 
         ## VARIABLES ##
-        logging.config.dictConfig(yaml.load(self.loggerConfig))
+        logging.config.dictConfig(yaml.safe_load(self.loggerConfig))
         log = logging.getLogger(__name__)
         if self.dbConfig:
             import pymysql as ms
-            connDict = yaml.load(self.dbConfig)
+            connDict = yaml.safe_load(self.dbConfig)
             dbConn = ms.connect(
                 host=connDict['host'],
                 user=connDict['user'],
