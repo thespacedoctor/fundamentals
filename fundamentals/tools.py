@@ -571,7 +571,7 @@ class tools(object):
 ###################################################################
 
 
-def ordered_load(stream, Loader=yaml.safe_loader, object_pairs_hook=OrderedDict):
+def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
 
