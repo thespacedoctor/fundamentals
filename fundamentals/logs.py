@@ -71,7 +71,7 @@ def console_logger(
       level: """ + level + """
       handlers: [console]"""
 
-    logging.config.dictConfig(yaml.load(loggerConfig))
+    logging.config.dictConfig(yaml.safe_load(loggerConfig))
     logger = logging.getLogger(__name__)
 
     return logger
@@ -156,7 +156,7 @@ def setup_dryx_logging(yaml_file):
     home = expanduser("~")
     content = content.replace("~/", home + "/")
     stream = StringIO(content)
-    yamlContent = yaml.load(stream)
+    yamlContent = yaml.safe_load(stream)
     stream.close()
 
     # USE THE LOGGING SETTINGS SECTION OF THE SETTINGS DICTIONARY FILE IF THERE IS ONE

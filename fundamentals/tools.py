@@ -195,7 +195,7 @@ class tools(object):
             advs = {}
         else:
             with open(advs, 'r') as stream:
-                advs = yaml.load(stream)
+                advs = yaml.safe_load(stream)
 
         if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments and os.path.exists(os.getenv(
                 "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
@@ -248,7 +248,7 @@ class tools(object):
                 if orderedSettings:
                     this = ordered_load(astream, yaml.SafeLoader)
                 else:
-                    this = yaml.load(astream)
+                    this = yaml.safe_load(astream)
                 if this:
 
                     settings = this
@@ -324,7 +324,7 @@ class tools(object):
             if orderedSettings:
                 settings = ordered_load(astream, yaml.SafeLoader)
             else:
-                settings = yaml.load(astream)
+                settings = yaml.safe_load(astream)
 
         # MERGE ADVANCED SETTINGS AND USER SETTINGS (USER SETTINGS OVERRIDE)
         if 'settings' not in locals():
@@ -571,7 +571,7 @@ class tools(object):
 ###################################################################
 
 
-def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+def ordered_load(stream, Loader=yaml.safe_loader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
 
@@ -581,7 +581,7 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     OrderedLoader.add_constructor(
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
-    return yaml.load(stream, OrderedLoader)
+    return yaml.safe_load(stream, OrderedLoader)
 
 if __name__ == '__main__':
     main()
