@@ -1,17 +1,21 @@
 
 ## Release Notes
 
-**v2.3.9 - November 8, 2021**
+**v2.3.10 - March 7, 2022**  
 
-* **FIXED:** moved depreciated calls to yaml `load` to `safe_load`
+* **ENHANCEMENT:** can now turn off multiprocessing with the `turnOffMP` parameter of `fmultiprocessing`. Needed for full profiling of code.  
 
-**v2.3.8 - September 29, 2021**
+**v2.3.9 - November 8, 2021**  
 
-* **ENHANCEMENT:** fundamentals is now on conda-forge
+* **FIXED:** moved depreciated calls to yaml `load` to `safe_load`  
 
-**v2.3.7 - September 27, 2021**
+**v2.3.8 - September 29, 2021**  
 
-* **ENHANCEMENT:** some speed improvements in multi-downloads
+* **ENHANCEMENT:** fundamentals is now on conda-forge  
+
+**v2.3.7 - September 27, 2021**  
+
+* **ENHANCEMENT:** some speed improvements in multi-downloads  
 
 **v2.3.6 - August 16, 2021**
 
