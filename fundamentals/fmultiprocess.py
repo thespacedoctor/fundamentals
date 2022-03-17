@@ -22,6 +22,7 @@ def fmultiprocess(
         inputArray,
         poolSize=False,
         timeout=3600,
+        turnOffMP=False,
         **kwargs):
     """multiprocess pool
 
@@ -32,6 +33,7 @@ def fmultiprocess(
     - ``inputArray`` -- the array to be iterated over
     - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
     - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
+    - ``turnOffMP`` -- turn off multiprocessing. Useful for profiling and debugging. Default **False**
 
 
     **Return**
@@ -51,29 +53,7 @@ def fmultiprocess(
 
     """
     log.debug('starting the ``multiprocess`` function')
-    import psutil
-    # import multiprocess as mp
-    # mp.set_start_method('forkserver')
-    from multiprocess import cpu_count, Pool
 
-    # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
-    if not poolSize:
-        poolSize = psutil.cpu_count()
-
-    if poolSize:
-        p = Pool(processes=poolSize)
-    else:
-        p = Pool()
-
-    cpuCount = psutil.cpu_count()
-    chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
-
-    if chunksize == 0:
-        chunksize = 1
-
-    # chunksize = 1
-
-    # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
     logFound = False
     # PYTHON 3 VS 2 ..
     try:
@@ -82,18 +62,54 @@ def fmultiprocess(
     except:
         if "log" in inspect.getargspec(function)[0]:
             logFound = True
-    if logFound:
-        mapfunc = partial(function, log=log, **kwargs)
-        resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
+
+    if turnOffMP == False:
+        import psutil
+        # import multiprocess as mp
+        # mp.set_start_method('forkserver')
+        from multiprocess import cpu_count, Pool
+
+        # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
+        if not poolSize:
+            poolSize = psutil.cpu_count()
+
+        if poolSize:
+            p = Pool(processes=poolSize)
+        else:
+            p = Pool()
+
+        cpuCount = psutil.cpu_count()
+        chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
+
+        if chunksize == 0:
+            chunksize = 1
+
+        # chunksize = 1
+        # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
+        if logFound:
+            mapfunc = partial(function, log=log, **kwargs)
+            resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
+        else:
+            mapfunc = partial(function, **kwargs)
+            resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
+
+        resultArray = resultArray.get(timeout=timeout)
+
+        p.close()
+        p.join()
+        # p.terminate()
+
     else:
-        mapfunc = partial(function, **kwargs)
-        resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
+        resultArray = []
 
-    resultArray = resultArray.get(timeout=timeout)
-
-    p.close()
-    p.join()
-    # p.terminate()
+        if logFound:
+            for i in inputArray:
+                r = function(log, i, **kwargs)
+                resultArray.append(r)
+        else:
+            for i in inputArray:
+                r = function(i, **kwargs)
+                resultArray.append(r)
 
     log.debug('completed the ``multiprocess`` function')
     return resultArray
