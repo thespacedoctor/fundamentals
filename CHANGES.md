@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+**FIXED**: Deadlocked connections now attempt to reconnect.
+
 **v2.3.9 - November 8, 2021**
 
 * **FIXED:** moved depreciated calls to yaml `load` to `safe_load`
