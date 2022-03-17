@@ -1,6 +1,8 @@
 
 ## Release Notes
 
+**FIXED**: Deadlocked connections now attempt to reconnect.
+
 **v2.3.10 - March 7, 2022**  
 
 * **ENHANCEMENT:** can now turn off multiprocessing with the `turnOffMP` parameter of `fmultiprocessing`. Needed for full profiling of code.  

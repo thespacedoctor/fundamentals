@@ -105,7 +105,7 @@ def writequery(
                     dbConn.commit()
                     if len(thisList) < batch:
                         stop = 1
-        except pymysql.err.InternalError as e:
+        except (pymysql.err.InternalError, pymysql.err.OperationalError) as e:
             if tries < 61:
                 tryAgain = True
                 log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
