@@ -1,7 +1,9 @@
 
 ## Release Notes
 
-**FIXED**: Deadlocked connections now attempt to reconnect.
+**v2.3.11 - March 17, 2022**  
+
+* **FIXED**: deadlocked connections now attempt to reconnect.
 
 **v2.3.10 - March 7, 2022**  
 
