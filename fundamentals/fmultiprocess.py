@@ -7,13 +7,13 @@
     David Young
 """
 from __future__ import division
+import inspect
+from functools import partial
+from fundamentals import tools
 from past.utils import old_div
 import sys
 import os
 os.environ['TERM'] = 'vt100'
-from fundamentals import tools
-from functools import partial
-import inspect
 
 
 def fmultiprocess(
