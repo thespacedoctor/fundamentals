@@ -133,7 +133,8 @@ class tools(object):
             projectName=False,
             distributionName=False,
             orderedSettings=False,
-            defaultSettingsFile=False
+            defaultSettingsFile=False,
+            quitIfRunning=True
     ):
         self.arguments = arguments
         self.docString = docString
@@ -161,17 +162,18 @@ class tools(object):
 
         # TEST IF THE PROCESS IS ALREADY RUNNING WITH THE SAME ARGUMENTS (e.g.
         # FROM CRON) - QUIT IF MATCH FOUND
-        for q in psutil.process_iter():
-            try:
-                this = q.cmdline()
-            except:
-                continue
+        if quitIfRunning:
+            for q in psutil.process_iter():
+                try:
+                    this = q.cmdline()
+                except:
+                    continue
 
-            test = "".join(this[1:])
-            if q.pid != os.getpid() and lockname == test and "--reload" not in test:
-                thisId = q.pid
-                print("This command is already running (see PID %(thisId)s)" % locals())
-                sys.exit(0)
+                test = "".join(this[1:])
+                if q.pid != os.getpid() and lockname == test and "--reload" not in test:
+                    thisId = q.pid
+                    print("This command is already running (see PID %(thisId)s)" % locals())
+                    sys.exit(0)
 
         try:
             if "tests.test" in arguments["<pathToSettingsFile>"]:
@@ -582,6 +584,7 @@ def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
     return yaml.safe_load(stream, OrderedLoader)
+
 
 if __name__ == '__main__':
     main()
