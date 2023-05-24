@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.4.0 - May 24, 2023**
+
+* **FEATURE** added a class to help daemonise code
+
 **v2.3.12 - May 10, 2022**
 
 * **FIXED** doc fixes
