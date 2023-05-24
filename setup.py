@@ -19,7 +19,7 @@ install_requires = [
     'python-dateutil',
     'coloredlogs',
     'requests',
-    'daemon'
+    'python-daemon'
 ]
 
 # READ THE DOCS SERVERS
