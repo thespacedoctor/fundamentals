@@ -151,6 +151,8 @@ class daemonise():
         """
         self.log.debug('starting the ``stop`` method')
 
+        import signal
+
         if os.path.exists(self.pidFile):
             with open(self.pidFile, mode='r') as f:
                 pid = f.read().strip()

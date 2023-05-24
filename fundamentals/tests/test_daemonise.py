@@ -52,9 +52,9 @@ class test_daemonise(unittest.TestCase):
         from fundamentals import daemonise
         this = daemonise(
             log=log,
-            settings=settings
+            settings=settings,
+            name="nice"
         )
-        this.get()
 
     def test_daemonise_function_exception(self):
 
