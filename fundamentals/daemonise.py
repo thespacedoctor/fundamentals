@@ -93,9 +93,9 @@ class daemonise():
             os.makedirs(self.rootDir)
 
         self.name = name
-        self.errLog = home + f"/.config/{name}/dameon_err.log"
-        self.outLog = home + f"/.config/{name}/dameon.log"
-        self.pidFile = home + f"/.config/{name}/dameon.pid"
+        self.errLog = home + f"/.config/{name}/daemon_err.log"
+        self.outLog = home + f"/.config/{name}/daemon.log"
+        self.pidFile = home + f"/.config/{name}/daemon.pid"
         self.akws = akws
 
         return
@@ -123,11 +123,29 @@ class daemonise():
                 pidfile=pidfile.TimeoutPIDLockFile(self.pidFile),
                 stdout=open(self.outLog, 'a'),
                 stderr=open(self.errLog, 'a'),
-                signal_map={signal.SIGTERM: self.stop}
+                signal_map={signal.SIGTERM: self.cleanup}
             ) as context:
                 self.action(**self.akws)
 
         self.log.info('completed the ``get`` method')
+        return None
+
+    def cleanup(
+            self,
+            signum,
+            frame):
+        """*the code to run when daemon is killed*
+        """
+        self.log.debug('starting the ``cleanup`` method')
+
+        from datetime import datetime, date, time
+        now = datetime.now()
+        now = now.strftime("%Y%m%dt%H%M%S")
+
+        print(f"{self.name} stopped at {now}")
+        sys.exit(0)
+
+        self.log.debug('completed the ``cleanup`` method')
         return None
 
     def action(
