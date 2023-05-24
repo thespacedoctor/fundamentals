@@ -18,7 +18,8 @@ install_requires = [
     'psutil',
     'python-dateutil',
     'coloredlogs',
-    'requests'
+    'requests',
+    'daemon'
 ]
 
 # READ THE DOCS SERVERS
