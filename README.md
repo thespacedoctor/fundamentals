@@ -1,5 +1,10 @@
 # fundamentals
 
+
+[![](https://zenodo.org/badge/52598459.svg)](https://zenodo.org/badge/latestdoi/52598459) 
+
+
+
 <!-- INFO BADGES -->  
 
 [![](https://img.shields.io/pypi/pyversions/fundamentals)](https://pypi.org/project/fundamentals/)
@@ -24,5 +29,18 @@ Documentation for fundamentals is hosted by [Read the Docs](https://fundamentals
 
 * 
 
+## How to cite fundamentals
 
+If you use `fundamentals` in your work, please cite using the following BibTeX entry: 
+
+```bibtex
+@software{Young_fundamentals,
+    author = {Young, David R.},
+    doi = {10.5281/zenodo.8037510},
+    license = {GPL-3.0-only},
+    title = {{fundamentals}},
+    url = {https://github.com/thespacedoctor/fundamentals}
+    }
+```
+ 
 
