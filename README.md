@@ -40,7 +40,9 @@ If you use `fundamentals` in your work, please cite using the following BibTeX e
     license = {GPL-3.0-only},
     title = {{fundamentals}},
     url = {https://github.com/thespacedoctor/fundamentals}
-    }
+}
 ```
+
+
  
 
