@@ -7,6 +7,13 @@
     David Young
 """
 from __future__ import print_function
+from datetime import datetime
+from fundamentals.mysql.database import database
+import re
+import time
+from fundamentals.fmultiprocess import fmultiprocess
+from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
+from fundamentals import tools
 from __future__ import division
 from builtins import str
 from builtins import range
@@ -14,13 +21,6 @@ from past.utils import old_div
 import sys
 import os
 os.environ['TERM'] = 'vt100'
-from fundamentals import tools
-from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
-from fundamentals.fmultiprocess import fmultiprocess
-import time
-import re
-from fundamentals.mysql.database import database
-from datetime import datetime
 
 
 count = 0
