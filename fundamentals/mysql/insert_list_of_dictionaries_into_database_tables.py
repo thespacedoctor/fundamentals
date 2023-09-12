@@ -7,6 +7,7 @@
     David Young
 """
 from __future__ import print_function
+from __future__ import division
 from datetime import datetime
 from fundamentals.mysql.database import database
 import re
@@ -14,7 +15,6 @@ import time
 from fundamentals.fmultiprocess import fmultiprocess
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals import tools
-from __future__ import division
 from builtins import str
 from builtins import range
 from past.utils import old_div
