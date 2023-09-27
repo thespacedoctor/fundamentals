@@ -460,6 +460,22 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         dbConn=dbConn
     )
 
+    print(sqlQuery)
+
+    from fundamentals.mysql import readquery
+    sqlQuery = f"""
+        select * from {dbTablename}
+    """
+    rows = readquery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        quiet=False
+    )
+
+    for r in rows:
+        print(r)
+
     sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
     writequery(
         log=log,
