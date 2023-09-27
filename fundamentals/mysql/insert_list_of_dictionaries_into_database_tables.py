@@ -428,20 +428,6 @@ IGNORE 1 LINES
         dbConn=dbConn
     )
 
-    from fundamentals.mysql import readquery
-    sqlQuery = f"""
-        select * from {tmpTable}
-    """
-    rows = readquery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn,
-        quiet=False
-    )
-
-    for r in rows:
-        print(r)
-
     updateStatement = ""
     for i in csvColumns:
         updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
@@ -459,22 +445,6 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         sqlQuery=sqlQuery,
         dbConn=dbConn
     )
-
-    print(sqlQuery)
-
-    from fundamentals.mysql import readquery
-    sqlQuery = f"""
-        select * from {dbTablename}
-    """
-    rows = readquery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn,
-        quiet=False
-    )
-
-    for r in rows:
-        print(r)
 
     sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
     writequery(

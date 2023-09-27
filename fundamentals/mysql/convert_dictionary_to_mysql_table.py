@@ -6,20 +6,20 @@
 :Author:
     David Young
 """
+import six
+from fundamentals.mysql import writequery, table_exists, readquery
+from fundamentals import tools, times
+import collections as c
+import datetime
+import time
+import yaml
+import re
 from builtins import zip
 from builtins import str
 from builtins import range
 import sys
 import os
 os.environ['TERM'] = 'vt100'
-import re
-import yaml
-import time
-import datetime
-import collections as c
-from fundamentals import tools, times
-from fundamentals.mysql import writequery, table_exists, readquery
-import six
 
 
 def convert_dictionary_to_mysql_table(
@@ -206,7 +206,7 @@ def convert_dictionary_to_mysql_table(
                 `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
                 `updated` tinyint(4) DEFAULT '0',
                 PRIMARY KEY (`primaryId`))
-                ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+                ENGINE=Innodb AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
             """ % locals()
             writequery(
                 log=log,
