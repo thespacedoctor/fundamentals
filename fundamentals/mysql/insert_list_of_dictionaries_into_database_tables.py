@@ -430,7 +430,7 @@ IGNORE 1 LINES
 
     from fundamentals.mysql import readquery
     sqlQuery = f"""
-        select * from %(tmpTable)s
+        select * from {tmpTable}
     """
     rows = readquery(
         log=log,
