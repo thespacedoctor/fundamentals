@@ -428,6 +428,20 @@ IGNORE 1 LINES
         dbConn=dbConn
     )
 
+    from fundamentals.mysql import readquery
+    sqlQuery = f"""
+        select * from %(tmpTable)s
+    """
+    rows = readquery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn,
+        quiet=False
+    )
+
+    for r in rows:
+        print(r)
+
     updateStatement = ""
     for i in csvColumns:
         updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
