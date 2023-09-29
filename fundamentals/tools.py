@@ -153,10 +153,9 @@ class tools(object):
 
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
-        if arguments == None:
-            arguments = docopt(docString, version="v" + version,
-                               options_first=options_first)
-        self.arguments = arguments
+        if self.arguments == None:
+            self.arguments = docopt(docString, version="v" + version,
+                                    options_first=options_first)
 
         # BUILD A STRING FOR THE PROCESS TO MATCH RUNNING PROCESSES AGAINST
         lockname = "".join(sys.argv)
@@ -177,8 +176,8 @@ class tools(object):
                     sys.exit(0)
 
         try:
-            if "tests.test" in arguments["<pathToSettingsFile>"]:
-                del arguments["<pathToSettingsFile>"]
+            if "tests.test" in self.arguments["<pathToSettingsFile>"]:
+                del self.arguments["<pathToSettingsFile>"]
         except:
             pass
 
@@ -200,37 +199,37 @@ class tools(object):
             with open(advs, 'r') as stream:
                 advs = yaml.safe_load(stream)
 
-        if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments:
+        if defaultSettingsFile and "settingsFile" not in self.arguments and "--settings" not in self.arguments:
             cwdSettings = os.getcwd() + f"/{projectName}.yaml"
             if os.path.exists(cwdSettings):
-                arguments["settingsFile"] = settingsFile = cwdSettings
+                self.arguments["settingsFile"] = settingsFile = cwdSettings
             elif os.path.exists(os.getenv(
                     "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
-                arguments["settingsFile"] = settingsFile = os.getenv(
+                self.arguments["settingsFile"] = settingsFile = os.getenv(
                     "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
 
         # UNPACK SETTINGS
         stream = False
-        if "<settingsFile>" in arguments and arguments["<settingsFile>"]:
-            stream = open(arguments["<settingsFile>"], 'r')
-        elif "<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"]:
-            stream = open(arguments["<pathToSettingsFile>"], 'r')
-        elif "--settingsFile" in arguments and arguments["--settingsFile"]:
-            stream = open(arguments["--settingsFile"], 'r')
-        elif "--settings" in arguments and arguments["--settings"]:
-            stream = open(arguments["--settings"], 'r')
-        elif "pathToSettingsFile" in arguments and arguments["pathToSettingsFile"]:
-            stream = open(arguments["pathToSettingsFile"], 'r')
-        elif "settingsFile" in arguments and arguments["settingsFile"]:
-            stream = open(arguments["settingsFile"], 'r')
-        elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None) or ("pathToSettingsFile" in arguments and arguments["pathToSettingsFile"] == None):
+        if "<settingsFile>" in self.arguments and self.arguments["<settingsFile>"]:
+            stream = open(self.arguments["<settingsFile>"], 'r')
+        elif "<pathToSettingsFile>" in self.arguments and self.arguments["<pathToSettingsFile>"]:
+            stream = open(self.arguments["<pathToSettingsFile>"], 'r')
+        elif "--settingsFile" in self.arguments and self.arguments["--settingsFile"]:
+            stream = open(self.arguments["--settingsFile"], 'r')
+        elif "--settings" in self.arguments and self.arguments["--settings"]:
+            stream = open(self.arguments["--settings"], 'r')
+        elif "pathToSettingsFile" in self.arguments and self.arguments["pathToSettingsFile"]:
+            stream = open(self.arguments["pathToSettingsFile"], 'r')
+        elif "settingsFile" in self.arguments and self.arguments["settingsFile"]:
+            stream = open(self.arguments["settingsFile"], 'r')
+        elif ("settingsFile" in self.arguments and self.arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in self.arguments and self.arguments["<pathToSettingsFile>"] == None) or ("--settings" in self.arguments and self.arguments["--settings"] == None) or ("pathToSettingsFile" in self.arguments and self.arguments["pathToSettingsFile"] == None):
 
             init = False
             workspaceDirectory = False
-            if "init" in arguments and arguments["init"]:
+            if "init" in self.arguments and self.arguments["init"]:
                 init = True
-                if "<workspaceDirectory>" in arguments and arguments["<workspaceDirectory>"]:
-                    theseSettings = arguments["<workspaceDirectory>"] + f"/{projectName}.yaml"
+                if "<workspaceDirectory>" in self.arguments and self.arguments["<workspaceDirectory>"]:
+                    theseSettings = self.arguments["<workspaceDirectory>"] + f"/{projectName}.yaml"
                 else:
                     theseSettings = self.configSettingsPath
                 exists = self._create_or_verify_settings(pathToSettings=theseSettings, create=True)
@@ -248,7 +247,7 @@ class tools(object):
                     # CREATE SETTING IN DEFAULT SETTINGS LOCATION IF NONE EXIST
                     if not exists:
                         exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=True)
-            stream = open(arguments["settingsFile"], 'r')
+            stream = open(self.arguments["settingsFile"], 'r')
         else:
             pass
 
@@ -272,33 +271,33 @@ class tools(object):
         # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
         # SETTINGS
         if 'settings' in locals() and "logging settings" in settings:
-            if "settingsFile" in arguments:
+            if "settingsFile" in self.arguments:
                 log = dl.setup_dryx_logging(
-                    yaml_file=arguments["settingsFile"]
+                    yaml_file=self.arguments["settingsFile"]
                 )
-            elif "<settingsFile>" in arguments:
+            elif "<settingsFile>" in self.arguments:
                 log = dl.setup_dryx_logging(
-                    yaml_file=arguments["<settingsFile>"]
+                    yaml_file=self.arguments["<settingsFile>"]
                 )
-            elif "<pathToSettingsFile>" in arguments:
+            elif "<pathToSettingsFile>" in self.arguments:
                 log = dl.setup_dryx_logging(
-                    yaml_file=arguments["<pathToSettingsFile>"]
+                    yaml_file=self.arguments["<pathToSettingsFile>"]
                 )
-            elif "--settingsFile" in arguments:
+            elif "--settingsFile" in self.arguments:
                 log = dl.setup_dryx_logging(
-                    yaml_file=arguments["--settingsFile"]
+                    yaml_file=self.arguments["--settingsFile"]
                 )
-            elif "pathToSettingsFile" in arguments:
+            elif "pathToSettingsFile" in self.arguments:
                 log = dl.setup_dryx_logging(
-                    yaml_file=arguments["pathToSettingsFile"]
-                )
-
-            elif "--settings" in arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=arguments["--settings"]
+                    yaml_file=self.arguments["pathToSettingsFile"]
                 )
 
-        elif "--logger" not in arguments or arguments["--logger"] is None:
+            elif "--settings" in self.arguments:
+                log = dl.setup_dryx_logging(
+                    yaml_file=self.arguments["--settings"]
+                )
+
+        elif "--logger" not in self.arguments or self.arguments["--logger"] is None:
             log = dl.console_logger(
                 level=self.logLevel
             )
@@ -307,7 +306,7 @@ class tools(object):
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically
-        for arg, val in list(arguments.items()):
+        for arg, val in list(self.arguments.items()):
             if arg[0] == "-":
                 varname = arg.replace("-", "") + "Flag"
             else:
@@ -326,13 +325,13 @@ class tools(object):
         dbConn = False
         tunnel = False
 
-        if ("--host" in arguments and "--dbName" in arguments and arguments["--host"]):
+        if ("--host" in self.arguments and "--dbName" in self.arguments and self.arguments["--host"]):
             # SETUP DB CONNECTION
             dbConn = True
-            host = arguments["--host"]
-            user = arguments["--user"]
-            passwd = arguments["--passwd"]
-            dbName = arguments["--dbName"]
+            host = self.arguments["--host"]
+            user = self.arguments["--user"]
+            passwd = self.arguments["--passwd"]
+            dbName = self.arguments["--dbName"]
             port = False
 
         elif 'settings' in locals() and "database settings" in settings and "host" in settings["database settings"]:
