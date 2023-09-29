@@ -1,7 +1,7 @@
 
 ## Release Notes
 
-**v2.5.0 - September 29, 2023**
+**v2.5.1 - September 29, 2023**
 
 * **ENHANCEMENT:** reworking the `init` command so a user can create/use a settings file in the CWD (instead of the default `~/.config` directory)
 
