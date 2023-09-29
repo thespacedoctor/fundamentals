@@ -518,7 +518,9 @@ class tools(object):
 
         exists = False
 
-        pathToSettings = os.path.abspath(pathToSettings)
+        absPath = os.path.abspath(pathToSettings)
+        defaultLog = f"{os.getenv('HOME')}/.config/{self.projectName}/{self.projectName}.log".replace("//", "/")
+        alternativeLogPath = absPath.replace(".yaml", ".log")
 
         if os.path.exists(pathToSettings):
             self.arguments["settingsFile"] = pathToSettings
@@ -553,8 +555,13 @@ class tools(object):
                     message = 'could not open the file %s' % (
                         pathToReadFile,)
                     raise IOError(message)
+
+                # JUST INCASE!
                 thisData = thisData.replace(
                     "/Users/Dave", os.getenv("HOME"))
+
+                if defaultLog != alternativeLogPath:
+                    thisData = thisData.replace(defaultLog, alternativeLogPath)
 
                 # REWRITE CLEANED FILE
                 try:
@@ -577,10 +584,6 @@ class tools(object):
 
     # use the tab-trigger below for new method
     # xt-class-method
-
-###################################################################
-# PUBLIC FUNCTIONS                                                #
-###################################################################
 
 
 def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
