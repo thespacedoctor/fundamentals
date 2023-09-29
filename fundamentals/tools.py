@@ -236,110 +236,24 @@ class tools(object):
                 exists = self._create_or_verify_settings(pathToSettings=theseSettings, create=True)
 
             else:
-
                 if projectName != False:
                     # FIRST CHECK FOR SETTINGS IN CWD
                     cwdSettings = os.getcwd() + f"/{projectName}.yaml"
                     exists = self._create_or_verify_settings(pathToSettings=cwdSettings, create=False)
 
-                    if os.path.exists(cwdSettings):
-                        arguments["settingsFile"] = settingsFile = cwdSettings
                     # THEN CHECK FOR SETTINGS CONFIG DIRECTORY
-                    else:
-                        projectDir = os.getenv(
-                            "HOME") + "/.config/%(projectName)s" % locals()
-                        exists = os.path.exists(projectDir)
-                        if not exists:
-                            # Recursively create missing directories
-                            if not os.path.exists(projectDir):
-                                os.makedirs(projectDir)
-                        settingsFile = os.getenv(
-                            "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
-                        exists = os.path.exists(settingsFile)
-                        arguments["settingsFile"] = settingsFile
+                    if not exists:
+                        exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=False)
 
-                        if not exists:
-                            import codecs
-                            writeFile = codecs.open(
-                                settingsFile, encoding='utf-8', mode='w')
-
-                    # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY
-                    # PATH
-                    with open(settingsFile) as f:
-                        content = f.read()
-                    home = expanduser("~")
-                    content = content.replace("~/", home + "/")
-                    astream = StringIO(content)
-
-                    if orderedSettings:
-                        this = ordered_load(astream, yaml.SafeLoader)
-                    else:
-                        this = yaml.safe_load(astream)
-
-                    # IF CONTENT EXISTS IN SETTINGS FILE
-                    if this:
-                        settings = this
-                        arguments["<settingsFile>"] = settingsFile
-                    # IF FILE IS EMPTY
-                    else:
-                        ds = os.getcwd() + "/rubbish.yaml"
-                        print(ds)
-                        level = 0
-                        exists = False
-                        count = 1
-                        while not exists and len(ds) and count < 10:
-                            count += 1
-                            level -= 1
-                            exists = os.path.exists(ds)
-                            print(inspect.stack())
-                            if not exists:
-                                ds = "/".join(inspect.stack()
-                                              [1][1].split("/")[:level]) + "/default_settings.yaml"
-                                print(ds)
-
-                        shutil.copyfile(ds, settingsFile)
-                        try:
-
-                            print("4444")
-                            shutil.copyfile(ds, settingsFile)
-                            import codecs
-                            pathToReadFile = settingsFile
-                            try:
-                                readFile = codecs.open(
-                                    pathToReadFile, encoding='utf-8', mode='r')
-                                thisData = readFile.read()
-                                readFile.close()
-                            except IOError as e:
-                                message = 'could not open the file %s' % (
-                                    pathToReadFile,)
-                                raise IOError(message)
-                            thisData = thisData.replace(
-                                "/Users/Dave", os.getenv("HOME"))
-
-                            pathToWriteFile = pathToReadFile
-                            try:
-                                writeFile = codecs.open(
-                                    pathToWriteFile, encoding='utf-8', mode='w')
-                            except IOError as e:
-                                message = 'could not open the file %s' % (
-                                    pathToWriteFile,)
-                                raise IOError(message)
-                            writeFile.write(thisData)
-                            writeFile.close()
-                            print("5555")
-                            print(
-                                "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals())
-                        except:
-                            print(
-                                "please add settings to file '%(settingsFile)s'" % locals())
-                        # return
+                    # CREATE SETTING IN DEFAULT SETTINGS LOCATION IF NONE EXIST
+                    if not exists:
+                        exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=True)
+            stream = open(arguments["settingsFile"], 'r')
         else:
-            print("5555")
             pass
 
         # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
         if stream is not False:
-
             astream = stream.read()
             home = expanduser("~")
             astream = astream.replace("~/", home + "/")
@@ -597,24 +511,7 @@ class tools(object):
             - ``create`` -- create the file if it does not exist. Default *False*.
 
         **Return:**
-            - None
-
-        **Usage:**
-
-        ```python
-        usage code 
-        ```
-
-        ---
-
-        ```eval_rst
-        .. todo::
-
-            - add usage info
-            - create a sublime snippet for usage
-            - write a command-line tool for this method
-            - update package tutorial with command-line tool info if needed
-        ```
+            - ``exists`` -- does the setting file now exist?
         """
 
         import codecs
@@ -674,6 +571,7 @@ class tools(object):
             except:
                 print(
                     f"Please add any require settings to file '{pathToSettings}' before proceeding to run {self.projectName}.")
+            self.arguments["settingsFile"] = pathToSettings
 
         return exists
 
