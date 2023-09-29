@@ -48,10 +48,9 @@ class tools(object):
     - ``logLevel`` -- the level of the logger required. Default *DEBUG*. [DEBUG|INFO|WARNING|ERROR|CRITICAL]
     - ``options_first`` -- options come before commands in CL usage. Default *False*.
     - ``projectName`` -- the name of the project, used to create a default settings file in ``~/.config/projectName/projectName.yaml``. Default *False*.
-    - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by anohter name on PyPi). Default *False*
+    - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by another name on PyPi). Default *False*
     - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
-    - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
-
+    - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string, look for a settings file first in the PWD or use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
 
     **Usage**
 
@@ -139,6 +138,8 @@ class tools(object):
         self.arguments = arguments
         self.docString = docString
         self.logLevel = logLevel
+        self.configSettingsPath = os.getenv("HOME") + f"/.config/{projectName}/{projectName}.yaml"
+        self.projectName = projectName
 
         if not distributionName:
             distributionName = projectName
@@ -199,10 +200,14 @@ class tools(object):
             with open(advs, 'r') as stream:
                 advs = yaml.safe_load(stream)
 
-        if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments and os.path.exists(os.getenv(
-                "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
-            arguments["settingsFile"] = settingsFile = os.getenv(
-                "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
+        if defaultSettingsFile and "settingsFile" not in arguments and "--settings" not in arguments:
+            cwdSettings = os.getcwd() + f"/{projectName}.yaml"
+            if os.path.exists(cwdSettings):
+                arguments["settingsFile"] = settingsFile = cwdSettings
+            elif os.path.exists(os.getenv(
+                    "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
+                arguments["settingsFile"] = settingsFile = os.getenv(
+                    "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
 
         # UNPACK SETTINGS
         stream = False
@@ -220,100 +225,116 @@ class tools(object):
             stream = open(arguments["settingsFile"], 'r')
         elif ("settingsFile" in arguments and arguments["settingsFile"] == None) or ("<pathToSettingsFile>" in arguments and arguments["<pathToSettingsFile>"] == None) or ("--settings" in arguments and arguments["--settings"] == None) or ("pathToSettingsFile" in arguments and arguments["pathToSettingsFile"] == None):
 
-            if projectName != False:
-                os.getenv("HOME")
-                projectDir = os.getenv(
-                    "HOME") + "/.config/%(projectName)s" % locals()
-                exists = os.path.exists(projectDir)
-                if not exists:
-                    # Recursively create missing directories
-                    if not os.path.exists(projectDir):
-                        os.makedirs(projectDir)
-                settingsFile = os.getenv(
-                    "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
-                exists = os.path.exists(settingsFile)
-                arguments["settingsFile"] = settingsFile
-
-                if not exists:
-                    import codecs
-                    writeFile = codecs.open(
-                        settingsFile, encoding='utf-8', mode='w')
-
-                # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY
-                # PATH
-                with open(settingsFile) as f:
-                    content = f.read()
-                home = expanduser("~")
-                content = content.replace("~/", home + "/")
-                astream = StringIO(content)
-
-                if orderedSettings:
-                    this = ordered_load(astream, yaml.SafeLoader)
+            init = False
+            workspaceDirectory = False
+            if "init" in arguments and arguments["init"]:
+                init = True
+                if "<workspaceDirectory>" in arguments and arguments["<workspaceDirectory>"]:
+                    theseSettings = arguments["<workspaceDirectory>"] + f"/{projectName}.yaml"
                 else:
-                    this = yaml.safe_load(astream)
-                if this:
+                    theseSettings = self.configSettingsPath
+                exists = self._create_or_verify_settings(pathToSettings=theseSettings, create=True)
 
-                    settings = this
-                    arguments["<settingsFile>"] = settingsFile
-                else:
-                    ds = os.getcwd() + "/rubbish.yaml"
-                    level = 0
-                    exists = False
-                    count = 1
-                    while not exists and len(ds) and count < 10:
-                        count += 1
-                        level -= 1
-                        exists = os.path.exists(ds)
+            else:
+
+                if projectName != False:
+                    # FIRST CHECK FOR SETTINGS IN CWD
+                    cwdSettings = os.getcwd() + f"/{projectName}.yaml"
+                    exists = self._create_or_verify_settings(pathToSettings=cwdSettings, create=False)
+
+                    if os.path.exists(cwdSettings):
+                        arguments["settingsFile"] = settingsFile = cwdSettings
+                    # THEN CHECK FOR SETTINGS CONFIG DIRECTORY
+                    else:
+                        projectDir = os.getenv(
+                            "HOME") + "/.config/%(projectName)s" % locals()
+                        exists = os.path.exists(projectDir)
                         if not exists:
-                            ds = "/".join(inspect.stack()
-                                          [1][1].split("/")[:level]) + "/default_settings.yaml"
+                            # Recursively create missing directories
+                            if not os.path.exists(projectDir):
+                                os.makedirs(projectDir)
+                        settingsFile = os.getenv(
+                            "HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
+                        exists = os.path.exists(settingsFile)
+                        arguments["settingsFile"] = settingsFile
 
-                    shutil.copyfile(ds, settingsFile)
-                    try:
-                        shutil.copyfile(ds, settingsFile)
-                        import codecs
-                        pathToReadFile = settingsFile
-                        try:
-                            readFile = codecs.open(
-                                pathToReadFile, encoding='utf-8', mode='r')
-                            thisData = readFile.read()
-                            readFile.close()
-                        except IOError as e:
-                            message = 'could not open the file %s' % (
-                                pathToReadFile,)
-                            raise IOError(message)
-                        thisData = thisData.replace(
-                            "/Users/Dave", os.getenv("HOME"))
-
-                        pathToWriteFile = pathToReadFile
-                        try:
+                        if not exists:
+                            import codecs
                             writeFile = codecs.open(
-                                pathToWriteFile, encoding='utf-8', mode='w')
-                        except IOError as e:
-                            message = 'could not open the file %s' % (
-                                pathToWriteFile,)
-                            raise IOError(message)
-                        writeFile.write(thisData)
-                        writeFile.close()
-                        print(
-                            "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals())
+                                settingsFile, encoding='utf-8', mode='w')
+
+                    # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY
+                    # PATH
+                    with open(settingsFile) as f:
+                        content = f.read()
+                    home = expanduser("~")
+                    content = content.replace("~/", home + "/")
+                    astream = StringIO(content)
+
+                    if orderedSettings:
+                        this = ordered_load(astream, yaml.SafeLoader)
+                    else:
+                        this = yaml.safe_load(astream)
+
+                    # IF CONTENT EXISTS IN SETTINGS FILE
+                    if this:
+                        settings = this
+                        arguments["<settingsFile>"] = settingsFile
+                    # IF FILE IS EMPTY
+                    else:
+                        ds = os.getcwd() + "/rubbish.yaml"
+                        print(ds)
+                        level = 0
+                        exists = False
+                        count = 1
+                        while not exists and len(ds) and count < 10:
+                            count += 1
+                            level -= 1
+                            exists = os.path.exists(ds)
+                            print(inspect.stack())
+                            if not exists:
+                                ds = "/".join(inspect.stack()
+                                              [1][1].split("/")[:level]) + "/default_settings.yaml"
+                                print(ds)
+
+                        shutil.copyfile(ds, settingsFile)
                         try:
-                            cmd = """open %(pathToReadFile)s""" % locals()
-                            p = Popen(cmd, stdout=PIPE,
-                                      stderr=PIPE, shell=True)
+
+                            print("4444")
+                            shutil.copyfile(ds, settingsFile)
+                            import codecs
+                            pathToReadFile = settingsFile
+                            try:
+                                readFile = codecs.open(
+                                    pathToReadFile, encoding='utf-8', mode='r')
+                                thisData = readFile.read()
+                                readFile.close()
+                            except IOError as e:
+                                message = 'could not open the file %s' % (
+                                    pathToReadFile,)
+                                raise IOError(message)
+                            thisData = thisData.replace(
+                                "/Users/Dave", os.getenv("HOME"))
+
+                            pathToWriteFile = pathToReadFile
+                            try:
+                                writeFile = codecs.open(
+                                    pathToWriteFile, encoding='utf-8', mode='w')
+                            except IOError as e:
+                                message = 'could not open the file %s' % (
+                                    pathToWriteFile,)
+                                raise IOError(message)
+                            writeFile.write(thisData)
+                            writeFile.close()
+                            print("5555")
+                            print(
+                                "default settings have been added to '%(settingsFile)s'. Tailor these settings before proceeding to run %(projectName)s" % locals())
                         except:
-                            pass
-                        try:
-                            cmd = """start %(pathToReadFile)s""" % locals()
-                            p = Popen(cmd, stdout=PIPE,
-                                      stderr=PIPE, shell=True)
-                        except:
-                            pass
-                    except:
-                        print(
-                            "please add settings to file '%(settingsFile)s'" % locals())
-                    # return
+                            print(
+                                "please add settings to file '%(settingsFile)s'" % locals())
+                        # return
         else:
+            print("5555")
             pass
 
         # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
@@ -564,6 +585,97 @@ class tools(object):
             return False
 
         return None
+
+    def _create_or_verify_settings(
+            self,
+            pathToSettings,
+            create=False):
+        """*create and/or verify a settings file at a given path*
+
+        **Key Arguments:**
+            - ``pathToSettings`` -- path to create/verify
+            - ``create`` -- create the file if it does not exist. Default *False*.
+
+        **Return:**
+            - None
+
+        **Usage:**
+
+        ```python
+        usage code 
+        ```
+
+        ---
+
+        ```eval_rst
+        .. todo::
+
+            - add usage info
+            - create a sublime snippet for usage
+            - write a command-line tool for this method
+            - update package tutorial with command-line tool info if needed
+        ```
+        """
+
+        import codecs
+
+        exists = False
+
+        pathToSettings = os.path.abspath(pathToSettings)
+
+        if os.path.exists(pathToSettings):
+            self.arguments["settingsFile"] = pathToSettings
+            exists = True
+
+        if exists and create:
+            print(f"A settings file already exists at '{pathToSettings}' and has not been modified.")
+
+        if not exists and create:
+            # FIND THE DEAFULT SETTINGS FILE
+            ds = os.getcwd() + "/rubbish.yaml"
+            level = 0
+            exists = False
+            count = 1
+            while not exists and len(ds) and count < 10:
+                count += 1
+                level -= 1
+                exists = os.path.exists(ds)
+                if not exists:
+
+                    ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/default_settings.yaml"
+
+            try:
+                # COPY THE SETTINGS FILE TO THE REQUESTED LOCATION
+                shutil.copyfile(ds, pathToSettings)
+                try:
+                    readFile = codecs.open(
+                        pathToSettings, encoding='utf-8', mode='r')
+                    thisData = readFile.read()
+                    readFile.close()
+                except IOError as e:
+                    message = 'could not open the file %s' % (
+                        pathToReadFile,)
+                    raise IOError(message)
+                thisData = thisData.replace(
+                    "/Users/Dave", os.getenv("HOME"))
+
+                # REWRITE CLEANED FILE
+                try:
+                    writeFile = codecs.open(
+                        pathToSettings, encoding='utf-8', mode='w')
+                except IOError as e:
+                    message = 'could not open the file %s' % (
+                        pathToSettings,)
+                    raise IOError(message)
+                writeFile.write(thisData)
+                writeFile.close()
+                print(
+                    f"Default settings have been added to '{pathToSettings}'. Tailor these settings before proceeding to run {self.projectName}.")
+            except:
+                print(
+                    f"Please add any require settings to file '{pathToSettings}' before proceeding to run {self.projectName}.")
+
+        return exists
 
     # use the tab-trigger below for new method
     # xt-class-method
