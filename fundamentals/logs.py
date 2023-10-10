@@ -10,7 +10,6 @@ from builtins import object
 import os
 import sys
 import logging
-import coloredlogs
 from logging import handlers
 
 
@@ -45,7 +44,6 @@ def console_logger(
 
     import logging
     import logging.config
-    import coloredlogs
     ## THIRD PARTY ##
     import yaml
     try:
