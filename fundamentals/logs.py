@@ -138,7 +138,6 @@ def setup_dryx_logging(yaml_file):
 
     """
     import logging
-    import coloredlogs
     import logging.config
     import yaml
     try:
@@ -159,6 +158,13 @@ def setup_dryx_logging(yaml_file):
     yamlContent = yaml.safe_load(stream)
     stream.close()
 
+    # ADD log.print() LEVEL
+    exists = addLoggingLevel('PRINT', logging.INFO + 5)
+
+    if exists:
+        # SET THE ROOT LOGGER
+        logger = logging.getLogger(__name__)
+        return logger
     # USE THE LOGGING SETTINGS SECTION OF THE SETTINGS DICTIONARY FILE IF THERE IS ONE
     # OTHERWISE ASSUME THE FILE CONTAINS ONLY LOGGING SETTINGS
     if "logging settings" in yamlContent:
@@ -174,31 +180,125 @@ def setup_dryx_logging(yaml_file):
 
     if "root" in yamlContent and "level" in yamlContent["root"]:
         level = yamlContent["root"]["level"]
+    if "handlers" in yamlContent and "console" in yamlContent["handlers"] and "level" in yamlContent["handlers"]["console"]:
+        level = logging.getLevelName(yamlContent["handlers"]["console"]["level"]) - 6
+    if "formatters" in yamlContent and "console_style" in yamlContent["formatters"]:
+        format = yamlContent["formatters"]["console_style"]["format"]
+        dateFmt = yamlContent["formatters"]["console_style"]["datefmt"]
+    else:
+        format = '%(levelname)s: "%(pathname)s", line %(lineno)d, in %(funcName)s > %(message)s'
+        dateFmt = '%H:%M:%S'
 
-    logging.config.dictConfig(yamlContent)
+    addConsole = False
+    if "root" in yamlContent and "handlers" in yamlContent["root"]:
+        if "console" in yamlContent["root"]["handlers"]:
+            addConsole = True
+            yamlContent["root"]["handlers"].remove('console')
+
+    if len(yamlContent["root"]["handlers"]):
+        logging.config.dictConfig(yamlContent)
+
     # SET THE ROOT LOGGER
     logger = logging.getLogger(__name__)
 
+    if addConsole:
+        consoleLog = logging.StreamHandler()
+        consoleLog.set_name("consoleLog")
+        consoleLog.setLevel(level)
+        cf = ColorFormatter()
+        cf.setFormat(format, dateFmt)
+        consoleLog.setFormatter(cf)
+        logger.addHandler(consoleLog)
+
     logging.captureWarnings(True)
 
-    coloredlogs.DEFAULT_FIELD_STYLES = {
-        'asctime': {'color': 'green', 'faint': True},
-        'levelname': {'color': 'white'},
-        'pathname': {'color': 'cyan', 'faint': True},
-        'funcName': {'color': 'magenta', },
-        'lineno': {'color': 'cyan', 'faint': True}
-    }
-    coloredlogs.DEFAULT_LEVEL_STYLES = {
-        'debug': {'color': 'black', 'bright': True},
-        'info': {'color': 'white', 'bright': True},
-        'warning': {'color': 'yellow'},
-        'error': {'color': 'red'},
-        'critical': {'color': 'white', 'background': 'red'}}
-    coloredlogs.install(level=level, logger=logger, fmt=yamlContent[
-                        "formatters"]["console_style"]["format"], datefmt=yamlContent[
-                        "formatters"]["console_style"]["datefmt"])
-
     return logger
+
+
+def addLoggingLevel(levelName, levelNum, methodName=None):
+    """
+    FROM https://stackoverflow.com/questions/2183233/how-to-add-a-custom-loglevel-to-pythons-logging-facility/35804945#35804945
+
+    Comprehensively adds a new logging level to the `logging` module and the
+    currently configured logging class.
+
+    `levelName` becomes an attribute of the `logging` module with the value
+    `levelNum`. `methodName` becomes a convenience method for both `logging`
+    itself and the class returned by `logging.getLoggerClass()` (usually just
+    `logging.Logger`). If `methodName` is not specified, `levelName.lower()` is
+    used.
+
+    To avoid accidental clobberings of existing attributes, this method will
+    raise an `AttributeError` if the level name is already an attribute of the
+    `logging` module or if the method name is already present 
+
+    Example
+    -------
+    >>> addLoggingLevel('TRACE', logging.DEBUG - 5)
+    >>> logging.getLogger(__name__).setLevel("TRACE")
+    >>> logging.getLogger(__name__).trace('that worked')
+    >>> logging.trace('so did this')
+    >>> logging.TRACE
+    5
+
+    """
+    if not methodName:
+        methodName = levelName.lower()
+
+    if hasattr(logging, levelName):
+        return 1
+    if hasattr(logging, methodName):
+        return 1
+    if hasattr(logging.getLoggerClass(), methodName):
+        return 1
+
+    # This method was inspired by the answers to Stack Overflow post
+    # http://stackoverflow.com/q/2183233/2988730, especially
+    # http://stackoverflow.com/a/13638084/2988730
+    def logForLevel(self, message, *args, **kwargs):
+        if self.isEnabledFor(levelNum):
+            self._log(levelNum, message, args, **kwargs)
+
+    def logToRoot(message, *args, **kwargs):
+        logging.log(levelNum, message, *args, **kwargs)
+
+    logging.addLevelName(levelNum, levelName)
+    setattr(logging, levelName, levelNum)
+    setattr(logging.getLoggerClass(), methodName, logForLevel)
+    setattr(logging, methodName, logToRoot)
+    return 0
+
+
+class ColorFormatter(logging.Formatter):
+
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+
+    def setFormat(self, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)", dateFmt='%H:%M:%S'):
+        reset = "\u001b[0m"
+        bold = "\u001b[1m"
+        white = "\u001b[38;5;15m"
+        green = "\u001b[38;5;76m"
+        red = "\u001b[38;5;196m"
+        yellow = "\u001b[38;5;226m"
+        blue = "\u001b[38;5;39m"
+        purple = "\u001b[38;5;56m"
+        grey = "\u001b[38;5;245m"
+        ul = "\u001b[4m"
+
+        self.FORMATS = {
+            logging.PRINT: f"{white}%(message)s{reset}",
+            logging.DEBUG: grey + format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+            logging.INFO: grey + format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+            logging.WARNING: grey + format.replace("%(levelname)s", f"{green}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+            logging.ERROR: grey + format.replace("%(levelname)s", f"{red}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+            logging.CRITICAL: grey + format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+        }
+        self.dateFmt = dateFmt
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, self.dateFmt)
+        return formatter.format(record)
 
 
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
