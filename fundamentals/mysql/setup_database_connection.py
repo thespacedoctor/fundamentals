@@ -6,6 +6,7 @@
 :Author:
     David Young
 """
+from fundamentals import tools
 from builtins import str
 import sys
 import os
@@ -15,7 +16,6 @@ try:
 except:
     pass
 os.environ['TERM'] = 'vt100'
-from fundamentals import tools
 
 
 def setup_database_connection(
@@ -57,7 +57,6 @@ def setup_database_connection(
     """
     import sys
     import logging
-    import coloredlogs
     import pymysql as ms
 
     # IMPORT THE YAML CONNECTION DICTIONARY

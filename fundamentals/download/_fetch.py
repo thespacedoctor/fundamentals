@@ -7,13 +7,13 @@
     David Young
 """
 from __future__ import print_function
+from fundamentals import tools
+import os
+import sys
+from builtins import str
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-import sys
-import os
 os.environ['TERM'] = 'vt100'
-from fundamentals import tools
 
 
 def _fetch(url,):
@@ -29,7 +29,6 @@ def _fetch(url,):
       - ``url`` -- the URL of the document or file, or None if an error occured
       - ``body`` -- the text content of the HTML document.
     """
-    import coloredlogs
     import logging as log
     import socket
     from eventlet import Timeout

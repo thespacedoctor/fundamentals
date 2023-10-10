@@ -17,7 +17,6 @@ install_requires = [
     'docopt',
     'psutil',
     'python-dateutil',
-    'coloredlogs',
     'requests',
     'python-daemon'
 ]
