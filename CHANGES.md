@@ -4,7 +4,7 @@
 **v2.6.0 - October 10, 2023**
 
 * **ENHANCEMENT:** a print logger level has been added (lives between info and warning logs). To convert a `print()` statement, simply prefix it with `log.`, i.e. `log.print()`.
-* **REFACTOR:** logging in now coloured 'in house' without the need of the colorlog package
+* **REFACTOR:** logging in now coloured 'in house' without the need of the coloredlogs package
 
 **v2.5.1 - September 29, 2023**
 
