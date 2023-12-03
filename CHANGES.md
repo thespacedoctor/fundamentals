@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.6.1 - December 3, 2023**
+
+* **FIXED** fixing logging colours for white terminal backgrounds
+
 **v2.6.0 - October 10, 2023**
 
 * **ENHANCEMENT:** a print logger level has been added (lives between info and warning logs). To convert a `print()` statement, simply prefix it with `log.`, i.e. `log.print()`.
