@@ -284,12 +284,12 @@ class ColorFormatter(logging.Formatter):
         ul = "\u001b[4m"
 
         self.FORMATS = {
-            logging.PRINT: f"{white}%(message)s{reset}",
-            logging.DEBUG: grey + format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
-            logging.INFO: grey + format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
-            logging.WARNING: grey + format.replace("%(levelname)s", f"{green}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
-            logging.ERROR: grey + format.replace("%(levelname)s", f"{red}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
-            logging.CRITICAL: grey + format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}{grey}").replace("%(message)s", f"{white}%(message)s{reset}{grey}").replace("%(pathname)s", f"{ul}%(pathname)s{reset}{grey}") + reset,
+            logging.PRINT: f"%(message)s",
+            logging.DEBUG: format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
+            logging.INFO: format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
+            logging.WARNING: format.replace("%(levelname)s", f"{green}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
+            logging.ERROR: format.replace("%(levelname)s", f"{red}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
+            logging.CRITICAL: format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
         }
         self.dateFmt = dateFmt
 
