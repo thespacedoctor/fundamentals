@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.6.2 - January 19, 2024**
+
+* **FIXED** bug fix in collecting settings files from the default location
+
 **v2.6.1 - December 3, 2023**
 
 * **FIXED** fixing logging colours for white terminal backgrounds
