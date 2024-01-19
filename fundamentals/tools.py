@@ -247,7 +247,8 @@ class tools(object):
                     # CREATE SETTING IN DEFAULT SETTINGS LOCATION IF NONE EXIST
                     if not exists:
                         exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=True)
-            stream = open(self.arguments["settingsFile"], 'r')
+            if "settingsFile" in self.arguments and self.arguments["settingsFile"]:
+                stream = open(self.arguments["settingsFile"], 'r')
         else:
             pass
 
