@@ -36,10 +36,10 @@ If you use `fundamentals` in your work, please cite using the following BibTeX e
 ```bibtex
 @software{Young_fundamentals,
     author = {Young, David R.},
-    doi = {10.5281/zenodo.8037510},
+    doi = {10.5281/zenodo.8037509},
     license = {GPL-3.0-only},
-    title = {{fundamentals}},
-    url = {https://github.com/thespacedoctor/fundamentals}
+    title = {{fundamentals. Fundamental tools required by most self-respecting python-packages bundled in one place}},
+    url = {https://zenodo.org/doi/10.5281/zenodo.8037509}
 }
 ```
 
