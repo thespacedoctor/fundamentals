@@ -1,9 +1,7 @@
 # fundamentals
 
 
-[![](https://zenodo.org/badge/52598459.svg)](https://zenodo.org/badge/latestdoi/52598459) 
-
-
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.8037509.svg)](https://zenodo.org/doi/10.5281/zenodo.8037509) 
 
 <!-- INFO BADGES -->  
 
