@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.6.3 - April 6, 2024**
+
+* **FIXED** fixing 'insert_list_of_dictionaries_into_database_tables' for MySQL 8
+
 **v2.6.2 - January 19, 2024**
 
 * **FIXED** bug fix in collecting settings files from the default location
