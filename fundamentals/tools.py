@@ -140,6 +140,7 @@ class tools(object):
         self.logLevel = logLevel
         self.configSettingsPath = os.getenv("HOME") + f"/.config/{projectName}/{projectName}.yaml"
         self.projectName = projectName
+        self.defaultSettingsFile = defaultSettingsFile
 
         if not distributionName:
             distributionName = projectName
@@ -540,8 +541,10 @@ class tools(object):
                 level -= 1
                 exists = os.path.exists(ds)
                 if not exists:
-
-                    ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/default_settings.yaml"
+                    if isinstance(self.defaultSettingsFile, bool):
+                        ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/default_settings.yaml"
+                    else:
+                        ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/" + self.defaultSettingsFile
 
             try:
                 # COPY THE SETTINGS FILE TO THE REQUESTED LOCATION
