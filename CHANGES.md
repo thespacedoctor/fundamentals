@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.0 - May 31, 2024**
+
+* **FEATURE:** progress bar added to multiprocessing
+
 **v2.6.3 - April 6, 2024**
 
 * **FIXED** fixing 'insert_list_of_dictionaries_into_database_tables' for MySQL 8
