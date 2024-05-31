@@ -1,3 +1,4 @@
+
 #!/usr/local/bin/python
 # encoding: utf-8
 """
@@ -23,6 +24,8 @@ def fmultiprocess(
         poolSize=False,
         timeout=3600,
         turnOffMP=False,
+        progressBar=False,
+        mute=False,
         **kwargs):
     """multiprocess pool
 
@@ -34,6 +37,8 @@ def fmultiprocess(
     - ``poolSize`` -- limit the number of CPU that are used in multiprocess job
     - ``timeout`` -- time in sec after which to raise a timeout error if the processes have not completed
     - ``turnOffMP`` -- turn off multiprocessing. Useful for profiling and debugging. Default **False**
+    - ``progressBar`` -- add a progress bar
+    - ``mute`` -- mute terminal output from child processes
 
 
     **Return**
@@ -54,6 +59,9 @@ def fmultiprocess(
     """
     log.debug('starting the ``multiprocess`` function')
 
+    import multiprocess as mp
+    import time
+
     logFound = False
     # PYTHON 3 VS 2 ..
     try:
@@ -65,18 +73,43 @@ def fmultiprocess(
 
     if turnOffMP == False:
         import psutil
-        # import multiprocess as mp
-        # mp.set_start_method('forkserver')
         from multiprocess import cpu_count, Pool
+        from ctypes import c_int32
 
         # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
         if not poolSize:
             poolSize = psutil.cpu_count()
 
-        if poolSize:
-            p = Pool(processes=poolSize)
+        if mute:
+            # MUTE STDOUT AND PRINTING TO TERMINAL
+            def startFunc(log, l, c):
+                global counter_lock
+                global counter
+                counter = c
+                counter_lock = l
+                import logging
+                streamHandlers = [
+                    h for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                streamHandlersLevel = [
+                    h.level for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                [h.setLevel(logging.WARNING) for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                sys.stdout = open(os.devnull, 'w')
         else:
-            p = Pool()
+            def startFunc(log, l, c):
+                global counter_lock
+                global counter
+                counter = c
+                counter_lock = l
+                pass
+
+        # COUNTER AND LOCK FOR PROGRESS BAR
+        c = mp.Value(c_int32)
+        l = mp.Lock()
+
+        if poolSize:
+            p = Pool(processes=poolSize, initializer=startFunc, initargs=(log, l, c))
+        else:
+            p = Pool(initializer=mute, initargs=(log, l, c))
 
         cpuCount = psutil.cpu_count()
         chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
@@ -84,16 +117,50 @@ def fmultiprocess(
         if chunksize == 0:
             chunksize = 1
 
-        # chunksize = 1
-        # MAP-REDUCE THE WORK OVER MULTIPLE CPU CORES
+        def thisFunction(
+                p):
+
+            result = mapfunc(p)
+
+            # WE CAN DO SOMETHING ELSE AFTER RUNNING OF SINGLE FUNCTIONS
+            with counter_lock:
+                counter.value += 1
+
+            return result
+
         if logFound:
             mapfunc = partial(function, log=log, **kwargs)
-            resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
         else:
             mapfunc = partial(function, **kwargs)
-            resultArray = p.map_async(mapfunc, inputArray, chunksize=chunksize)
 
-        resultArray = resultArray.get(timeout=timeout)
+        if not timeout:
+            # 3 DAYS
+            timeout = 60 * 60 * 24 * 3
+        start_time = time.time()
+
+        futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
+        if progressBar:
+            import tqdm
+            with tqdm.tqdm(total=len(inputArray)) as pbar:
+                with p as pool:
+                    while not futureArray.ready():
+                        current_time = time.time()
+                        if current_time > start_time + timeout:
+                            raise TimeoutError(f"The timeout limit of {timeout}s has been reached")
+                        if c.value != 0:
+                            with l:
+                                increment = c.value
+                                c.value = 0
+                            pbar.update(n=increment)
+                        time.sleep(1)
+                    if c.value != 0:
+                        with l:
+                            increment = c.value
+                            c.value = 0
+                        pbar.update(n=increment)
+                    resultArray = futureArray.get()
+
+        resultArray = futureArray.get(timeout=timeout)
 
         p.close()
         p.join()
@@ -104,7 +171,7 @@ def fmultiprocess(
 
         if logFound:
             for i in inputArray:
-                r = function(log, i, **kwargs)
+                r = function(i, log=log, ** kwargs)
                 resultArray.append(r)
         else:
             for i in inputArray:

@@ -357,3 +357,6 @@ class emptyLogger(object):
 
     def warning(self, argu):
         pass
+
+    def print(self, argu):
+        pass
