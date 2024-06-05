@@ -7,7 +7,7 @@
 
 [![](https://img.shields.io/pypi/pyversions/fundamentals)](https://pypi.org/project/fundamentals/)
 [![](https://img.shields.io/pypi/v/fundamentals)](https://pypi.org/project/fundamentals/)
-[![](https://img.shields.io/conda/vn/conda-forge/fundamentals.svg)](https://anaconda.org/conda-forge/fundamentals)
+[![](https://img.shields.io/conda/vn/conda-forge/fundamentals)](https://anaconda.org/conda-forge/fundamentals)
 [![](https://pepy.tech/badge/fundamentals)](https://pepy.tech/project/fundamentals)
 [![](https://img.shields.io/github/license/thespacedoctor/fundamentals)](https://github.com/thespacedoctor/fundamentals)
 
