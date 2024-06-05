@@ -31,15 +31,7 @@ Documentation for fundamentals is hosted by [Read the Docs](https://fundamentals
 
 If you use `fundamentals` in your work, please cite using the following BibTeX entry: 
 
-```bibtex
-@software{Young_fundamentals,
-    author = {Young, David R.},
-    doi = {10.5281/zenodo.8037509},
-    license = {GPL-3.0-only},
-    title = {{fundamentals. Fundamental tools required by most self-respecting python-packages bundled in one place}},
-    url = {https://zenodo.org/doi/10.5281/zenodo.8037509}
-}
-```
+
 
 
  
