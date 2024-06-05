@@ -24,7 +24,9 @@ Classes
    :toctree: _autosummary
    :nosignatures:
 
+   fundamentals.daemonise
    fundamentals.files.fileChunker
+   fundamentals.logs.ColorFormatter
    fundamentals.logs.GroupWriteRotatingFileHandler
    fundamentals.logs.emptyLogger
    fundamentals.mysql.database
@@ -51,6 +53,7 @@ Functions
    fundamentals.files.recursive_directory_listing
    fundamentals.files.tag
    fundamentals.fmultiprocess
+   fundamentals.logs.addLoggingLevel
    fundamentals.logs.console_logger
    fundamentals.logs.setup_dryx_logging
    fundamentals.mysql.convert_dictionary_to_mysql_table

@@ -1,9 +1,9 @@
-﻿emptyLogger *(class)*
-=======================================
+﻿ColorFormatter *(class)*
+==========================================
 
 .. currentmodule:: fundamentals.logs
 
-.. autoclass:: emptyLogger
+.. autoclass:: ColorFormatter
    :members:
    :show-inheritance:
    :inherited-members:
@@ -19,27 +19,35 @@
         
    
         
-            ~emptyLogger.critical
+            ~ColorFormatter.converter
        
    
         
-            ~emptyLogger.debug
+            ~ColorFormatter.format
        
    
         
-            ~emptyLogger.error
+            ~ColorFormatter.formatException
        
    
         
-            ~emptyLogger.info
+            ~ColorFormatter.formatMessage
        
    
         
-            ~emptyLogger.print
+            ~ColorFormatter.formatStack
        
    
         
-            ~emptyLogger.warning
+            ~ColorFormatter.formatTime
+       
+   
+        
+            ~ColorFormatter.setFormat
+       
+   
+        
+            ~ColorFormatter.usesTime
        
    
    .. 
@@ -92,6 +100,18 @@
    ..     
    .. 
    ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   .. 
+   ..     
+   ..          ~ColorFormatter.default_msec_format
+   ..      
+   .. 
+   ..     
+   ..          ~ColorFormatter.default_time_format
+   ..      
    .. 
    ..     
    .. 
@@ -110,6 +130,15 @@
    
    
 
+   
+   
+   .. rubric:: Properties
+
+   .. autosummary::
+   
+      ~ColorFormatter.default_msec_format
+   
+      ~ColorFormatter.default_time_format
    
    
    

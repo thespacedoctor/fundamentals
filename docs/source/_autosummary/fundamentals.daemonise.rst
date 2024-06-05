@@ -1,9 +1,9 @@
-﻿tools *(class)*
-============================
+﻿daemonise *(class)*
+================================
 
 .. currentmodule:: fundamentals
 
-.. autoclass:: tools
+.. autoclass:: daemonise
    :members:
    :show-inheritance:
    :inherited-members:
@@ -19,7 +19,27 @@
         
    
         
-            ~tools.setup
+            ~daemonise.action
+       
+   
+        
+            ~daemonise.cleanup
+       
+   
+        
+            ~daemonise.restart
+       
+   
+        
+            ~daemonise.start
+       
+   
+        
+            ~daemonise.status
+       
+   
+        
+            ~daemonise.stop
        
    
    .. 
@@ -76,16 +96,14 @@
    ..     
    .. 
    ..     
-   ..          ~tools._checkServer
-   ..      
    .. 
    ..     
-   ..          ~tools._create_or_verify_settings
-   ..      
    .. 
    ..     
-   ..          ~tools._setup_tunnel
-   ..      
+   .. 
+   ..     
+   .. 
+   ..     
    .. 
    ..     
    .. 
