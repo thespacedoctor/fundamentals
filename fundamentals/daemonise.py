@@ -83,12 +83,12 @@ class daemonise():
             **akws
     ):
         self.log = log
-        log.debug("instansiating a new 'daemonise' object")
+        log.debug("instantiating a new 'daemonise' object")
 
         # MAKE ROOT DIR
         from os.path import expanduser
         home = expanduser("~")
-        self.rootDir = home + "/.config/gocart/"
+        self.rootDir = home + f"/.config/{name}/"
         if not os.path.exists(self.rootDir):
             os.makedirs(self.rootDir)
 
@@ -110,13 +110,31 @@ class daemonise():
         from daemon import pidfile
         import daemon
 
+        running = False
         if os.path.exists(self.pidFile):
             with open(self.pidFile, mode='r') as f:
-                pid = f.read().strip()
-                print(f"{self.name} is already running (PID = {pid}).")
-        else:
+                pid = int(f.read().strip())
+                try:
+                    os.kill(pid, 0)
+                except OSError:
+                    os.remove(self.pidFile)
+                else:
+                    running = True
+                    print(f"{self.name} is already running (PID = {pid}).")
+
+        if not running:
             print(f"{self.name} has been started.")
             print(f"The logs can be found here: {self.rootDir}")
+
+            try:
+                os.remove(self.outLog)
+            except:
+                pass
+            try:
+                os.remove(self.errLog)
+            except:
+                pass
+
             with daemon.DaemonContext(
                 working_directory=self.rootDir,
                 umask=0o002,
@@ -174,7 +192,10 @@ class daemonise():
         if os.path.exists(self.pidFile):
             with open(self.pidFile, mode='r') as f:
                 pid = f.read().strip()
-            os.kill(int(pid), signal.SIGTERM)
+            try:
+                os.kill(int(pid), signal.SIGTERM)
+            except:
+                os.remove(self.pidFile)
             print(f"{self.name} has been stopped.")
         else:
             print(f"{self.name} is not running.")
@@ -190,8 +211,14 @@ class daemonise():
 
         if os.path.exists(self.pidFile):
             with open(self.pidFile, mode='r') as f:
-                pid = f.read().strip()
-            print(f"{self.name} is running (PID = {pid}).")
+                pid = int(f.read().strip())
+            try:
+                os.kill(pid, 0)
+            except OSError:
+                os.remove(self.pidFile)
+                print(f"{self.name} is not running.")
+            else:
+                print(f"{self.name} is running (PID = {pid}).")
         else:
             print(f"{self.name} is not running.")
 
