@@ -120,11 +120,11 @@ class daemonise():
                     os.remove(self.pidFile)
                 else:
                     running = True
-                    print(f"{self.name} is already running (PID = {pid}).")
+                    print(f"{self.name} daemon is already running (PID = {pid}).")
 
         if not running:
-            print(f"{self.name} has been started.")
-            print(f"The logs can be found here: {self.rootDir}")
+            print(f"{self.name} daemon has been started.")
+            print(f"The daemon logs can be found here: {self.rootDir}")
 
             try:
                 os.remove(self.outLog)
@@ -160,7 +160,7 @@ class daemonise():
         now = datetime.now()
         now = now.strftime("%Y%m%dt%H%M%S")
 
-        print(f"{self.name} stopped at {now}")
+        print(f"{self.name} daemon stopped at {now}")
         sys.exit(0)
 
         self.log.debug('completed the ``cleanup`` method')
@@ -196,9 +196,9 @@ class daemonise():
                 os.kill(int(pid), signal.SIGTERM)
             except:
                 os.remove(self.pidFile)
-            print(f"{self.name} has been stopped.")
+            print(f"{self.name} daemon has been stopped.")
         else:
-            print(f"{self.name} is not running.")
+            print(f"{self.name} daemon is not running.")
 
         self.log.debug('completed the ``stop`` method')
         return None
@@ -216,11 +216,11 @@ class daemonise():
                 os.kill(pid, 0)
             except OSError:
                 os.remove(self.pidFile)
-                print(f"{self.name} is not running.")
+                print(f"{self.name} daemon is not running.")
             else:
-                print(f"{self.name} is running (PID = {pid}).")
+                print(f"{self.name} daemon is running (PID = {pid}).")
         else:
-            print(f"{self.name} is not running.")
+            print(f"{self.name} daemon is not running.")
 
         self.log.debug('completed the ``status`` method')
         return None

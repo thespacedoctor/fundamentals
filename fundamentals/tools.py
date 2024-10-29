@@ -51,6 +51,7 @@ class tools(object):
     - ``distributionName`` -- the distribution name if different from the projectName (i.e. if the package is called by another name on PyPi). Default *False*
     - ``tunnel`` -- will setup a ssh tunnel (if the settings are found in the settings file). Default *False*.
     - ``defaultSettingsFile`` -- if no settings file is passed via the doc-string, look for a settings file first in the PWD or use the default settings file in ``~/.config/projectName/projectName.yaml`` (don't have to clutter command-line with settings)
+    - ``createLogger`` -- create a logger for the project (Default is True)
 
     **Usage**
 
@@ -133,7 +134,8 @@ class tools(object):
             distributionName=False,
             orderedSettings=False,
             defaultSettingsFile=False,
-            quitIfRunning=True
+            quitIfRunning=True,
+            createLogger=True
     ):
         self.arguments = arguments
         self.docString = docString
@@ -141,6 +143,7 @@ class tools(object):
         self.configSettingsPath = os.getenv("HOME") + f"/.config/{projectName}/{projectName}.yaml"
         self.projectName = projectName
         self.defaultSettingsFile = defaultSettingsFile
+        self.createLogger = createLogger
 
         if not distributionName:
             distributionName = projectName
@@ -270,41 +273,46 @@ class tools(object):
         else:
             settings = {**advs, **settings}
 
-        # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
-        # SETTINGS
-        if 'settings' in locals() and "logging settings" in settings:
-            if "settingsFile" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["settingsFile"]
-                )
-            elif "<settingsFile>" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["<settingsFile>"]
-                )
-            elif "<pathToSettingsFile>" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["<pathToSettingsFile>"]
-                )
-            elif "--settingsFile" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["--settingsFile"]
-                )
-            elif "pathToSettingsFile" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["pathToSettingsFile"]
+        if self.createLogger:
+
+            # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
+            # SETTINGS
+            if 'settings' in locals() and "logging settings" in settings:
+                if "settingsFile" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["settingsFile"]
+                    )
+                elif "<settingsFile>" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["<settingsFile>"]
+                    )
+                elif "<pathToSettingsFile>" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["<pathToSettingsFile>"]
+                    )
+                elif "--settingsFile" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["--settingsFile"]
+                    )
+                elif "pathToSettingsFile" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["pathToSettingsFile"]
+                    )
+
+                elif "--settings" in self.arguments:
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["--settings"]
+                    )
+
+            elif "--logger" not in self.arguments or self.arguments["--logger"] is None:
+                log = dl.console_logger(
+                    level=self.logLevel
                 )
 
-            elif "--settings" in self.arguments:
-                log = dl.setup_dryx_logging(
-                    yaml_file=self.arguments["--settings"]
-                )
+            self.log = log
 
-        elif "--logger" not in self.arguments or self.arguments["--logger"] is None:
-            log = dl.console_logger(
-                level=self.logLevel
-            )
-
-        self.log = log
+        else:
+            self.log = None
 
         # unpack remaining cl arguments using `exec` to setup the variable names
         # automatically
