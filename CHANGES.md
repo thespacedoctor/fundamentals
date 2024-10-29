@@ -1,9 +1,14 @@
 
 ## Release Notes
 
+**v2.7.2 - October 29, 2024**
+
+* **REFACTOR:** allow for 'tools' to optionally create a logger
+* **REFACTOR:** better messaging for daemon start/stop/status
+
 **v2.7.1 - October 28, 2024**
 
-* **FIXED** daemon PID file remaining even if code had crashed
+* **FIXED** daemon PID file remaining even if code had crashed	
 
 **v2.7.0 - May 31, 2024**
 
