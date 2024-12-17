@@ -406,6 +406,13 @@ def _add_dictlist_to_database_via_load_in_file(
         dbConn=dbConn
     )
 
+    sqlQuery = """ALTER TEMPORARY TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
+    writequery(
+        log=log,
+        sqlQuery=sqlQuery,
+        dbConn=dbConn
+    )
+
     csvColumns = [k for d in dictList for k in list(d.keys())]
     csvColumns = list(set(csvColumns))
     csvColumnsString = ('`, `').join(csvColumns)
