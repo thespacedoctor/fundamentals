@@ -406,7 +406,7 @@ def _add_dictlist_to_database_via_load_in_file(
         dbConn=dbConn
     )
 
-    sqlQuery = """ALTER TEMPORARY TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
+    sqlQuery = """ALTER TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
     writequery(
         log=log,
         sqlQuery=sqlQuery,
