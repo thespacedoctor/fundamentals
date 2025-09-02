@@ -150,10 +150,10 @@ class tools(object):
 
         version = '0.0.1'
         try:
-            import pkg_resources
-            version = pkg_resources.get_distribution(distributionName).version
-        except:
-            pass
+            from importlib.metadata import version as get_version
+        except ImportError:  # For Python < 3.8
+            from importlib_metadata import version as get_version
+        version = get_version(distributionName)
 
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
