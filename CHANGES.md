@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.3 - September 2, 2025**
+
+* **FIXED:** adding a fix to read version of new codebases.
+
 **v2.7.2 - October 29, 2024**
 
 * **REFACTOR:** allow for 'tools' to optionally create a logger
