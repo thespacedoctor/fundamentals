@@ -153,7 +153,10 @@ class tools(object):
             from importlib.metadata import version as get_version
         except ImportError:  # For Python < 3.8
             from importlib_metadata import version as get_version
-        version = get_version(distributionName)
+        try:
+            version = get_version(distributionName)
+        except:
+            version = '?'
 
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
