@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.4 - September 3, 2025**
+
+* **FIXED:** adding a fix to read version of new codebases (more robust).
+
 **v2.7.3 - September 2, 2025**
 
 * **FIXED:** adding a fix to read version of new codebases.
