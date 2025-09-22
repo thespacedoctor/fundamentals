@@ -62,6 +62,8 @@ def fmultiprocess(
     import multiprocess as mp
     import time
 
+    # mp.set_start_method('spawn', force=True)
+
     logFound = False
     # PYTHON 3 VS 2 ..
     try:
@@ -92,7 +94,8 @@ def fmultiprocess(
                     h for h in log.handlers if not isinstance(h, logging.FileHandler)]
                 streamHandlersLevel = [
                     h.level for h in log.handlers if not isinstance(h, logging.FileHandler)]
-                [h.setLevel(logging.WARNING) for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                [h.setLevel(logging.WARNING) for h in log.handlers if not isinstance(
+                    h, logging.FileHandler)]
                 sys.stdout = open(os.devnull, 'w')
         else:
             def startFunc(log, l, c):
@@ -107,7 +110,8 @@ def fmultiprocess(
         l = mp.Lock()
 
         if poolSize:
-            p = Pool(processes=poolSize, initializer=startFunc, initargs=(log, l, c))
+            p = Pool(processes=poolSize, initializer=startFunc,
+                     initargs=(log, l, c))
         else:
             p = Pool(initializer=mute, initargs=(log, l, c))
 
@@ -138,7 +142,8 @@ def fmultiprocess(
             timeout = 60 * 60 * 24 * 3
         start_time = time.time()
 
-        futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
+        futureArray = p.map_async(
+            thisFunction, inputArray, chunksize=chunksize)
         if progressBar:
             import tqdm
             with tqdm.tqdm(total=len(inputArray)) as pbar:
@@ -146,7 +151,8 @@ def fmultiprocess(
                     while not futureArray.ready():
                         current_time = time.time()
                         if current_time > start_time + timeout:
-                            raise TimeoutError(f"The timeout limit of {timeout}s has been reached")
+                            raise TimeoutError(
+                                f"The timeout limit of {timeout}s has been reached")
                         if c.value != 0:
                             with l:
                                 increment = c.value

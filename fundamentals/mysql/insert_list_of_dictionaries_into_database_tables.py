@@ -396,7 +396,11 @@ def _add_dictlist_to_database_via_load_in_file(
     ).connect()
 
     now = datetime.now()
-    tmpTable = now.strftime("tmp_%Y%m%dt%H%M%S%f")
+
+    import random
+    rand = random.randint(0, 10000)
+
+    tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
 
     # CREATE A TEMPORY TABLE TO ADD DATA TO
     sqlQuery = """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;""" % locals()
