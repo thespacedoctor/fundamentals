@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.5 - September 22, 2025**
+
+* **FIXED:** small fix to writing mysql tables to tmp tables with multiprocessing
+
 **v2.7.4 - September 3, 2025**
 
 * **FIXED:** adding a fix to read version of new codebases (more robust).
