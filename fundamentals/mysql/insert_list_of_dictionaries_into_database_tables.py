@@ -465,10 +465,10 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         dbConn=dbConn
     )
 
-    try:
-        os.remove('/tmp/%(tmpTable)s' % locals())
-    except:
-        pass
+    # try:
+    #     os.remove('/tmp/%(tmpTable)s' % locals())
+    # except:
+    #     pass
 
     dbConn.close()
 
