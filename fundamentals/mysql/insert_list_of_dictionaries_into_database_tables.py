@@ -424,7 +424,7 @@ def _add_dictlist_to_database_via_load_in_file(
     csvColumnsString = csvColumnsString.replace(u'`dec`', u'`decl`')
 
     df = pd.DataFrame(dictList)
-    df.replace(['nan', 'None', '', 'NaN', np.nan], '\\N', inplace=True)
+    df.replace(['nan', 'None', '', 'NaN', np.nan, None], '\N', inplace=True)
     df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|",
               index=False, escapechar="\\", quotechar='"', columns=csvColumns, encoding='utf-8')
 
