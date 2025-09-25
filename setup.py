@@ -18,7 +18,8 @@ install_requires = [
     'psutil',
     'python-dateutil',
     'requests',
-    'python-daemon'
+    'python-daemon',
+    'tqdm'
 ]
 
 # READ THE DOCS SERVERS
