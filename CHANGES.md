@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.6 - September 25, 2025**
+
+* **FIXED:** adding tqdm to setup
+
 **v2.7.5 - September 22, 2025**
 
 * **FIXED:** small fix to writing mysql tables to tmp tables with multiprocessing
