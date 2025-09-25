@@ -424,9 +424,9 @@ def _add_dictlist_to_database_via_load_in_file(
     csvColumnsString = csvColumnsString.replace(u'`dec`', u'`decl`')
 
     df = pd.DataFrame(dictList)
-    df.replace(['nan', 'None', '', 'NaN', np.nan, None], '\N', inplace=True)
+    df.replace(['nan', 'None', '', 'NaN', np.nan, None], "\\N", inplace=True)
     df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|",
-              index=False, escapechar="\\", quotechar='"', columns=csvColumns, encoding='utf-8')
+              index=False, quotechar='"', columns=csvColumns, encoding='utf-8')
 
     sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
 INTO TABLE %(tmpTable)s
@@ -465,10 +465,10 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         dbConn=dbConn
     )
 
-    try:
-        os.remove('/tmp/%(tmpTable)s' % locals())
-    except:
-        pass
+    # try:
+    #     os.remove('/tmp/%(tmpTable)s' % locals())
+    # except:
+    #     pass
 
     dbConn.close()
 
