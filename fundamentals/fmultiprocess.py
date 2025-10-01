@@ -73,6 +73,16 @@ def fmultiprocess(
         if "log" in inspect.getargspec(function)[0]:
             logFound = True
 
+    import psutil
+    import os
+
+    global theseBatches
+
+    process = psutil.Process(os.getpid())
+    memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
+    log.info(
+        f"CHILD: Python is using {memory_usage:.2f} MB of memory at this point.")
+
     if turnOffMP == False:
         import psutil
         from multiprocess import cpu_count, Pool
