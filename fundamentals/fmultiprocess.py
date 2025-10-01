@@ -11,8 +11,6 @@ from __future__ import division
 from line_profiler import profile
 import inspect
 from functools import partial
-from fundamentals import tools
-from past.utils import old_div
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -66,24 +64,12 @@ def fmultiprocess(
 
     # mp.set_start_method('spawn', force=True)
 
-    logFound = False
-    # PYTHON 3 VS 2 ..
-    try:
-        if "log" in inspect.getfullargspec(function)[0]:
-            logFound = True
-    except:
-        if "log" in inspect.getargspec(function)[0]:
-            logFound = True
+    logFound = "log" in inspect.signature(function).parameters
 
     import psutil
     import os
 
     global theseBatches
-
-    process = psutil.Process(os.getpid())
-    memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
-    print(
-        f"PARENT {os.getpid()}: Python is using {memory_usage:.2f} MB of memory at this point.")
 
     if turnOffMP == False:
         import psutil
@@ -125,10 +111,10 @@ def fmultiprocess(
             p = Pool(processes=poolSize, initializer=startFunc,
                      initargs=(log, l, c))
         else:
-            p = Pool(initializer=mute, initargs=(log, l, c))
+            p = Pool(initializer=startFunc, initargs=(log, l, c))
 
         cpuCount = psutil.cpu_count()
-        chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
+        chunksize = max(1, (len(inputArray) + 1) // (cpuCount * 3))
 
         if chunksize == 0:
             chunksize = 1
@@ -150,8 +136,8 @@ def fmultiprocess(
             mapfunc = partial(function, **kwargs)
 
         if not timeout:
-            # 3 DAYS
-            timeout = 60 * 60 * 24 * 3
+            # 3 HRS
+            timeout = 60 * 60 * 3
         start_time = time.time()
 
         futureArray = p.map_async(
@@ -171,17 +157,17 @@ def fmultiprocess(
                                 c.value = 0
                             pbar.update(n=increment)
                         time.sleep(1)
-                        memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
-                        print(
-                            f"PARENT {os.getpid()}: Python is using {memory_usage:.2f} MB of memory at this point.")
                     if c.value != 0:
                         with l:
                             increment = c.value
                             c.value = 0
                         pbar.update(n=increment)
-                    resultArray = futureArray.get()
 
-        resultArray = futureArray.get(timeout=timeout)
+        try:
+            resultArray = futureArray.get(timeout=timeout)
+        except Exception as e:
+            log.error(f"Multiprocessing error: {e}")
+            raise
 
         p.close()
         p.join()
