@@ -8,6 +8,7 @@
     David Young
 """
 from __future__ import division
+from line_profiler import profile
 import inspect
 from functools import partial
 from fundamentals import tools
@@ -17,6 +18,7 @@ import os
 os.environ['TERM'] = 'vt100'
 
 
+@profile
 def fmultiprocess(
         log,
         function,
@@ -81,7 +83,7 @@ def fmultiprocess(
     process = psutil.Process(os.getpid())
     memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
     print(
-        f"CHILD: Python is using {memory_usage:.2f} MB of memory at this point.")
+        f"PARENT {os.getpid()}: Python is using {memory_usage:.2f} MB of memory at this point.")
 
     if turnOffMP == False:
         import psutil
@@ -169,6 +171,9 @@ def fmultiprocess(
                                 c.value = 0
                             pbar.update(n=increment)
                         time.sleep(1)
+                        memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
+                        print(
+                            f"PARENT {os.getpid()}: Python is using {memory_usage:.2f} MB of memory at this point.")
                     if c.value != 0:
                         with l:
                             increment = c.value
