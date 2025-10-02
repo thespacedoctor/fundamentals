@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.7 - October 2, 2025**
+
+* **REFACTOR:** updates to multiprocessing code
+
 **v2.7.6 - September 25, 2025**
 
 * **FIXED:** adding tqdm to setup
