@@ -7,12 +7,8 @@
 :Author:
     David Young
 """
-from __future__ import division
-import inspect
-from functools import partial
-from fundamentals import tools
-from past.utils import old_div
-import sys
+
+
 import os
 os.environ['TERM'] = 'vt100'
 
@@ -61,27 +57,15 @@ def fmultiprocess(
 
     import multiprocess as mp
     import time
-
-    # mp.set_start_method('spawn', force=True)
-
-    logFound = False
-    # PYTHON 3 VS 2 ..
-    try:
-        if "log" in inspect.getfullargspec(function)[0]:
-            logFound = True
-    except:
-        if "log" in inspect.getargspec(function)[0]:
-            logFound = True
-
+    import inspect
+    from functools import partial
     import psutil
     import os
+    import sys
+
+    logFound = "log" in inspect.signature(function).parameters
 
     global theseBatches
-
-    process = psutil.Process(os.getpid())
-    memory_usage = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
-    log.info(
-        f"CHILD: Python is using {memory_usage:.2f} MB of memory at this point.")
 
     if turnOffMP == False:
         import psutil
@@ -123,10 +107,10 @@ def fmultiprocess(
             p = Pool(processes=poolSize, initializer=startFunc,
                      initargs=(log, l, c))
         else:
-            p = Pool(initializer=mute, initargs=(log, l, c))
+            p = Pool(initializer=startFunc, initargs=(log, l, c))
 
         cpuCount = psutil.cpu_count()
-        chunksize = int(old_div((len(inputArray) + 1), (cpuCount * 3)))
+        chunksize = max(1, (len(inputArray) + 1) // (cpuCount * 3))
 
         if chunksize == 0:
             chunksize = 1
@@ -148,8 +132,8 @@ def fmultiprocess(
             mapfunc = partial(function, **kwargs)
 
         if not timeout:
-            # 3 DAYS
-            timeout = 60 * 60 * 24 * 3
+            # 1 HRS
+            timeout = 60 * 60
         start_time = time.time()
 
         futureArray = p.map_async(
@@ -157,30 +141,31 @@ def fmultiprocess(
         if progressBar:
             import tqdm
             with tqdm.tqdm(total=len(inputArray)) as pbar:
-                with p as pool:
-                    while not futureArray.ready():
-                        current_time = time.time()
-                        if current_time > start_time + timeout:
-                            raise TimeoutError(
-                                f"The timeout limit of {timeout}s has been reached")
-                        if c.value != 0:
-                            with l:
-                                increment = c.value
-                                c.value = 0
-                            pbar.update(n=increment)
-                        time.sleep(1)
+                while not futureArray.ready():
+                    current_time = time.time()
+                    if current_time > start_time + timeout:
+                        raise TimeoutError(
+                            f"The timeout limit of {timeout}s has been reached")
                     if c.value != 0:
                         with l:
                             increment = c.value
                             c.value = 0
                         pbar.update(n=increment)
-                    resultArray = futureArray.get()
+                    time.sleep(0.5)
+                if c.value != 0:
+                    with l:
+                        increment = c.value
+                        c.value = 0
+                    pbar.update(n=increment)
 
-        resultArray = futureArray.get(timeout=timeout)
+        try:
+            resultArray = futureArray.get(timeout=timeout)
+        except Exception as e:
+            log.error(f"Multiprocessing error: {e}")
+            raise
 
         p.close()
         p.join()
-        # p.terminate()
 
     else:
         resultArray = []
