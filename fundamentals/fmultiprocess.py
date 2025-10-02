@@ -7,16 +7,12 @@
 :Author:
     David Young
 """
-from __future__ import division
-from line_profiler import profile
-import inspect
-from functools import partial
-import sys
+
+
 import os
 os.environ['TERM'] = 'vt100'
 
 
-@profile
 def fmultiprocess(
         log,
         function,
@@ -61,13 +57,13 @@ def fmultiprocess(
 
     import multiprocess as mp
     import time
-
-    # mp.set_start_method('spawn', force=True)
-
-    logFound = "log" in inspect.signature(function).parameters
-
+    import inspect
+    from functools import partial
     import psutil
     import os
+    import sys
+
+    logFound = "log" in inspect.signature(function).parameters
 
     global theseBatches
 
@@ -136,8 +132,8 @@ def fmultiprocess(
             mapfunc = partial(function, **kwargs)
 
         if not timeout:
-            # 3 HRS
-            timeout = 60 * 60 * 3
+            # 1 HRS
+            timeout = 60 * 60
         start_time = time.time()
 
         futureArray = p.map_async(
@@ -145,23 +141,22 @@ def fmultiprocess(
         if progressBar:
             import tqdm
             with tqdm.tqdm(total=len(inputArray)) as pbar:
-                with p as pool:
-                    while not futureArray.ready():
-                        current_time = time.time()
-                        if current_time > start_time + timeout:
-                            raise TimeoutError(
-                                f"The timeout limit of {timeout}s has been reached")
-                        if c.value != 0:
-                            with l:
-                                increment = c.value
-                                c.value = 0
-                            pbar.update(n=increment)
-                        time.sleep(1)
+                while not futureArray.ready():
+                    current_time = time.time()
+                    if current_time > start_time + timeout:
+                        raise TimeoutError(
+                            f"The timeout limit of {timeout}s has been reached")
                     if c.value != 0:
                         with l:
                             increment = c.value
                             c.value = 0
                         pbar.update(n=increment)
+                    time.sleep(0.5)
+                if c.value != 0:
+                    with l:
+                        increment = c.value
+                        c.value = 0
+                    pbar.update(n=increment)
 
         try:
             resultArray = futureArray.get(timeout=timeout)
@@ -171,7 +166,6 @@ def fmultiprocess(
 
         p.close()
         p.join()
-        # p.terminate()
 
     else:
         resultArray = []
