@@ -56,8 +56,8 @@ def readquery(
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
 
     try:
-        # cursor = dbConn.cursor(pymysql.cursors.DictCursor)
-        cursor = dbConn.cursor(pymysql.cursors.SSDictCursor)
+        cursor = dbConn.cursor(pymysql.cursors.DictCursor)
+        # cursor = dbConn.SScursor(pymysql.cursors.SSDictCursor)
     except Exception as e:
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
@@ -68,7 +68,7 @@ def readquery(
         tryAgain = False
         try:
             cursor.execute(sqlQuery)
-            rows = list(cursor.fetchall_unbuffered())
+            rows = cursor.fetchall()
         except pymysql.err.InternalError as e:
             if tries < 61:
                 tryAgain = True
