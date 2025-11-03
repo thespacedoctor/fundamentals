@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.7.8 - November 3, 2025**
+
+* **REFACTOR:** adding some db.commits()
+
 **v2.7.7 - October 2, 2025**
 
 * **REFACTOR:** updates to multiprocessing code

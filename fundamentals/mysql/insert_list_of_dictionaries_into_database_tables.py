@@ -18,6 +18,7 @@ from fundamentals import tools
 from builtins import str
 from builtins import range
 from past.utils import old_div
+import pandas as pd
 import sys
 import os
 os.environ['TERM'] = 'vt100'
@@ -170,7 +171,7 @@ def insert_list_of_dictionaries_into_database_tables(
         else:
             fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
                           inputArray=list(range(len(sharedList))), dbTablename=dbTableName,
-                          dbSettings=dbSettings, dateModified=dateModified)
+                          dbSettings=dbSettings, dateModified=dateModified, turnOffMP=False, progressBar=True)
 
         sys.stdout.write("\x1b[1A\x1b[2K")
         print("%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals())
@@ -335,7 +336,7 @@ def _insert_single_batch_into_database(
         else:
             inserted = True
 
-        dbConn.commit()
+    dbConn.commit()
 
     log.debug('completed the ``_insert_single_batch_into_database`` function')
     return "None"
@@ -374,13 +375,12 @@ def _add_dictlist_to_database_via_load_in_file(
     ```
 
     """
+    global sharedList
+
     from fundamentals.logs import emptyLogger
-    import pandas as pd
     import numpy as np
     log = emptyLogger()
     log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
-
-    global sharedList
 
     dictList = sharedList[masterListIndex][0]
 
@@ -465,11 +465,12 @@ ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
         dbConn=dbConn
     )
 
-    # try:
-    #     os.remove('/tmp/%(tmpTable)s' % locals())
-    # except:
-    #     pass
+    try:
+        os.remove('/tmp/%(tmpTable)s' % locals())
+    except:
+        pass
 
+    dbConn.commit()
     dbConn.close()
 
     log.debug(

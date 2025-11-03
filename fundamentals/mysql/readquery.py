@@ -6,11 +6,11 @@
 :Author:
     David Young
 """
+from fundamentals import tools
 from builtins import str
 import sys
 import os
 os.environ['TERM'] = 'vt100'
-from fundamentals import tools
 
 
 def readquery(
@@ -57,6 +57,7 @@ def readquery(
 
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
+        # cursor = dbConn.SScursor(pymysql.cursors.SSDictCursor)
     except Exception as e:
         log.error('could not create the database cursor: %s' % (e, ))
         raise IOError('could not create the database cursor: %s' % (e, ))
