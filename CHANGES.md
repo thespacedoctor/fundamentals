@@ -3,6 +3,7 @@
 
 **v May 13, 2026**
 
+* **REFACTOR:** updating readthedocs settings
 * **REFACTOR:** upgrading to `pyproject.toml` from `setup.py`
 * **ENHANCEMENT:** adding github actions for automatic release
 
