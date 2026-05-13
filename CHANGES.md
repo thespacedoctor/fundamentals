@@ -1,6 +1,11 @@
 
 ## Release Notes
 
+**v May 13, 2026**
+
+* **REFACTOR:** upgrading to `pyproject.toml` from `setup.py`
+* **ENHANCEMENT:** adding github actions for automatic release
+
 **v2.7.8 - November 3, 2025**
 
 * **REFACTOR:** adding some db.commits()
