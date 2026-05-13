@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=70", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fundamentals"
+dynamic = ["version"]
+description = "Some fundamental tools required by most self-respecting python-packages bundled in one place. Very opinionated project setup tools including logging, plain-text settings files and database connections."
+authors = [
+    {name = "David Young", email= "david.young.rse@gmail.com"},
+]
+keywords = ['logging, database']
+requires-python = ">=3.11"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities"
+]
+dependencies = [
+    'pyyaml',
+    'fundamentals',
+    'future',
+    'docopt',
+    'psutil',
+    'python-dateutil',
+    'requests',
+    'python-daemon',
+    'tqdm'
+]
+
+[project.urls]
+"Homepage" = "https://github.com/thespacedoctor/fundamentals"
+
+[project.optional-dependencies]
+docs = [
+    "build",
+    "sphinx",
+    "sphinx-autodoc2",
+    "myst-parser",
+    "furo",
+    "sphinx-inline-tabs",
+    "sphinxext-opengraph",
+    "sphinx-autobuild",
+    "linkify-it-py",
+    "sphinxcontrib-mermaid",
+    "sphinx-togglebutton",
+    "sphinx_copybutton",
+    "sphinx_tippy",
+    "sphinx_design",
+    "pygments-csv-lexer",
+    "sphinxcontrib-svg2pdfconverter",
+    "sphinx-remove-toctrees",
+    "sphinxcontrib.bibtex",
+]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "nose2"
+]
+dev = [
+    "fundamentals[tests, docs]",
+    "build",
+    "twine"
+]
+
+# THESE ARE ENTRY POINTS USED FOR THE CL-INTERFACE
+[project.scripts]
+mysqlSucker='fundamentals.mysql.directory_script_runner:main'
+yaml2db='fundamentals.mysql.yaml_to_database:main'
+sqlite2mysql='fundamentals.mysql.sqlite2mysql:main'
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+fundamentals = ["resources/**/*"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests", "tests.*"]
+
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+write_to = "fundamentals/__version__.py"
+write_to_template = "__version__ = '{version}'\n"
+
+

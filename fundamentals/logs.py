@@ -13,9 +13,7 @@ import logging
 from logging import handlers
 
 
-def console_logger(
-    level="WARNING"
-):
+def console_logger(level="WARNING"):
     """
     *Setup and return a console logger*
 
@@ -44,16 +42,19 @@ def console_logger(
 
     import logging
     import logging.config
+
     ## THIRD PARTY ##
     import yaml
+
     try:
-        yaml.warnings({'YAMLLoadWarning': False})
+        yaml.warnings({"YAMLLoadWarning": False})
     except:
         pass
     ## LOCAL APPLICATION ##
 
     # SETUP LOGGING
-    loggerConfig = """
+    loggerConfig = (
+        """
   version: 1
   formatters:
       console_style:
@@ -62,12 +63,17 @@ def console_logger(
   handlers:
       console:
           class: logging.StreamHandler
-          level: """ + level + """
+          level: """
+        + level
+        + """
           formatter: console_style
           stream: ext://sys.stdout
   root:
-      level: """ + level + """
+      level: """
+        + level
+        + """
       handlers: [console]"""
+    )
 
     logging.config.dictConfig(yaml.safe_load(loggerConfig))
     logger = logging.getLogger(__name__)
@@ -138,6 +144,7 @@ def setup_dryx_logging(yaml_file):
     import logging
     import logging.config
     import yaml
+
     try:
         from StringIO import StringIO
     except ImportError:
@@ -157,7 +164,7 @@ def setup_dryx_logging(yaml_file):
     stream.close()
 
     # ADD log.print() LEVEL
-    exists = addLoggingLevel('PRINT', logging.INFO + 5)
+    exists = addLoggingLevel("PRINT", logging.INFO + 5)
 
     if exists:
         # SET THE ROOT LOGGER
@@ -169,29 +176,36 @@ def setup_dryx_logging(yaml_file):
         yamlContent = yamlContent["logging settings"]
         yamlContent["version"] = 1
 
-    if "handlers" in yamlContent and "file" in yamlContent["handlers"] and "filename" in yamlContent["handlers"]["file"]:
-        loggingDir = os.path.dirname(
-            yamlContent["handlers"]["file"]["filename"])
+    if (
+        "handlers" in yamlContent
+        and "file" in yamlContent["handlers"]
+        and "filename" in yamlContent["handlers"]["file"]
+    ):
+        loggingDir = os.path.dirname(yamlContent["handlers"]["file"]["filename"])
         # Recursively create missing directories
         if not os.path.exists(loggingDir):
             os.makedirs(loggingDir)
 
     if "root" in yamlContent and "level" in yamlContent["root"]:
         level = yamlContent["root"]["level"]
-    if "handlers" in yamlContent and "console" in yamlContent["handlers"] and "level" in yamlContent["handlers"]["console"]:
+    if (
+        "handlers" in yamlContent
+        and "console" in yamlContent["handlers"]
+        and "level" in yamlContent["handlers"]["console"]
+    ):
         level = logging.getLevelName(yamlContent["handlers"]["console"]["level"]) - 6
     if "formatters" in yamlContent and "console_style" in yamlContent["formatters"]:
         format = yamlContent["formatters"]["console_style"]["format"]
         dateFmt = yamlContent["formatters"]["console_style"]["datefmt"]
     else:
         format = '%(levelname)s: "%(pathname)s", line %(lineno)d, in %(funcName)s > %(message)s'
-        dateFmt = '%H:%M:%S'
+        dateFmt = "%H:%M:%S"
 
     addConsole = False
     if "root" in yamlContent and "handlers" in yamlContent["root"]:
         if "console" in yamlContent["root"]["handlers"]:
             addConsole = True
-            yamlContent["root"]["handlers"].remove('console')
+            yamlContent["root"]["handlers"].remove("console")
 
     if len(yamlContent["root"]["handlers"]):
         logging.config.dictConfig(yamlContent)
@@ -228,7 +242,7 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
 
     To avoid accidental clobberings of existing attributes, this method will
     raise an `AttributeError` if the level name is already an attribute of the
-    `logging` module or if the method name is already present 
+    `logging` module or if the method name is already present
 
     Example
     -------
@@ -271,7 +285,11 @@ class ColorFormatter(logging.Formatter):
 
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
 
-    def setFormat(self, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)", dateFmt='%H:%M:%S'):
+    def setFormat(
+        self,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)",
+        dateFmt="%H:%M:%S",
+    ):
         reset = "\u001b[0m"
         bold = "\u001b[1m"
         white = "\u001b[38;5;15m"
@@ -285,11 +303,26 @@ class ColorFormatter(logging.Formatter):
 
         self.FORMATS = {
             logging.PRINT: f"%(message)s",
-            logging.DEBUG: format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
-            logging.INFO: format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
-            logging.WARNING: format.replace("%(levelname)s", f"{green}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
-            logging.ERROR: format.replace("%(levelname)s", f"{red}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
-            logging.CRITICAL: format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}").replace("%(message)s", f"%(message)s").replace("%(pathname)s", f"{ul}%(pathname)s{reset}") + reset,
+            logging.DEBUG: format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}")
+            .replace("%(message)s", f"%(message)s")
+            .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
+            + reset,
+            logging.INFO: format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}")
+            .replace("%(message)s", f"%(message)s")
+            .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
+            + reset,
+            logging.WARNING: format.replace("%(levelname)s", f"{green}%(levelname)s{reset}")
+            .replace("%(message)s", f"%(message)s")
+            .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
+            + reset,
+            logging.ERROR: format.replace("%(levelname)s", f"{red}%(levelname)s{reset}")
+            .replace("%(message)s", f"%(message)s")
+            .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
+            + reset,
+            logging.CRITICAL: format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}")
+            .replace("%(message)s", f"%(message)s")
+            .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
+            + reset,
         }
         self.dateFmt = dateFmt
 
@@ -313,8 +346,7 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
 
         # Add group write to the current permissions.
         currMode = os.stat(self.baseFilename).st_mode
-        os.chmod(self.baseFilename, currMode | stat.S_IWGRP |
-                 stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
+        os.chmod(self.baseFilename, currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
 
 
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):

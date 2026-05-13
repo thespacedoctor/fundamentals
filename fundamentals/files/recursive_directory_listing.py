@@ -8,15 +8,12 @@
 """
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 
 
-def recursive_directory_listing(
-    log,
-    baseFolderPath,
-    whatToList="all"
-):
+def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
     """*list directory contents recursively.*
 
     Options to list only files or only directories.
@@ -25,7 +22,7 @@ def recursive_directory_listing(
 
     - ``log`` -- logger
     - ``baseFolderPath`` -- path to the base folder to list contained files and folders recursively
-    - ``whatToList`` -- list files only, durectories only or all [ "files" | "dirs" | "all" ]
+    - ``whatToList`` -- list files only, directories only or all [ "files" | "dirs" | "all" ]
 
 
     **Return**
@@ -42,7 +39,7 @@ def recursive_directory_listing(
         baseFolderPath="/tmp"
     )
 
-    # OR JUST FILE  
+    # OR JUST FILE
 
     from fundamentals.files import recursive_directory_listing
     theseFiles = recursive_directory_listing(
@@ -51,7 +48,7 @@ def recursive_directory_listing(
         whatToList="files"
     )
 
-    # OR JUST FOLDERS   
+    # OR JUST FOLDERS
 
     from fundamentals.files import recursive_directory_listing
     theseFiles = recursive_directory_listing(
@@ -59,14 +56,16 @@ def recursive_directory_listing(
         baseFolderPath="/tmp",
         whatToList="dirs"
     )
-    print theseFiles        
+    print theseFiles
     ```
     """
-    log.debug('starting the ``recursive_directory_listing`` function')
+    log.debug("starting the ``recursive_directory_listing`` function")
 
     ## VARIABLES ##
     matchedPathList = []
-    parentDirectoryList = [baseFolderPath, ]
+    parentDirectoryList = [
+        baseFolderPath,
+    ]
 
     count = 0
     while os.listdir(baseFolderPath) and count < 20:
@@ -92,7 +91,9 @@ def recursive_directory_listing(
                         matched = os.path.isfile(fullPath)
                     else:
                         log.error(
-                            'cound not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]' % (baseFolderPath,))
+                            'cound not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]'
+                            % (baseFolderPath,)
+                        )
                         sys.exit(0)
 
                     if matched:
@@ -104,5 +105,5 @@ def recursive_directory_listing(
 
                 parentDirectoryList = childDirList
 
-    log.debug('completed the ``recursive_directory_listing`` function')
+    log.debug("completed the ``recursive_directory_listing`` function")
     return matchedPathList
