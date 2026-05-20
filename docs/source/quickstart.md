@@ -14,5 +14,6 @@ creates a yaml settings file in your home foler under `~/.config/fundamentals/fu
 
 ## Command-Line Usage
 
-{{usage.md}}
+:::{include} usage.md
+:::
 

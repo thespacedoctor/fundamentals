@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -44,29 +45,32 @@ if not os.path.exists(pathToOutputDir):
 
 pathToSqlite = pathToInputDir + "/test.sqlite"
 
+
 class test_sqlite2mysql(unittest.TestCase):
 
     def test_sqlite2mysql_function(self):
 
         from fundamentals.mysql import sqlite2mysql
+
         this = sqlite2mysql(
             log=log,
             settings=settings,
             pathToSqlite=pathToSqlite,
             tablePrefix="Marvin",
-            dbConn=dbConn
+            dbConn=dbConn,
         )
         this.convert_sqlite_to_mysql()
 
     def test_sqlite2mysql_function_exception(self):
 
         from fundamentals.mysql import sqlite2mysql
+
         try:
             this = sqlite2mysql(
                 log=log,
                 settings=settings,
                 pathToSqlite=pathToSqlite,
-                fakeKey="break the code"
+                fakeKey="break the code",
             )
             this.get()
             assert False

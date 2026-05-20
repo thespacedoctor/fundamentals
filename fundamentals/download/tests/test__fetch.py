@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 

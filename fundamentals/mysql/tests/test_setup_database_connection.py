@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,11 +41,13 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_setup_database_connection(unittest.TestCase):
 
     def test_setup_database_connection_function(self):
 
         from fundamentals.mysql import setup_database_connection
+
         this = setup_database_connection(
             pathToYamlFile=pathToInputDir + "/db_settings.yaml"
         )

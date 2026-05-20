@@ -3,24 +3,22 @@
 """
 *given a sorted list of values, median sigma-clip values based on a window of values either side of each value (rolling window) and return the array mask*
 
-:Author:
-    David Young
+Author
+: David Young
 
-:Date Created:
-    January  1, 2021
+Date Created
+: January  1, 2021
 """
+
 from builtins import object
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 
 
-def rolling_window_sigma_clip(
-        log,
-        array,
-        clippingSigma,
-        windowSize):
+def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
     """*given a sorted list of values, median sigma-clip values based on a window of values either side of each value (rolling window) and return the array mask*
 
     **Key Arguments:**
@@ -46,9 +44,9 @@ def rolling_window_sigma_clip(
             myArray, arrayMask) if m == False]
     except:
         myArray = []
-    ```           
+    ```
     """
-    log.debug('starting the ``rolling_window_sigma_clip`` function')
+    log.debug("starting the ``rolling_window_sigma_clip`` function")
 
     from astropy.stats import sigma_clip, mad_std
 
@@ -58,7 +56,13 @@ def rolling_window_sigma_clip(
         return len(array) * [False]
     elif len(array) < windowSize:
         masked = sigma_clip(
-            array, sigma_lower=clippingSigma, sigma_upper=clippingSigma, maxiters=7, cenfunc='median', stdfunc=mad_std)
+            array,
+            sigma_lower=clippingSigma,
+            sigma_upper=clippingSigma,
+            maxiters=7,
+            cenfunc="median",
+            stdfunc=mad_std,
+        )
         return list(masked.mask)
     startOfWindow = 0
     endOfWindow = windowSize
@@ -69,7 +73,13 @@ def rolling_window_sigma_clip(
         startOfWindow += 1
         endOfWindow += 1
         masked = sigma_clip(
-            arrayWindow, sigma_lower=clippingSigma, sigma_upper=clippingSigma, maxiters=7, cenfunc='median', stdfunc=mad_std)
+            arrayWindow,
+            sigma_lower=clippingSigma,
+            sigma_upper=clippingSigma,
+            maxiters=7,
+            cenfunc="median",
+            stdfunc=mad_std,
+        )
 
         if dataIndex == 0:
             # 0,1,2...midWindow-1
@@ -83,5 +93,5 @@ def rolling_window_sigma_clip(
             maskedArray += [list(masked.mask)[midWindow - 1]]
             dataIndex += 1
 
-    log.debug('completed the ``rolling_window_sigma_clip`` function')
+    log.debug("completed the ``rolling_window_sigma_clip`` function")
     return maskedArray

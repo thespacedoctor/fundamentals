@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -21,7 +22,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -45,26 +46,21 @@ if not os.path.exists(pathToOutputDir):
 # xt-setup-unit-testing-files-and-folders
 # xt-utkit-refresh-database
 
+
 class test_daemonise(unittest.TestCase):
 
     def test_daemonise_function(self):
 
         from fundamentals import daemonise
-        this = daemonise(
-            log=log,
-            settings=settings,
-            name="nice"
-        )
+
+        this = daemonise(log=log, settings=settings, name="nice")
 
     def test_daemonise_function_exception(self):
 
         from fundamentals import daemonise
+
         try:
-            this = daemonise(
-                log=log,
-                settings=settings,
-                fakeKey="break the code"
-            )
+            this = daemonise(log=log, settings=settings, fakeKey="break the code")
             this.get()
             assert False
         except Exception as e:

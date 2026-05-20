@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -62,10 +63,8 @@ class test_database(unittest.TestCase):
     def test_no_tunnel(self):
 
         from fundamentals.mysql import database
-        db = database(
-            log=log,
-            dbSettings=dbSettings2
-        ).connect()
+
+        db = database(log=log, dbSettings=dbSettings2).connect()
 
         return
 
@@ -73,32 +72,23 @@ class test_database(unittest.TestCase):
 
         # SETUP ALL DATABASE CONNECTIONS
         from fundamentals.mysql import database
-        dbConn = database(
-            log=log,
-            dbSettings=dbSettings2
-        ).connect()
+
+        dbConn = database(log=log, dbSettings=dbSettings2).connect()
 
         from fundamentals.mysql import readquery
-        sqlQuery = u"""
+
+        sqlQuery = """
             SELECT VERSION();
         """ % locals()
-        rows = readquery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            quiet=False
-        )
+        rows = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
         # print(rows)
 
     def test_database_function_exception(self):
 
         from fundamentals.mysql import database
+
         try:
-            this = database(
-                log=log,
-                dbSettings=dbSettings2,
-                fakeKey="break the code"
-            )
+            this = database(log=log, dbSettings=dbSettings2, fakeKey="break the code")
             this.get()
             assert False
         except Exception as e:

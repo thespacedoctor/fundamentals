@@ -1,0 +1,10 @@
+name: Basic Python Checks
+
+on: [push, pull_request]
+
+jobs:
+  call-workflow:
+    uses: thespacedoctor/reusable-workflows/.github/workflows/_basics.yml@main
+    
+
+    

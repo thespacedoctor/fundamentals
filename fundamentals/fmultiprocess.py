@@ -1,28 +1,28 @@
-
 #!/usr/local/bin/python
 # encoding: utf-8
 """
 *A function to quickly add multiprocessing to any program*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 
-
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 
 
 def fmultiprocess(
-        log,
-        function,
-        inputArray,
-        poolSize=False,
-        timeout=3600,
-        turnOffMP=False,
-        progressBar=False,
-        mute=False,
-        **kwargs):
+    log,
+    function,
+    inputArray,
+    poolSize=False,
+    timeout=3600,
+    turnOffMP=False,
+    progressBar=False,
+    mute=False,
+    **kwargs,
+):
     """multiprocess pool
 
     **Key Arguments**
@@ -53,7 +53,7 @@ def fmultiprocess(
     ```
 
     """
-    log.debug('starting the ``multiprocess`` function')
+    log.debug("starting the ``multiprocess`` function")
 
     import multiprocess as mp
     import time
@@ -70,6 +70,7 @@ def fmultiprocess(
     if turnOffMP == False:
         import psutil
         from multiprocess import cpu_count, Pool
+
         from ctypes import c_int32
 
         # DEFINTE POOL SIZE - NUMBER OF CPU CORES TO USE (BEST = ALL - 1)
@@ -84,14 +85,24 @@ def fmultiprocess(
                 counter = c
                 counter_lock = l
                 import logging
+
                 streamHandlers = [
-                    h for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                    h for h in log.handlers if not isinstance(h, logging.FileHandler)
+                ]
                 streamHandlersLevel = [
-                    h.level for h in log.handlers if not isinstance(h, logging.FileHandler)]
-                [h.setLevel(logging.WARNING) for h in log.handlers if not isinstance(
-                    h, logging.FileHandler)]
-                sys.stdout = open(os.devnull, 'w')
+                    h.level
+                    for h in log.handlers
+                    if not isinstance(h, logging.FileHandler)
+                ]
+                [
+                    h.setLevel(logging.WARNING)
+                    for h in log.handlers
+                    if not isinstance(h, logging.FileHandler)
+                ]
+                sys.stdout = open(os.devnull, "w")
+
         else:
+
             def startFunc(log, l, c):
                 global counter_lock
                 global counter
@@ -104,8 +115,7 @@ def fmultiprocess(
         l = mp.Lock()
 
         if poolSize:
-            p = Pool(processes=poolSize, initializer=startFunc,
-                     initargs=(log, l, c))
+            p = Pool(processes=poolSize, initializer=startFunc, initargs=(log, l, c))
         else:
             p = Pool(initializer=startFunc, initargs=(log, l, c))
 
@@ -115,8 +125,7 @@ def fmultiprocess(
         if chunksize == 0:
             chunksize = 1
 
-        def thisFunction(
-                p):
+        def thisFunction(p):
 
             result = mapfunc(p)
 
@@ -136,16 +145,17 @@ def fmultiprocess(
             timeout = 60 * 60
         start_time = time.time()
 
-        futureArray = p.map_async(
-            thisFunction, inputArray, chunksize=chunksize)
+        futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
         if progressBar:
             import tqdm
+
             with tqdm.tqdm(total=len(inputArray)) as pbar:
                 while not futureArray.ready():
                     current_time = time.time()
                     if current_time > start_time + timeout:
                         raise TimeoutError(
-                            f"The timeout limit of {timeout}s has been reached")
+                            f"The timeout limit of {timeout}s has been reached"
+                        )
                     if c.value != 0:
                         with l:
                             increment = c.value
@@ -172,12 +182,12 @@ def fmultiprocess(
 
         if logFound:
             for i in inputArray:
-                r = function(i, log=log, ** kwargs)
+                r = function(i, log=log, **kwargs)
                 resultArray.append(r)
         else:
             for i in inputArray:
                 r = function(i, **kwargs)
                 resultArray.append(r)
 
-    log.debug('completed the ``multiprocess`` function')
+    log.debug("completed the ``multiprocess`` function")
     return resultArray

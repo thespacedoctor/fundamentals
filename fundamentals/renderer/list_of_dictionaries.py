@@ -3,9 +3,10 @@
 """
 *Render a python list of dictionaries in various list and markup formats*
 
-:Author:
-    David Young
+Author
+: David Young
 """
+
 from builtins import str
 from builtins import range
 from builtins import object
@@ -19,7 +20,8 @@ import json
 import yaml
 from decimal import Decimal
 from datetime import datetime
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
@@ -32,7 +34,7 @@ class list_of_dictionaries(object):
 
     - ``log`` -- logger
     - ``listOfDictionaries`` -- the list of dictionaries to render
-    - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss 
+    - ``reDatetime`` -- a pre-compiled datetime regex. Default *False*fss
 
 
     **Usage**
@@ -68,12 +70,7 @@ class list_of_dictionaries(object):
 
     """
 
-    def __init__(
-            self,
-            log,
-            listOfDictionaries,
-            reDatetime=False
-    ):
+    def __init__(self, log, listOfDictionaries, reDatetime=False):
         self.log = log
         self.log.debug("instansiating a new 'list_of_dictionaries' object")
         self.listOfDictionaries = listOfDictionaries
@@ -82,8 +79,7 @@ class list_of_dictionaries(object):
         return None
 
     @property
-    def list(
-            self):
+    def list(self):
         """*Returns the original list of dictionaries*
 
         **Usage**
@@ -93,10 +89,7 @@ class list_of_dictionaries(object):
         """
         return self.listOfDictionaries
 
-    def csv(
-        self,
-        filepath=None
-    ):
+    def csv(self, filepath=None):
         """*Render the data in CSV format*
 
         **Key Arguments**
@@ -131,7 +124,7 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``csv`` method')
+        self.log.debug("starting the ``csv`` method")
 
         renderedData = self._list_of_dictionaries_to_csv("machine")
 
@@ -141,17 +134,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``csv`` method')
+        self.log.debug("completed the ``csv`` method")
         return renderedData
 
-    def table(
-        self,
-        filepath=None
-    ):
+    def table(self, filepath=None):
         """*Render the data as a  plain text table*
 
         **Key Arguments**
@@ -189,7 +179,7 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``table`` method')
+        self.log.debug("starting the ``table`` method")
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("human")
@@ -200,17 +190,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``table`` method')
+        self.log.debug("completed the ``table`` method")
         return renderedData
 
-    def reST(
-        self,
-        filepath=None
-    ):
+    def reST(self, filepath=None):
         """*Render the data as a  resturcturedText table*
 
         **Key Arguments**
@@ -250,7 +237,7 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``table`` method')
+        self.log.debug("starting the ``table`` method")
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("reST")
@@ -261,17 +248,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``table`` method')
+        self.log.debug("completed the ``table`` method")
         return renderedData
 
-    def markdown(
-        self,
-        filepath=None
-    ):
+    def markdown(self, filepath=None):
         """*Render the data as a markdown table*
 
         **Key Arguments**
@@ -307,7 +291,7 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``markdown`` method')
+        self.log.debug("starting the ``markdown`` method")
 
         self.filepath = filepath
         renderedData = self._list_of_dictionaries_to_csv("markdown")
@@ -318,17 +302,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``markdown`` method')
+        self.log.debug("completed the ``markdown`` method")
         return renderedData
 
-    def json(
-        self,
-        filepath=None
-    ):
+    def json(self, filepath=None):
         """*Render the data in json format*
 
         **Key Arguments**
@@ -376,19 +357,16 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``json`` method')
+        self.log.debug("starting the ``json`` method")
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
         for d in dataCopy:
             for k, v in list(d.items()):
-                if isinstance(v,  datetime):
+                if isinstance(v, datetime):
                     d[k] = v.strftime("%Y%m%dt%H%M%S")
 
         renderedData = json.dumps(
-            dataCopy,
-            separators=(',', ': '),
-            sort_keys=True,
-            indent=4
+            dataCopy, separators=(",", ": "), sort_keys=True, indent=4
         )
 
         if filepath and len(self.listOfDictionaries):
@@ -397,17 +375,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = codecs.open(filepath, encoding='utf-8', mode='w')
+            writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``json`` method')
+        self.log.debug("completed the ``json`` method")
         return renderedData
 
-    def yaml(
-        self,
-        filepath=None
-    ):
+    def yaml(self, filepath=None):
         """*Render the data in yaml format*
 
         **Key Arguments**
@@ -447,7 +422,7 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``yaml`` method')
+        self.log.debug("starting the ``yaml`` method")
 
         dataCopy = []
         dataCopy[:] = [dict(l) for l in self.listOfDictionaries]
@@ -459,19 +434,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            stream = open(filepath, 'w')
+            stream = open(filepath, "w")
             yaml.dump(dataCopy, stream, default_flow_style=False)
             stream.close()
 
-        self.log.debug('completed the ``yaml`` method')
+        self.log.debug("completed the ``yaml`` method")
         return renderedData
 
-    def mysql(
-        self,
-        tableName,
-        filepath=None,
-        createStatement=None
-    ):
+    def mysql(self, tableName, filepath=None, createStatement=None):
         """*Render the dataset as a series of mysql insert statements*
 
         **Key Arguments**
@@ -507,17 +477,19 @@ class list_of_dictionaries(object):
         ```
 
         """
-        self.log.debug('starting the ``mysql`` method')
+        self.log.debug("starting the ``mysql`` method")
 
         import re
-        if createStatement and "create table if not exists" not in createStatement.lower():
-            regex = re.compile(r'^\s*CREATE TABLE ', re.I | re.S)
-            createStatement = regex.sub(
-                "CREATE TABLE IF NOT EXISTS ", createStatement)
+
+        if (
+            createStatement
+            and "create table if not exists" not in createStatement.lower()
+        ):
+            regex = re.compile(r"^\s*CREATE TABLE ", re.I | re.S)
+            createStatement = regex.sub("CREATE TABLE IF NOT EXISTS ", createStatement)
 
         renderedData = self._list_of_dictionaries_to_mysql_inserts(
-            tableName=tableName,
-            createStatement=createStatement
+            tableName=tableName, createStatement=createStatement
         )
 
         if filepath and len(self.listOfDictionaries):
@@ -526,16 +498,14 @@ class list_of_dictionaries(object):
             if not os.path.exists(os.path.dirname(filepath)):
                 os.makedirs(os.path.dirname(filepath))
 
-            writeFile = open(filepath, mode='w')
+            writeFile = open(filepath, mode="w")
             writeFile.write(renderedData)
             writeFile.close()
 
-        self.log.debug('completed the ``mysql`` method')
+        self.log.debug("completed the ``mysql`` method")
         return renderedData
 
-    def _list_of_dictionaries_to_csv(
-            self,
-            csvType="human"):
+    def _list_of_dictionaries_to_csv(self, csvType="human"):
         """Convert a python list of dictionaries to pretty csv output
 
         **Key Arguments**
@@ -548,8 +518,7 @@ class list_of_dictionaries(object):
         - ``output`` -- the contents of a CSV file
 
         """
-        self.log.debug(
-            'starting the ``_list_of_dictionaries_to_csv`` function')
+        self.log.debug("starting the ``_list_of_dictionaries_to_csv`` function")
         import unicodecsv as csv
 
         if not len(self.listOfDictionaries):
@@ -559,8 +528,9 @@ class list_of_dictionaries(object):
 
         tableColumnNames = list(dataCopy[0].keys())
         columnWidths = []
-        columnWidths[:] = [len(tableColumnNames[i])
-                           for i in range(len(tableColumnNames))]
+        columnWidths[:] = [
+            len(tableColumnNames[i]) for i in range(len(tableColumnNames))
+        ]
 
         output = io.BytesIO()
         # setup csv styles
@@ -571,18 +541,44 @@ class list_of_dictionaries(object):
         elif csvType in ["reST"]:
             delimiter = "|"
         if csvType in ["markdown"]:
-            writer = csv.writer(output, delimiter=delimiter,
-                                quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\", lineterminator="\n")
+            writer = csv.writer(
+                output,
+                delimiter=delimiter,
+                quoting=csv.QUOTE_NONE,
+                doublequote=False,
+                quotechar='"',
+                escapechar="\\",
+                lineterminator="\n",
+            )
         else:
-            writer = csv.writer(output, dialect='excel', delimiter=delimiter,
-                                quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
+            writer = csv.writer(
+                output,
+                dialect="excel",
+                delimiter=delimiter,
+                quotechar='"',
+                quoting=csv.QUOTE_MINIMAL,
+                lineterminator="\n",
+            )
 
         if csvType in ["markdown"]:
             dividerWriter = csv.writer(
-                output, delimiter="|", quoting=csv.QUOTE_NONE, doublequote=False, quotechar='"', escapechar="\\", lineterminator="\n")
+                output,
+                delimiter="|",
+                quoting=csv.QUOTE_NONE,
+                doublequote=False,
+                quotechar='"',
+                escapechar="\\",
+                lineterminator="\n",
+            )
         else:
-            dividerWriter = csv.writer(output, dialect='excel', delimiter="+",
-                                       quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
+            dividerWriter = csv.writer(
+                output,
+                dialect="excel",
+                delimiter="+",
+                quotechar='"',
+                quoting=csv.QUOTE_MINIMAL,
+                lineterminator="\n",
+            )
         # add column names to csv
         header = []
         divider = []
@@ -614,10 +610,9 @@ class list_of_dictionaries(object):
             if csvType == "machine":
                 header.append(c)
             elif csvType in ["human", "markdown", "reST"]:
-                header.append(
-                    c.ljust(columnWidths[i] + 2).rjust(columnWidths[i] + 3))
-                divider.append('-' * (columnWidths[i] + 3))
-                rstDivider.append('=' * (columnWidths[i] + 3))
+                header.append(c.ljust(columnWidths[i] + 2).rjust(columnWidths[i] + 3))
+                divider.append("-" * (columnWidths[i] + 3))
+                rstDivider.append("=" * (columnWidths[i] + 3))
 
         # table border for human readable
         if csvType in ["human", "markdown", "reST"]:
@@ -636,8 +631,11 @@ class list_of_dictionaries(object):
                 if csvType in ["human", "markdown", "reST"]:
                     if row[c] == None:
                         row[c] = ""
-                    row[c] = str(str(row[c]).ljust(columnWidths[i] + 2)
-                                 .rjust(columnWidths[i] + 3))
+                    row[c] = str(
+                        str(row[c])
+                        .ljust(columnWidths[i] + 2)
+                        .rjust(columnWidths[i] + 3)
+                    )
                 thisRow.append(row[c])
             # table border for human readable
             if csvType in ["human", "markdown", "reST"]:
@@ -678,15 +676,11 @@ class list_of_dictionaries(object):
         if csvType in ["reST"]:
             output = output.replace("|--", "+--").replace("--|", "--+")
 
-        self.log.debug(
-            'completed the ``_list_of_dictionaries_to_csv`` function')
+        self.log.debug("completed the ``_list_of_dictionaries_to_csv`` function")
 
         return output
 
-    def _list_of_dictionaries_to_mysql_inserts(
-            self,
-            tableName,
-            createStatement=None):
+    def _list_of_dictionaries_to_mysql_inserts(self, tableName, createStatement=None):
         """Convert a python list of dictionaries to pretty csv output
 
         **Key Arguments**
@@ -701,7 +695,8 @@ class list_of_dictionaries(object):
 
         """
         self.log.debug(
-            'completed the ````_list_of_dictionaries_to_mysql_inserts`` function')
+            "completed the ````_list_of_dictionaries_to_mysql_inserts`` function"
+        )
 
         if not len(self.listOfDictionaries):
             return "NO MATCH"
@@ -716,10 +711,23 @@ class list_of_dictionaries(object):
         inserts = []
 
         inserts = []
-        inserts[:] = [convert_dictionary_to_mysql_table(log=self.log, dictionary=d, dbTableName=tableName, uniqueKeyList=[
-        ], dateModified=False, returnInsertOnly=True, replace=True, batchInserts=False, reDatetime=self.reDatetime) for d in dataCopy]
+        inserts[:] = [
+            convert_dictionary_to_mysql_table(
+                log=self.log,
+                dictionary=d,
+                dbTableName=tableName,
+                uniqueKeyList=[],
+                dateModified=False,
+                returnInsertOnly=True,
+                replace=True,
+                batchInserts=False,
+                reDatetime=self.reDatetime,
+            )
+            for d in dataCopy
+        ]
         output += ";\n".join(inserts) + ";"
 
         self.log.debug(
-            'completed the ``_list_of_dictionaries_to_mysql_inserts`` function')
+            "completed the ``_list_of_dictionaries_to_mysql_inserts`` function"
+        )
         return output

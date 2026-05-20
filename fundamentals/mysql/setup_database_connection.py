@@ -3,24 +3,25 @@
 """
 *Given a yaml settings file containing database connection details, setup and return the db connector*
 
-:Author:
-    David Young
+Author
+: David Young
 """
+
 from fundamentals import tools
 from builtins import str
 import sys
 import os
 import yaml
+
 try:
-    yaml.warnings({'YAMLLoadWarning': False})
+    yaml.warnings({"YAMLLoadWarning": False})
 except:
     pass
-os.environ['TERM'] = 'vt100'
+os.environ["TERM"] = "vt100"
 
 
-def setup_database_connection(
-        pathToYamlFile):
-    """*Start a database connection using settings in yaml file* 
+def setup_database_connection(pathToYamlFile):
+    """*Start a database connection using settings in yaml file*
 
     Given the location of a YAML dictionary containing database credientials, this function will setup and return the connection*
 
@@ -62,33 +63,42 @@ def setup_database_connection(
     # IMPORT THE YAML CONNECTION DICTIONARY
     try:
         logging.info(
-            'importing the yaml database connection dictionary from ' + pathToYamlFile)
-        stream = open(pathToYamlFile, 'r')
+            "importing the yaml database connection dictionary from " + pathToYamlFile
+        )
+        stream = open(pathToYamlFile, "r")
         connDict = yaml.safe_load(stream)
     except:
-        logging.critical(
-            'could not load the connect dictionary from ' + pathToYamlFile)
+        logging.critical("could not load the connect dictionary from " + pathToYamlFile)
         sys.exit(1)
     # ESTABLISH A DB CONNECTION
     try:
-        logging.info('connecting to the ' + connDict[
-                     'db'] + ' database on ' + connDict['host'])
+        logging.info(
+            "connecting to the " + connDict["db"] + " database on " + connDict["host"]
+        )
         dbConn = ms.connect(
-            host=connDict['host'],
-            user=connDict['user'],
-            passwd=connDict['password'],
-            db=connDict['db'],
+            host=connDict["host"],
+            user=connDict["user"],
+            passwd=connDict["password"],
+            db=connDict["db"],
             use_unicode=True,
-            charset='utf8',
+            charset="utf8",
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000
+            connect_timeout=36000,
         )
         dbConn.autocommit(True)
     except Exception as e:
-        logging.critical('could not connect to the ' + connDict['db'] + ' database on ' + connDict['host'] + ' : '
-                         + str(e) + '\n')
+        logging.critical(
+            "could not connect to the "
+            + connDict["db"]
+            + " database on "
+            + connDict["host"]
+            + " : "
+            + str(e)
+            + "\n"
+        )
     return dbConn
+
 
 # use the tab-trigger below for new function
 # xt-def-function

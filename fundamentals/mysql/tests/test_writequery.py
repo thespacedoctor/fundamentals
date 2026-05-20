@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,64 +41,66 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_writequery(unittest.TestCase):
 
     def test_writequery_function(self):
 
         from fundamentals.mysql import writequery
+
         sqlQuery = "CREATE TABLE  IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
     def test_manyvalue_insert(self):
         from fundamentals.mysql import writequery
+
         sqlQuery = "CREATE TABLE  IF NOT EXISTS  `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
         from fundamentals.mysql import writequery
+
         sqlQuery = """INSERT INTO testing_table (id) values (%s)"""
         writequery(
             log=log,
             sqlQuery=sqlQuery,
             dbConn=dbConn,
             Force=False,
-            manyValueList=[(1,), (2,), (3,), (4,), (5,), (6,), (7,),
-                           (8,), (9,), (10,), (11,), (12,), ]
+            manyValueList=[
+                (1,),
+                (2,),
+                (3,),
+                (4,),
+                (5,),
+                (6,),
+                (7,),
+                (8,),
+                (9,),
+                (10,),
+                (11,),
+                (12,),
+            ],
         )
 
     def test_writequery_function_delete(self):
 
         from fundamentals.mysql import writequery
+
         sqlQuery = "DROP TABLE `testing_table`;"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
     def test_writequery_error_force(self):
 
         from fundamentals.mysql import writequery
+
         sqlQuery = "rubbish query;"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=True,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=True, manyValueList=False
         )
 
         # x-print-testpage-for-pessto-marshall-web-object

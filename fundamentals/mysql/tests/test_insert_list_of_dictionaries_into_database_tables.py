@@ -9,6 +9,7 @@ import time
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -20,7 +21,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -45,20 +46,16 @@ dictList = []
 
 for i in range(100000):
 
-    dictList.append({
-        "col1": i,
-        "col2": i + 10.,
-        "col3": i / 2.,
-        "col4": i * 34.
-    })
+    dictList.append({"col1": i, "col2": i + 10.0, "col3": i / 2.0, "col4": i * 34.0})
 
 dbSettings = dbSettings = {
-    'host': '127.0.0.1',
-    'user': 'utuser',
-    'tunnel': False,
-    'password': 'utpass',
-    'db': 'unit_tests'
+    "host": "127.0.0.1",
+    "user": "utuser",
+    "tunnel": False,
+    "password": "utpass",
+    "db": "unit_tests",
 }
+
 
 class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 
@@ -67,6 +64,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         t1 = time.time()
 
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+
         insert_list_of_dictionaries_into_database_tables(
             dbConn=dbConn,
             log=log,
@@ -76,7 +74,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dateModified=True,
             batchSize=10000,
             replace=True,
-            dbSettings=dbSettings
+            dbSettings=dbSettings,
         )
 
         # print(time.time() - t1)
