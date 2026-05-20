@@ -39,6 +39,7 @@ Options:
 :Author:
     David Young
 """
+
 from builtins import str
 import sys
 import os
@@ -46,20 +47,22 @@ import time
 import collections
 import datetime
 from subprocess import Popen, PIPE, STDOUT
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 
 
 def directory_script_runner(
-        log,
-        pathToScriptDirectory,
-        dbConn=False,
-        waitForResult=True,
-        successRule=None,
-        failureRule=None,
-        loginPath=False,
-        databaseName=False,
-        force=True):
+    log,
+    pathToScriptDirectory,
+    dbConn=False,
+    waitForResult=True,
+    successRule=None,
+    failureRule=None,
+    loginPath=False,
+    databaseName=False,
+    force=True,
+):
     """A function to run all mysql scripts in a given directory (in a modified date order, oldest first) and then act on the script files in accordance with the succcess or failure of their execution
 
     The function can be run with either with an established database connection (`dbConn`) or with a mysql generated `login-path` name (`loginPath`).
@@ -149,7 +152,7 @@ def directory_script_runner(
     Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
 
     """
-    log.debug('starting the ``directory_script_runner`` function')
+    log.debug("starting the ``directory_script_runner`` function")
 
     # COMPILE A DICTIONARY OF SCRIPTS / MODIFIED TIMES
     scriptList = {}
@@ -158,8 +161,9 @@ def directory_script_runner(
         filename = os.path.basename(filePath)
         extension = filePath.split(".")[-1]
         if os.path.isfile(filePath) and extension == "sql":
-            modified = datetime.datetime.strptime(time.ctime(
-                os.path.getmtime(filePath)), "%a %b %d %H:%M:%S %Y")
+            modified = datetime.datetime.strptime(
+                time.ctime(os.path.getmtime(filePath)), "%a %b %d %H:%M:%S %Y"
+            )
             scriptList[str(modified) + filename] = filePath
 
     # ORDER THE DICTIONARY BY MODIFIED TIME - OLDEST FIRST
@@ -174,15 +178,13 @@ def directory_script_runner(
     if dbConn:
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
-            exception = execute_mysql_script(
-                pathToScript=v,
-                log=log,
-                dbConn=dbConn
-            )
+            exception = execute_mysql_script(pathToScript=v, log=log, dbConn=dbConn)
             # FAILED SCRIPTS
             if exception:
                 log.error(
-                    'The script %(scriptname)s failed with the following exception: "%(exception)s"' % locals())
+                    'The script %(scriptname)s failed with the following exception: "%(exception)s"'
+                    % locals()
+                )
                 rule = failureRule
                 print(exception)
             else:
@@ -191,20 +193,34 @@ def directory_script_runner(
                 pathToScriptDirectory=pathToScriptDirectory,
                 scriptname=scriptname,
                 rule=rule,
-                log=log)
+                log=log,
+            )
     else:
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
             if waitForResult == True:
-                cmd =  """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """ % locals(
+                cmd = (
+                    """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """
+                    % locals()
                 )
-                p = Popen(cmd, stdout=PIPE, stderr=PIPE, close_fds=True,
-                          env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True)
+                p = Popen(
+                    cmd,
+                    stdout=PIPE,
+                    stderr=PIPE,
+                    close_fds=True,
+                    env={
+                        "PATH": os.getenv("PATH")
+                        + ":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin",
+                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
+                    },
+                    shell=True,
+                )
                 stdout, stderr = p.communicate()
 
                 if len(stderr):
                     log.error(
-                        "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals())
+                        "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals()
+                    )
                     rule = failureRule
                 else:
                     rule = successRule
@@ -212,23 +228,37 @@ def directory_script_runner(
                     pathToScriptDirectory=pathToScriptDirectory,
                     scriptname=scriptname,
                     rule=rule,
-                    log=log)
+                    log=log,
+                )
             else:
                 if waitForResult == "delete":
-                    cmd =  """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """ % locals()
+                    cmd = (
+                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """
+                        % locals()
+                    )
                 else:
-                    cmd =  """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 """ % locals()
-                p = Popen(cmd, close_fds=True,
-                          env={'PATH': os.getenv('PATH') + ":/usr/local/bin:/usr/bin:", "MYSQL_TEST_LOGIN_FILE": os.getenv('HOME') + "/.mylogin.cnf"}, shell=True, stdin=None, stdout=None, stderr=None)
+                    cmd = (
+                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 """
+                        % locals()
+                    )
+                p = Popen(
+                    cmd,
+                    close_fds=True,
+                    env={
+                        "PATH": os.getenv("PATH") + ":/usr/local/bin:/usr/bin:",
+                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
+                    },
+                    shell=True,
+                    stdin=None,
+                    stdout=None,
+                    stderr=None,
+                )
 
-    log.debug('completed the ``directory_script_runner`` function')
+    log.debug("completed the ``directory_script_runner`` function")
     return None
 
 
-def execute_mysql_script(
-        pathToScript,
-        dbConn,
-        log):
+def execute_mysql_script(pathToScript, dbConn, log):
     """*execute a mysql script given its file path and return the success or failure status of the execution*
 
     **Key Arguments:**
@@ -239,7 +269,7 @@ def execute_mysql_script(
 
     **Return:**
 
-    - `exception` -- None or the exception thrown during execution of the sql script. 
+    - `exception` -- None or the exception thrown during execution of the sql script.
 
     **Usage:**
 
@@ -257,21 +287,22 @@ def execute_mysql_script(
         ...
     ```
     """
-    log.debug('starting the ``execute_mysql_script`` function')
+    log.debug("starting the ``execute_mysql_script`` function")
 
     from fundamentals.mysql import writequery
 
     pathToScript = pathToScript.replace("//", "/")
 
     import codecs
+
     pathToReadFile = pathToScript
     try:
         log.debug("attempting to open the file %s" % (pathToReadFile,))
-        readFile = codecs.open(pathToReadFile, encoding='utf-8', mode='r')
+        readFile = codecs.open(pathToReadFile, encoding="utf-8", mode="r")
         thisData = readFile.read()
         readFile.close()
     except IOError as e:
-        message = 'could not open the file %s' % (pathToReadFile,)
+        message = "could not open the file %s" % (pathToReadFile,)
         log.critical(message)
         raise IOError(message)
 
@@ -279,24 +310,16 @@ def execute_mysql_script(
 
     # EXECUTE AND RETURN NONE IF SUCCESSFUL OR THE EXCEPTION IF NOT
     try:
-        writequery(
-            log=log,
-            sqlQuery=thisData,
-            dbConn=dbConn
-        )
+        writequery(log=log, sqlQuery=thisData, dbConn=dbConn)
     except Exception as e:
-        log.debug('completed the ``execute_mysql_script`` function - failure')
+        log.debug("completed the ``execute_mysql_script`` function - failure")
         return e
 
-    log.debug('completed the ``execute_mysql_script`` function - successful')
+    log.debug("completed the ``execute_mysql_script`` function - successful")
     return None
 
 
-def _process_script_file(
-        pathToScriptDirectory,
-        scriptname,
-        rule,
-        log):
+def _process_script_file(pathToScriptDirectory, scriptname, rule, log):
     """*summary of function*
 
     **Key Arguments:**
@@ -316,10 +339,10 @@ def _process_script_file(
     ```
 
     ```python
-    usage code 
-    ```           
+    usage code
+    ```
     """
-    log.debug('starting the ``_process_script_file`` function')
+    log.debug("starting the ``_process_script_file`` function")
 
     scriptPath = pathToScriptDirectory + "/" + scriptname
 
@@ -334,15 +357,21 @@ def _process_script_file(
             os.makedirs(moveTo)
         moveTo = moveTo + "/" + scriptname
         try:
-            log.debug("attempting to rename file %s to %s" %
-                      (scriptPath, moveTo))
+            log.debug("attempting to rename file %s to %s" % (scriptPath, moveTo))
             os.rename(scriptPath, moveTo)
         except Exception as e:
             log.error(
-                "could not rename file %s to %s - failed with this error: %s " % (scriptPath, moveTo, str(e),))
+                "could not rename file %s to %s - failed with this error: %s "
+                % (
+                    scriptPath,
+                    moveTo,
+                    str(e),
+                )
+            )
 
-    log.debug('completed the ``_process_script_file`` function')
+    log.debug("completed the ``_process_script_file`` function")
     return None
+
 
 # use the tab-trigger below for new function
 # xt-def-function
@@ -359,7 +388,7 @@ def main(arguments=None):
         docString=__doc__,
         logLevel="WARNING",
         options_first=False,
-        projectName="fundmentals"
+        projectName="fundmentals",
     )
     arguments, settings, log, dbConn = su.setup()
 
@@ -370,13 +399,19 @@ def main(arguments=None):
             varname = arg.replace("-", "") + "Flag"
         else:
             varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, ("".__class__, u"".__class__)):
+        if isinstance(val, ("".__class__, "".__class__)):
             exec(varname + " = '%s'" % (val,))
         else:
             exec(varname + " = %s" % (val,))
         if arg == "--dbConn":
             dbConn = val
-        log.debug('%s = %s' % (varname, val,))
+        log.debug(
+            "%s = %s"
+            % (
+                varname,
+                val,
+            )
+        )
 
     if successFlag and successFlag.lower() == "none":
         successFlag = None
@@ -389,10 +424,11 @@ def main(arguments=None):
         databaseName=databaseName,
         loginPath=loginPath,
         successRule=successFlag,
-        failureRule=failureFlag
+        failureRule=failureFlag,
     )
 
     return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

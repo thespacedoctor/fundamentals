@@ -6,10 +6,12 @@
 :Author:
     David Young
 """
+
 from builtins import object
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 import readline
 import glob
 import pickle
@@ -40,16 +42,16 @@ class database(object):
 
     ```python
     dbSettings = {
-        'host': '127.0.0.1', 
-        'loginPath': 'atlasMovers', 
-        'user': 'monster', 
+        'host': '127.0.0.1',
+        'loginPath': 'atlasMovers',
+        'user': 'monster',
         'tunnel': {
-            'remote ip': 'psweb.mp.qub.ac.uk', 
-            'remote datbase host': 'dormammu', 
-            'remote user': 'monster', 
+            'remote ip': 'psweb.mp.qub.ac.uk',
+            'remote datbase host': 'dormammu',
+            'remote user': 'monster',
             'port': 9006
-        }, 
-        'password': 'myPass', 
+        },
+        'password': 'myPass',
         'db': 'atlas_moving_objects'
     }
     ```
@@ -69,13 +71,7 @@ class database(object):
 
     # INITIALISATION
 
-    def __init__(
-            self,
-            log,
-            dbSettings=False,
-            autocommit=True
-
-    ):
+    def __init__(self, log, dbSettings=False, autocommit=True):
         self.log = log
         log.debug("instansiating a new '_database' object")
         self.dbSettings = dbSettings
@@ -94,16 +90,15 @@ class database(object):
         See the class docstring for usage
         """
 
-        self.log.debug('starting the ``connect`` method')
+        self.log.debug("starting the ``connect`` method")
 
         import pymysql as ms
+
         dbSettings = self.dbSettings
 
         port = False
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
-            port = self._setup_tunnel(
-                tunnelParameters=dbSettings["tunnel"]
-            )
+            port = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
         elif "port" in dbSettings and dbSettings["port"]:
             port = int(dbSettings["port"])
 
@@ -119,21 +114,19 @@ class database(object):
             db=dbName,
             port=port,
             use_unicode=True,
-            charset='utf8mb4',
+            charset="utf8mb4",
             local_infile=1,
             client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
             connect_timeout=36000,
-            max_allowed_packet=51200000
+            max_allowed_packet=51200000,
         )
         if self.autocommit:
             dbConn.autocommit(True)
 
-        self.log.debug('completed the ``connect`` method')
+        self.log.debug("completed the ``connect`` method")
         return dbConn
 
-    def _setup_tunnel(
-            self,
-            tunnelParameters):
+    def _setup_tunnel(self, tunnelParameters):
         """
         *Setup a ssh tunnel for a database connection to port through*
 
@@ -147,14 +140,13 @@ class database(object):
         - ``sshPort`` -- the port the ssh tunnel is connected via
 
         """
-        self.log.debug('starting the ``_setup_tunnel`` method')
+        self.log.debug("starting the ``_setup_tunnel`` method")
 
         # TEST TUNNEL DOES NOT ALREADY EXIST
         sshPort = tunnelParameters["port"]
-        connected = self._checkServer(
-            "127.0.0.1", sshPort)
+        connected = self._checkServer("127.0.0.1", sshPort)
         if connected:
-            self.log.debug('ssh tunnel already exists - moving on')
+            self.log.debug("ssh tunnel already exists - moving on")
         else:
             # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
             ru = tunnelParameters["remote user"]
@@ -164,40 +156,44 @@ class database(object):
             cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
             p = Popen(cmd, shell=True, close_fds=True)
             output = p.communicate()[0]
-            self.log.debug('output: %(output)s' % locals())
+            self.log.debug("output: %(output)s" % locals())
 
             # TEST CONNECTION - QUIT AFTER SO MANY TRIES
             connected = False
             count = 0
             while not connected:
-                connected = self._checkServer(
-                    "127.0.0.1", sshPort)
+                connected = self._checkServer("127.0.0.1", sshPort)
                 time.sleep(1)
                 count += 1
                 if count == 5:
                     self.log.error(
-                        'cound not setup tunnel to remote datbase' % locals())
+                        "cound not setup tunnel to remote datbase" % locals()
+                    )
                     sys.exit(0)
         return sshPort
 
     def _checkServer(self, address, port):
-        """*Check that the TCP Port we've decided to use for tunnelling is available*
-        """
-        self.log.debug('starting the ``_checkServer`` method')
+        """*Check that the TCP Port we've decided to use for tunnelling is available*"""
+        self.log.debug("starting the ``_checkServer`` method")
 
         # CREATE A TCP SOCKET
         import socket
+
         s = socket.socket()
         self.log.debug(
-            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals())
+            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals()
+        )
         try:
             s.connect((address, port))
             self.log.debug(
-                """Connected to `%(address)s` on port `%(port)s`""" % locals())
+                """Connected to `%(address)s` on port `%(port)s`""" % locals()
+            )
             return True
         except socket.error as e:
             self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
+                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
+                % locals()
+            )
             return False
 
         return None

@@ -6,7 +6,9 @@
 :Author:
     David Young
 """
+
 import os
+
 
 def getpackagepath():
     """

@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,48 +41,37 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_table_exists(unittest.TestCase):
 
     def test_table_exists_function(self):
 
         from fundamentals.mysql import writequery
+
         sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
         from fundamentals.mysql import table_exists
+
         tableName = "testing_table"
-        this = table_exists(
-            dbConn=dbConn,
-            log=log,
-            dbTableName=tableName
-        )
+        this = table_exists(dbConn=dbConn, log=log, dbTableName=tableName)
         # print("%(tableName)s exists: %(this)s" % locals())
 
         from fundamentals.mysql import writequery
+
         sqlQuery = "DROP TABLE `testing_table`;"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
     def test_table_exists_function02(self):
 
         from fundamentals.mysql import table_exists
+
         tableName = "stupid_named_table"
-        this = table_exists(
-            dbConn=dbConn,
-            log=log,
-            dbTableName=tableName
-        )
+        this = table_exists(dbConn=dbConn, log=log, dbTableName=tableName)
         # print("%(tableName)s exists: %(this)s" % locals())
 
         # x-print-testpage-for-pessto-marshall-web-object

@@ -6,6 +6,7 @@
 :Author:
     David Young
 """
+
 from builtins import object
 import os
 import sys
@@ -283,7 +284,9 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
 
 class ColorFormatter(logging.Formatter):
 
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = (
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    )
 
     def setFormat(
         self,
@@ -303,7 +306,9 @@ class ColorFormatter(logging.Formatter):
 
         self.FORMATS = {
             logging.PRINT: f"%(message)s",
-            logging.DEBUG: format.replace("%(levelname)s", f"{yellow}%(levelname)s{reset}")
+            logging.DEBUG: format.replace(
+                "%(levelname)s", f"{yellow}%(levelname)s{reset}"
+            )
             .replace("%(message)s", f"%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
@@ -311,7 +316,9 @@ class ColorFormatter(logging.Formatter):
             .replace("%(message)s", f"%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
-            logging.WARNING: format.replace("%(levelname)s", f"{green}%(levelname)s{reset}")
+            logging.WARNING: format.replace(
+                "%(levelname)s", f"{green}%(levelname)s{reset}"
+            )
             .replace("%(message)s", f"%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
@@ -319,7 +326,9 @@ class ColorFormatter(logging.Formatter):
             .replace("%(message)s", f"%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
-            logging.CRITICAL: format.replace("%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}")
+            logging.CRITICAL: format.replace(
+                "%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}"
+            )
             .replace("%(message)s", f"%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
@@ -346,7 +355,10 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
 
         # Add group write to the current permissions.
         currMode = os.stat(self.baseFilename).st_mode
-        os.chmod(self.baseFilename, currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH)
+        os.chmod(
+            self.baseFilename,
+            currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH,
+        )
 
 
 class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):

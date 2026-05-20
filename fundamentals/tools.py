@@ -6,6 +6,7 @@
 :Author:
     David Young
 """
+
 from __future__ import print_function
 from __future__ import absolute_import
 from builtins import object
@@ -31,7 +32,6 @@ except ImportError:
 from os.path import expanduser
 import inspect
 import psutil
-
 
 ###################################################################
 # CLASSES                                                         #
@@ -143,7 +143,9 @@ class tools(object):
         self.arguments = arguments
         self.docString = docString
         self.logLevel = logLevel
-        self.configSettingsPath = os.getenv("HOME") + f"/.config/{projectName}/{projectName}.yaml"
+        self.configSettingsPath = (
+            os.getenv("HOME") + f"/.config/{projectName}/{projectName}.yaml"
+        )
         self.projectName = projectName
         self.defaultSettingsFile = defaultSettingsFile
         self.createLogger = createLogger
@@ -164,7 +166,9 @@ class tools(object):
         ## ACTIONS BASED ON WHICH ARGUMENTS ARE RECIEVED ##
         # PRINT COMMAND-LINE USAGE IF NO ARGUMENTS PASSED
         if self.arguments == None:
-            self.arguments = docopt(docString, version="v" + version, options_first=options_first)
+            self.arguments = docopt(
+                docString, version="v" + version, options_first=options_first
+            )
 
         # BUILD A STRING FOR THE PROCESS TO MATCH RUNNING PROCESSES AGAINST
         lockname = "".join(sys.argv)
@@ -181,7 +185,10 @@ class tools(object):
                 test = "".join(this[1:])
                 if q.pid != os.getpid() and lockname == test and "--reload" not in test:
                     thisId = q.pid
-                    print("This command is already running (see PID %(thisId)s)" % locals())
+                    print(
+                        "This command is already running (see PID %(thisId)s)"
+                        % locals()
+                    )
                     sys.exit(0)
 
         try:
@@ -200,66 +207,105 @@ class tools(object):
             level -= 1
             exists = os.path.exists(advs)
             if not exists:
-                advs = "/".join(inspect.stack()[1][1].split("/")[:level]) + "/advanced_settings.yaml"
+                advs = (
+                    "/".join(inspect.stack()[1][1].split("/")[:level])
+                    + "/advanced_settings.yaml"
+                )
         if not exists:
             advs = {}
         else:
             with open(advs, "r") as stream:
                 advs = yaml.safe_load(stream)
 
-        if defaultSettingsFile and "settingsFile" not in self.arguments and "--settings" not in self.arguments:
+        if (
+            defaultSettingsFile
+            and "settingsFile" not in self.arguments
+            and "--settings" not in self.arguments
+        ):
             cwdSettings = os.getcwd() + f"/{projectName}.yaml"
             if os.path.exists(cwdSettings):
                 self.arguments["settingsFile"] = settingsFile = cwdSettings
-            elif os.path.exists(os.getenv("HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()):
+            elif os.path.exists(
+                os.getenv("HOME")
+                + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
+            ):
                 self.arguments["settingsFile"] = settingsFile = (
-                    os.getenv("HOME") + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
+                    os.getenv("HOME")
+                    + "/.config/%(projectName)s/%(projectName)s.yaml" % locals()
                 )
 
         # UNPACK SETTINGS
         stream = False
         if "<settingsFile>" in self.arguments and self.arguments["<settingsFile>"]:
             stream = open(self.arguments["<settingsFile>"], "r")
-        elif "<pathToSettingsFile>" in self.arguments and self.arguments["<pathToSettingsFile>"]:
+        elif (
+            "<pathToSettingsFile>" in self.arguments
+            and self.arguments["<pathToSettingsFile>"]
+        ):
             stream = open(self.arguments["<pathToSettingsFile>"], "r")
         elif "--settingsFile" in self.arguments and self.arguments["--settingsFile"]:
             stream = open(self.arguments["--settingsFile"], "r")
         elif "--settings" in self.arguments and self.arguments["--settings"]:
             stream = open(self.arguments["--settings"], "r")
-        elif "pathToSettingsFile" in self.arguments and self.arguments["pathToSettingsFile"]:
+        elif (
+            "pathToSettingsFile" in self.arguments
+            and self.arguments["pathToSettingsFile"]
+        ):
             stream = open(self.arguments["pathToSettingsFile"], "r")
         elif "settingsFile" in self.arguments and self.arguments["settingsFile"]:
             stream = open(self.arguments["settingsFile"], "r")
         elif (
-            ("settingsFile" in self.arguments and self.arguments["settingsFile"] == None)
-            or ("<pathToSettingsFile>" in self.arguments and self.arguments["<pathToSettingsFile>"] == None)
+            (
+                "settingsFile" in self.arguments
+                and self.arguments["settingsFile"] == None
+            )
+            or (
+                "<pathToSettingsFile>" in self.arguments
+                and self.arguments["<pathToSettingsFile>"] == None
+            )
             or ("--settings" in self.arguments and self.arguments["--settings"] == None)
-            or ("pathToSettingsFile" in self.arguments and self.arguments["pathToSettingsFile"] == None)
+            or (
+                "pathToSettingsFile" in self.arguments
+                and self.arguments["pathToSettingsFile"] == None
+            )
         ):
 
             init = False
             workspaceDirectory = False
             if "init" in self.arguments and self.arguments["init"]:
                 init = True
-                if "<workspaceDirectory>" in self.arguments and self.arguments["<workspaceDirectory>"]:
-                    theseSettings = self.arguments["<workspaceDirectory>"] + f"/{projectName}.yaml"
+                if (
+                    "<workspaceDirectory>" in self.arguments
+                    and self.arguments["<workspaceDirectory>"]
+                ):
+                    theseSettings = (
+                        self.arguments["<workspaceDirectory>"] + f"/{projectName}.yaml"
+                    )
                 else:
                     theseSettings = self.configSettingsPath
-                exists = self._create_or_verify_settings(pathToSettings=theseSettings, create=True)
+                exists = self._create_or_verify_settings(
+                    pathToSettings=theseSettings, create=True
+                )
 
             else:
                 if projectName != False:
                     # FIRST CHECK FOR SETTINGS IN CWD
                     cwdSettings = os.getcwd() + f"/{projectName}.yaml"
-                    exists = self._create_or_verify_settings(pathToSettings=cwdSettings, create=False)
+                    exists = self._create_or_verify_settings(
+                        pathToSettings=cwdSettings, create=False
+                    )
 
                     # THEN CHECK FOR SETTINGS CONFIG DIRECTORY
                     if not exists:
-                        exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=False)
+                        exists = self._create_or_verify_settings(
+                            pathToSettings=self.configSettingsPath, create=False
+                        )
 
                     # CREATE SETTING IN DEFAULT SETTINGS LOCATION IF NONE EXIST
                     if not exists:
-                        exists = self._create_or_verify_settings(pathToSettings=self.configSettingsPath, create=True)
+                        exists = self._create_or_verify_settings(
+                            pathToSettings=self.configSettingsPath, create=True
+                        )
             if "settingsFile" in self.arguments and self.arguments["settingsFile"]:
                 stream = open(self.arguments["settingsFile"], "r")
         else:
@@ -288,15 +334,25 @@ class tools(object):
             # SETTINGS
             if "settings" in locals() and "logging settings" in settings:
                 if "settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["settingsFile"])
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["settingsFile"]
+                    )
                 elif "<settingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["<settingsFile>"])
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["<settingsFile>"]
+                    )
                 elif "<pathToSettingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["<pathToSettingsFile>"])
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["<pathToSettingsFile>"]
+                    )
                 elif "--settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["--settingsFile"])
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["--settingsFile"]
+                    )
                 elif "pathToSettingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["pathToSettingsFile"])
+                    log = dl.setup_dryx_logging(
+                        yaml_file=self.arguments["pathToSettingsFile"]
+                    )
                 elif "--settings" in self.arguments:
                     log = dl.setup_dryx_logging(yaml_file=self.arguments["--settings"])
 
@@ -329,7 +385,11 @@ class tools(object):
         dbConn = False
         tunnel = False
 
-        if "--host" in self.arguments and "--dbName" in self.arguments and self.arguments["--host"]:
+        if (
+            "--host" in self.arguments
+            and "--dbName" in self.arguments
+            and self.arguments["--host"]
+        ):
             # SETUP DB CONNECTION
             dbConn = True
             host = self.arguments["--host"]
@@ -338,16 +398,26 @@ class tools(object):
             dbName = self.arguments["--dbName"]
             port = False
 
-        elif "settings" in locals() and "database settings" in settings and "host" in settings["database settings"]:
+        elif (
+            "settings" in locals()
+            and "database settings" in settings
+            and "host" in settings["database settings"]
+        ):
             host = settings["database settings"]["host"]
             user = settings["database settings"]["user"]
             passwd = settings["database settings"]["password"]
             dbName = settings["database settings"]["db"]
-            if "tunnel" in settings["database settings"] and settings["database settings"]["tunnel"]:
+            if (
+                "tunnel" in settings["database settings"]
+                and settings["database settings"]["tunnel"]
+            ):
                 tunnel = True
             dbConn = True
             port = False
-            if "port" in settings["database settings"] and settings["database settings"]["port"]:
+            if (
+                "port" in settings["database settings"]
+                and settings["database settings"]["port"]
+            ):
                 port = int(settings["database settings"]["port"])
         else:
             pass
@@ -402,7 +472,9 @@ class tools(object):
         if "ssh tunnel" in self.settings:
             # TEST TUNNEL DOES NOT ALREADY EXIST
             sshPort = self.settings["ssh tunnel"]["port"]
-            connected = self._checkServer(self.settings["database settings"]["host"], sshPort)
+            connected = self._checkServer(
+                self.settings["database settings"]["host"], sshPort
+            )
             if connected:
                 pass
             else:
@@ -419,17 +491,26 @@ class tools(object):
                 connected = False
                 count = 0
                 while not connected:
-                    connected = self._checkServer(self.settings["database settings"]["host"], sshPort)
+                    connected = self._checkServer(
+                        self.settings["database settings"]["host"], sshPort
+                    )
                     time.sleep(1)
                     count += 1
                     if count == 5:
-                        self.log.error("cound not setup tunnel to remote datbase" % locals())
+                        self.log.error(
+                            "cound not setup tunnel to remote datbase" % locals()
+                        )
                         sys.exit(0)
 
-        if "tunnel" in self.settings["database settings"] and self.settings["database settings"]["tunnel"]:
+        if (
+            "tunnel" in self.settings["database settings"]
+            and self.settings["database settings"]["tunnel"]
+        ):
             # TEST TUNNEL DOES NOT ALREADY EXIST
             sshPort = self.settings["database settings"]["tunnel"]["port"]
-            connected = self._checkServer(self.settings["database settings"]["host"], sshPort)
+            connected = self._checkServer(
+                self.settings["database settings"]["host"], sshPort
+            )
             if connected:
                 pass
             else:
@@ -446,11 +527,15 @@ class tools(object):
                 connected = False
                 count = 0
                 while not connected:
-                    connected = self._checkServer(self.settings["database settings"]["host"], sshPort)
+                    connected = self._checkServer(
+                        self.settings["database settings"]["host"], sshPort
+                    )
                     time.sleep(1)
                     count += 1
                     if count == 5:
-                        self.log.error("cound not setup tunnel to remote datbase" % locals())
+                        self.log.error(
+                            "cound not setup tunnel to remote datbase" % locals()
+                        )
                         sys.exit(0)
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
@@ -489,7 +574,10 @@ class tools(object):
             s.connect((address, port))
             return True
         except socket.error as e:
-            self.log.warning("""Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
+            self.log.warning(
+                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
+                % locals()
+            )
             return False
 
         return None
@@ -510,7 +598,9 @@ class tools(object):
         exists = False
 
         absPath = os.path.abspath(pathToSettings)
-        defaultLog = f"{os.getenv('HOME')}/.config/{self.projectName}/{self.projectName}.log".replace("//", "/")
+        defaultLog = f"{os.getenv('HOME')}/.config/{self.projectName}/{self.projectName}.log".replace(
+            "//", "/"
+        )
         alternativeLogPath = absPath.replace(".yaml", ".log")
 
         if os.path.exists(pathToSettings):
@@ -518,7 +608,9 @@ class tools(object):
             exists = True
 
         if exists and create:
-            print(f"A settings file already exists at '{pathToSettings}' and has not been modified.")
+            print(
+                f"A settings file already exists at '{pathToSettings}' and has not been modified."
+            )
 
         if not exists and create:
             # FIND THE DEAFULT SETTINGS FILE
@@ -532,9 +624,16 @@ class tools(object):
                 exists = os.path.exists(ds)
                 if not exists:
                     if isinstance(self.defaultSettingsFile, bool):
-                        ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/default_settings.yaml"
+                        ds = (
+                            "/".join(inspect.stack()[2][1].split("/")[:level])
+                            + "/default_settings.yaml"
+                        )
                     else:
-                        ds = "/".join(inspect.stack()[2][1].split("/")[:level]) + "/" + self.defaultSettingsFile
+                        ds = (
+                            "/".join(inspect.stack()[2][1].split("/")[:level])
+                            + "/"
+                            + self.defaultSettingsFile
+                        )
 
             try:
                 # COPY THE SETTINGS FILE TO THE REQUESTED LOCATION
@@ -584,7 +683,9 @@ def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
         loader.flatten_mapping(node)
         return object_pairs_hook(loader.construct_pairs(node))
 
-    OrderedLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping
+    )
     return yaml.safe_load(stream, OrderedLoader)
 
 

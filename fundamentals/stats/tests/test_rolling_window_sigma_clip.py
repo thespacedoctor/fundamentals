@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -21,7 +22,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -45,11 +46,13 @@ if not os.path.exists(pathToOutputDir):
 # xt-setup-unit-testing-files-and-folders
 # xt-utkit-refresh-database
 
+
 class test_rolling_window_sigma_clip(unittest.TestCase):
 
     def test_rolling_window_sigma_clip_function(self):
         import numpy as np
         import random
+
         normalDist = np.random.normal(loc=100, scale=3.0, size=[200])
         for i in range(1, 7):
             randNum = random.randint(1, 199)
@@ -57,27 +60,24 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         normalDist = list(normalDist)
 
         from fundamentals.stats import rolling_window_sigma_clip
+
         arrayMask = rolling_window_sigma_clip(
-            log=log,
-            array=normalDist,
-            clippingSigma=2.2,
-            windowSize=11)
+            log=log, array=normalDist, clippingSigma=2.2, windowSize=11
+        )
 
         # JUST KEEP UNMASKED VALUES
         try:
-            normalDist = [e for e, m in zip(
-                normalDist, arrayMask) if m == False]
+            normalDist = [e for e, m in zip(normalDist, arrayMask) if m == False]
         except:
             normalDist = []
 
     def test_rolling_window_sigma_clip_function_exception(self):
 
         from fundamentals.stats import rolling_window_sigma_clip
+
         try:
             this = rolling_window_sigma_clip(
-                log=log,
-                settings=settings,
-                fakeKey="break the code"
+                log=log, settings=settings, fakeKey="break the code"
             )
             this.get()
             assert False

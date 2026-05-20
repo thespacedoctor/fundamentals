@@ -6,20 +6,20 @@
 :Author:
     David Young
 """
+
 import sys
 import os
 import io
 import csv
 from decimal import Decimal
 from datetime import datetime
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
-def list_of_dictionaries_to_mysql_inserts(
-        log,
-        datalist,
-        tableName):
+
+def list_of_dictionaries_to_mysql_inserts(log, datalist, tableName):
     """Convert a python list of dictionaries to pretty csv output
 
     **Key Arguments**
@@ -27,12 +27,12 @@ def list_of_dictionaries_to_mysql_inserts(
     - ``log`` -- logger
     - ``datalist`` -- a list of dictionaries
     - ``tableName`` -- the name of the table to create the insert statements for
-    
+
 
     **Return**
 
     - ``output`` -- the mysql insert statements (as a string)
-    
+
 
     **Usage**
 
@@ -53,9 +53,9 @@ def list_of_dictionaries_to_mysql_inserts(
     ...
     ...
     ```
-    
+
     """
-    log.debug('starting the ``list_of_dictionaries_to_mysql_inserts`` function')
+    log.debug("starting the ``list_of_dictionaries_to_mysql_inserts`` function")
 
     if not len(datalist):
         return "NO MATCH"
@@ -71,11 +71,11 @@ def list_of_dictionaries_to_mysql_inserts(
             dateModified=False,
             returnInsertOnly=True,
             replace=True,
-            batchInserts=False
+            batchInserts=False,
         )
         inserts.append(insertCommand)
 
     output = ";\n".join(inserts) + ";"
 
-    log.debug('completed the ``list_of_dictionaries_to_mysql_inserts`` function')
+    log.debug("completed the ``list_of_dictionaries_to_mysql_inserts`` function")
     return output
