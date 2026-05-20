@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.8.2 - May 20, 2026**
+
+* **FIXED:** fixing readline import issues on windows 
+
 **v2.8.1 - May 20, 2026**
 
 * **FIXED:** adding `tqdm` to the conda requirements
