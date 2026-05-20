@@ -5,6 +5,72 @@ on:
     tags:
       - "v*"  # Triggers on tags like v0.1.0, v1.2.3
 
+# PyPI publishing not yet supported in reusable workflows, see https://github.com/pypa/gh-action-pypi-publish/issues/166
+# jobs:
+#   call-workflow:
+#     uses: thespacedoctor/reusable-workflows/.github/workflows/publish.yml@main
+
+
 jobs:
-  call-workflow:
-    uses: thespacedoctor/reusable-workflows/.github/workflows/publish.yml@main
+  build:
+    name: Publish release to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Act Workaround # https://github.com/nektos/act/issues/973
+        if: ${{ env.ACT }}
+        run: curl -fsSL https://deb.nodesource.com/setup_22.x | bash && apt install -y nodejs
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: pyproject.toml
+          architecture: x64
+          check-latest: true
+
+      - name: Install build tool
+        run: pip install build
+
+      - name: Build package
+        run: python -m build 
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write  # Required for OIDC trusted publishing
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Get tag message
+        id: tag_message
+        run: |
+          TAG_MSG=$(git tag -l --format='%(contents)' ${{ github.ref_name }})
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAG_MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*  # attach the .whl and .tar.gz to the release
+          body: ${{ steps.tag_message.outputs.message }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
