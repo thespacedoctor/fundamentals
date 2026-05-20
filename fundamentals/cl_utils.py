@@ -18,7 +18,14 @@ import sys
 import os
 
 os.environ["TERM"] = "vt100"
-import readline
+try:
+    import readline
+except ImportError:
+    # Windows: readline not available in stdlib Optionally use pyreadline3 if installed
+    try:
+        import pyreadline3 as readline
+    except ImportError:
+        readline = None  # or just pass — basic input() still works
 import glob
 import pickle
 from docopt import docopt

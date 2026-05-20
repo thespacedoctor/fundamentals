@@ -12,7 +12,14 @@ import sys
 import os
 
 os.environ["TERM"] = "vt100"
-import readline
+try:
+    import readline
+except ImportError:
+    # Windows: readline not available in stdlib Optionally use pyreadline3 if installed
+    try:
+        import pyreadline3 as readline
+    except ImportError:
+        readline = None  # or just pass — basic input() still works
 import glob
 import pickle
 import time
@@ -166,9 +173,7 @@ class database(object):
                 time.sleep(1)
                 count += 1
                 if count == 5:
-                    self.log.error(
-                        "cound not setup tunnel to remote datbase" % locals()
-                    )
+                    self.log.error("cound not setup tunnel to remote datbase" % locals())
                     sys.exit(0)
         return sshPort
 
@@ -180,20 +185,13 @@ class database(object):
         import socket
 
         s = socket.socket()
-        self.log.debug(
-            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals()
-        )
+        self.log.debug("""Attempting to connect to `%(address)s` on port `%(port)s`""" % locals())
         try:
             s.connect((address, port))
-            self.log.debug(
-                """Connected to `%(address)s` on port `%(port)s`""" % locals()
-            )
+            self.log.debug("""Connected to `%(address)s` on port `%(port)s`""" % locals())
             return True
         except socket.error as e:
-            self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
-                % locals()
-            )
+            self.log.warning("""Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s""" % locals())
             return False
 
         return None
