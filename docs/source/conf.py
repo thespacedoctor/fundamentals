@@ -156,7 +156,13 @@ html_add_permalinks = "  ∞"
 latex_engine = "xelatex"
 
 latex_documents = [
-    ("index", "fundamentals.tex", "fundamentals Documentation", "David R. Young", "manual"),
+    (
+        "index",
+        "fundamentals.tex",
+        "fundamentals Documentation",
+        "David R. Young",
+        "manual",
+    ),
 ]
 
 
@@ -178,7 +184,12 @@ def linkcode_resolve(domain, info):
             filename = ("/").join(filename.split("/")[0:-1]) + "/"
         else:
             filename = ""
-        filename += ("/").join(info["fullname"].split(".")[0:-1]) + ".py" + "#" + info["fullname"].split(".")[-1]
+        filename += (
+            ("/").join(info["fullname"].split(".")[0:-1])
+            + ".py"
+            + "#"
+            + info["fullname"].split(".")[-1]
+        )
     return link_resolver_url + "/" + filename
 
 

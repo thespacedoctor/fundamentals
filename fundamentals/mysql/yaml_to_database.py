@@ -21,6 +21,7 @@ Options:
     -v, --version         show version
     -s, --settings        the settings file
 """
+
 from __future__ import print_function
 
 from builtins import object
@@ -46,7 +47,7 @@ def main(arguments=None):
         docString=__doc__,
         logLevel="WARNING",
         options_first=False,
-        projectName=False
+        projectName=False,
     )
     arguments, settings, log, dbConn = su.setup()
 
@@ -63,31 +64,34 @@ def main(arguments=None):
             exec(varname + " = %s" % (val,))
         if arg == "--dbConn":
             dbConn = val
-        log.debug('%s = %s' % (varname, val,))
+        log.debug(
+            "%s = %s"
+            % (
+                varname,
+                val,
+            )
+        )
 
     if os.path.isfile(pathToYaml):
         from fundamentals.mysql import yaml_to_database
+
         # PARSE YAML FILE CONTENTS AND ADD TO DATABASE
-        yaml2db = yaml_to_database(
-            log=log,
-            settings=settings,
-            dbConn=dbConn
-        )
+        yaml2db = yaml_to_database(log=log, settings=settings, dbConn=dbConn)
         yaml2db.add_yaml_file_content_to_database(
-            filepath=pathToYaml,
-            deleteFile=deleteFlag
+            filepath=pathToYaml, deleteFile=deleteFlag
         )
         basename = os.path.basename(pathToYaml)
         print("Content of %(basename)s added to database" % locals())
 
     else:
         from fundamentals.mysql import yaml_to_database
+
         yaml2db = yaml_to_database(
             log=log,
             settings=settings,
             dbConn=dbConn,
             pathToInputDir=pathToYaml,
-            deleteFiles=deleteFlag
+            deleteFiles=deleteFlag,
         )
         yaml2db.ingest()
         print("Content of %(pathToYaml)s directory added to database" % locals())
@@ -110,7 +114,7 @@ class yaml_to_database(object):
 
     **Usage**
 
-    To setup your logger, settings and database connections, please use the ``fundamentals`` package (see tutorial here https://fundamentals.readthedocs.io/en/master/initialisation.html). 
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (see tutorial here https://fundamentals.readthedocs.io/en/master/initialisation.html).
 
     To initiate a ``yaml2db`` object, use the following:
 
@@ -122,7 +126,7 @@ class yaml_to_database(object):
         dbConn=dbConn,
         pathToInputDir="/path/to/yaml/directory",
         deleteFiles=False
-    ) 
+    )
     ```
 
     And here's an example of the content in a yaml file that this ``yaml2db`` object can parse:
@@ -132,20 +136,15 @@ class yaml_to_database(object):
     url: http://sublimetexttips.com/why-you-should-do-most-of-your-text-editing-in-sublime-text/?utm_source=drip&utm_medium=email&utm_campaign=editor-proliferation
     kind: webpage
     subtype: article
-    table: web_articles,podcasts 
+    table: web_articles,podcasts
     ```
 
     """
+
     # Initialisation
 
     def __init__(
-            self,
-            log,
-            dbConn,
-            pathToInputDir=False,
-            settings=False,
-            deleteFiles=False
-
+        self, log, dbConn, pathToInputDir=False, settings=False, deleteFiles=False
     ):
         self.log = log
         log.debug("instansiating a new 'yaml_to_database' object")
@@ -179,27 +178,26 @@ class yaml_to_database(object):
             dbConn=dbConn,
             pathToInputDir="/path/to/yaml/directory",
             deleteFiles=False
-        ) 
-        yaml2db.ingest() 
+        )
+        yaml2db.ingest()
         ```
         """
-        self.log.debug('starting the ``ingest`` method')
+        self.log.debug("starting the ``ingest`` method")
 
         for d in os.listdir(self.pathToInputDir):
-            if os.path.isfile(os.path.join(self.pathToInputDir, d)) and "yaml" in d.lower():
+            if (
+                os.path.isfile(os.path.join(self.pathToInputDir, d))
+                and "yaml" in d.lower()
+            ):
                 self.add_yaml_file_content_to_database(
                     filepath=os.path.join(self.pathToInputDir, d),
-                    deleteFile=self.deleteFiles
+                    deleteFile=self.deleteFiles,
                 )
 
-        self.log.debug('completed the ``ingest`` method')
+        self.log.debug("completed the ``ingest`` method")
         return None
 
-    def add_yaml_file_content_to_database(
-        self,
-        filepath,
-        deleteFile=False
-    ):
+    def add_yaml_file_content_to_database(self, filepath, deleteFile=False):
         """*given a file to a yaml file, add yaml file content to database*
 
         **Key Arguments**
@@ -224,7 +222,7 @@ class yaml_to_database(object):
             log=log,
             settings=settings,
             dbConn=dbConn
-        ) 
+        )
         yaml2db.add_yaml_file_content_to_database(
             filepath=${1:"/path/to/file.yaml"},
             deleteFile=True
@@ -232,29 +230,29 @@ class yaml_to_database(object):
         ```
 
         """
-        self.log.debug(
-            'completed the ````add_yaml_file_content_to_database`` method')
+        self.log.debug("completed the ````add_yaml_file_content_to_database`` method")
 
         import codecs
         import requests
         import requests.packages.urllib3
+
         requests.packages.urllib3.disable_warnings()
 
         try:
             self.log.debug("attempting to open the file %s" % (filepath,))
-            readFile = codecs.open(filepath, encoding='utf-8', mode='r')
+            readFile = codecs.open(filepath, encoding="utf-8", mode="r")
             thisData = readFile.read()
             readFile.close()
         except IOError as e:
-            message = 'could not open the file %s' % (filepath,)
+            message = "could not open the file %s" % (filepath,)
             self.log.critical(message)
             raise IOError(message)
         readFile.close()
 
         matchObject = re.finditer(
-            r'(^|\n)(?P<key>[^\:]*)\:\s(?P<value>.*?)(\n|$)',
+            r"(^|\n)(?P<key>[^\:]*)\:\s(?P<value>.*?)(\n|$)",
             thisData,
-            flags=re.M | re.S  # re.S
+            flags=re.M | re.S,  # re.S
         )
 
         yamlContent = {}
@@ -269,7 +267,9 @@ class yaml_to_database(object):
 
         if "table" not in yamlContent:
             self.log.warning(
-                'A table value is need in the yaml content to indicate which database table to add the content to: %(filepath)s' % locals())
+                "A table value is need in the yaml content to indicate which database table to add the content to: %(filepath)s"
+                % locals()
+            )
             return None
 
         # NOTE THERE MAY BE MORE THAN ONE DATABASE TABLE
@@ -301,17 +301,17 @@ class yaml_to_database(object):
                 uniqueKeyList=uniqueKeyList,
                 dateModified=True,
                 returnInsertOnly=False,
-                replace=True
+                replace=True,
             )
         if deleteFile:
             os.remove(filepath)
 
-        self.log.debug(
-            'completed the ``add_yaml_file_content_to_database`` method')
+        self.log.debug("completed the ``add_yaml_file_content_to_database`` method")
         return None
 
     # use the tab-trigger below for new method
     # xt-class-method
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
