@@ -3,8 +3,8 @@
 """
 *Write the contents of HTML documents from memory to individual files*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys
@@ -19,14 +19,14 @@ def _dump_files_to_local_drive(bodies, theseUrls, log):
     **Key Arguments**
 
     
-      - ``bodies`` -- array of file data (currently stored in memory)
-      - ``theseUrls`` -- array of local files paths to dump the file data into
-      - ``log`` -- the logger
+    - ``bodies`` -- array of file data (currently stored in memory)
+    - ``theseUrls`` -- array of local files paths to dump the file data into
+    - ``log`` -- the logger
 
     **Return**
 
     
-      - ``None``
+    - ``None``
     """
     j = 0
     log.debug("attempting to write file data to local drive")

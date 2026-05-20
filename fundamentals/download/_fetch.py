@@ -3,8 +3,8 @@
 """
 *Retrieve an HTML document or file from the web at a given URL*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from __future__ import print_function
 from fundamentals import tools
@@ -22,12 +22,12 @@ def _fetch(url,):
 
     **Key Arguments**
 
-      - ``url`` -- the URL of the document or file
+    - ``url`` -- the URL of the document or file
 
     **Return**
 
-      - ``url`` -- the URL of the document or file, or None if an error occured
-      - ``body`` -- the text content of the HTML document.
+    - ``url`` -- the URL of the document or file, or None if an error occured
+    - ``body`` -- the text content of the HTML document.
     """
     import logging as log
     import socket

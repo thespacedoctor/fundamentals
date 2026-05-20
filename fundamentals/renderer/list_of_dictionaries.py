@@ -3,8 +3,8 @@
 """
 *Render a python list of dictionaries in various list and markup formats*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 from builtins import range

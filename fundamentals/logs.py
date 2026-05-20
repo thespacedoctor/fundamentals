@@ -3,8 +3,8 @@
 """
 *Logger setup for python projects*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import object
 import os

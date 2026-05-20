@@ -3,8 +3,8 @@
 """
 *Iterate through large line-based files in batches of lines*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import range
 from builtins import object
@@ -26,7 +26,7 @@ class fileChunker(object):
 
     **Usage**
 
-    To setup your logger, settings and database connections, please use the ``fundamentals`` package (`see tutorial here <http://fundamentals.readthedocs.io/en/latest/#tutorial>`_). 
+    To setup your logger, settings and database connections, please use the ``fundamentals`` package (see tutorial here https://fundamentals.readthedocs.io/en/master/initialisation.html). 
 
     To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
 

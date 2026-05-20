@@ -3,8 +3,8 @@
 """
 *Convert a python dictionary into rows of a mysql table*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import six
 from fundamentals.mysql import writequery, table_exists, readquery

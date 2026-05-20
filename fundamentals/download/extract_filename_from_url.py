@@ -3,8 +3,8 @@
 """
 *Try and extract the name of the document located at the given URL*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys

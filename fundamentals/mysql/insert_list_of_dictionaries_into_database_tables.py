@@ -3,8 +3,8 @@
 """
 *Given a list of dictionaries this function will insert each dictionary as a row into the given database table*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 
 from __future__ import print_function

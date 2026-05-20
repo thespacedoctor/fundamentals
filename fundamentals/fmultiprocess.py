@@ -3,8 +3,8 @@
 """
 *A function to quickly add multiprocessing to any program*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 
 

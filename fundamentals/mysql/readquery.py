@@ -3,8 +3,8 @@
 """
 *Given a mysql query, read the data from the database and return the results as a list of dictionaries (database rows)*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from fundamentals import tools
 from builtins import str

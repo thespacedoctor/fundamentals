@@ -3,8 +3,8 @@
 """
 *Toolset to setup the main function for a cl-util*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from __future__ import print_function
 from __future__ import absolute_import
@@ -498,11 +498,13 @@ class tools(object):
         """*create and/or verify a settings file at a given path*
 
         **Key Arguments:**
-            - ``pathToSettings`` -- path to create/verify
-            - ``create`` -- create the file if it does not exist. Default *False*.
+
+        - ``pathToSettings`` -- path to create/verify
+        - ``create`` -- create the file if it does not exist. Default *False*.
 
         **Return:**
-            - ``exists`` -- does the setting file now exist?
+
+        - ``exists`` -- does the setting file now exist?
         """
 
         import codecs

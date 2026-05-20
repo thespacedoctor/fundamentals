@@ -3,11 +3,11 @@
 """
 *given a sorted list of values, median sigma-clip values based on a window of values either side of each value (rolling window) and return the array mask*
 
-:Author:
-    David Young
+Author
+: David Young
 
-:Date Created:
-    January  1, 2021
+Date Created
+: January  1, 2021
 """
 from builtins import object
 import sys

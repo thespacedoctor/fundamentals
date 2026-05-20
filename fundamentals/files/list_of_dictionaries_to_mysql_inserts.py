@@ -3,8 +3,8 @@
 """
 *Convert a python list of dictionaries to pretty csv output*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import sys
 import os

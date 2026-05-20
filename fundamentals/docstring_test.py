@@ -43,9 +43,7 @@ def docsting_test(self):
     ```
     
 
-    ```eval_rst
-    .. todo::
-
+    :::{todo}
         - update key arguments values and definitions with defaults
         - update return values and definitions
         - update usage examples and text
@@ -53,15 +51,13 @@ def docsting_test(self):
         - check sublime snippet exists
         - clip any useful text to docs mindmap
         - regenerate the docs and check redendering of this docstring
-    ```
+    :::
 
     **Embed reStructuredText**
 
-    ```eval_rst
-    .. todo::
-
+    :::{todo}
         - nice!
-    ```
+    :::
 
     **Code and Syntax Highlighting**
 

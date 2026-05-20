@@ -3,8 +3,8 @@
 """
 *Given a yaml settings file containing database connection details, setup and return the db connector*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from fundamentals import tools
 from builtins import str

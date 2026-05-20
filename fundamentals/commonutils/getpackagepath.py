@@ -3,8 +3,8 @@
 """
 *Get the root path for this python package*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import os
 

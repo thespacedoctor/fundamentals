@@ -3,8 +3,8 @@
 """
 *Generate the datetime stamp for filenames*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import sys
 import os

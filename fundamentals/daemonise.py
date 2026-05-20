@@ -3,11 +3,11 @@
 """
 *helper class to daemonise you code*
 
-:Author:
-    David Young
+Author
+: David Young
 
-:Date Created:
-    May 23, 2023
+Date Created
+: May 23, 2023
 """
 
 from fundamentals import tools
@@ -22,8 +22,9 @@ class daemonise():
     A class to daemonise a python code
 
     **Key Arguments:**
-        - ``log`` -- logger
-        - ``name`` -- a name for the daemon (e.g. python package name)
+
+    - ``log`` -- logger
+    - ``name`` -- a name for the daemon (e.g. python package name)
 
     **Usage:**
 

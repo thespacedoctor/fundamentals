@@ -3,8 +3,8 @@
 """
 *Append a datetime stamp to the end of a filename to ensure uniqueness*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys

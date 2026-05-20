@@ -36,8 +36,8 @@ Options:
 
         mysqlSucker /path/to/scriptdir myLoginPath myDatabaseName -s pass -f failed
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys
@@ -308,12 +308,10 @@ def _process_script_file(
 
     **Usage:**
 
-    ```eval_rst
-    .. todo::
-
+    :::{todo}
             add usage info
             create a sublime snippet for usage
-    ```
+    :::
 
     ```python
     usage code 

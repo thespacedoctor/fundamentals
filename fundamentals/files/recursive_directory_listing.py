@@ -3,8 +3,8 @@
 """
 *List the contents of a directory recursively*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import sys
 import os

@@ -3,8 +3,8 @@
 """
 *Some time functions to be used with logging etc*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys

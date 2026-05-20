@@ -3,8 +3,8 @@
 """
 *Add tags and ratings to your macOS files and folders*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import sys
 import os

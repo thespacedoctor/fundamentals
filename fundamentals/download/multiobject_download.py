@@ -5,8 +5,8 @@
 
 There are options to rename all the downloaded resource, index the files, set differing download locations and pass basic authentication credentials.*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from __future__ import print_function
 from future import standard_library
@@ -43,20 +43,20 @@ def multiobject_download(
 
     **Key Arguments**
 
-      - ``urlList`` -- list of document urls
-      - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
-      - ``log`` -- the logger
-      - ``timestamp`` -- append a timestamp the name of the URL (ensure unique filenames)
-      - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
-      - ``timeout`` -- the timeout limit for downloads (secs)
-      - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
-      - ``resetFilename`` -- a string to reset all filenames to
-      - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
-      - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
+    - ``urlList`` -- list of document urls
+    - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
+    - ``log`` -- the logger
+    - ``timestamp`` -- append a timestamp the name of the URL (ensure unique filenames)
+    - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
+    - ``timeout`` -- the timeout limit for downloads (secs)
+    - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
+    - ``resetFilename`` -- a string to reset all filenames to
+    - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
+    - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
     **Return**
 
-      - list of timestamped documents (same order as the input urlList)
+    - list of timestamped documents (same order as the input urlList)
 
     **Usage**
 

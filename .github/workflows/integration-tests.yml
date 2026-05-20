@@ -1,0 +1,7 @@
+name: Integration Tests
+
+on: [pull_request]
+
+jobs:
+  call-workflow:
+    uses: thespacedoctor/reusable-workflows/.github/workflows/integration-tests.yml@main

@@ -3,8 +3,8 @@
 """
 *A unit-testing kit to simplify my unit-tests*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import object
 import sys

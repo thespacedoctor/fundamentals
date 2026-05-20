@@ -3,8 +3,8 @@
 """
 *Probe a database to determine if a given table exists*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 import sys
 import os

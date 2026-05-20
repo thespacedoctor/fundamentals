@@ -3,8 +3,8 @@
 """
 *Given a database connection and a database table name, return the column names for the table*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys

@@ -3,8 +3,8 @@
 """
 *a database object that can setup up a ssh tunnel (optional) and a database connection*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import object
 import sys

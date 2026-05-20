@@ -3,8 +3,8 @@
 """
 *Execute a MySQL write query on a database table*
 
-:Author:
-    David Young
+Author
+: David Young
 """
 from builtins import str
 import sys
