@@ -1,11 +1,12 @@
 
 ## Release Notes
 
-**v May 13, 2026**
+**v2.8.0 - May 20, 2026**
 
+* **ENHANCEMENT:** adding github actions for automatic release
 * **REFACTOR:** updating readthedocs settings
 * **REFACTOR:** upgrading to `pyproject.toml` from `setup.py`
-* **ENHANCEMENT:** adding github actions for automatic release
+* **DOCS**: updating docs to use furo theme
 
 **v2.7.8 - November 3, 2025**
 
