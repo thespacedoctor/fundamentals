@@ -1,6 +1,9 @@
 
 ## Release Notes
 
+**v2.8.1 - May 20, 2026**
+
+* **FIXED:** adding `tqdm` to the conda requirements
 
 **v2.8.0 - May 20, 2026**
 
