@@ -28,7 +28,8 @@ dependencies = [
     'python-dateutil',
     'requests',
     'python-daemon',
-    'tqdm'
+    'tqdm',
+    'pyreadline3'
 ]
 
 [project.urls]
