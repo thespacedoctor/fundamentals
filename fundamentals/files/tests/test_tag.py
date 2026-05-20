@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -42,27 +43,27 @@ if not os.path.exists(pathToOutputDir):
 
 # xt-setup-unit-testing-files-and-folders
 
+
 class test_tag(unittest.TestCase):
 
     def test_tag_function(self):
 
         from fundamentals.files.tag import tag
+
         tag(
             log=log,
             filepath=pathToOutputDir + "/file_needing_tagged.dat",
             tags="test,tags, fundamentals",
             rating=3,
-            wherefrom="http://www.thespacedoctor.co.uk"
+            wherefrom="http://www.thespacedoctor.co.uk",
         )
 
     def test_tag_function_exception(self):
 
         from fundamentals.files import tag
+
         try:
-            this = tag(
-                log=log,
-                fakeKey="break the code"
-            )
+            this = tag(log=log, fakeKey="break the code")
             assert False
         except Exception as e:
             assert True

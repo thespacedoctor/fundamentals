@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -42,11 +43,13 @@ if not os.path.exists(pathToOutputDir):
 
 # xt-setup-unit-testing-files-and-folders
 
+
 class test_yaml_to_database(unittest.TestCase):
 
     def test_single_yaml_to_database_function(self):
         # COPY INPUT TO OUTPUT DIR
         import shutil
+
         try:
             shutil.rmtree(pathToOutputDir)
         except:
@@ -55,11 +58,12 @@ class test_yaml_to_database(unittest.TestCase):
         shutil.copytree(pathToInputDir, pathToOutputDir)
 
         from fundamentals.mysql import yaml_to_database
+
         yaml2db = yaml_to_database(
             log=log,
             settings=settings,
             dbConn=dbConn,
-            pathToInputDir=pathToOutputDir + "yaml"
+            pathToInputDir=pathToOutputDir + "yaml",
         )
         yaml2db.add_yaml_file_content_to_database(
             filepath=pathToOutputDir + "yaml/20161219105124.yaml"
@@ -68,23 +72,22 @@ class test_yaml_to_database(unittest.TestCase):
     def test_yaml_to_database_function(self):
 
         from fundamentals.mysql import yaml_to_database
+
         yaml2db = yaml_to_database(
             log=log,
             settings=settings,
             dbConn=dbConn,
-            pathToInputDir=pathToOutputDir + "/yaml"
+            pathToInputDir=pathToOutputDir + "/yaml",
         )
         yaml2db.ingest()
 
     def test_yaml_to_database_function_exception(self):
 
         from fundamentals.mysql import yaml_to_database
+
         try:
             this = yaml_to_database(
-                log=log,
-                settings=settings,
-                dbConn=dbConn,
-                fakeKey="break the code"
+                log=log, settings=settings, dbConn=dbConn, fakeKey="break the code"
             )
             this.get()
             assert False

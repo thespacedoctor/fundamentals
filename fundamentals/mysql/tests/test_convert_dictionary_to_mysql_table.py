@@ -9,6 +9,7 @@ import re
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -20,7 +21,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -41,24 +42,27 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-reDatetime = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
+reDatetime = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
+
 
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def test_convert_dictionary_to_mysql_table_function(self):
         from fundamentals.mysql import writequery
+
         sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL  AUTO_INCREMENT,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', `dateCreated` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP, `dateModified` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`) )"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
-        dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        dictionary = {
+            "a newKey": "cool",
+            "and another": "super cool",
+            "uniquekey1": "cheese",
+            "uniqueKey2": "burgers",
+        }
         from fundamentals.mysql import convert_dictionary_to_mysql_table
+
         message = convert_dictionary_to_mysql_table(
             dbConn=dbConn,
             log=log,
@@ -67,49 +71,25 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
             createHelperTables=False,
             dateModified=True,
-            returnInsertOnly=False
+            returnInsertOnly=False,
         )
 
     def test_return_inserts(self):
         from fundamentals.mysql import writequery
+
         sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
         )
 
-        dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        dictionary = {
+            "a newKey": "cool",
+            "and another": "super cool",
+            "uniquekey1": "cheese",
+            "uniqueKey2": "burgers",
+        }
         from fundamentals.mysql import convert_dictionary_to_mysql_table
-        message = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
-            dictionary=dictionary,
-            dbTableName="testing_table",
-            uniqueKeyList=["uniquekey1", "uniqueKey2"],
-            createHelperTables=False,
-            dateModified=False,
-            returnInsertOnly=True
-        )
-        # print(message)
 
-    def test_return_inserts_with_datetime_pre_compiled(self):
-        from fundamentals.mysql import writequery
-        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
-        writequery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-            Force=False,
-            manyValueList=False
-        )
-
-        dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
-        from fundamentals.mysql import convert_dictionary_to_mysql_table
         message = convert_dictionary_to_mysql_table(
             dbConn=dbConn,
             log=log,
@@ -119,14 +99,47 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             createHelperTables=False,
             dateModified=False,
             returnInsertOnly=True,
-            reDatetime=reDatetime
+        )
+        # print(message)
+
+    def test_return_inserts_with_datetime_pre_compiled(self):
+        from fundamentals.mysql import writequery
+
+        sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
+        writequery(
+            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+        )
+
+        dictionary = {
+            "a newKey": "cool",
+            "and another": "super cool",
+            "uniquekey1": "cheese",
+            "uniqueKey2": "burgers",
+        }
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        message = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=["uniquekey1", "uniqueKey2"],
+            createHelperTables=False,
+            dateModified=False,
+            returnInsertOnly=True,
+            reDatetime=reDatetime,
         )
         # print(message)
 
     def test_return_inserts_non_batch(self):
-        dictionary = {"a newKey": "cool", "and another": "super cool",
-                      "uniquekey1": "cheese", "uniqueKey2": "burgers"}
+        dictionary = {
+            "a newKey": "cool",
+            "and another": "super cool",
+            "uniquekey1": "cheese",
+            "uniqueKey2": "burgers",
+        }
         from fundamentals.mysql import convert_dictionary_to_mysql_table
+
         inserts = convert_dictionary_to_mysql_table(
             dbConn=dbConn,
             log=log,
@@ -136,7 +149,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dateModified=False,
             returnInsertOnly=True,
             replace=True,
-            batchInserts=False
+            batchInserts=False,
         )
 
         # x-print-testpage-for-pessto-marshall-web-object

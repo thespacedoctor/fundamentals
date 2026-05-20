@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,15 +41,15 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_get_database_table_column_names(unittest.TestCase):
 
     def test_get_database_table_column_names_function(self):
 
         from fundamentals.mysql import get_database_table_column_names
+
         columnNames = get_database_table_column_names(
-            dbConn=dbConn,
-            log=log,
-            dbTable="testing_table"
+            dbConn=dbConn, log=log, dbTable="testing_table"
         )
         # print(columnNames)
 

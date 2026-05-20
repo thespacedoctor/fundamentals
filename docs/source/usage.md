@@ -1,6 +1,6 @@
 
 
-```bash 
+```bash
     
     Documentation for fundamentals can be found here: http://fundamentals.readthedocs.org
     

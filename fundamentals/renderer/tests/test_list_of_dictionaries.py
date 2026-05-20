@@ -9,6 +9,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -20,7 +21,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -45,22 +46,20 @@ pathToPickleFile = pathToInputDir + "/list-of-dictionaries.p"
 
 listOfDictionaries = pickle.load(open(pathToPickleFile, "rb"))
 
+
 class test_list_of_dictionaries(unittest.TestCase):
 
     def test_list_of_dictionaries_function(self):
 
         from fundamentals.renderer import list_of_dictionaries
-        dataSet = list_of_dictionaries(
-            log=log,
-            listOfDictionaries=listOfDictionaries
-        )
+
+        dataSet = list_of_dictionaries(log=log, listOfDictionaries=listOfDictionaries)
         # print(dataSet.table())
         dataSet.table(filepath=pathToOutputDir + "myData.dat")
         # print(dataSet.csv())
         dataSet.csv(filepath=pathToOutputDir + "myData.csv")
         # print(dataSet.mysql(tableName="TNS"))
-        dataSet.mysql(tableName="TNS",
-                      filepath=pathToOutputDir + "myData.mysql")
+        dataSet.mysql(tableName="TNS", filepath=pathToOutputDir + "myData.mysql")
 
         # print(dataSet.json())
         dataSet.json(filepath=pathToOutputDir + "myData.json")
@@ -72,36 +71,20 @@ class test_list_of_dictionaries(unittest.TestCase):
     def test_list_of_dictionaries_function_02(self):
 
         dataList = [
-            {
-                "owner": "daisy",
-                "pet": "dog",
-                "address": "belfast, uk"
-            },
-            {
-                "owner": "john",
-                "pet": "snake",
-                "address": "the moon"
-            },
-            {
-                "owner": "susan",
-                "pet": "crocodile",
-                "address": "larne"
-            }
-
+            {"owner": "daisy", "pet": "dog", "address": "belfast, uk"},
+            {"owner": "john", "pet": "snake", "address": "the moon"},
+            {"owner": "susan", "pet": "crocodile", "address": "larne"},
         ]
 
         from fundamentals.renderer import list_of_dictionaries
-        dataSet = list_of_dictionaries(
-            log=log,
-            listOfDictionaries=dataList
-        )
+
+        dataSet = list_of_dictionaries(log=log, listOfDictionaries=dataList)
         # print(dataSet.table())
         dataSet.table(filepath=pathToOutputDir + "myData.dat")
         # print(dataSet.csv())
         dataSet.csv(filepath=pathToOutputDir + "myData.csv")
         # print(dataSet.mysql(tableName="TNS"))
-        dataSet.mysql(tableName="TNS",
-                      filepath=pathToOutputDir + "myData.mysql")
+        dataSet.mysql(tableName="TNS", filepath=pathToOutputDir + "myData.mysql")
         # print(dataSet.json())
         dataSet.json(filepath=pathToOutputDir + "myData.json")
         # print(dataSet.yaml())
@@ -112,11 +95,10 @@ class test_list_of_dictionaries(unittest.TestCase):
     def test_list_of_dictionaries_function_exception(self):
 
         from fundamentals.renderer import list_of_dictionaries
+
         try:
             this = list_of_dictionaries(
-                log=log,
-                listOfDictionaries=listOfDictionaries,
-                fakeKey="break the code"
+                log=log, listOfDictionaries=listOfDictionaries, fakeKey="break the code"
             )
             this.get()
             assert False

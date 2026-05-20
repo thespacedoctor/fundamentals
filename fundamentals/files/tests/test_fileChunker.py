@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -42,15 +43,14 @@ if not os.path.exists(pathToOutputDir):
 
 largeFile = pathToInputDir + "/ppmxl-head.csv"
 
+
 class test_fileChunker(unittest.TestCase):
 
     def test_fileChunker_function(self):
 
         from fundamentals.files import fileChunker
-        fileIterator = fileChunker(
-            filepath=largeFile,
-            batchSize=93840
-        )
+
+        fileIterator = fileChunker(filepath=largeFile, batchSize=93840)
         for i in fileIterator:
             print(len(i))
 
@@ -69,6 +69,6 @@ class test_fileChunker(unittest.TestCase):
     #         assert True
     #         print(str(e))
 
-        # x-print-testpage-for-pessto-marshall-web-object
+    # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function

@@ -3,14 +3,17 @@
 """
 *Try and extract the name of the document located at the given URL*
 
-:Author:
-    David Young
+Author
+: David Young
 """
+
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
+
 
 def extract_filename_from_url(log, url):
     """
@@ -21,7 +24,7 @@ def extract_filename_from_url(log, url):
     **Key Arguments**
 
     - ``url`` -- the url to extract filename from
-    
+
 
     Returns:
         - ``filename`` -- the filename
@@ -37,19 +40,20 @@ def extract_filename_from_url(log, url):
     print name
     # OUT: Docstring.html
     ```
-    
+
     """
     import re
+
     # EXTRACT THE FILENAME FROM THE URL
     try:
         log.debug("extracting filename from url " + url)
-        reEoURL = re.compile('([\w\.\_\-]*)$')
+        reEoURL = re.compile("([\w\.\_\-]*)$")
         filename = reEoURL.findall(url)[0]
         # log.debug(filename)
-        if(len(filename) == 0):
-            filename = 'untitled.html'
-        if not (re.search('\.', filename)):
-            filename = filename + '.html'
+        if len(filename) == 0:
+            filename = "untitled.html"
+        if not (re.search("\.", filename)):
+            filename = filename + ".html"
     except Exception as e:
         filename = None
         # print url

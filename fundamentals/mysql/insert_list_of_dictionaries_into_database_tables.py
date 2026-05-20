@@ -3,9 +3,10 @@
 """
 *Given a list of dictionaries this function will insert each dictionary as a row into the given database table*
 
-:Author:
-    David Young
+Author
+: David Young
 """
+
 from __future__ import print_function
 from __future__ import division
 from datetime import datetime
@@ -18,10 +19,10 @@ from fundamentals import tools
 from builtins import str
 from builtins import range
 from past.utils import old_div
-import pandas as pd
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 
 
 count = 0
@@ -31,16 +32,17 @@ sharedList = []
 
 
 def insert_list_of_dictionaries_into_database_tables(
-        dbConn,
-        log,
-        dictList,
-        dbTableName,
-        uniqueKeyList=[],
-        dateModified=False,
-        dateCreated=True,
-        batchSize=2500,
-        replace=False,
-        dbSettings=False):
+    dbConn,
+    log,
+    dictList,
+    dbTableName,
+    uniqueKeyList=[],
+    dateModified=False,
+    dateCreated=True,
+    batchSize=2500,
+    replace=False,
+    dbSettings=False,
+):
     """insert list of dictionaries into database tables
 
     **Key Arguments**
@@ -80,14 +82,15 @@ def insert_list_of_dictionaries_into_database_tables(
     """
 
     log.debug(
-        'starting the ````insert_list_of_dictionaries_into_database_tables`` function')
+        "starting the ````insert_list_of_dictionaries_into_database_tables`` function"
+    )
 
     global count
     global totalCount
     global globalDbConn
     global sharedList
 
-    reDate = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}T')
+    reDate = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
 
     if dbSettings:
         globalDbConn = dbSettings
@@ -95,8 +98,7 @@ def insert_list_of_dictionaries_into_database_tables(
         globalDbConn = dbConn
 
     if len(dictList) == 0:
-        log.warning(
-            'the dictionary to be added to the database is empty' % locals())
+        log.warning("the dictionary to be added to the database is empty" % locals())
         return None
 
     if len(dictList):
@@ -130,7 +132,8 @@ def insert_list_of_dictionaries_into_database_tables(
             dateModified=dateModified,
             reDatetime=reDate,
             replace=replace,
-            dateCreated=dateCreated)
+            dateCreated=dateCreated,
+        )
         dictList = dictList[1:]
 
     dbConn.autocommit(False)
@@ -165,32 +168,44 @@ def insert_list_of_dictionaries_into_database_tables(
                 replace=replace,
                 batchSize=batchSize,
                 reDatetime=reDate,
-                dateCreated=dateCreated
+                dateCreated=dateCreated,
             )
 
         else:
-            fmultiprocess(log=log, function=_add_dictlist_to_database_via_load_in_file,
-                          inputArray=list(range(len(sharedList))), dbTablename=dbTableName,
-                          dbSettings=dbSettings, dateModified=dateModified, turnOffMP=False, progressBar=True)
+            fmultiprocess(
+                log=log,
+                function=_add_dictlist_to_database_via_load_in_file,
+                inputArray=list(range(len(sharedList))),
+                dbTablename=dbTableName,
+                dbSettings=dbSettings,
+                dateModified=dateModified,
+                turnOffMP=False,
+                progressBar=True,
+            )
 
         sys.stdout.write("\x1b[1A\x1b[2K")
-        print("%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s" % locals())
+        print(
+            "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"
+            % locals()
+        )
 
     log.debug(
-        'completed the ``insert_list_of_dictionaries_into_database_tables`` function')
+        "completed the ``insert_list_of_dictionaries_into_database_tables`` function"
+    )
     return None
 
 
 def _insert_single_batch_into_database(
-        batchIndex,
-        log,
-        dbTableName,
-        uniqueKeyList,
-        dateModified,
-        replace,
-        batchSize,
-        reDatetime,
-        dateCreated):
+    batchIndex,
+    log,
+    dbTableName,
+    uniqueKeyList,
+    dateModified,
+    replace,
+    batchSize,
+    reDatetime,
+    dateCreated,
+):
     """*summary of function*
 
     **Key Arguments**
@@ -213,11 +228,11 @@ def _insert_single_batch_into_database(
         create a sublime snippet for usage
 
     ```python
-    usage code            
+    usage code
     ```
 
     """
-    log.debug('starting the ``_insert_single_batch_into_database`` function')
+    log.debug("starting the ``_insert_single_batch_into_database`` function")
 
     global totalCount
     global globalDbConn
@@ -230,11 +245,7 @@ def _insert_single_batch_into_database(
     if isinstance(globalDbConn, dict):
         # SETUP ALL DATABASE CONNECTIONS
 
-        dbConn = database(
-            log=log,
-            dbSettings=globalDbConn,
-            autocommit=False
-        ).connect()
+        dbConn = database(log=log, dbSettings=globalDbConn, autocommit=False).connect()
     else:
         dbConn = globalDbConn
 
@@ -253,21 +264,30 @@ def _insert_single_batch_into_database(
 
         uniKeys = set().union(*(list(d.keys()) for d in batch[0]))
         tmp = []
-        tmp[:] = [m.replace(" ", "_").replace(
-            "-", "_") for m in uniKeys]
+        tmp[:] = [m.replace(" ", "_").replace("-", "_") for m in uniKeys]
         uniKeys = tmp
 
-        myKeys = '`,`'.join(uniKeys)
-        vals = [tuple([None if d[k] in ["None", None] else d[k]
-                       for k in uniKeys]) for d in batch[0]]
+        myKeys = "`,`".join(uniKeys)
+        vals = [
+            tuple([None if d[k] in ["None", None] else d[k] for k in uniKeys])
+            for d in batch[0]
+        ]
         valueString = ("%s, " * len(vals[0]))[:-2]
-        insertCommand = insertVerb + """ INTO `""" + dbTableName + \
-            """` (`""" + myKeys + """`, dateCreated) VALUES (""" + \
-            valueString + """, NOW())"""
+        insertCommand = (
+            insertVerb
+            + """ INTO `"""
+            + dbTableName
+            + """` (`"""
+            + myKeys
+            + """`, dateCreated) VALUES ("""
+            + valueString
+            + """, NOW())"""
+        )
 
         if not dateCreated:
-            insertCommand = insertCommand.replace(
-                ", dateCreated)", ")").replace(", NOW())", ")")
+            insertCommand = insertCommand.replace(", dateCreated)", ")").replace(
+                ", NOW())", ")"
+            )
 
         dup = ""
         if replace:
@@ -280,7 +300,7 @@ def _insert_single_batch_into_database(
 
         insertCommand = insertCommand.replace('\\""', '\\" "')
         insertCommand = insertCommand.replace('""', "null")
-        insertCommand = insertCommand.replace('"None"', 'null')
+        insertCommand = insertCommand.replace('"None"', "null")
 
         message = ""
         # log.debug('adding new data to the %s table; query: %s' %
@@ -291,7 +311,7 @@ def _insert_single_batch_into_database(
                 sqlQuery=insertCommand,
                 dbConn=dbConn,
                 Force=True,
-                manyValueList=vals
+                manyValueList=vals,
             )
         except:
             theseInserts = []
@@ -306,7 +326,7 @@ def _insert_single_batch_into_database(
                     returnInsertOnly=True,
                     replace=replace,
                     reDatetime=reDate,
-                    skipChecks=True
+                    skipChecks=True,
                 )
                 theseInserts.append(valueTuple)
 
@@ -318,7 +338,7 @@ def _insert_single_batch_into_database(
                 sqlQuery=insertCommand,
                 dbConn=dbConn,
                 Force=True,
-                manyValueList=theseInserts
+                manyValueList=theseInserts,
             )
 
         if message == "unknown column":
@@ -331,22 +351,20 @@ def _insert_single_batch_into_database(
                     uniqueKeyList=uniqueKeyList,
                     dateModified=dateModified,
                     reDatetime=reDate,
-                    replace=replace
+                    replace=replace,
                 )
         else:
             inserted = True
 
     dbConn.commit()
 
-    log.debug('completed the ``_insert_single_batch_into_database`` function')
+    log.debug("completed the ``_insert_single_batch_into_database`` function")
     return "None"
 
 
 def _add_dictlist_to_database_via_load_in_file(
-        masterListIndex,
-        dbTablename,
-        dbSettings,
-        dateModified=False):
+    masterListIndex, dbTablename, dbSettings, dateModified=False
+):
     """*load a list of dictionaries into a database table with load data infile*
 
     **Key Arguments**
@@ -379,8 +397,10 @@ def _add_dictlist_to_database_via_load_in_file(
 
     from fundamentals.logs import emptyLogger
     import numpy as np
+    import pandas as pd
+
     log = emptyLogger()
-    log.debug('starting the ``_add_dictlist_to_database_via_load_in_file`` function')
+    log.debug("starting the ``_add_dictlist_to_database_via_load_in_file`` function")
 
     dictList = sharedList[masterListIndex][0]
 
@@ -390,43 +410,42 @@ def _add_dictlist_to_database_via_load_in_file(
     ltotalCount = totalCount
 
     # SETUP ALL DATABASE CONNECTIONS
-    dbConn = database(
-        log=log,
-        dbSettings=dbSettings
-    ).connect()
+    dbConn = database(log=log, dbSettings=dbSettings).connect()
 
     now = datetime.now()
 
     import random
+
     rand = random.randint(0, 10000)
 
     tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
 
     # CREATE A TEMPORY TABLE TO ADD DATA TO
-    sqlQuery = """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;""" % locals()
-    writequery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn
+    sqlQuery = (
+        """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;"""
+        % locals()
     )
+    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     sqlQuery = """ALTER TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
-    writequery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn
-    )
+    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     csvColumns = [k for d in dictList for k in list(d.keys())]
     csvColumns = list(set(csvColumns))
-    csvColumnsString = ('`, `').join(csvColumns)
-    csvColumnsString = f'`{csvColumnsString}`'
-    csvColumnsString = csvColumnsString.replace(u'`dec`', u'`decl`')
+    csvColumnsString = ("`, `").join(csvColumns)
+    csvColumnsString = f"`{csvColumnsString}`"
+    csvColumnsString = csvColumnsString.replace("`dec`", "`decl`")
 
     df = pd.DataFrame(dictList)
-    df.replace(['nan', 'None', '', 'NaN', np.nan, None], "\\N", inplace=True)
-    df.to_csv('/tmp/%(tmpTable)s' % locals(), sep="|",
-              index=False, quotechar='"', columns=csvColumns, encoding='utf-8')
+    df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
+    df.to_csv(
+        "/tmp/%(tmpTable)s" % locals(),
+        sep="|",
+        index=False,
+        quotechar='"',
+        columns=csvColumns,
+        encoding="utf-8",
+    )
 
     sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
 INTO TABLE %(tmpTable)s
@@ -434,11 +453,7 @@ FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
 IGNORE 1 LINES
 (%(csvColumnsString)s);""" % locals()
 
-    writequery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn
-    )
+    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     updateStatement = ""
     for i in csvColumns:
@@ -452,30 +467,22 @@ IGNORE 1 LINES
 INSERT IGNORE INTO %(dbTablename)s
 SELECT * FROM %(tmpTable)s
 ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
-    writequery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn
-    )
+    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
-    writequery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn
-    )
+    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     try:
-        os.remove('/tmp/%(tmpTable)s' % locals())
+        os.remove("/tmp/%(tmpTable)s" % locals())
     except:
         pass
 
     dbConn.commit()
     dbConn.close()
 
-    log.debug(
-        'completed the ``_add_dictlist_to_database_via_load_in_file`` function')
+    log.debug("completed the ``_add_dictlist_to_database_via_load_in_file`` function")
     return None
+
 
 # use the tab-trigger below for new function
 # xt-def-function

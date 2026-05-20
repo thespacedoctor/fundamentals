@@ -5,22 +5,26 @@
 
 There are options to rename all the downloaded resource, index the files, set differing download locations and pass basic authentication credentials.*
 
-:Author:
-    David Young
+Author
+: David Young
 """
+
 from __future__ import print_function
 from future import standard_library
+
 standard_library.install_aliases()
 from builtins import zip
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 import urllib
 import requests
 from multiprocessing.pool import ThreadPool
-gtimeout = 10.
+
+gtimeout = 10.0
 llog = ""
 import random
 import time
@@ -36,27 +40,27 @@ def multiobject_download(
     resetFilename=False,
     credentials=False,
     longTime=False,
-    indexFilenames=False
+    indexFilenames=False,
 ):
     """
     *get multiple url documents and place them in specified download directory/directories*
 
     **Key Arguments**
 
-      - ``urlList`` -- list of document urls
-      - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
-      - ``log`` -- the logger
-      - ``timestamp`` -- append a timestamp the name of the URL (ensure unique filenames)
-      - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
-      - ``timeout`` -- the timeout limit for downloads (secs)
-      - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
-      - ``resetFilename`` -- a string to reset all filenames to
-      - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
-      - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
+    - ``urlList`` -- list of document urls
+    - ``downloadDirectory`` -- directory(ies) to download the documents to - can be one directory path or a list of paths the same length as urlList
+    - ``log`` -- the logger
+    - ``timestamp`` -- append a timestamp the name of the URL (ensure unique filenames)
+    - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
+    - ``timeout`` -- the timeout limit for downloads (secs)
+    - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
+    - ``resetFilename`` -- a string to reset all filenames to
+    - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
+    - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
     **Return**
 
-      - list of timestamped documents (same order as the input urlList)
+    - list of timestamped documents (same order as the input urlList)
 
     **Usage**
 
@@ -86,7 +90,10 @@ def multiobject_download(
     import sys
     import os
     import re
-    from fundamentals.download import append_now_datestamp_to_filename, extract_filename_from_url
+    from fundamentals.download import (
+        append_now_datestamp_to_filename,
+        extract_filename_from_url,
+    )
 
     # TIMEOUT IN SECONDS
     global gtimeout
@@ -116,13 +123,15 @@ def multiobject_download(
 
             if not filename:
                 from datetime import datetime, date, time
+
                 now = datetime.now()
                 filename = now.strftime("%Y%m%dt%H%M%S%f")
 
-            if(timeStamp):
+            if timeStamp:
                 # APPEND TIMESTAMP TO THE FILENAME
                 filename = append_now_datestamp_to_filename(
-                    log, filename, longTime=longTime)
+                    log, filename, longTime=longTime
+                )
             # GENERATE THE LOCAL FILE URL
             localFilepath = downloadDirectory + "/" + filename
 
@@ -146,10 +155,9 @@ def multiobject_download(
             if not filename:
                 continue
 
-            if(timeStamp):
+            if timeStamp:
                 # APPEND TIMESTAMP TO THE FILENAME
-                filename = append_now_datestamp_to_filename(
-                    log, filename)
+                filename = append_now_datestamp_to_filename(log, filename)
             # GENERATE THE LOCAL FILE URL
             localFilepath = d + "/" + filename
             thisArray.extend([[url, localFilepath]])
@@ -163,8 +171,7 @@ def multiobject_download(
                     url = url_pass + url
 
     # CONCURRENTLY DOWNLOAD URLS
-    results = ThreadPool(concurrentDownloads).imap_unordered(
-        fetch_url, thisArray)
+    results = ThreadPool(concurrentDownloads).imap_unordered(fetch_url, thisArray)
     urlNum = 0
     returnPaths = []
     for path in results:
@@ -173,8 +180,11 @@ def multiobject_download(
         if urlNum > 1:
             # CURSOR UP ONE LINE AND CLEAR LINE
             sys.stdout.write("\x1b[1A\x1b[2K")
-        percent = (float(urlNum) / float(totalCount)) * 100.
-        print("  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded" % locals())
+        percent = (float(urlNum) / float(totalCount)) * 100.0
+        print(
+            "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded"
+            % locals()
+        )
 
     localPaths = []
     localPaths[:] = [o[1] for o in thisArray if o[1] in returnPaths]
@@ -189,7 +199,7 @@ def fetch_url(entry):
     uri, path = entry
     timeout = gtimeout
 
-    randSleep = random.randint(1, 101) / 20.
+    randSleep = random.randint(1, 101) / 20.0
 
     time.sleep(randSleep)
 
@@ -199,17 +209,21 @@ def fetch_url(entry):
         except:
             count += 1
             timeout *= 2
-            llog.warning(f"timeout on attempt number {count}/{tries}. Increasing to {timeout}s")
+            llog.warning(
+                f"timeout on attempt number {count}/{tries}. Increasing to {timeout}s"
+            )
             continue
 
         if r.status_code == 200:
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 for chunk in r:
                     f.write(chunk)
             return path
         else:
             count += 1
-            llog.warning(f"Getting status code {r.status_code} on download attempt {count}/{tries}.")
+            llog.warning(
+                f"Getting status code {r.status_code} on download attempt {count}/{tries}."
+            )
             downloaded = False
 
     return None

@@ -5,7 +5,7 @@ Documentation for fundamentals can be found here: http://fundamentals.readthedoc
 
 Usage:
     fundamentals init
-    fundamentals [-s <pathToSettingsFile>]  
+    fundamentals [-s <pathToSettingsFile>]
 
 Options:
     init                                   setup the fundamentals settings file for the first time
@@ -13,9 +13,11 @@ Options:
     -v, --version                          show version
     -s, --settings <pathToSettingsFile>    the settings file
 """
+
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 import readline
 import glob
 import pickle
@@ -25,7 +27,7 @@ from subprocess import Popen, PIPE, STDOUT
 
 
 def tab_complete(text, state):
-    return (glob.glob(text + '*') + [None])[state]
+    return (glob.glob(text + "*") + [None])[state]
 
 
 def main(arguments=None):
@@ -39,12 +41,12 @@ def main(arguments=None):
         logLevel="WARNING",
         options_first=False,
         projectName="fundamentals",
-        defaultSettingsFile=True
+        defaultSettingsFile=True,
     )
     arguments, settings, log, dbConn = su.setup()
 
     # tab completion for raw_input
-    readline.set_completer_delims(' \t\n;')
+    readline.set_completer_delims(" \t\n;")
     readline.parse_and_bind("tab: complete")
     readline.set_completer(tab_complete)
 
@@ -60,13 +62,17 @@ def main(arguments=None):
         if arg == "--dbConn":
             dbConn = val
             a["dbConn"] = val
-        log.debug('%s = %s' % (varname, val,))
+        log.debug(
+            "%s = %s"
+            % (
+                varname,
+                val,
+            )
+        )
 
     ## START LOGGING ##
     startTime = times.get_now_sql_datetime()
-    log.info(
-        '--- STARTING TO RUN THE cl_utils.py AT %s' %
-        (startTime,))
+    log.info("--- STARTING TO RUN THE cl_utils.py AT %s" % (startTime,))
 
     # set options interactively if user requests
     if "interactiveFlag" in a and a["interactiveFlag"]:
@@ -98,6 +104,7 @@ def main(arguments=None):
 
     if a["init"]:
         from os.path import expanduser
+
         home = expanduser("~")
         filepath = home + "/.config/fundamentals/fundamentals.yaml"
         try:
@@ -120,10 +127,16 @@ def main(arguments=None):
     ## FINISH LOGGING ##
     endTime = times.get_now_sql_datetime()
     runningTime = times.calculate_time_difference(startTime, endTime)
-    log.info('-- FINISHED ATTEMPT TO RUN THE cl_utils.py AT %s (RUNTIME: %s) --' %
-             (endTime, runningTime, ))
+    log.info(
+        "-- FINISHED ATTEMPT TO RUN THE cl_utils.py AT %s (RUNTIME: %s) --"
+        % (
+            endTime,
+            runningTime,
+        )
+    )
 
     return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
