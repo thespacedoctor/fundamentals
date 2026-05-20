@@ -7,14 +7,21 @@ Author
 : David Young
 """
 
-
 import os
 
 os.environ["TERM"] = "vt100"
 
 
 def fmultiprocess(
-    log, function, inputArray, poolSize=False, timeout=3600, turnOffMP=False, progressBar=False, mute=False, **kwargs
+    log,
+    function,
+    inputArray,
+    poolSize=False,
+    timeout=3600,
+    turnOffMP=False,
+    progressBar=False,
+    mute=False,
+    **kwargs,
 ):
     """multiprocess pool
 
@@ -79,9 +86,19 @@ def fmultiprocess(
                 counter_lock = l
                 import logging
 
-                streamHandlers = [h for h in log.handlers if not isinstance(h, logging.FileHandler)]
-                streamHandlersLevel = [h.level for h in log.handlers if not isinstance(h, logging.FileHandler)]
-                [h.setLevel(logging.WARNING) for h in log.handlers if not isinstance(h, logging.FileHandler)]
+                streamHandlers = [
+                    h for h in log.handlers if not isinstance(h, logging.FileHandler)
+                ]
+                streamHandlersLevel = [
+                    h.level
+                    for h in log.handlers
+                    if not isinstance(h, logging.FileHandler)
+                ]
+                [
+                    h.setLevel(logging.WARNING)
+                    for h in log.handlers
+                    if not isinstance(h, logging.FileHandler)
+                ]
                 sys.stdout = open(os.devnull, "w")
 
         else:
@@ -136,7 +153,9 @@ def fmultiprocess(
                 while not futureArray.ready():
                     current_time = time.time()
                     if current_time > start_time + timeout:
-                        raise TimeoutError(f"The timeout limit of {timeout}s has been reached")
+                        raise TimeoutError(
+                            f"The timeout limit of {timeout}s has been reached"
+                        )
                     if c.value != 0:
                         with l:
                             increment = c.value

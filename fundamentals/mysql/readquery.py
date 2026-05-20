@@ -6,18 +6,16 @@
 Author
 : David Young
 """
+
 from fundamentals import tools
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 
 
-def readquery(
-        sqlQuery,
-        dbConn,
-        log,
-        quiet=False):
+def readquery(sqlQuery, dbConn, log, quiet=False):
     """Given a mysql query, read the data from the database and return the results as a list of dictionaries (database rows)
 
     **Key Arguments**
@@ -46,10 +44,11 @@ def readquery(
     ```
 
     """
-    log.debug('starting the ``readquery`` function')
+    log.debug("starting the ``readquery`` function")
     import pymysql
     import warnings
-    warnings.filterwarnings('error', category=pymysql.Warning)
+
+    warnings.filterwarnings("error", category=pymysql.Warning)
 
     rows = []
 
@@ -59,8 +58,8 @@ def readquery(
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
         # cursor = dbConn.SScursor(pymysql.cursors.SSDictCursor)
     except Exception as e:
-        log.error('could not create the database cursor: %s' % (e, ))
-        raise IOError('could not create the database cursor: %s' % (e, ))
+        log.error("could not create the database cursor: %s" % (e,))
+        raise IOError("could not create the database cursor: %s" % (e,))
     # EXECUTE THE SQL COMMAND
     tryAgain = True
     tries = 1
@@ -81,18 +80,24 @@ def readquery(
             sqlQuery = sqlQuery[:1000]
             if quiet == False:
                 log.warning(
-                    'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
+                    "MySQL raised an error - read command not executed.\n"
+                    + str(e)
+                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+                )
                 raise e
             else:
                 log.warning(
-                    'MySQL raised an error - read command not executed.\n' + str(e) + '\nHere is the sqlQuery\n\t%(sqlQuery)s' % locals())
+                    "MySQL raised an error - read command not executed.\n"
+                    + str(e)
+                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+                )
                 pass
 
     # CLOSE THE CURSOR
     try:
         cursor.close()
     except Exception as e:
-        log.warning('could not close the db cursor ' + str(e) + '\n')
+        log.warning("could not close the db cursor " + str(e) + "\n")
 
-    log.debug('completed the ``readquery`` function')
+    log.debug("completed the ``readquery`` function")
     return rows

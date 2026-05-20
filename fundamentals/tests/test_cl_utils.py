@@ -9,6 +9,7 @@ from fundamentals import tools
 from os.path import expanduser
 from docopt import docopt
 from fundamentals import cl_utils
+
 doc = cl_utils.__doc__
 home = expanduser("~")
 
@@ -21,7 +22,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 

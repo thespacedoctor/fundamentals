@@ -6,9 +6,11 @@
 Author
 : David Young
 """
+
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 
 
@@ -32,10 +34,11 @@ def get_now_datetime_filestamp(longTime=False):
     #Out: '20160316t154635'
 
     get_now_datetime_filestamp(longTime=True)
-    #Out: '20160316t154644133638' 
+    #Out: '20160316t154644133638'
     ```
     """
     from datetime import datetime, date, time
+
     now = datetime.now()
     if longTime:
         now = now.strftime("%Y%m%dt%H%M%S%f")

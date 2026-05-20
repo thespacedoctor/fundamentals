@@ -21,7 +21,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -44,11 +44,13 @@ if not os.path.exists(pathToOutputDir):
 
 # xt-setup-unit-testing-files-and-folders
 
+
 def f(n, anotherKeyword="nothing"):
     result = 0
     for x in range(10000):
         result += n * n * x
     return result
+
 
 class test_multiprocess(unittest.TestCase):
 
@@ -59,8 +61,9 @@ class test_multiprocess(unittest.TestCase):
         # DEFINE AN INPUT ARRAY
         inputArray = list(range(1000))
         t1 = time.time()
-        result = fmultiprocess(log=log, function=f,
-                               inputArray=inputArray, anotherKeyword="cheese")
+        result = fmultiprocess(
+            log=log, function=f, inputArray=inputArray, anotherKeyword="cheese"
+        )
 
         took = time.time() - t1
         print("Multiprocessing took: %(took)s" % locals())
@@ -76,12 +79,9 @@ class test_multiprocess(unittest.TestCase):
     def test_multiprocess_function_exception(self):
 
         from fundamentals import fmultiprocess
+
         try:
-            this = fmultiprocess(
-                log=log,
-                settings=settings,
-                fakeKey="break the code"
-            )
+            this = fmultiprocess(log=log, settings=settings, fakeKey="break the code")
             this.get()
             assert False
         except Exception as e:

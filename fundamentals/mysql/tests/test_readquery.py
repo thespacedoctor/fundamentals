@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,27 +41,22 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_readquery(unittest.TestCase):
 
     def test_readquery_function(self):
 
         from fundamentals.mysql import readquery
-        rows = readquery(
-            log=log,
-            sqlQuery="show tables",
-            dbConn=dbConn,
-            quiet=False
-        )
+
+        rows = readquery(log=log, sqlQuery="show tables", dbConn=dbConn, quiet=False)
 
     def test_readquery_error_function(self):
 
         from fundamentals.mysql import readquery
+
         try:
             rows = readquery(
-                log=log,
-                sqlQuery="rubbish query",
-                dbConn=dbConn,
-                quiet=False
+                log=log, sqlQuery="rubbish query", dbConn=dbConn, quiet=False
             )
             assert False
         except Exception as e:
@@ -70,12 +66,10 @@ class test_readquery(unittest.TestCase):
     def test_readquery_error_function_quiet(self):
 
         from fundamentals.mysql import readquery
+
         try:
             rows = readquery(
-                log=log,
-                sqlQuery="rubbish query",
-                dbConn=dbConn,
-                quiet=True
+                log=log, sqlQuery="rubbish query", dbConn=dbConn, quiet=True
             )
             assert True
         except Exception as e:

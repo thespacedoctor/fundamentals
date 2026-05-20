@@ -4,6 +4,7 @@
 Check the API output here: file:///Users/Dave/git_repos/_templates_/python-package-template/fundamentals/docs/build/html/_api/fundamentals.docstring_test.html
 """
 
+
 def docsting_test(self):
     """
     *the database object for sherlock, setting up ssh tunnels and various database connections*
@@ -18,12 +19,12 @@ def docsting_test(self):
 
     - ``log`` -- logger
     - ``settings`` -- the settings dictionary
-    
+
 
     **Return**
 
     - ``dbConns`` -- a dictionary of the database connections required by sherlock
-    
+
 
     **Usage**
 
@@ -41,7 +42,7 @@ def docsting_test(self):
     cataloguesDbConn = dbConns["catalogues"]
     pmDbConn = dbConns["marshall"]
     ```
-    
+
 
     :::{todo}
         - update key arguments values and definitions with defaults
@@ -75,7 +76,7 @@ def docsting_test(self):
     ```
 
     ```
-    No language indicated, so no syntax highlighting. 
+    No language indicated, so no syntax highlighting.
     But let's throw in a <b>tag</b>.
     ```
 
@@ -174,7 +175,7 @@ def docsting_test(self):
 
     **Emphasis**
 
-    Emphasis, aka italics, with *asterisks* 
+    Emphasis, aka italics, with *asterisks*
 
     Strong emphasis, aka bold, with **asterisks**.
 
@@ -184,12 +185,12 @@ def docsting_test(self):
 
     1. First ordered list item
     2. Another item
-        * Unordered sub-list. 
+        * Unordered sub-list.
     1. Actual numbers don't matter, just that it's a number
         1. Ordered sub-list
     4. And another item.
 
-        You can have properly indented paragraphs within list items.   
+        You can have properly indented paragraphs within list items.
 
     and unordered lists:
 
@@ -205,10 +206,10 @@ def docsting_test(self):
 
     Here's our logo (hover to see the title text):
 
-    Inline-style: 
+    Inline-style:
     ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
 
-    Reference-style: 
+    Reference-style:
     ![alt text][logo]
 
     [logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
@@ -220,7 +221,7 @@ def docsting_test(self):
 
     Quote break.
 
-    > This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote. 
+    > This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote.
 
     **Abbreviations**
 
@@ -238,6 +239,7 @@ def docsting_test(self):
     Hyphens
     """
     import os
+
     rootPath = os.path.dirname(__file__)
 
     return rootPath

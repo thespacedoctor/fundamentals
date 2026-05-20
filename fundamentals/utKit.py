@@ -6,14 +6,16 @@
 Author
 : David Young
 """
+
 from builtins import object
 import sys
 import os
 import logging
 import logging.config
 import yaml
+
 try:
-    yaml.warnings({'YAMLLoadWarning': False})
+    yaml.warnings({"YAMLLoadWarning": False})
 except:
     pass
 
@@ -37,16 +39,14 @@ class utKit(object):
     moduleDirectory = os.path.dirname(__file__)
     utKit = utKit(moduleDirectory)
     log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
-    utKit.tearDownModule() 
+    utKit.tearDownModule()
     ```
 
     """
+
     # Initialisation
 
-    def __init__(
-            self,
-            moduleDirectory
-    ):
+    def __init__(self, moduleDirectory):
         self.moduleDirectory = moduleDirectory
         # x-self-arg-tmpx
 
@@ -87,8 +87,7 @@ class utKit(object):
 
         return
 
-    def setupModule(
-            self):
+    def setupModule(self):
         """
         *The setupModule method*
 
@@ -106,17 +105,18 @@ class utKit(object):
         log = logging.getLogger(__name__)
         if self.dbConfig:
             import pymysql as ms
+
             connDict = yaml.safe_load(self.dbConfig)
             dbConn = ms.connect(
-                host=connDict['host'],
-                user=connDict['user'],
-                passwd=connDict['password'],
-                db=connDict['db'],
+                host=connDict["host"],
+                user=connDict["user"],
+                passwd=connDict["password"],
+                db=connDict["db"],
                 use_unicode=True,
-                charset='utf8',
+                charset="utf8",
                 local_infile=1,
                 client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-                connect_timeout=3600
+                connect_timeout=3600,
             )
             dbConn.autocommit(True)
         else:
@@ -124,8 +124,7 @@ class utKit(object):
 
         return log, dbConn, self.pathToInputDir, self.pathToOutputDir
 
-    def tearDownModule(
-            self):
+    def tearDownModule(self):
         """
         *The tearDownModule method*
         """
@@ -142,6 +141,7 @@ class utKit(object):
 
         """
         import os
+
         rootPath = os.path.dirname(__file__)
 
         return rootPath
@@ -152,15 +152,15 @@ class utKit(object):
         """
         from fundamentals.mysql import directory_script_runner
         from fundamentals import tools
+
         packageDirectory = self.get_project_root()
         su = tools(
-            arguments={"settingsFile": packageDirectory +
-                       "/test_settings.yaml"},
+            arguments={"settingsFile": packageDirectory + "/test_settings.yaml"},
             docString=__doc__,
             logLevel="DEBUG",
             options_first=False,
             projectName=None,
-            defaultSettingsFile=False
+            defaultSettingsFile=False,
         )
         arguments, settings, log, dbConn = su.setup()
         directory_script_runner(
@@ -168,8 +168,9 @@ class utKit(object):
             pathToScriptDirectory=packageDirectory + "/tests/input",
             dbConn=dbConn,
             successRule=None,
-            failureRule=None
+            failureRule=None,
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

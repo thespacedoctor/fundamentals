@@ -6,17 +6,21 @@
 Author
 : David Young
 """
+
 from __future__ import print_function
 from fundamentals import tools
 import os
 import sys
 from builtins import str
 from future import standard_library
+
 standard_library.install_aliases()
-os.environ['TERM'] = 'vt100'
+os.environ["TERM"] = "vt100"
 
 
-def _fetch(url,):
+def _fetch(
+    url,
+):
     """
     *Retrieve an HTML document or file from the web at a given URL*
 
@@ -41,7 +45,7 @@ def _fetch(url,):
     downloaded = False
     while count < tries and downloaded == False:
         try:
-            log.debug('downloading ' + url.get_full_url())
+            log.debug("downloading " + url.get_full_url())
             body = urllib.request.urlopen(url).read()
             downloaded = True
         except socket.timeout as e:
@@ -49,14 +53,15 @@ def _fetch(url,):
             count += 1
         except Exception as e:
             if "[Errno 60]" in str(e):
-                log.warning('timeout on URL, trying again' % locals())
+                log.warning("timeout on URL, trying again" % locals())
                 count += 1
             if "Error 502" in str(e):
-                log.warning('proxy error on URL, trying again' % locals())
+                log.warning("proxy error on URL, trying again" % locals())
                 count += 1
             else:
                 log.warning(
-                    "could not download " + url.get_full_url() + " : " + str(e) + "\n")
+                    "could not download " + url.get_full_url() + " : " + str(e) + "\n"
+                )
                 url = None
                 body = None
                 downloaded = True

@@ -6,10 +6,12 @@
 Author
 : David Young
 """
+
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 
 
 def get_now_sql_datetime():
@@ -27,10 +29,11 @@ def get_now_sql_datetime():
     now = times.get_now_sql_datetime()
     print now
 
-    # OUT: 2016-03-18T11:08:23 
+    # OUT: 2016-03-18T11:08:23
     ```
     """
     from datetime import datetime, date, time
+
     now = datetime.now()
     now = now.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -57,24 +60,25 @@ def datetime_relative_to_now(date):
     ```
     """
     from datetime import datetime
+
     diff = datetime.now() - date
     s = diff.seconds
     if diff.days == 1:
-        return ' + 1d'
+        return " + 1d"
     elif diff.days > 1:
-        return ' +{0}d'.format(diff.days)
+        return " +{0}d".format(diff.days)
     elif s <= 1:
-        return ' just now'
+        return " just now"
     elif s < 60:
-        return ' +{0}sec'.format(s)
+        return " +{0}sec".format(s)
     elif s < 120:
-        return ' +1min'
+        return " +1min"
     elif s < 3600:
-        return ' +{0}min'.format(int(s / 3600))
+        return " +{0}min".format(int(s / 3600))
     elif s < 7200:
-        return ' +1hr'
+        return " +1hr"
     else:
-        return ' +{0}hr'.format(int(s / 3600))
+        return " +{0}hr".format(int(s / 3600))
 
 
 def calculate_time_difference(startDate, endDate):
@@ -110,8 +114,8 @@ def calculate_time_difference(startDate, endDate):
         startDate = startDate.strip().replace(" ", "T")
     if "T" not in endDate:
         endDate = endDate.strip().replace(" ", "T")
-    startDate = datetime.strptime(startDate, '%Y-%m-%dT%H:%M:%S')
-    endDate = datetime.strptime(endDate, '%Y-%m-%dT%H:%M:%S')
+    startDate = datetime.strptime(startDate, "%Y-%m-%dT%H:%M:%S")
+    endDate = datetime.strptime(endDate, "%Y-%m-%dT%H:%M:%S")
     d = relativedelta.relativedelta(endDate, startDate)
 
     relTime = ""

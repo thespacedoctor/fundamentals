@@ -6,20 +6,18 @@
 Author
 : David Young
 """
+
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from subprocess import Popen, PIPE, STDOUT
 from datetime import datetime, date, time
 import codecs
 
-def tag(
-        log,
-        filepath,
-        tags=False,
-        rating=False,
-        wherefrom=False):
+
+def tag(log, filepath, tags=False, rating=False, wherefrom=False):
     """Add tags and ratings to your macOS files and folders
 
     **Key Arguments**
@@ -29,12 +27,12 @@ def tag(
     - ``tags`` -- comma or space-separated string, or list of tags. Use `False` to leave file tags as they are. Use "" or [] to remove tags. Default *False*.
     - ``rating`` -- a rating to add to the file. Use 0 to remove rating or `False` to leave file rating as it is. Default *False*.
     - ``wherefrom`` -- add a URL to indicate where the file come from. Use `False` to leave file location as it is. Use "" to remove location. Default *False*.
-    
+
 
     **Return**
 
     - None
-    
+
 
     **Usage**
 
@@ -50,17 +48,22 @@ def tag(
         wherefrom="http://www.thespacedoctor.co.uk"
     )
     ```
-    
+
     """
-    log.debug('starting the ``tag`` function')
+    log.debug("starting the ``tag`` function")
 
     if isinstance(tags, list):
         tags = (" ").join(tags)
 
     if tags and len(tags):
         tags = tags.replace(",", " ")
-        tags = "<string>" + tags.replace("  ", " ").replace(
-            "  ", " ").replace(" ", "</string><string>") + "</string>"
+        tags = (
+            "<string>"
+            + tags.replace("  ", " ")
+            .replace("  ", " ")
+            .replace(" ", "</string><string>")
+            + "</string>"
+        )
 
     if tags != False:
         now = datetime.now()
@@ -68,10 +71,9 @@ def tag(
         tagPlist = "/tmp/fund-%(now)s-tags.plist" % locals()
         # GENERATE THE TAGS PLIST FILE
         try:
-            writeFile = codecs.open(
-                tagPlist, encoding='utf-8', mode='w')
+            writeFile = codecs.open(tagPlist, encoding="utf-8", mode="w")
         except IOError as e:
-            message = 'could not open the file %s' % (tagPlist,)
+            message = "could not open the file %s" % (tagPlist,)
             raise IOError(message)
         writeFile.write("""
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -83,20 +85,21 @@ def tag(
         writeFile.close()
 
         # CONVERT PLIST TO BINARY
-        cmd = """plutil -convert binary1 %(tagPlist)s""" % locals(
-        )
+        cmd = """plutil -convert binary1 %(tagPlist)s""" % locals()
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output: %(stdout)s' % locals())
-        log.debug('output: %(stderr)s' % locals())
+        log.debug("output: %(stdout)s" % locals())
+        log.debug("output: %(stderr)s" % locals())
 
         # ASSIGN TAGS TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:_kMDItemUserTags" "`xxd -ps %(tagPlist)s`" "%(filepath)s"' % locals(
+        cmd = (
+            'xattr -wx "com.apple.metadata:_kMDItemUserTags" "`xxd -ps %(tagPlist)s`" "%(filepath)s"'
+            % locals()
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output: %(stdout)s' % locals())
-        log.debug('output: %(stderr)s' % locals())
+        log.debug("output: %(stdout)s" % locals())
+        log.debug("output: %(stderr)s" % locals())
 
         # DELETE PLIST
         os.remove(tagPlist)
@@ -104,22 +107,25 @@ def tag(
     if rating != False:
 
         ratingsContainer = os.path.dirname(__file__) + "/resources/ratings/"
-        ratingPlist = "%(ratingsContainer)s%(rating)s.plist" % locals(
-        )
+        ratingPlist = "%(ratingsContainer)s%(rating)s.plist" % locals()
 
         # ASSIGN RATING TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"' % locals(
+        cmd = (
+            'xattr -wx "com.apple.metadata:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"'
+            % locals()
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output: %(stdout)s' % locals())
-        log.debug('output: %(stderr)s' % locals())
-        cmd = 'xattr -wx "org.openmetainfo:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"' % locals(
+        log.debug("output: %(stdout)s" % locals())
+        log.debug("output: %(stderr)s" % locals())
+        cmd = (
+            'xattr -wx "org.openmetainfo:kMDItemStarRating" "`xxd -ps %(ratingPlist)s`" "%(filepath)s"'
+            % locals()
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output: %(stdout)s' % locals())
-        log.debug('output: %(stderr)s' % locals())
+        log.debug("output: %(stdout)s" % locals())
+        log.debug("output: %(stderr)s" % locals())
 
     if wherefrom != False:
 
@@ -132,10 +138,9 @@ def tag(
         urlPlist = "/tmp/fund-%(now)s-url.plist" % locals()
         # GENERATE THE WHEREFROM PLIST FILE
         try:
-            writeFile = codecs.open(
-                urlPlist, encoding='utf-8', mode='w')
+            writeFile = codecs.open(urlPlist, encoding="utf-8", mode="w")
         except IOError as e:
-            message = 'could not open the file %s' % (urlPlist,)
+            message = "could not open the file %s" % (urlPlist,)
             raise IOError(message)
         writeFile.write("""
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -145,24 +150,25 @@ def tag(
         writeFile.close()
 
         # ASSIGN WHEREFORM TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`xxd -ps %(urlPlist)s`" "%(filepath)s"' % locals(
+        cmd = (
+            'xattr -wx "com.apple.metadata:kMDItemURL" "`xxd -ps %(urlPlist)s`" "%(filepath)s"'
+            % locals()
         )
         # cmd = 'xattr -wx "com.apple.metadata:kMDItemURL" "`plutil -convert binary1 %(urlPlist)s -o - | xxd -p`" "%(filepath)s"' % locals()
 
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output URL: %(stdout)s' % locals())
-        log.debug('output URL: %(stderr)s' % locals())
+        log.debug("output URL: %(stdout)s" % locals())
+        log.debug("output URL: %(stderr)s" % locals())
 
         now = datetime.now()
         now = now.strftime("%Y%m%dt%H%M%S%f")
         urlPlist = "/tmp/fund-%(now)s-url.plist" % locals()
         # GENERATE THE WHEREFROM PLIST FILE
         try:
-            writeFile = codecs.open(
-                urlPlist, encoding='utf-8', mode='w')
+            writeFile = codecs.open(urlPlist, encoding="utf-8", mode="w")
         except IOError as e:
-            message = 'could not open the file %s' % (urlPlist,)
+            message = "could not open the file %s" % (urlPlist,)
             raise IOError(message)
         writeFile.write("""
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -174,15 +180,17 @@ def tag(
         writeFile.close()
 
         # ASSIGN WHEREFORM TO FILE
-        cmd = 'xattr -wx "com.apple.metadata:kMDItemWhereFroms" "`xxd -ps %(urlPlist)s`" "%(filepath)s"' % locals(
+        cmd = (
+            'xattr -wx "com.apple.metadata:kMDItemWhereFroms" "`xxd -ps %(urlPlist)s`" "%(filepath)s"'
+            % locals()
         )
         p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         stdout, stderr = p.communicate()
-        log.debug('output URL: %(stdout)s' % locals())
-        log.debug('output URL: %(stderr)s' % locals())
+        log.debug("output URL: %(stdout)s" % locals())
+        log.debug("output URL: %(stderr)s" % locals())
 
         # DELETE PLIST
         # os.remove(urlPlist)
 
-    log.debug('completed the ``tag`` function')
+    log.debug("completed the ``tag`` function")
     return None

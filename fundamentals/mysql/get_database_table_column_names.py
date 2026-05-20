@@ -6,18 +6,17 @@
 Author
 : David Young
 """
+
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import readquery
 
-def get_database_table_column_names(
-    dbConn,
-    log,
-    dbTable
-):
+
+def get_database_table_column_names(dbConn, log, dbTable):
     """get database table column names
 
     **Key Arguments**
@@ -25,12 +24,12 @@ def get_database_table_column_names(
     - ``dbConn`` -- mysql database connection
     - ``log`` -- logger
     - ``dbTable`` -- database tablename
-    
+
 
     **Return**
 
     - ``columnNames`` -- table column names
-    
+
 
     **Usage**
 
@@ -44,12 +43,11 @@ def get_database_table_column_names(
         dbTable="test_table"
     )
     ```
-    
-    """
-    log.debug('starting the ``get_database_table_column_names`` function')
 
-    sqlQuery = """SELECT * FROM %s LIMIT 1""" \
-        % (dbTable, )
+    """
+    log.debug("starting the ``get_database_table_column_names`` function")
+
+    sqlQuery = """SELECT * FROM %s LIMIT 1""" % (dbTable,)
     # ############### >ACTION(S) ################
     try:
         rows = readquery(
@@ -59,10 +57,11 @@ def get_database_table_column_names(
         )
     except Exception as e:
         log.error(
-            'could not find column names for dbTable %s - failed with this error: %s ' %
-            (dbTable, str(e)))
+            "could not find column names for dbTable %s - failed with this error: %s "
+            % (dbTable, str(e))
+        )
         return -1
     columnNames = list(rows[0].keys())
 
-    log.debug('completed the ``get_database_table_column_names`` function')
+    log.debug("completed the ``get_database_table_column_names`` function")
     return columnNames

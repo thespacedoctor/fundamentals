@@ -9,6 +9,7 @@ import pickle
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -20,7 +21,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -45,25 +46,28 @@ pathToPickleFile = pathToInputDir + "/list-of-dictionaries.p"
 
 listOfDictionaries = pickle.load(open(pathToPickleFile, "rb"))
 
+
 class test_list_of_dictionaries_to_mysql(unittest.TestCase):
 
     def test_list_of_dictionaries_to_mysql_function(self):
 
-        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import list_of_dictionaries_to_mysql_inserts
+        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import (
+            list_of_dictionaries_to_mysql_inserts,
+        )
+
         mysqlInserts = list_of_dictionaries_to_mysql_inserts(
-            log=log,
-            datalist=listOfDictionaries,
-            tableName="my_new_table"
+            log=log, datalist=listOfDictionaries, tableName="my_new_table"
         )
 
     def test_list_of_dictionaries_to_mysql_function_exception(self):
 
-        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import list_of_dictionaries_to_mysql_inserts
+        from fundamentals.files.list_of_dictionaries_to_mysql_inserts import (
+            list_of_dictionaries_to_mysql_inserts,
+        )
+
         try:
             this = list_of_dictionaries_to_mysql_inserts(
-                log=log,
-                settings=settings,
-                fakeKey="break the code"
+                log=log, settings=settings, fakeKey="break the code"
             )
             this.get()
             assert False

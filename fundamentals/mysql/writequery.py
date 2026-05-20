@@ -6,21 +6,17 @@
 Author
 : David Young
 """
+
 from builtins import str
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 import time
 
 
-def writequery(
-    log,
-    sqlQuery,
-    dbConn,
-    Force=False,
-    manyValueList=False
-):
+def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
     """*Execute a MySQL write command given a sql query*
 
     **Key Arguments**
@@ -68,15 +64,16 @@ def writequery(
     ```
 
     """
-    log.debug('starting the ``writequery`` function')
+    log.debug("starting the ``writequery`` function")
     import pymysql
     import warnings
-    warnings.filterwarnings('error', category=pymysql.Warning)
+
+    warnings.filterwarnings("error", category=pymysql.Warning)
     message = ""
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
     except Exception as e:
-        log.error('could not create the database cursor.')
+        log.error("could not create the database cursor.")
     # EXECUTE THE SQL COMMAND
 
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
@@ -98,7 +95,7 @@ def writequery(
                 stop = 0
 
                 while stop == 0:
-                    thisList = manyValueList[offset:offset + batch]
+                    thisList = manyValueList[offset : offset + batch]
                     offset += batch
                     a = len(thisList)
                     cursor.executemany(sqlQuery, thisList)
@@ -115,8 +112,10 @@ def writequery(
                 raise
 
         except pymysql.err.ProgrammingError as e:
-            message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
-                                                                                                           str(e))
+            message = (
+                "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
+                % (sqlQuery, str(e))
+            )
             if Force == False:
                 log.error(message)
                 raise
@@ -128,18 +127,18 @@ def writequery(
             except:
                 pass
 
-            if e[0] == 1050 and 'already exists' in e[1]:
-                log.info(str(e) + '\n')
+            if e[0] == 1050 and "already exists" in e[1]:
+                log.info(str(e) + "\n")
             elif e[0] == 1062:
-                               # Duplicate Key error
-                log.debug('Duplicate Key error: %s\n' % (str(e), ))
+                # Duplicate Key error
+                log.debug("Duplicate Key error: %s\n" % (str(e),))
                 message = "duplicate key error"
             elif e[0] == 1061:
-                               # Duplicate Key error
-                log.debug('index already exists: %s\n' % (str(e), ))
+                # Duplicate Key error
+                log.debug("index already exists: %s\n" % (str(e),))
                 message = "index already exists"
             elif "Duplicate entry" in str(e):
-                log.debug('Duplicate Key error: %s\n' % (str(e), ))
+                log.debug("Duplicate Key error: %s\n" % (str(e),))
                 message = "duplicate key error"
             elif "Deadlock" in str(e):
                 i = 0
@@ -158,7 +157,7 @@ def writequery(
                             stop = 0
 
                             while stop == 0:
-                                thisList = manyValueList[offset:offset + batch]
+                                thisList = manyValueList[offset : offset + batch]
                                 offset += batch
                                 a = len(thisList)
                                 cursor.executemany(sqlQuery, thisList)
@@ -169,13 +168,15 @@ def writequery(
                     except:
                         pass
                 if i == 10:
-                    log.error('Deadlock: %s\n' % (str(e), ))
+                    log.error("Deadlock: %s\n" % (str(e),))
                     message = "Deadlock error"
                     raise
 
             else:
-                message = 'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' % (sqlQuery,
-                                                                                                               str(e))
+                message = (
+                    "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
+                    % (sqlQuery, str(e))
+                )
                 if Force == False:
                     log.error(message)
                     raise
@@ -186,17 +187,17 @@ def writequery(
             log.info(str(e))
         except Exception as e:
             if "truncated" in str(e):
-                log.error('%s\n Here is the sqlquery:\n%s\n' %
-                          (str(e), sqlQuery))
+                log.error("%s\n Here is the sqlquery:\n%s\n" % (str(e), sqlQuery))
                 if manyValueList:
-                    log.error('... and the values:\n%s\n' % (thisList, ))
+                    log.error("... and the values:\n%s\n" % (thisList,))
             elif "Duplicate entry" in str(e):
-                log.warning('Duplicate Key error: %s\n' % (str(e), ))
+                log.warning("Duplicate Key error: %s\n" % (str(e),))
                 message = "duplicate key error"
             else:
                 log.error(
-                    'MySQL write command not executed for this query: << %s >>\nThe error was: %s \n' %
-                    (sqlQuery, str(e)))
+                    "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
+                    % (sqlQuery, str(e))
+                )
                 if Force == False:
                     sys.exit(0)
                 cursor.close()
@@ -213,9 +214,9 @@ def writequery(
             time.sleep(1)
             count += 1
             if count == 10:
-                log.warning('could not close the db cursor ' + str(e) + '\n')
+                log.warning("could not close the db cursor " + str(e) + "\n")
                 raise e
                 count = 0
 
-    log.debug('completed the ``writequery`` function')
+    log.debug("completed the ``writequery`` function")
     return message

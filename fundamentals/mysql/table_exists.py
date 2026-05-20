@@ -6,16 +6,16 @@
 Author
 : David Young
 """
+
 import sys
 import os
-os.environ['TERM'] = 'vt100'
+
+os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import readquery
 
-def table_exists(
-        dbConn,
-        log,
-        dbTableName):
+
+def table_exists(dbConn, log, dbTableName):
     """*Probe a database to determine if a given table exists*
 
     **Key Arguments**
@@ -23,12 +23,12 @@ def table_exists(
     - ``dbConn`` -- mysql database connection
     - ``log`` -- logger
     - ``dbTableName`` -- the database tablename
-    
+
 
     **Return**
 
     - ``tableExists`` -- True or False
-    
+
 
     **Usage**
 
@@ -46,26 +46,21 @@ def table_exists(
 
     # OUTPUT: False
     ```
-    
-    """
-    log.debug('starting the ``table_exists`` function')
 
-    sqlQuery = u"""
+    """
+    log.debug("starting the ``table_exists`` function")
+
+    sqlQuery = """
         SELECT count(*)
         FROM information_schema.tables
         WHERE table_name = '%(dbTableName)s'
     """ % locals()
-    tableExists = readquery(
-        log=log,
-        sqlQuery=sqlQuery,
-        dbConn=dbConn,
-        quiet=False
-    )
+    tableExists = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
 
     if tableExists[0]["count(*)"] == 0:
         tableExists = False
     else:
         tableExists = True
 
-    log.debug('completed the ``table_exists`` function')
+    log.debug("completed the ``table_exists`` function")
     return tableExists

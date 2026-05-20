@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+
 home = expanduser("~")
 
 packageDirectory = utKit("").get_project_root()
@@ -19,7 +20,7 @@ su = tools(
     logLevel="DEBUG",
     options_first=False,
     projectName=None,
-    defaultSettingsFile=False
+    defaultSettingsFile=False,
 )
 arguments, settings, log, dbConn = su.setup()
 
@@ -40,31 +41,29 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_recursive_directory_listing(unittest.TestCase):
 
     def test_recursive_directory_listing_function(self):
 
         from fundamentals.files import recursive_directory_listing
+
         theseFiles = recursive_directory_listing(
-            log,
-            baseFolderPath="/tmp",
-            whatToList="all"
+            log, baseFolderPath="/tmp", whatToList="all"
         )
         # print(theseFiles)
 
         from fundamentals.files import recursive_directory_listing
+
         theseFiles = recursive_directory_listing(
-            log,
-            baseFolderPath="/tmp",
-            whatToList="files"
+            log, baseFolderPath="/tmp", whatToList="files"
         )
         # print(theseFiles)
 
         from fundamentals.files import recursive_directory_listing
+
         theseFiles = recursive_directory_listing(
-            log,
-            baseFolderPath="/tmp",
-            whatToList="dirs"
+            log, baseFolderPath="/tmp", whatToList="dirs"
         )
         # print(theseFiles)
 
