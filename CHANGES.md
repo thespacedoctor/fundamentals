@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**v2.8.3 - May 21, 2026**
+
+* **FIXED:** removing pyreadline3 dependency
+
 **v2.8.2 - May 20, 2026**
 
 * **FIXED:** fixing readline import issues on windows 
