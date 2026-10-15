@@ -1,6 +1,10 @@
 
 ## Release Notes
 
+**Unreleased**
+
+* **FIXED:** removed the unused `docs/requirements.txt`, which pinned vulnerable docs packages (mistune, Jinja2, Markdown) and raised 16 Dependabot alerts
+
 **v2.8.3 - May 21, 2026**
 
 * **FIXED:** removing pyreadline3 dependency
