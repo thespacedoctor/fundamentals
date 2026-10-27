@@ -4,6 +4,7 @@
 **Unreleased**
 
 * **FIXED:** `recursive_directory_listing` no longer hangs on an unreadable subfolder or loops on a symlink to a parent folder; it now lists with `os.walk`, so the order changes (each folder's subfolders, then its files, depth first), and an invalid `whatToList` raises `ValueError` instead of calling `sys.exit(0)` (DY-2012)
+* **FIXED:** `extract_filename_from_url` takes the filename from the URL path only, so a query string or fragment no longer ends up in the name; a URL with no path now gives `untitled.html` (DY-2017)
 * **FIXED:** `tag` and the `LOAD DATA` path of `insert_list_of_dictionaries_into_database_tables` now write their scratch files to a private temporary folder that is removed afterwards, even on error, instead of leaving files in `/tmp`; `sqlite2mysql` no longer creates an unused `/tmp/headjack/` folder
 * **FIXED:** `fmultiprocess` now terminates and joins its worker pool when a task raises, the timeout is reached or the call is interrupted with Ctrl-C, instead of leaving workers running (DY-1701)
 * **FIXED:** removed the unused `docs/requirements.txt`, which pinned vulnerable docs packages (mistune, Jinja2, Markdown) and raised 16 Dependabot alerts
