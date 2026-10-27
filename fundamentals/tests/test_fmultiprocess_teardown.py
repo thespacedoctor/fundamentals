@@ -242,31 +242,6 @@ def test_fmultiprocess_stops_its_workers_when_map_async_fails(
     assert pool_workers.alive_after_grace() == []
 
 
-def test_fmultiprocess_stops_started_workers_when_interrupted_while_building_the_pool(
-    log, cyclic_gc_disabled, pool_workers, monkeypatch
-):
-    from fundamentals import fmultiprocess
-
-    # ARRANGE: THE WORKERS START, THEN CTRL-C ARRIVES BEFORE THE POOL CONSTRUCTOR RETURNS
-    originalRepopulate = pool_module.Pool._repopulate_pool
-
-    def interruptedRepopulate(self):
-        originalRepopulate(self)
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr(pool_module.Pool, "_repopulate_pool", interruptedRepopulate)
-
-    # ACT
-    with pytest.raises(KeyboardInterrupt):
-        fmultiprocess(
-            log=log, function=task_that_doubles, inputArray=[1, 2], poolSize=2
-        )
-
-    # ASSERT: WORKERS REALLY STARTED, AND NONE OF THEM STILL RUNS
-    assert sum(len(pool._pool) for pool in pool_workers.pools) >= 1
-    assert pool_workers.alive_after_grace() == []
-
-
 def test_fmultiprocess_terminates_the_pool_when_interrupted_during_clean_shutdown(
     log, cyclic_gc_disabled, pool_workers, monkeypatch
 ):

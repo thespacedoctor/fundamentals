@@ -12,34 +12,17 @@ import os
 os.environ["TERM"] = "vt100"
 
 
-def _guarded_pool_class():
-    """Return a ``multiprocess`` pool class that stops its own workers if construction is interrupted.
-
-    ``Pool.__init__`` stops workers it has already started only for an ``Exception``, so a
-    ``KeyboardInterrupt`` raised part-way through construction leaves them running.
-    """
-    from multiprocess.pool import Pool
-
-    class GuardedPool(Pool):
-        def __init__(self, *args, **kwargs):
-            try:
-                super().__init__(*args, **kwargs)
-            except BaseException:
-                workers = list(getattr(self, "_pool", []))
-                for worker in workers:
-                    if worker.exitcode is None:
-                        worker.terminate()
-                for worker in workers:
-                    worker.join()
-                raise
-
-    return GuardedPool
-
-
 def _shut_down_pool(pool, isMapComplete):
     """Close the pool after a complete map and terminate it after any other exit.
 
     An interrupt during the clean ``close`` and ``join`` also ends in ``terminate`` and ``join``.
+
+    Accepted residual risks: a ``KeyboardInterrupt`` while ``Pool`` is being constructed, or a
+    second Ctrl-C during this teardown, can still leave workers running.
+
+    This runs in a ``finally`` block. If the teardown itself raises while a task error or
+    timeout is in flight, the new error replaces the original, which survives only as its
+    ``__context__``.
     """
     try:
         if isMapComplete:
@@ -110,9 +93,7 @@ def fmultiprocess(
 
     if turnOffMP == False:
         import psutil
-        from multiprocess import cpu_count
-
-        Pool = _guarded_pool_class()
+        from multiprocess import Pool
 
         from ctypes import c_int32
 
