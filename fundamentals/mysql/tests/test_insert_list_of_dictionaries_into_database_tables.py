@@ -199,10 +199,34 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         self.assertEqual(os.listdir(slashTmp), [])
 
     def test_insert_list_of_dictionaries_into_database_tables_function(self):
+        from fundamentals.mysql import (
+            insert_list_of_dictionaries_into_database_tables,
+            readquery,
+            writequery,
+        )
 
-        t1 = time.time()
-
-        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+        # THE TABLE IS CREATED HERE BECAUSE table_exists LOOKS IN EVERY SCHEMA, SO A
+        # test_insert_many TABLE IN ANOTHER SCHEMA WOULD STOP IT BEING CREATED IN unit_tests
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS test_insert_many;", dbConn=dbConn
+        )
+        self.addCleanup(
+            writequery,
+            log=log,
+            sqlQuery="DROP TABLE IF EXISTS test_insert_many;",
+            dbConn=dbConn,
+        )
+        writequery(
+            log=log,
+            sqlQuery="""CREATE TABLE test_insert_many
+                (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
+                `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated` tinyint(4) DEFAULT '0',
+                PRIMARY KEY (`primaryId`))
+                ENGINE=Innodb AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;""",
+            dbConn=dbConn,
+        )
 
         insert_list_of_dictionaries_into_database_tables(
             dbConn=dbConn,
@@ -216,9 +240,13 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dbSettings=dbSettings,
         )
 
-        # print(time.time() - t1)
-
-        # x-print-testpage-for-pessto-marshall-web-object
+        dbConn.commit()
+        rows = readquery(
+            log=log,
+            sqlQuery="SELECT COUNT(*) AS n FROM test_insert_many;",
+            dbConn=dbConn,
+        )
+        self.assertEqual(rows[0]["n"], len(dictList))
 
     # x-class-to-test-named-worker-function
 
