@@ -139,6 +139,11 @@ class test_multiobject_download(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.download(resetFilename=["only_one.html"])
 
+    def test_prefixes_credentials_when_url_has_no_scheme(self):
+        self.download(urlList=["example.com/a.html"], credentials=CREDENTIALS)
+
+        self.assertEqual(self.entries[0][0], "alice:s3cret@example.com/a.html")
+
     def test_percent_encodes_credentials_so_they_cannot_change_the_host(self):
         self.download(
             urlList=URLS[:1],
