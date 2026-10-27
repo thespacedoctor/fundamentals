@@ -28,7 +28,7 @@ today_fmt = "%Y"
 
 # -- General configuration ---------------------------------------------------
 templates_path = ["_templates"]
-exclude_patterns = ["**xxx**"]
+exclude_patterns = ["**xxx**", "_template_.md"]
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
@@ -93,6 +93,8 @@ numfig_format = {
 myst_enable_checkboxes = True
 myst_heading_anchors = 3
 todo_include_todos = True
+# NO WIKIPEDIA TOOLTIPS: THE ONLY WIKIPEDIA LINK IS AN EXAMPLE URL, AND THE FETCH FAILS WITHOUT NETWORK ACCESS
+tippy_enable_wikitips = False
 
 link_resolver_url = "https://github.com/thespacedoctor/fundamentals/blob/master"
 
@@ -133,7 +135,7 @@ ogp_custom_meta_tags = [
 
 # -- THEME SETTINGS -------------------------------------------------
 html_theme = "furo"
-html_static_path = ["_static", "_images"]
+html_static_path = ["_images"]
 html_theme_options = {
     "light_logo": "thespacedoctor_icon_dark_circle.png",
     "dark_logo": "thespacedoctor_icon_white_circle.png",
