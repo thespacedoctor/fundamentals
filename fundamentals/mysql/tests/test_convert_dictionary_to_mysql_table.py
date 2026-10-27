@@ -157,6 +157,27 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # x-print-testpage-for-pessto-marshall-web-object
 
+    def test_returns_inserts_for_mixed_type_keys_in_string_order(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a": "x", 1: "y"}
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=[],
+            dateModified=False,
+            returnInsertOnly=True,
+        )
+
+        # ASSERT
+        self.assertIn("(`1`,`a`", insertCommand)
+        self.assertEqual(valueTuple, ("y", "x"))
+
     def test_does_not_mutate_caller_dictionary_when_returning_inserts(self):
         # ARRANGE
         from fundamentals.mysql import convert_dictionary_to_mysql_table
@@ -242,6 +263,35 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             with mock.patch.object(
                 module, "readquery", side_effect=RuntimeError("column check failed")
             ):
+                with self.assertRaises(RuntimeError):
+                    module.convert_dictionary_to_mysql_table(
+                        dbConn=dbConn,
+                        log=log,
+                        dictionary={"a newKey": "cool", "another": "value"},
+                        dbTableName=tableName,
+                    )
+        finally:
+            writequery(
+                log=log,
+                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                dbConn=dbConn,
+            )
+
+    def test_raises_when_add_column_query_fails(self):
+        # ARRANGE
+        from fundamentals.mysql import writequery
+
+        module = sys.modules["fundamentals.mysql.convert_dictionary_to_mysql_table"]
+        tableName = "dy2028_add_column_table"
+
+        def failOnAlter(log, sqlQuery, dbConn, **kwargs):
+            if sqlQuery.startswith("ALTER TABLE"):
+                raise RuntimeError("add column failed")
+            return writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, **kwargs)
+
+        # ACT / ASSERT
+        try:
+            with mock.patch.object(module, "writequery", side_effect=failOnAlter):
                 with self.assertRaises(RuntimeError):
                     module.convert_dictionary_to_mysql_table(
                         dbConn=dbConn,

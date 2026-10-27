@@ -85,3 +85,17 @@ class test_setup_database_connection(unittest.TestCase):
 
         with self.assertRaises(yaml.YAMLError):
             setup_database_connection(pathToYamlFile=settingsPath)
+
+    def test_raises_value_error_when_settings_file_is_not_a_dictionary(self):
+        from fundamentals.mysql import setup_database_connection
+
+        for name, content in (("empty", ""), ("list", "- one\n- two\n")):
+            with self.subTest(name=name):
+                settingsPath = pathToOutputDir + "/" + name + "_settings.yaml"
+                with open(settingsPath, "w") as stream:
+                    stream.write(content)
+
+                with self.assertRaises(ValueError) as context:
+                    setup_database_connection(pathToYamlFile=settingsPath)
+
+                self.assertIn(settingsPath, str(context.exception))

@@ -269,10 +269,10 @@ def convert_dictionary_to_mysql_table(
     for key, value in list(dictionary.items()):
         if isinstance(value, list) and value[0] is None:
             del dictionary[key]
-    # SORT THE DICTIONARY BY KEY
-    odictionary = c.OrderedDict(sorted(dictionary.items()))
+    # SORT THE DICTIONARY BY KEY (AS STRINGS SO MIXED-TYPE KEYS CAN BE COMPARED)
+    odictionary = c.OrderedDict(sorted(dictionary.items(), key=lambda kv: str(kv[0])))
     for key, value in list(odictionary.items()):
-
+        key = str(key)
         formattedKey = key.replace(" ", "_").replace("-", "_")
         # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
         if formattedKey == "dec":
@@ -408,6 +408,7 @@ def convert_dictionary_to_mysql_table(
                                 + str(e)
                                 + "\n"
                             )
+                            raise
 
     if returnInsertOnly == False:
         # GENERATE THE INDEX NAME - THEN CREATE INDEX IF IT DOES NOT YET EXIST

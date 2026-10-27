@@ -193,26 +193,57 @@ def directory_script_runner(
                 log=log,
             )
     else:
+        # "--" ENDS OPTION PARSING SO A DATABASE NAME CANNOT BE READ AS A MYSQL OPTION
+        mysqlCmd = [
+            "mysql",
+            "--login-path=%s" % (loginPath,),
+            *forceArgs,
+            "--",
+            databaseName,
+        ]
+        mysqlEnv = _mysql_environment()
+        isWaiting = waitForResult == True
+        isDelete = waitForResult == "delete"
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
-            mysqlCmd = ["mysql", "--login-path=%s" % (loginPath,)] + forceArgs
-            mysqlCmd.append(databaseName)
-            mysqlEnv = _mysql_environment()
-            if waitForResult == True:
+            try:
                 with open(v, "rb") as scriptFile:
                     p = Popen(
                         mysqlCmd,
                         stdin=scriptFile,
-                        stdout=PIPE,
-                        stderr=PIPE,
+                        stdout=DEVNULL,
+                        stderr=PIPE if (isWaiting or isDelete) else DEVNULL,
                         close_fds=True,
                         env=mysqlEnv,
                     )
-                    stdout, stderr = p.communicate()
+                    # WAIT SO MYSQL HAS READ THE SCRIPT BEFORE IT IS PROCESSED
+                    if isWaiting or isDelete:
+                        stderr = p.communicate()[1]
+            except OSError as e:
+                # MISSING MYSQL BINARY OR UNREADABLE SCRIPT
+                log.error("MySQL Script `%s` could not be run: '%s'" % (scriptname, e))
+                if isWaiting:
+                    _process_script_file(
+                        pathToScriptDirectory=pathToScriptDirectory,
+                        scriptname=scriptname,
+                        rule=failureRule,
+                        log=log,
+                    )
+                continue
 
-                if len(stderr):
+            if isDelete:
+                if p.returncode:
                     log.error(
-                        "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals()
+                        "MySQL Script `%s` failed with return code %s and was deleted: '%s'"
+                        % (scriptname, p.returncode, stderr)
+                    )
+                os.remove(v)
+            elif isWaiting:
+                # A NON-ZERO RETURN CODE IS A FAILURE EVEN WHEN STDERR IS EMPTY
+                if p.returncode or len(stderr):
+                    log.error(
+                        "MySQL Script `%s` Failed with return code %s: '%s'"
+                        % (scriptname, p.returncode, stderr)
                     )
                     rule = failureRule
                 else:
@@ -223,21 +254,6 @@ def directory_script_runner(
                     rule=rule,
                     log=log,
                 )
-            else:
-                with open(v, "rb") as scriptFile:
-                    p = Popen(
-                        mysqlCmd,
-                        stdin=scriptFile,
-                        stdout=DEVNULL,
-                        stderr=DEVNULL,
-                        close_fds=True,
-                        env=mysqlEnv,
-                    )
-                    # WAIT BEFORE DELETING SO MYSQL HAS READ THE SCRIPT
-                    if waitForResult == "delete":
-                        p.wait()
-                if waitForResult == "delete":
-                    os.remove(v)
 
     log.debug("completed the ``directory_script_runner`` function")
     return None

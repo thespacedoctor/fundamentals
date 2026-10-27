@@ -423,3 +423,99 @@ class test_insert_batches(unittest.TestCase):
         # ASSERT
         self.assertEqual(result, "None")
         self.assertEqual(writequeryMock.call_count, 2)
+
+    def test_falls_back_with_a_matching_command_and_values_for_rows_with_different_keys(
+        self,
+    ):
+        # ARRANGE: THE FIRST ROW CREATES THE TABLE; THE BATCH ROWS HAVE DIFFERENT KEY SETS
+        import pymysql
+        from fundamentals.mysql import writequery
+
+        rows = [{"a": 1, "b": 2}, {"a": 3}, {"b": 4}]
+        calls = []
+
+        def failOnceThenWrite(**kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                raise pymysql.err.OperationalError(1213, "simulated")
+            return writequery(**kwargs)
+
+        # ACT
+        result = self._run_single_batch(rows, failOnceThenWrite)
+
+        # ASSERT
+        self.assertEqual(result, "None")
+        stored = self._select("a, b")
+        self.assertEqual(
+            sorted(((r["a"], r["b"]) for r in stored), key=str),
+            [(1, 2), (3, None), (None, 4)],
+        )
+
+    def test_sorts_columns_when_dictionary_keys_are_of_mixed_types(self):
+        # ARRANGE
+        rows = [{"a": 1}, {"a": 2, 1: 3}]
+        writequeryMock = mock.Mock(return_value="")
+
+        # ACT
+        self._run_single_batch(rows, writequeryMock)
+
+        # ASSERT
+        sqlQuery = writequeryMock.call_args.kwargs["sqlQuery"]
+        self.assertIn("(`1`,`a`", sqlQuery)
+
+    def test_restore_error_is_raised_when_the_insert_succeeded(self):
+        # ARRANGE
+        import pymysql
+        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+
+        dbConn.autocommit(True)
+        realAutocommit = dbConn.autocommit
+
+        def autocommitFailsOnRestore(value):
+            if value:
+                raise pymysql.err.OperationalError(2006, "server has gone away")
+            return realAutocommit(value)
+
+        # ACT / ASSERT
+        with mock.patch.object(self.insertModule, "fmultiprocess", run_serially):
+            with mock.patch.object(
+                dbConn, "autocommit", side_effect=autocommitFailsOnRestore
+            ):
+                with self.assertRaises(pymysql.err.OperationalError):
+                    insert_list_of_dictionaries_into_database_tables(
+                        dbConn=dbConn,
+                        log=log,
+                        dictList=[{"col1": i} for i in range(3)],
+                        dbTableName=BATCH_TABLE,
+                        dateCreated=False,
+                    )
+
+    def test_original_error_propagates_when_autocommit_restore_also_raises(self):
+        # ARRANGE
+        import pymysql
+        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+
+        dbConn.autocommit(True)
+        realAutocommit = dbConn.autocommit
+
+        def autocommitFailsOnRestore(value):
+            if value:
+                raise pymysql.err.OperationalError(2006, "server has gone away")
+            return realAutocommit(value)
+
+        def insertFails(**kwargs):
+            raise RuntimeError("original insert failure")
+
+        # ACT / ASSERT
+        with mock.patch.object(self.insertModule, "fmultiprocess", insertFails):
+            with mock.patch.object(
+                dbConn, "autocommit", side_effect=autocommitFailsOnRestore
+            ):
+                with self.assertRaisesRegex(RuntimeError, "original insert failure"):
+                    insert_list_of_dictionaries_into_database_tables(
+                        dbConn=dbConn,
+                        log=log,
+                        dictList=[{"col1": i} for i in range(3)],
+                        dbTableName=BATCH_TABLE,
+                        dateCreated=False,
+                    )

@@ -38,6 +38,7 @@ def setup_database_connection(pathToYamlFile):
 
     - ``OSError`` -- if the settings file cannot be read.
     - ``yaml.YAMLError`` -- if the settings file is not valid YAML.
+    - ``ValueError`` -- if the settings file does not contain a dictionary.
     - the original ``pymysql`` exception if the connection cannot be established.
 
 
@@ -75,6 +76,10 @@ def setup_database_connection(pathToYamlFile):
     except (OSError, yaml.YAMLError):
         logging.critical("could not load the connect dictionary from " + pathToYamlFile)
         raise
+    if not isinstance(connDict, dict):
+        message = "the settings file " + pathToYamlFile + " must contain a dictionary"
+        logging.critical(message)
+        raise ValueError(message)
     # ESTABLISH A DB CONNECTION
     try:
         logging.info(

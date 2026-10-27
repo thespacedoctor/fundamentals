@@ -227,13 +227,13 @@ def test_yaml_writer_opens_file_as_utf8(tmp_path, monkeypatch):
     import builtins
 
     opened = []
-    realOpen = builtins.open
+    real_open = builtins.open
 
-    def spyOpen(*args, **kwargs):
+    def spy_open(*args, **kwargs):
         opened.append((args, kwargs))
-        return realOpen(*args, **kwargs)
+        return real_open(*args, **kwargs)
 
-    monkeypatch.setattr(builtins, "open", spyOpen)
+    monkeypatch.setattr(builtins, "open", spy_open)
     filepath = str(tmp_path / "out.yaml")
 
     _render([{"name": "café"}]).yaml(filepath=filepath)

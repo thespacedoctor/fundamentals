@@ -36,13 +36,28 @@ BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
 
 def _normalise_key(key):
     """*return the database column name for a dictionary key*"""
-    formattedKey = key.replace(" ", "_").replace("-", "_")
+    formattedKey = str(key).replace(" ", "_").replace("-", "_")
     # DEC IS A KEYWORD IN MYSQL - MATCHES THE RENAME IN convert_dictionary_to_mysql_table
     if formattedKey == "dec":
         formattedKey = "decl"
     if formattedKey == "DEC":
         formattedKey = "DECL"
     return formattedKey
+
+
+def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
+    """*restore the caller's autocommit setting*
+
+    If ``isErrorInFlight`` is True a failed restore is logged so it cannot mask the error being raised. Otherwise a failed restore is raised.
+    """
+    import pymysql
+
+    try:
+        dbConn.autocommit(originalAutocommit)
+    except pymysql.Error as e:
+        if not isErrorInFlight:
+            raise
+        log.warning("could not restore the autocommit setting: %s" % (e,))
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -210,13 +225,53 @@ def insert_list_of_dictionaries_into_database_tables(
                 "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"
                 % locals()
             )
-    finally:
-        dbConn.autocommit(originalAutocommit)
+    except BaseException:
+        _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=True)
+        raise
+    _restore_autocommit(dbConn, originalAutocommit, log)
 
     log.debug(
         "completed the ``insert_list_of_dictionaries_into_database_tables`` function"
     )
     return None
+
+
+def _insert_rows_individually(
+    rows, dbConn, log, dbTableName, uniqueKeyList, dateModified, replace, reDatetime
+):
+    """*insert each row with its own insert command, grouping rows that share a command*
+
+    **Return**
+
+    - the first message from writequery that is not benign, or an empty string
+    """
+    insertsByCommand = {}
+    for aDict in rows:
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=aDict,
+            dbTableName=dbTableName,
+            uniqueKeyList=uniqueKeyList,
+            dateModified=dateModified,
+            returnInsertOnly=True,
+            replace=replace,
+            reDatetime=reDatetime,
+            skipChecks=True,
+        )
+        insertsByCommand.setdefault(insertCommand, []).append(valueTuple)
+
+    for insertCommand, valueTuples in insertsByCommand.items():
+        message = writequery(
+            log=log,
+            sqlQuery=insertCommand,
+            dbConn=dbConn,
+            Force=True,
+            manyValueList=valueTuples,
+        )
+        if message not in BENIGN_WRITE_MESSAGES:
+            return message
+    return ""
 
 
 def _insert_single_batch_into_database(
@@ -286,7 +341,7 @@ def _insert_single_batch_into_database(
         insertVerb = "INSERT IGNORE"
 
     # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
-    originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])))
+    originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])), key=str)
     uniKeys = [_normalise_key(k) for k in originalKeys]
 
     myKeys = "`,`".join(uniKeys)
@@ -324,8 +379,6 @@ def _insert_single_batch_into_database(
     insertCommand = insertCommand.replace('""', "null")
     insertCommand = insertCommand.replace('"None"', "null")
 
-    # log.debug('adding new data to the %s table; query: %s' %
-    # (dbTableName, addValue))
     try:
         message = writequery(
             log=log,
@@ -335,30 +388,15 @@ def _insert_single_batch_into_database(
             manyValueList=vals,
         )
     except pymysql.Error:
-        theseInserts = []
-        for aDict in batch[0]:
-            insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
-                dictionary=aDict,
-                dbTableName=dbTableName,
-                uniqueKeyList=uniqueKeyList,
-                dateModified=dateModified,
-                returnInsertOnly=True,
-                replace=replace,
-                reDatetime=reDate,
-                skipChecks=True,
-            )
-            theseInserts.append(valueTuple)
-
-        # log.debug('adding new data to the %s table; query: %s' %
-        # (dbTableName, addValue))
-        message = writequery(
-            log=log,
-            sqlQuery=insertCommand,
-            dbConn=dbConn,
-            Force=True,
-            manyValueList=theseInserts,
+        message = _insert_rows_individually(
+            batch[0],
+            dbConn,
+            log,
+            dbTableName,
+            uniqueKeyList,
+            dateModified,
+            replace,
+            reDate,
         )
 
     if message not in BENIGN_WRITE_MESSAGES:
