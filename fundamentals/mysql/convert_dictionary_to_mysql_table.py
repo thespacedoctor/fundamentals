@@ -13,6 +13,7 @@ from fundamentals import tools, times
 from fundamentals.mysql.sql_identifiers import (
     normalise_column_name,
     quote_identifier,
+    quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
 from pymysql.converters import escape_item
@@ -73,11 +74,11 @@ def _build_batch_insert(
 
     - ``insertCommand``, ``valueTuple`` -- the command and the values to bind
     """
-    quotedKeys = [_quote_for_format(k) for k in formattedKeyList]
+    quotedKeys = [quote_identifier_for_format(k) for k in formattedKeyList]
     placeholders = ", ".join(["%s"] * len(values))
     insertCommand = "%s INTO %s (%s%s) VALUES (%s%s)" % (
         insertVerb,
-        _quote_for_format(dbTableName),
+        quote_identifier_for_format(dbTableName),
         ",".join(quotedKeys),
         ", dateCreated" if dateCreated else "",
         placeholders,
@@ -131,11 +132,6 @@ def _build_literal_insert(
             % (unchanged, unchanged)
         )
     return insertStatement
-
-
-def _quote_for_format(name):
-    """*quote an identifier for a statement that is later formatted with ``%s`` placeholders*"""
-    return quote_identifier(name).replace("%", "%%")
 
 
 def convert_dictionary_to_mysql_table(

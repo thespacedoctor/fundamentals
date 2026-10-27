@@ -39,6 +39,22 @@ def quote_identifier(name):
     return "`" + name.replace("`", "``") + "`"
 
 
+def quote_identifier_for_format(name):
+    """*Return a quoted MySQL identifier for a statement that pymysql later fills in with ``%s`` placeholders*
+
+    **Key Arguments**
+
+    - ``name`` -- the table or column name
+
+    **Return**
+
+    - ``quotedName`` -- the name wrapped in backticks, with backticks doubled and each ``%`` written as ``%%``
+
+    Raises ``ValueError`` in the same cases as ``quote_identifier``.
+    """
+    return quote_identifier(name).replace("%", "%%")
+
+
 def normalise_column_name(key):
     """*Return the database column name for a dictionary key*
 
