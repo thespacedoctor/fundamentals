@@ -244,6 +244,13 @@ def convert_dictionary_to_mysql_table(
     formattedKeyList = []
     myValues = []
 
+    # COPY THE ARGUMENTS SO THE CALLER'S DATA IS NEVER MODIFIED (LIST VALUES
+    # ARE COPIED TOO AS value[0] IS REWRITTEN BELOW)
+    dictionary = {
+        k: list(v) if isinstance(v, list) else v for k, v in dictionary.items()
+    }
+    uniqueKeyList = list(uniqueKeyList)
+
     # ADD EXTRA COLUMNS TO THE DICTIONARY todo: do I need this?
     if dateModified:
         dictionary["dateLastModified"] = [
@@ -286,13 +293,6 @@ def convert_dictionary_to_mysql_table(
             if isinstance(value, str):
                 value = value.replace("\\", "\\\\")
                 value = value.replace('"', '\\"')
-                try:
-                    udata = value.decode("utf-8", "ignore")
-                    value = udata.encode("ascii", "ignore")
-                except:
-                    pass
-
-                # log.debug('udata: %(udata)s' % locals())
 
             if isinstance(value, list) and isinstance(value[0], str):
                 myValues.extend(["%s" % value[0].strip()])
@@ -320,7 +320,9 @@ def convert_dictionary_to_mysql_table(
                         dbConn=dbConn,
                     )
                 except Exception as e:
+                    # WITHOUT ROWS WE CANNOT DECIDE WHETHER TO ALTER THE TABLE
                     log.error("something went wrong" + str(e) + "\n")
+                    raise
 
                 # IF COLUMN DOESN'T EXIT - GENERATE IT
                 if len(rows) == 0:
@@ -340,18 +342,15 @@ def convert_dictionary_to_mysql_table(
                         or formattedKey == "title"
                     ):
                         qCreateColumn += "` varchar(100) DEFAULT NULL"
-                    elif (
-                        isinstance(value[0], ("".__class__, "".__class__))
-                        and len(value[0]) < 30
-                    ):
+                    elif isinstance(value[0], str) and len(value[0]) < 30:
                         qCreateColumn += "` varchar(100) DEFAULT NULL"
                     elif (
-                        isinstance(value[0], ("".__class__, "".__class__))
+                        isinstance(value[0], str)
                         and len(value[0]) >= 30
                         and len(value[0]) < 80
                     ):
                         qCreateColumn += "` varchar(100) DEFAULT NULL"
-                    elif isinstance(value[0], ("".__class__, "".__class__)):
+                    elif isinstance(value[0], str):
                         columnLength = 450 + len(value[0]) * 2
                         qCreateColumn += (
                             "` varchar(" + str(columnLength) + ") DEFAULT NULL"
