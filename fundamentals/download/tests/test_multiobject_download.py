@@ -42,6 +42,9 @@ if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
 import re
+import sys
+import tempfile
+from multiprocessing.pool import ThreadPool
 from unittest import mock
 from fundamentals.download import multiobject_download
 
@@ -145,3 +148,157 @@ class test_multiobject_download(unittest.TestCase):
         self.assertEqual(
             self.entries[0][0], "http://al%2Fice:p%40ss%2Fw%3Ard@example.com/a.html"
         )
+
+
+REQUESTS_GET = "fundamentals.download.multiobject_download.requests.get"
+THREAD_POOL = "fundamentals.download.multiobject_download.ThreadPool"
+MODULE_TIME = "fundamentals.download.multiobject_download.time"
+THREE_URLS = [
+    "http://example.com/a.html",
+    "http://example.com/b.html",
+    "http://example.com/c.html",
+]
+
+
+def make_response(chunks=(b"data",), status=200, streamError=None):
+    response = mock.Mock()
+    response.status_code = status
+
+    def iter_content(chunk_size):
+        for chunk in chunks:
+            yield chunk
+        if streamError:
+            raise streamError
+
+    response.iter_content.side_effect = iter_content
+    return response
+
+
+class test_multiobject_download_fetching(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpDir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpDir, ignore_errors=True)
+        self.log = mock.Mock()
+        sleepPatch = mock.patch(MODULE_TIME)
+        sleepPatch.start()
+        self.addCleanup(sleepPatch.stop)
+
+    def download(self, responses, urlList=THREE_URLS, log=None, **kwargs):
+        kwargs.setdefault("timeStamp", False)
+        with mock.patch(REQUESTS_GET, side_effect=lambda uri, **kw: responses[uri]):
+            return multiobject_download(
+                urlList=urlList,
+                downloadDirectory=self.tmpDir,
+                log=log or self.log,
+                **kwargs,
+            )
+
+    def path(self, name):
+        return os.path.join(self.tmpDir, name)
+
+    def test_failed_stream_gives_none_in_its_slot_and_leaves_no_partial_file(self):
+        responses = {
+            THREE_URLS[0]: make_response([b"aa"]),
+            THREE_URLS[1]: make_response([b"b"], streamError=OSError("reset")),
+            THREE_URLS[2]: make_response([b"cc"]),
+        }
+
+        result = self.download(responses)
+
+        self.assertEqual(result, [self.path("a.html"), None, self.path("c.html")])
+        self.assertFalse(os.path.exists(self.path("b.html")))
+        with open(self.path("c.html"), "rb") as f:
+            self.assertEqual(f.read(), b"cc")
+
+    def test_closes_response_when_status_is_not_200(self):
+        response = make_response(status=404)
+
+        result = self.download({THREE_URLS[0]: response}, urlList=THREE_URLS[:1])
+
+        self.assertEqual(result, [None])
+        response.close.assert_called()
+
+    def test_closes_response_after_successful_download(self):
+        response = make_response()
+
+        self.download({THREE_URLS[0]: response}, urlList=THREE_URLS[:1])
+
+        response.close.assert_called_once_with()
+
+    def test_streams_in_large_chunks(self):
+        response = make_response()
+
+        self.download({THREE_URLS[0]: response}, urlList=THREE_URLS[:1])
+
+        response.iter_content.assert_called_once_with(65536)
+
+    def test_passes_timeout_to_requests(self):
+        response = make_response()
+        with mock.patch(REQUESTS_GET, return_value=response) as get:
+            multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=self.log,
+                timeout=7,
+            )
+
+        self.assertEqual(get.call_args.kwargs["timeout"], 7.0)
+
+    def test_each_call_logs_to_its_own_logger_even_when_calls_overlap(self):
+        logA, logB = mock.Mock(), mock.Mock()
+        notFound = make_response(status=404)
+        nested = []
+
+        def getWithNestedCall(uri, **kwargs):
+            # START A SECOND DOWNLOAD WHILE THE FIRST IS IN PROGRESS
+            if not nested:
+                nested.append(True)
+                self.download(
+                    {THREE_URLS[0]: notFound}, urlList=THREE_URLS[:1], log=logB
+                )
+            return notFound
+
+        with mock.patch(REQUESTS_GET, side_effect=getWithNestedCall):
+            multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=logA,
+                timeStamp=False,
+            )
+
+        self.assertGreater(logA.warning.call_count, 0)
+        self.assertGreater(logB.warning.call_count, 0)
+
+    def test_module_has_no_shared_timeout_or_logger_globals(self):
+        moduleUnderTest = sys.modules["fundamentals.download.multiobject_download"]
+
+        self.assertFalse(hasattr(moduleUnderTest, "gtimeout"))
+        self.assertFalse(hasattr(moduleUnderTest, "llog"))
+
+    def test_shuts_down_the_thread_pool_after_downloading(self):
+        pool = ThreadPool(1)
+        pool.terminate = mock.Mock(wraps=pool.terminate)
+
+        with mock.patch(THREAD_POOL, return_value=pool):
+            self.download({THREE_URLS[0]: make_response()}, urlList=THREE_URLS[:1])
+
+        pool.terminate.assert_called_once_with()
+
+    def test_never_logs_credentials_or_urls_containing_them(self):
+        secretUrl = "http://alice:s3cret@example.com/a.html"
+        error = OSError("cannot reach " + secretUrl)
+
+        with mock.patch(REQUESTS_GET, side_effect=error):
+            result = multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=self.log,
+                timeStamp=False,
+                credentials=CREDENTIALS,
+            )
+
+        self.assertEqual(result, [None])
+        logged = str(self.log.mock_calls)
+        self.assertNotIn("s3cret", logged)
+        self.assertNotIn("alice", logged)
