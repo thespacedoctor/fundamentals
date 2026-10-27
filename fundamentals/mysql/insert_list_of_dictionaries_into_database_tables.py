@@ -21,6 +21,7 @@ from builtins import range
 from past.utils import old_div
 import sys
 import os
+import tempfile
 
 os.environ["TERM"] = "vt100"
 
@@ -438,44 +439,50 @@ def _add_dictlist_to_database_via_load_in_file(
 
     df = pd.DataFrame(dictList)
     df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
-    df.to_csv(
-        "/tmp/%(tmpTable)s" % locals(),
-        sep="|",
-        index=False,
-        quotechar='"',
-        columns=csvColumns,
-        encoding="utf-8",
-    )
 
-    sqlQuery = """LOAD DATA LOCAL INFILE '/tmp/%(tmpTable)s'
+    with tempfile.TemporaryDirectory(prefix="fundamentals-load-") as tmpDir:
+        csvPath = os.path.join(tmpDir, tmpTable + ".csv")
+        df.to_csv(
+            csvPath,
+            sep="|",
+            index=False,
+            quotechar='"',
+            columns=csvColumns,
+            encoding="utf-8",
+        )
+
+        # A BACKSLASH IS READ DIFFERENTLY DEPENDING ON THE SERVER'S NO_BACKSLASH_ESCAPES
+        # MODE, SO REFUSE SUCH PATHS; DOUBLED QUOTES ARE SAFE IN EVERY MODE
+        if "\\" in csvPath:
+            raise ValueError(
+                "the temporary CSV path contains a backslash and cannot be used in LOAD DATA: %s"
+                % csvPath
+            )
+        sqlCsvPath = csvPath.replace("'", "''")
+        sqlQuery = """LOAD DATA LOCAL INFILE '%(sqlCsvPath)s'
 INTO TABLE %(tmpTable)s
 FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
 IGNORE 1 LINES
 (%(csvColumnsString)s);""" % locals()
 
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    updateStatement = ""
-    for i in csvColumns:
-        updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
-    if dateModified:
-        updateStatement += "dateLastModified = NOW(), updated = 1"
-    else:
-        updateStatement = updateStatement[0:-2]
+        updateStatement = ""
+        for i in csvColumns:
+            updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
+        if dateModified:
+            updateStatement += "dateLastModified = NOW(), updated = 1"
+        else:
+            updateStatement = updateStatement[0:-2]
 
-    sqlQuery = """
+        sqlQuery = """
 INSERT IGNORE INTO %(dbTablename)s
 SELECT * FROM %(tmpTable)s
 ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-    try:
-        os.remove("/tmp/%(tmpTable)s" % locals())
-    except:
-        pass
+        sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
     dbConn.commit()
     dbConn.close()

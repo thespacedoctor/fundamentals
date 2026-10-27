@@ -5,6 +5,8 @@ import unittest
 import shutil
 import unittest
 import yaml
+import sys
+from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -46,7 +48,56 @@ if not os.path.exists(pathToOutputDir):
 pathToSqlite = pathToInputDir + "/test.sqlite"
 
 
+HEADJACK_DIRECTORY = "/tmp/headjack"
+
+
 class test_sqlite2mysql(unittest.TestCase):
+
+    def test_sqlite2mysql_does_not_create_tmp_headjack_directory(self):
+
+        import fundamentals.mysql
+        from fundamentals.mysql import sqlite2mysql
+
+        realExists = os.path.exists
+        realMakedirs = os.makedirs
+        makedirsCalls = []
+
+        def fakeExists(path):
+            if str(path).startswith(HEADJACK_DIRECTORY):
+                return False
+            return realExists(path)
+
+        def fakeMakedirs(path, *args, **kwargs):
+            if str(path).startswith(HEADJACK_DIRECTORY):
+                makedirsCalls.append(path)
+                return None
+            return realMakedirs(path, *args, **kwargs)
+
+        this = sqlite2mysql(
+            log=log,
+            settings=settings,
+            pathToSqlite=pathToSqlite,
+            tablePrefix="Marvin",
+            dbConn=dbConn,
+        )
+        sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
+
+        # PATCH ONLY THE MODULE'S OWN os REFERENCE, NOT THE GLOBAL os MODULE
+        fakeOs = mock.Mock(wraps=os)
+        fakeOs.path = mock.Mock(wraps=os.path)
+        fakeOs.path.exists.side_effect = fakeExists
+        fakeOs.makedirs.side_effect = fakeMakedirs
+
+        with (
+            mock.patch.object(sqliteModule, "writequery"),
+            mock.patch.object(
+                fundamentals.mysql, "insert_list_of_dictionaries_into_database_tables"
+            ),
+            mock.patch.object(sqliteModule, "os", fakeOs),
+        ):
+            this.convert_sqlite_to_mysql()
+
+        self.assertEqual(makedirsCalls, [])
 
     def test_sqlite2mysql_function(self):
 
