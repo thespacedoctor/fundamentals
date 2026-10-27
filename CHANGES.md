@@ -3,6 +3,7 @@
 
 **Unreleased**
 
+* **FIXED:** `append_now_datestamp_to_filename` puts the datestamp before the last extension (`a.tar.gz` gives `a.tar_<stamp>.gz`) and no longer adds `.xhtml` to a name with no extension; a filename that is not a string raises `TypeError` (DY-2014)
 * **FIXED:** `tag` and the `LOAD DATA` path of `insert_list_of_dictionaries_into_database_tables` now write their scratch files to a private temporary folder that is removed afterwards, even on error, instead of leaving files in `/tmp`; `sqlite2mysql` no longer creates an unused `/tmp/headjack/` folder
 * **FIXED:** `fmultiprocess` now terminates and joins its worker pool when a task raises, the timeout is reached or the call is interrupted with Ctrl-C, instead of leaving workers running (DY-1701)
 * **FIXED:** removed the unused `docs/requirements.txt`, which pinned vulnerable docs packages (mistune, Jinja2, Markdown) and raised 16 Dependabot alerts
