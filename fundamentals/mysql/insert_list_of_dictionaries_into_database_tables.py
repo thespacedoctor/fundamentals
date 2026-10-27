@@ -206,6 +206,8 @@ def insert_list_of_dictionaries_into_database_tables(
                     batchSize=batchSize,
                     reDatetime=reDate,
                     dateCreated=dateCreated,
+                    # FORKED WORKERS WOULD SHARE THE CALLER'S SINGLE CONNECTION, SO RUN IN THIS PROCESS
+                    turnOffMP=True,
                 )
 
             else:

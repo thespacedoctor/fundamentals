@@ -225,11 +225,6 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 BATCH_TABLE = "test_dy2025_insert_batches"
 
 
-def run_serially(log, function, inputArray, **kwargs):
-    """Stand-in for fmultiprocess so forked workers do not share the test connection."""
-    return [function(item, log=log, **kwargs) for item in inputArray]
-
-
 class test_insert_batches(unittest.TestCase):
 
     def setUp(self):
@@ -252,17 +247,20 @@ class test_insert_batches(unittest.TestCase):
         )
 
     def _insert(self, rows, batchSize=2500):
+        self._insert_rows(rows, batchSize=batchSize)
+
+    def _insert_rows(self, rows, batchSize=2500, **kwargs):
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
 
-        with mock.patch.object(self.insertModule, "fmultiprocess", run_serially):
-            insert_list_of_dictionaries_into_database_tables(
-                dbConn=dbConn,
-                log=log,
-                dictList=rows,
-                dbTableName=BATCH_TABLE,
-                batchSize=batchSize,
-                dateCreated=False,
-            )
+        insert_list_of_dictionaries_into_database_tables(
+            dbConn=dbConn,
+            log=log,
+            dictList=rows,
+            dbTableName=BATCH_TABLE,
+            batchSize=batchSize,
+            dateCreated=False,
+            **kwargs
+        )
 
     def _select(self, columns):
         from fundamentals.mysql import readquery
@@ -320,6 +318,53 @@ class test_insert_batches(unittest.TestCase):
             [(r["my_key"], r["other_key"]) for r in result],
             [(i, i * 2) for i in range(4)],
         )
+
+    def test_runs_batches_serially_when_only_a_connection_is_given(self):
+        # ARRANGE
+        rows = [{"col1": i} for i in range(6)]
+        fmultiprocessSpy = mock.Mock(wraps=self.insertModule.fmultiprocess)
+
+        # ACT
+        with mock.patch.object(self.insertModule, "fmultiprocess", fmultiprocessSpy):
+            self._insert_rows(rows, batchSize=2)
+
+        # ASSERT
+        self.assertTrue(fmultiprocessSpy.call_args.kwargs["turnOffMP"])
+
+    def test_inserts_all_batches_on_the_callers_connection_without_a_serial_stand_in(
+        self,
+    ):
+        # ARRANGE: 1 ROW CREATES THE TABLE, THE REMAINING 8 FILL 4 BATCHES OF 2
+        rows = [{"col1": i} for i in range(9)]
+
+        # ACT
+        self._insert_rows(rows, batchSize=2)
+
+        # ASSERT
+        self.assertEqual([r["col1"] for r in self._select("col1")], list(range(9)))
+
+    def test_raises_runtime_error_when_a_batch_fails_on_the_connection_only_path(self):
+        # ARRANGE
+        rows = [{"col1": i} for i in range(5)]
+
+        # ACT / ASSERT
+        with mock.patch.object(
+            self.insertModule, "writequery", return_value="simulated write error"
+        ):
+            with self.assertRaises(RuntimeError):
+                self._insert_rows(rows, batchSize=2)
+
+    def test_keeps_multiprocessing_on_when_database_settings_are_given(self):
+        # ARRANGE
+        rows = [{"col1": i} for i in range(3)]
+        fmultiprocessSpy = mock.Mock(return_value=[])
+
+        # ACT
+        with mock.patch.object(self.insertModule, "fmultiprocess", fmultiprocessSpy):
+            self._insert_rows(rows, dbSettings=dbSettings)
+
+        # ASSERT
+        self.assertFalse(fmultiprocessSpy.call_args.kwargs["turnOffMP"])
 
     def test_normalise_key_replaces_separators_and_renames_mysql_keyword_dec(self):
         # ARRANGE
@@ -477,18 +522,17 @@ class test_insert_batches(unittest.TestCase):
             return realAutocommit(value)
 
         # ACT / ASSERT
-        with mock.patch.object(self.insertModule, "fmultiprocess", run_serially):
-            with mock.patch.object(
-                dbConn, "autocommit", side_effect=autocommitFailsOnRestore
-            ):
-                with self.assertRaises(pymysql.err.OperationalError):
-                    insert_list_of_dictionaries_into_database_tables(
-                        dbConn=dbConn,
-                        log=log,
-                        dictList=[{"col1": i} for i in range(3)],
-                        dbTableName=BATCH_TABLE,
-                        dateCreated=False,
-                    )
+        with mock.patch.object(
+            dbConn, "autocommit", side_effect=autocommitFailsOnRestore
+        ):
+            with self.assertRaises(pymysql.err.OperationalError):
+                insert_list_of_dictionaries_into_database_tables(
+                    dbConn=dbConn,
+                    log=log,
+                    dictList=[{"col1": i} for i in range(3)],
+                    dbTableName=BATCH_TABLE,
+                    dateCreated=False,
+                )
 
     def test_original_error_propagates_when_autocommit_restore_also_raises(self):
         # ARRANGE
