@@ -46,7 +46,7 @@ import os
 import time
 import collections
 import datetime
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE, STDOUT, DEVNULL
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
@@ -170,10 +170,7 @@ def directory_script_runner(
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
 
     # FORCE MYSQL SCRIPT?
-    if force:
-        force = "--force"
-    else:
-        force = ""
+    forceArgs = ["--force"] if force else []
 
     if dbConn:
         for k, v in list(scriptList.items()):
@@ -198,24 +195,20 @@ def directory_script_runner(
     else:
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
+            mysqlCmd = ["mysql", "--login-path=%s" % (loginPath,)] + forceArgs
+            mysqlCmd.append(databaseName)
+            mysqlEnv = _mysql_environment()
             if waitForResult == True:
-                cmd = (
-                    """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """
-                    % locals()
-                )
-                p = Popen(
-                    cmd,
-                    stdout=PIPE,
-                    stderr=PIPE,
-                    close_fds=True,
-                    env={
-                        "PATH": os.getenv("PATH")
-                        + ":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin",
-                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
-                    },
-                    shell=True,
-                )
-                stdout, stderr = p.communicate()
+                with open(v, "rb") as scriptFile:
+                    p = Popen(
+                        mysqlCmd,
+                        stdin=scriptFile,
+                        stdout=PIPE,
+                        stderr=PIPE,
+                        close_fds=True,
+                        env=mysqlEnv,
+                    )
+                    stdout, stderr = p.communicate()
 
                 if len(stderr):
                     log.error(
@@ -231,31 +224,38 @@ def directory_script_runner(
                     log=log,
                 )
             else:
+                with open(v, "rb") as scriptFile:
+                    p = Popen(
+                        mysqlCmd,
+                        stdin=scriptFile,
+                        stdout=DEVNULL,
+                        stderr=DEVNULL,
+                        close_fds=True,
+                        env=mysqlEnv,
+                    )
+                    # WAIT BEFORE DELETING SO MYSQL HAS READ THE SCRIPT
+                    if waitForResult == "delete":
+                        p.wait()
                 if waitForResult == "delete":
-                    cmd = (
-                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """
-                        % locals()
-                    )
-                else:
-                    cmd = (
-                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 """
-                        % locals()
-                    )
-                p = Popen(
-                    cmd,
-                    close_fds=True,
-                    env={
-                        "PATH": os.getenv("PATH") + ":/usr/local/bin:/usr/bin:",
-                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
-                    },
-                    shell=True,
-                    stdin=None,
-                    stdout=None,
-                    stderr=None,
-                )
+                    os.remove(v)
 
     log.debug("completed the ``directory_script_runner`` function")
     return None
+
+
+def _mysql_environment():
+    """*return a copy of the current environment extended with the paths the mysql client needs*
+
+    **Return:**
+
+    - `env` -- the environment dictionary to pass to the mysql subprocess
+    """
+    env = os.environ.copy()
+    extraPaths = "/usr/local/bin:/usr/bin:/usr/local/mysql/bin"
+    currentPath = env.get("PATH")
+    env["PATH"] = currentPath + ":" + extraPaths if currentPath else extraPaths
+    env["MYSQL_TEST_LOGIN_FILE"] = os.path.join(os.path.expanduser("~"), ".mylogin.cnf")
+    return env
 
 
 def execute_mysql_script(pathToScript, dbConn, log):
