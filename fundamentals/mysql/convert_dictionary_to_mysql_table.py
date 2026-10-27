@@ -16,6 +16,7 @@ from fundamentals.mysql.sql_identifiers import (
     quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql.sql_values import null_if_missing
 from pymysql.converters import escape_item
 import collections as c
 import datetime
@@ -38,10 +39,9 @@ def _sql_literal(value):
 
 
 def _database_value(value):
-    """*return the value as it should be stored: None and empty strings become NULL (None), numbers and strings are kept, anything else is stored as text*"""
-    if value is None or value == "":
-        return None
-    if isinstance(value, (str, int, float, bool)):
+    """*return the value as it should be stored: missing values become NULL (None), numbers and strings are kept, anything else is stored as text*"""
+    value = null_if_missing(value)
+    if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
 

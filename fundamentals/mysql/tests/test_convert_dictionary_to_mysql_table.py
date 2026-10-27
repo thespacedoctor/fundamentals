@@ -509,7 +509,13 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         # ARRANGE
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
-        dictionary = {"a": None, "b": "", "c": "None", "d": ["", "comment"]}
+        dictionary = {
+            "a": None,
+            "b": "",
+            "c": "None",
+            "d": ["", "comment"],
+            "e": "null",
+        }
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
@@ -521,8 +527,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         literalCommand = self._insert_statement(dictionary)
 
         # ASSERT
-        self.assertEqual(valueTuple, (None, None, "None", None))
-        self.assertIn("VALUES (NULL,NULL,'None',NULL, NOW())", literalCommand)
+        self.assertEqual(valueTuple, (None, None, "None", None, "null"))
+        self.assertIn("VALUES (NULL,NULL,'None',NULL,'null', NOW())", literalCommand)
 
     def test_batch_value_tuple_keeps_numbers_and_booleans_native(self):
         # ARRANGE

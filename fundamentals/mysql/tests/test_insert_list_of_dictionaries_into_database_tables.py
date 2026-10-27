@@ -295,6 +295,35 @@ class test_load_in_file_statements(unittest.TestCase):
     def _statement_containing(self, text):
         return next(q for q in self.sqlStatements if text in q)
 
+    def test_marks_none_nan_and_empty_values_null_and_keeps_none_and_null_text(self):
+        # ARRANGE
+        rows = [
+            {
+                "a": None,
+                "b": "None",
+                "c": "",
+                "d": float("nan"),
+                "e": "null",
+                "f": "kept",
+            }
+        ]
+        loadedFrames = []
+
+        def recordFrame(log, dbConn, df, *args):
+            loadedFrames.append(df.copy())
+
+        # ACT
+        with mock.patch.object(
+            self.insertModule, "_load_dataframe_into_table", recordFrame
+        ):
+            self._run_load(rows)
+
+        # ASSERT
+        self.assertEqual(
+            loadedFrames[0].iloc[0].tolist(),
+            ["\\N", "None", "\\N", "\\N", "null", "kept"],
+        )
+
     def test_does_not_update_duplicates_when_replace_is_false(self):
         # ARRANGE
         rows = [{"col1": 1, "col2": 2.0}]
@@ -911,15 +940,15 @@ class test_batch_insert_statement(unittest.TestCase):
         # ASSERT
         self.assertIn('(`a""b`,`c"None"d`', sqlQuery)
 
-    def test_binds_none_and_empty_values_as_null(self):
+    def test_binds_none_and_empty_values_as_null_and_keeps_none_and_null_text(self):
         # ARRANGE
-        rows = [{"a": None, "b": "None", "c": "", "d": 0}]
+        rows = [{"a": None, "b": "None", "c": "", "d": 0, "e": "null"}]
 
         # ACT
         values = self._build_sql(rows=rows)["manyValueList"]
 
         # ASSERT
-        self.assertEqual(values, [(None, None, None, 0)])
+        self.assertEqual(values, [(None, "None", None, 0, "null")])
 
     def test_raises_when_a_column_name_contains_a_nul_character(self):
         # ARRANGE

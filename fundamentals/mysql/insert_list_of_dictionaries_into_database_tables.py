@@ -20,6 +20,7 @@ from fundamentals.mysql.sql_identifiers import (
     quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql.sql_values import null_if_missing
 from builtins import str
 from builtins import range
 import sys
@@ -304,13 +305,6 @@ def _insert_rows_individually(
     return ""
 
 
-def _database_value(value):
-    """*return the value to bind for a batch insert: None and the strings ``"None"`` and ``""`` become NULL*"""
-    if value is None or (isinstance(value, str) and value in ("None", "")):
-        return None
-    return value
-
-
 def _build_batch_insert_command(dbTableName, columns, replace, dateCreated):
     """*build the multi-row insert command, with ``%s`` placeholders for the values*
 
@@ -412,7 +406,7 @@ def _insert_single_batch_into_database(
     # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
     originalKeys, uniKeys = _map_keys_to_columns(batch[0])
 
-    vals = [tuple([_database_value(d.get(k)) for k in originalKeys]) for d in batch[0]]
+    vals = [tuple([null_if_missing(d.get(k)) for k in originalKeys]) for d in batch[0]]
     insertCommand = _build_batch_insert_command(
         dbTableName, uniKeys, replace, dateCreated
     )
@@ -486,7 +480,8 @@ def _add_dictlist_to_database_via_load_in_file(
     quotedTable = quote_identifier(dbTablename)
 
     df = pd.DataFrame(dictList)
-    df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
+    # THE SAME NULL RULE AS null_if_missing, PLUS NAN (A PANDAS NAN MEANS MISSING)
+    df.replace(["", np.nan, None], "\\N", inplace=True)
 
     # SETUP ALL DATABASE CONNECTIONS
     dbConn = database(log=log, dbSettings=dbSettings).connect()
