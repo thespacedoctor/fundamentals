@@ -105,3 +105,78 @@ class test_tools_logger(unittest.TestCase):
 
         loggingMock.assert_called_once_with(yaml_file=settingsFile)
         self.assertIs(su.setup()[2], loggingMock.return_value)
+
+
+TUNNEL_YAML = """
+database settings:
+    db: d
+    host: 127.0.0.1
+    user: u
+    password: p
+    tunnel: %s
+"""
+
+TUNNEL_DICT_YAML = """
+        remote user: monster
+        remote ip: psweb.example.ac.uk
+        remote datbase host: dormammu
+        port: 9006
+"""
+
+
+class test_tools_tunnel(unittest.TestCase):
+
+    def _build_tools(self, tunnelValue):
+        import os
+        import tempfile
+        from unittest import mock
+        from fundamentals import tools
+
+        with tempfile.TemporaryDirectory() as tmpDir:
+            settingsFile = os.path.join(tmpDir, "settings.yaml")
+            with open(settingsFile, "w") as stream:
+                stream.write(TUNNEL_YAML % tunnelValue)
+            with mock.patch("pymysql.connect") as connectMock:
+                su = tools(
+                    arguments={"settingsFile": settingsFile},
+                    docString="",
+                    quitIfRunning=False,
+                )
+        return su, connectMock
+
+    def test_connects_through_the_nested_tunnel_port(self):
+        from unittest import mock
+
+        with mock.patch(
+            "fundamentals.tools.setup_ssh_tunnel", return_value=9006
+        ) as tunnelMock:
+            su, connectMock = self._build_tools("\n" + TUNNEL_DICT_YAML)
+
+        self.assertEqual(tunnelMock.call_args.kwargs["tunnelParameters"]["port"], 9006)
+        self.assertEqual(connectMock.call_args.kwargs["port"], 9006)
+        self.assertIs(su.setup()[3], connectMock.return_value)
+
+    def test_does_not_start_a_tunnel_when_tunnel_is_false(self):
+        from unittest import mock
+
+        with mock.patch("fundamentals.tools.setup_ssh_tunnel") as tunnelMock:
+            su, connectMock = self._build_tools("false")
+
+        tunnelMock.assert_not_called()
+        connectMock.assert_called_once()
+
+    def test_raises_tunnel_error_when_tunnel_is_true_without_a_config(self):
+        from fundamentals.ssh_tunnel import tunnel_error
+
+        with self.assertRaises(tunnel_error):
+            self._build_tools("true")
+
+    def test_raises_tunnel_error_rather_than_exiting_when_tunnel_never_connects(self):
+        from unittest import mock
+        from fundamentals.ssh_tunnel import tunnel_error
+
+        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
+            "fundamentals.ssh_tunnel.is_port_open", return_value=False
+        ), mock.patch("fundamentals.ssh_tunnel.time.sleep"):
+            with self.assertRaises(tunnel_error):
+                self._build_tools("\n" + TUNNEL_DICT_YAML)

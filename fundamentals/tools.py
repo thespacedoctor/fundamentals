@@ -20,9 +20,8 @@ except:
     pass
 from collections import OrderedDict
 import shutil
-from subprocess import Popen, PIPE, STDOUT
 from . import logs as dl
-import time
+from .ssh_tunnel import setup_ssh_tunnel
 from docopt import docopt
 
 try:
@@ -90,16 +89,15 @@ class tools(object):
         host: localhost
         user: utuser
         password: utpass
-        tunnel: true
+        tunnel:
+            remote user: username
+            remote ip: mydomain.co.uk
+            remote datbase host: mydatabaseName
+            port: 9002
 
-    # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
+    # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
-    ssh tunnel:
-        remote user: username
-        remote ip: mydomain.co.uk
-        remote datbase host: mydatabaseName
-        port: 9002
 
     logging settings:
         formatters:
@@ -444,90 +442,25 @@ class tools(object):
 
     def _setup_tunnel(self):
         """
-        *setup ssh tunnel if required*
+        *setup the ssh tunnel described by ``database settings: tunnel`` and connect to the remote database through it*
+
+        Raises ``fundamentals.ssh_tunnel.tunnel_error`` if the tunnel settings are invalid or the tunnel cannot be set up.
         """
         import pymysql as ms
 
-        # SETUP TUNNEL IF REQUIRED
-        if "ssh tunnel" in self.settings:
-            # TEST TUNNEL DOES NOT ALREADY EXIST
-            sshPort = self.settings["ssh tunnel"]["port"]
-            connected = self._checkServer(
-                self.settings["database settings"]["host"], sshPort
-            )
-            if connected:
-                pass
-            else:
-                # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
-                ru = self.settings["ssh tunnel"]["remote user"]
-                rip = self.settings["ssh tunnel"]["remote ip"]
-                rh = self.settings["ssh tunnel"]["remote datbase host"]
-
-                cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
-                p = Popen(cmd, shell=True, close_fds=True)
-                output = p.communicate()[0]
-
-                # TEST CONNECTION - QUIT AFTER SO MANY TRIES
-                connected = False
-                count = 0
-                while not connected:
-                    connected = self._checkServer(
-                        self.settings["database settings"]["host"], sshPort
-                    )
-                    time.sleep(1)
-                    count += 1
-                    if count == 5:
-                        self.log.error(
-                            "cound not setup tunnel to remote datbase" % locals()
-                        )
-                        sys.exit(0)
-
-        if (
-            "tunnel" in self.settings["database settings"]
-            and self.settings["database settings"]["tunnel"]
-        ):
-            # TEST TUNNEL DOES NOT ALREADY EXIST
-            sshPort = self.settings["database settings"]["tunnel"]["port"]
-            connected = self._checkServer(
-                self.settings["database settings"]["host"], sshPort
-            )
-            if connected:
-                pass
-            else:
-                # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
-                ru = self.settings["database settings"]["tunnel"]["remote user"]
-                rip = self.settings["database settings"]["tunnel"]["remote ip"]
-                rh = self.settings["database settings"]["tunnel"]["remote datbase host"]
-
-                cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
-                p = Popen(cmd, shell=True, close_fds=True)
-                output = p.communicate()[0]
-
-                # TEST CONNECTION - QUIT AFTER SO MANY TRIES
-                connected = False
-                count = 0
-                while not connected:
-                    connected = self._checkServer(
-                        self.settings["database settings"]["host"], sshPort
-                    )
-                    time.sleep(1)
-                    count += 1
-                    if count == 5:
-                        self.log.error(
-                            "cound not setup tunnel to remote datbase" % locals()
-                        )
-                        sys.exit(0)
+        databaseSettings = self.settings["database settings"]
+        sshPort = setup_ssh_tunnel(
+            tunnelParameters=databaseSettings["tunnel"],
+            log=self.log,
+            checkHost=databaseSettings["host"],
+        )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
-        host = self.settings["database settings"]["host"]
-        user = self.settings["database settings"]["user"]
-        passwd = self.settings["database settings"]["password"]
-        dbName = self.settings["database settings"]["db"]
         thisConn = ms.connect(
-            host=host,
-            user=user,
-            passwd=passwd,
-            db=dbName,
+            host=databaseSettings["host"],
+            user=databaseSettings["user"],
+            passwd=databaseSettings["password"],
+            db=databaseSettings["db"],
             port=sshPort,
             use_unicode=True,
             charset="utf8",
@@ -538,27 +471,6 @@ class tools(object):
         )
         thisConn.autocommit(True)
         self.remoteDBConn = thisConn
-
-        return None
-
-    def _checkServer(self, address, port):
-        """
-        *Check that the TCP Port we've decided to use for tunnelling is available*
-        """
-        # CREATE A TCP SOCKET
-        import socket
-
-        s = socket.socket()
-
-        try:
-            s.connect((address, port))
-            return True
-        except socket.error as e:
-            self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
-                % locals()
-            )
-            return False
 
         return None
 
