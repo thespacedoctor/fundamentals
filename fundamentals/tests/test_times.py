@@ -41,6 +41,19 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+class test_datetime_relative_to_now(unittest.TestCase):
+
+    def test_reports_minutes_for_a_date_five_minutes_ago(self):
+        from datetime import datetime, timedelta
+        from fundamentals import times
+
+        date = datetime.now() - timedelta(seconds=300)
+
+        relTime = times.datetime_relative_to_now(date)
+
+        self.assertEqual(relTime, " +5min")
+
+
 # class test_times(unittest.TestCase):
 
 #     def test_times_function(self):

@@ -74,7 +74,7 @@ def datetime_relative_to_now(date):
     elif s < 120:
         return " +1min"
     elif s < 3600:
-        return " +{0}min".format(int(s / 3600))
+        return " +{0}min".format(int(s / 60))
     elif s < 7200:
         return " +1hr"
     else:
