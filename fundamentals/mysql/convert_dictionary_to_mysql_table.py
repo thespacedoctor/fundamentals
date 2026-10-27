@@ -277,7 +277,6 @@ def convert_dictionary_to_mysql_table(
                 raise ValueError(message)
 
         for k, v in list(dictionary.items()):
-            # log.debug('k: %s, v: %s' % (k, v,))
             if isinstance(v, list) and len(v) != 2:
                 message = (
                     'Please make sure the list values in "dictionary" 2 items in length'
@@ -413,9 +412,6 @@ def convert_dictionary_to_mysql_table(
                 + _sql_literal(dbTableName)
             )
             try:
-                # log.debug('checking if the column '+formattedKey+' exists
-                # in the '+dbTableName+' table')
-
                 rows = readquery(
                     log=log,
                     sqlQuery=colExists,
@@ -435,7 +431,6 @@ def convert_dictionary_to_mysql_table(
                 if not isinstance(value, list):
                     value = [value]
                 if reDatetime.search(str(value[0])):
-                    # log.debug('Ok - a datetime string was found')
                     qCreateColumn += " datetime DEFAULT NULL"
                 elif (
                     formattedKey == "updated_parsed"
@@ -474,9 +469,6 @@ def convert_dictionary_to_mysql_table(
                 elif isinstance(value[0], list):
                     qCreateColumn += " varchar(1024) DEFAULT NULL"
                 else:
-                    # log.debug('Do not know what format to add this key in
-                    # MySQL - removing from dictionary: %s, %s'
-                    # % (key, type(value[0])))
                     formattedKeyList.pop()
                     myValues.pop()
                     qCreateColumn = None
@@ -499,8 +491,6 @@ def convert_dictionary_to_mysql_table(
                         writequery(log=log, sqlQuery=qCreateColumn, dbConn=dbConn)
 
                     except Exception as e:
-                        # log.debug('qCreateColumn: %s' % (qCreateColumn,
-                        # ))
                         log.error(
                             "could not create the "
                             + formattedKey
@@ -533,7 +523,6 @@ def convert_dictionary_to_mysql_table(
             rows = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
 
             exists = rows[0]["COUNT(*)"]
-            # log.debug('uniqueKeyList: %s' % (uniqueKeyList,))
             if exists == 0:
                 uniqueColumns = ",".join(quote_identifier(k) for k in uniqueKeyList)
 
@@ -546,7 +535,6 @@ def convert_dictionary_to_mysql_table(
                     + uniqueColumns
                     + ")"
                 )
-                # log.debug('HERE IS THE COMMAND:'+addUniqueKey)
                 writequery(log=log, sqlQuery=addUniqueKey, dbConn=dbConn)
 
     if returnInsertOnly == True and batchInserts == True:
@@ -569,8 +557,6 @@ def convert_dictionary_to_mysql_table(
 
     message = ""
     try:
-        # log.debug('adding new data to the %s table; query: %s' %
-        # (dbTableName, addValue))"
         writequery(log=log, sqlQuery=addValue, dbConn=dbConn)
 
     except Exception as e:
