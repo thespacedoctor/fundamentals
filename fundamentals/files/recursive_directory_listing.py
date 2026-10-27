@@ -63,6 +63,8 @@ def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
     """
     log.debug("starting the ``recursive_directory_listing`` function")
 
+    baseFolderPath = os.fspath(baseFolderPath)
+
     if whatToList not in VALID_WHAT_TO_LIST:
         raise ValueError(
             'could not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]'

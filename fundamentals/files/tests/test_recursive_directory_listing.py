@@ -1,6 +1,7 @@
 from __future__ import print_function
 from builtins import str
 import os
+import pathlib
 import unittest
 import shutil
 import tempfile
@@ -122,6 +123,14 @@ class test_recursive_directory_listing(unittest.TestCase):
         from fundamentals.files import recursive_directory_listing
 
         missingDir = os.path.join(self.baseDir, "missing")
+
+        with self.assertRaises(FileNotFoundError):
+            recursive_directory_listing(log, missingDir, whatToList="all")
+
+    def test_raises_file_not_found_error_when_pathlib_base_folder_is_missing(self):
+        from fundamentals.files import recursive_directory_listing
+
+        missingDir = pathlib.Path(self.baseDir) / "missing"
 
         with self.assertRaises(FileNotFoundError):
             recursive_directory_listing(log, missingDir, whatToList="all")
