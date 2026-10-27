@@ -35,6 +35,9 @@ import docopt
 from fundamentals import tools, times
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
+URL_REQUEST_TIMEOUT = 10
+URL_SCHEMES_ALLOWED = ("http", "https")
+
 
 def main(arguments=None):
     """
@@ -234,9 +237,7 @@ class yaml_to_database(object):
 
         import codecs
         import requests
-        import requests.packages.urllib3
-
-        requests.packages.urllib3.disable_warnings()
+        from urllib.parse import urlparse
 
         try:
             self.log.debug("attempting to open the file %s" % (filepath,))
@@ -273,11 +274,22 @@ class yaml_to_database(object):
         dbTables = []
         dbTables[:] = [d.strip() for d in dbTablesTmp]
 
-        # UNSHORTEN URL
+        # UNSHORTEN URL (ONLY FOR HTTP/HTTPS; REDIRECTS ARE NEEDED TO FIND THE FINAL URL)
         try:
-            r = requests.head(yamlContent["url"], allow_redirects=True)
-            yamlContent["url"] = r.url
-        except:
+            if urlparse(yamlContent["url"]).scheme.lower() in URL_SCHEMES_ALLOWED:
+                r = requests.head(
+                    yamlContent["url"],
+                    allow_redirects=True,
+                    timeout=URL_REQUEST_TIMEOUT,
+                )
+                yamlContent["url"] = r.url
+            else:
+                self.log.warning(
+                    "not unshortening url with a scheme other than http/https: %(filepath)s"
+                    % locals()
+                )
+        except (requests.RequestException, KeyError, ValueError):
+            # VALUEERROR: MALFORMED URL REJECTED BY urlparse
             pass
 
         yamlContent["original_yaml_path"] = filepath
