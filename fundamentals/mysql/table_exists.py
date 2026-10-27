@@ -7,11 +7,9 @@ Author
 : David Young
 """
 
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 
 
 def table_exists(dbConn, log, dbTableName):

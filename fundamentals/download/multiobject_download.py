@@ -14,12 +14,10 @@ from future import standard_library
 
 standard_library.install_aliases()
 from builtins import zip
-from builtins import str
 import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 from urllib.parse import quote
 from datetime import datetime
 import requests

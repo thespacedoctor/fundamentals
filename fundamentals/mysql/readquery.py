@@ -7,10 +7,8 @@ Author
 : David Young
 """
 
-from fundamentals import tools
 from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 from builtins import str
-import sys
 import os
 import time
 

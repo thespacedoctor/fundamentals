@@ -5,9 +5,7 @@ import unittest
 import shutil
 import signal
 import tempfile
-import unittest
 from unittest import mock
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser

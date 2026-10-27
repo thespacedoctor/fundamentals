@@ -25,17 +25,13 @@ Options:
 from __future__ import print_function
 
 from builtins import object
-import sys
 import os
-import yaml
 
 import re
-import glob
 import ipaddress
 import socket
 from urllib.parse import urljoin, urlparse
-import docopt
-from fundamentals import tools, times
+from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
 URL_REQUEST_TIMEOUT = 10

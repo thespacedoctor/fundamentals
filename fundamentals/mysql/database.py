@@ -19,10 +19,6 @@ except ImportError:
         import pyreadline3 as readline
     except ImportError:
         readline = None  # or just pass — basic input() still works
-import glob
-import pickle
-from docopt import docopt
-from fundamentals.mysql import readquery
 from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
 

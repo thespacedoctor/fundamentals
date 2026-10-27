@@ -1,11 +1,8 @@
 from __future__ import print_function
-from builtins import str
 import os
 import logging
 import unittest
 import shutil
-import unittest
-import yaml
 import sys
 import stat
 import subprocess

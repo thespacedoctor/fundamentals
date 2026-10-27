@@ -9,7 +9,7 @@ Author
 
 import six
 from fundamentals.mysql import writequery, table_exists, readquery
-from fundamentals import tools, times
+from fundamentals import times
 from fundamentals.mysql.sql_identifiers import (
     normalise_column_name,
     quote_identifier,
@@ -19,13 +19,11 @@ from fundamentals.mysql.sql_identifiers import (
 from pymysql.converters import escape_item
 import collections as c
 import datetime
-import time
 import yaml
 import re
 from builtins import zip
 from builtins import str
 from builtins import range
-import sys
 import os
 
 os.environ["TERM"] = "vt100"

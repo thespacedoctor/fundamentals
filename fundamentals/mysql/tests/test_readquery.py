@@ -1,13 +1,10 @@
 from __future__ import print_function
-from builtins import str
 import os
 import unittest
 import shutil
-import unittest
 import warnings
 from unittest import mock
 import pymysql
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser

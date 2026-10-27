@@ -10,7 +10,6 @@ Author
 from builtins import object
 import os
 import stat
-import sys
 import logging
 from logging import handlers
 

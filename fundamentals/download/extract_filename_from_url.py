@@ -8,13 +8,11 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 import re
 from urllib.parse import urlparse
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 
 # THE OPTIONAL SCHEME AND THE USER:PASSWORD@ PART THAT FOLLOWS IT
 USERINFO_PATTERN = re.compile(r"^((?:[A-Za-z][A-Za-z0-9+.-]*://)?)[^/?#]*@")

@@ -3,9 +3,6 @@ from builtins import str
 import os
 import unittest
 import shutil
-import unittest
-import yaml
-import time
 import sys
 import tempfile
 import uuid

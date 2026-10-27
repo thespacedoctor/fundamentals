@@ -10,8 +10,6 @@ Date Created
 : May 23, 2023
 """
 
-from fundamentals import tools
-from builtins import object
 import sys
 import os
 
@@ -102,7 +100,6 @@ class daemonise:
         """start the daemonise running"""
         self.log.info("starting the ``get`` method")
 
-        import time
         import signal
         from daemon import pidfile
         import daemon
@@ -153,7 +150,7 @@ class daemonise:
         """*the code to run when daemon is killed*"""
         self.log.debug("starting the ``cleanup`` method")
 
-        from datetime import datetime, date, time
+        from datetime import datetime
 
         now = datetime.now()
         now = now.strftime("%Y%m%dt%H%M%S")

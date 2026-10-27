@@ -8,11 +8,9 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 from fundamentals.mysql.sql_identifiers import quote_identifier
 
 

@@ -11,7 +11,6 @@ from builtins import str
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 import time
 

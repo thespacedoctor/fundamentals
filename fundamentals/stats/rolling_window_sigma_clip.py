@@ -10,12 +10,9 @@ Date Created
 : January  1, 2021
 """
 
-from builtins import object
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 
 
 def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):

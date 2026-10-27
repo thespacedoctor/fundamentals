@@ -12,7 +12,6 @@ from __future__ import division
 from datetime import datetime
 from fundamentals.mysql.database import database
 import re
-import time
 from fundamentals.fmultiprocess import fmultiprocess
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.mysql.sql_identifiers import (
@@ -21,7 +20,6 @@ from fundamentals.mysql.sql_identifiers import (
     quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
-from fundamentals import tools
 from builtins import str
 from builtins import range
 import sys
@@ -79,8 +77,8 @@ def _require_stats_dependencies():
     Raises ``ImportError`` naming the ``stats`` extra if either is missing.
     """
     try:
-        import numpy
-        import pandas
+        import numpy  # noqa: F401
+        import pandas  # noqa: F401
     except ImportError as e:
         raise ImportError(
             "loading rows with LOAD DATA needs numpy and pandas: "

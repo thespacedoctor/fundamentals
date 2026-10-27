@@ -28,7 +28,7 @@ from docopt import docopt
 try:
     from StringIO import StringIO
 except ImportError:
-    from io import StringIO
+    pass
 from os.path import expanduser
 import inspect
 import psutil

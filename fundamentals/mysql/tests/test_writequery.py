@@ -4,12 +4,9 @@ import os
 import unittest
 import shutil
 import sys
-import time
-import unittest
 import warnings
 from unittest import mock
 import pymysql
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
