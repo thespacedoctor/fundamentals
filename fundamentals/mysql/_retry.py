@@ -7,6 +7,8 @@ Author
 : David Young
 """
 
+import time
+
 import pymysql
 
 # MYSQL ERROR CODES THAT CLEAR THEMSELVES, SO THE SAME QUERY IS WORTH SENDING AGAIN
@@ -76,3 +78,33 @@ def next_retry_delay(error, delays):
     if not is_transient_error(error):
         return None
     return next(delays, None)
+
+
+def run_with_retries(log, operation):
+    """*Run an operation, retrying transient MySQL errors with a bounded backoff*
+
+    Errors that are not transient, and transient errors that outlast the backoff, are raised.
+
+    **Key Arguments**
+
+    - ``log`` -- the logger
+    - ``operation`` -- a function that takes no arguments. It is called again after each transient error, so it must be safe to repeat
+
+    **Return**
+
+    - ``result`` -- whatever ``operation`` returns
+    """
+    delays = iter(RETRY_DELAYS)
+    attempt = 1
+    while True:
+        try:
+            return operation()
+        except RETRYABLE_ERRORS as e:
+            delay = next_retry_delay(e, delays)
+            if delay is None:
+                raise
+            log.warning(
+                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
+            )
+            time.sleep(delay)
+            attempt += 1

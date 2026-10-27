@@ -11,8 +11,7 @@ from builtins import str
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
-import time
+from fundamentals.mysql._retry import run_with_retries
 
 # MYSQL ERROR CODES FOR A TABLE, INDEX OR ROW THAT ALREADY EXISTS
 TABLE_EXISTS_ERROR_CODE = 1050
@@ -201,26 +200,16 @@ def _send_with_retries(log, cursor, sqlQuery, dbConn, manyValueList):
     - ``dbConn`` -- the db connection
     - ``manyValueList`` -- a list of value tuples if executing more than one insert
     """
-    delays = iter(RETRY_DELAYS)
     # BATCHES ALREADY COMMITTED ARE NEVER SENT AGAIN WHEN A LATER BATCH IS RETRIED
     progress = {"committedRows": 0}
-    attempt = 1
-    while True:
-        try:
-            if manyValueList == False:
-                cursor.execute(sqlQuery)
-            else:
-                _insert_in_batches(cursor, sqlQuery, dbConn, manyValueList, progress)
-            return
-        except RETRYABLE_ERRORS as e:
-            delay = next_retry_delay(e, delays)
-            if delay is None:
-                raise
-            log.warning(
-                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
-            )
-            time.sleep(delay)
-            attempt += 1
+
+    def send():
+        if manyValueList == False:
+            cursor.execute(sqlQuery)
+        else:
+            _insert_in_batches(cursor, sqlQuery, dbConn, manyValueList, progress)
+
+    run_with_retries(log, send)
 
 
 def _insert_in_batches(cursor, sqlQuery, dbConn, manyValueList, progress):
