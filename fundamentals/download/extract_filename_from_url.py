@@ -43,12 +43,15 @@ def extract_filename_from_url(log, url):
 
     """
     import re
+    from urllib.parse import urlparse
 
     # EXTRACT THE FILENAME FROM THE URL
     try:
         log.debug("extracting filename from url " + url)
         reEoURL = re.compile(r"([\w\.\_\-]*)$")
-        filename = reEoURL.findall(url)[0]
+        # USE THE PATH ONLY, IGNORING ANY QUERY STRING OR FRAGMENT
+        urlPath = urlparse(url).path
+        filename = reEoURL.findall(urlPath)[0]
         # log.debug(filename)
         if len(filename) == 0:
             filename = "untitled.html"

@@ -8,6 +8,7 @@ import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
+from fundamentals.download import extract_filename_from_url
 
 home = expanduser("~")
 
@@ -41,17 +42,31 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-# class test_extract_filename_from_url(unittest.TestCase):
+class test_extract_filename_from_url(unittest.TestCase):
+    def test_returns_html_filename_for_plain_url(self):
+        filename = extract_filename_from_url(
+            log=log, url="https://en.wikipedia.org/wiki/Docstring"
+        )
+        self.assertEqual(filename, "Docstring.html")
 
-#     def test_extract_filename_from_url_function(self):
-#         kwargs = {}
-#         kwargs["log"] = log
-#         kwargs["settings"] = settings
-#         # xt-kwarg_key_and_value
+    def test_keeps_extension_for_plain_url_with_extension(self):
+        filename = extract_filename_from_url(log=log, url="http://x.org/files/data.pdf")
+        self.assertEqual(filename, "data.pdf")
 
-#         testObject = extract_filename_from_url(**kwargs)
-#         testObject.get()
+    def test_ignores_query_string(self):
+        filename = extract_filename_from_url(log=log, url="http://x.org/a.php?id=3")
+        self.assertEqual(filename, "a.php")
 
-#         # x-print-testpage-for-pessto-marshall-web-object
+    def test_ignores_query_string_when_path_has_no_extension(self):
+        filename = extract_filename_from_url(log=log, url="http://x.org/page?id=3.5")
+        self.assertEqual(filename, "page.html")
 
-#     # x-class-to-test-named-worker-function
+    def test_ignores_fragment(self):
+        filename = extract_filename_from_url(
+            log=log, url="http://x.org/doc.html#section.2"
+        )
+        self.assertEqual(filename, "doc.html")
+
+    def test_returns_untitled_when_url_ends_with_trailing_slash(self):
+        filename = extract_filename_from_url(log=log, url="http://x.org/dir/")
+        self.assertEqual(filename, "untitled.html")
