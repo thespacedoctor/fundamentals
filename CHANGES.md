@@ -3,6 +3,7 @@
 
 **Unreleased**
 
+* **FIXED:** `fmultiprocess` now terminates and joins its worker pool when a task raises, the timeout is reached or the call is interrupted with Ctrl-C, instead of leaving workers running (DY-1701)
 * **FIXED:** removed the unused `docs/requirements.txt`, which pinned vulnerable docs packages (mistune, Jinja2, Markdown) and raised 16 Dependabot alerts
 
 **v2.8.3 - May 21, 2026**
