@@ -18,7 +18,6 @@ from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals import tools
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import sys
 import os
 import tempfile
@@ -30,6 +29,35 @@ count = 0
 totalCount = 0
 globalDbConn = False
 sharedList = []
+
+# MESSAGES FROM writequery THAT ARE EXPECTED WHEN USING INSERT IGNORE
+BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
+
+
+def _normalise_key(key):
+    """*return the database column name for a dictionary key*"""
+    formattedKey = str(key).replace(" ", "_").replace("-", "_")
+    # DEC IS A KEYWORD IN MYSQL - MATCHES THE RENAME IN convert_dictionary_to_mysql_table
+    if formattedKey == "dec":
+        formattedKey = "decl"
+    if formattedKey == "DEC":
+        formattedKey = "DECL"
+    return formattedKey
+
+
+def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
+    """*restore the caller's autocommit setting*
+
+    If ``isErrorInFlight`` is True a failed restore is logged so it cannot mask the error being raised. Otherwise a failed restore is raised.
+    """
+    import pymysql
+
+    try:
+        dbConn.autocommit(originalAutocommit)
+    except pymysql.Error as e:
+        if not isErrorInFlight:
+            raise
+        log.warning("could not restore the autocommit setting: %s" % (e,))
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -140,63 +168,110 @@ def insert_list_of_dictionaries_into_database_tables(
         )
         dictList = dictList[1:]
 
+    # THE CALLER'S AUTOCOMMIT SETTING IS RESTORED WHEN THE INSERTS END
+    originalAutocommit = dbConn.get_autocommit()
     dbConn.autocommit(False)
+    try:
+        if len(dictList):
 
-    if len(dictList):
+            total = len(dictList)
+            batches = -(-total // batchSize)
 
-        total = len(dictList)
-        batches = int(old_div(total, batchSize))
+            start = 0
+            end = 0
+            sharedList = []
+            for i in range(batches):
+                end = end + batchSize
+                start = i * batchSize
+                thisBatch = dictList[start:end]
+                sharedList.append((thisBatch, end))
 
-        start = 0
-        end = 0
-        sharedList = []
-        for i in range(batches + 1):
-            end = end + batchSize
-            start = i * batchSize
-            thisBatch = dictList[start:end]
-            sharedList.append((thisBatch, end))
+            totalCount = total + 1
+            ltotalCount = totalCount
 
-        totalCount = total + 1
-        ltotalCount = totalCount
-
-        print("Starting to insert %(ltotalCount)s rows into %(dbTableName)s" % locals())
-
-        if dbSettings == False:
-            fmultiprocess(
-                log=log,
-                function=_insert_single_batch_into_database,
-                inputArray=list(range(len(sharedList))),
-                dbTableName=dbTableName,
-                uniqueKeyList=uniqueKeyList,
-                dateModified=dateModified,
-                replace=replace,
-                batchSize=batchSize,
-                reDatetime=reDate,
-                dateCreated=dateCreated,
+            print(
+                "Starting to insert %(ltotalCount)s rows into %(dbTableName)s"
+                % locals()
             )
 
-        else:
-            fmultiprocess(
-                log=log,
-                function=_add_dictlist_to_database_via_load_in_file,
-                inputArray=list(range(len(sharedList))),
-                dbTablename=dbTableName,
-                dbSettings=dbSettings,
-                dateModified=dateModified,
-                turnOffMP=False,
-                progressBar=True,
-            )
+            if dbSettings == False:
+                fmultiprocess(
+                    log=log,
+                    function=_insert_single_batch_into_database,
+                    inputArray=list(range(len(sharedList))),
+                    dbTableName=dbTableName,
+                    uniqueKeyList=uniqueKeyList,
+                    dateModified=dateModified,
+                    replace=replace,
+                    batchSize=batchSize,
+                    reDatetime=reDate,
+                    dateCreated=dateCreated,
+                )
 
-        sys.stdout.write("\x1b[1A\x1b[2K")
-        print(
-            "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"
-            % locals()
-        )
+            else:
+                fmultiprocess(
+                    log=log,
+                    function=_add_dictlist_to_database_via_load_in_file,
+                    inputArray=list(range(len(sharedList))),
+                    dbTablename=dbTableName,
+                    dbSettings=dbSettings,
+                    dateModified=dateModified,
+                    turnOffMP=False,
+                    progressBar=True,
+                )
+
+            sys.stdout.write("\x1b[1A\x1b[2K")
+            print(
+                "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"
+                % locals()
+            )
+    except BaseException:
+        _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=True)
+        raise
+    _restore_autocommit(dbConn, originalAutocommit, log)
 
     log.debug(
         "completed the ``insert_list_of_dictionaries_into_database_tables`` function"
     )
     return None
+
+
+def _insert_rows_individually(
+    rows, dbConn, log, dbTableName, uniqueKeyList, dateModified, replace, reDatetime
+):
+    """*insert each row with its own insert command, grouping rows that share a command*
+
+    **Return**
+
+    - the first message from writequery that is not benign, or an empty string
+    """
+    insertsByCommand = {}
+    for aDict in rows:
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=aDict,
+            dbTableName=dbTableName,
+            uniqueKeyList=uniqueKeyList,
+            dateModified=dateModified,
+            returnInsertOnly=True,
+            replace=replace,
+            reDatetime=reDatetime,
+            skipChecks=True,
+        )
+        insertsByCommand.setdefault(insertCommand, []).append(valueTuple)
+
+    for insertCommand, valueTuples in insertsByCommand.items():
+        message = writequery(
+            log=log,
+            sqlQuery=insertCommand,
+            dbConn=dbConn,
+            Force=True,
+            manyValueList=valueTuples,
+        )
+        if message not in BENIGN_WRITE_MESSAGES:
+            return message
+    return ""
 
 
 def _insert_single_batch_into_database(
@@ -258,107 +333,76 @@ def _insert_single_batch_into_database(
         count = totalCount
     ltotalCount = totalCount
 
-    inserted = False
-    while inserted == False:
+    import pymysql
 
-        if not replace:
-            insertVerb = "INSERT IGNORE"
-        else:
-            insertVerb = "INSERT IGNORE"
+    if not replace:
+        insertVerb = "INSERT IGNORE"
+    else:
+        insertVerb = "INSERT IGNORE"
 
-        uniKeys = set().union(*(list(d.keys()) for d in batch[0]))
-        tmp = []
-        tmp[:] = [m.replace(" ", "_").replace("-", "_") for m in uniKeys]
-        uniKeys = tmp
+    # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
+    originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])), key=str)
+    uniKeys = [_normalise_key(k) for k in originalKeys]
 
-        myKeys = "`,`".join(uniKeys)
-        vals = [
-            tuple([None if d[k] in ["None", None] else d[k] for k in uniKeys])
-            for d in batch[0]
-        ]
-        valueString = ("%s, " * len(vals[0]))[:-2]
-        insertCommand = (
-            insertVerb
-            + """ INTO `"""
-            + dbTableName
-            + """` (`"""
-            + myKeys
-            + """`, dateCreated) VALUES ("""
-            + valueString
-            + """, NOW())"""
+    myKeys = "`,`".join(uniKeys)
+    vals = [
+        tuple([None if d.get(k) in ["None", None] else d[k] for k in originalKeys])
+        for d in batch[0]
+    ]
+    valueString = ("%s, " * len(vals[0]))[:-2]
+    insertCommand = (
+        insertVerb
+        + """ INTO `"""
+        + dbTableName
+        + """` (`"""
+        + myKeys
+        + """`, dateCreated) VALUES ("""
+        + valueString
+        + """, NOW())"""
+    )
+
+    if not dateCreated:
+        insertCommand = insertCommand.replace(", dateCreated)", ")").replace(
+            ", NOW())", ")"
         )
 
-        if not dateCreated:
-            insertCommand = insertCommand.replace(", dateCreated)", ")").replace(
-                ", NOW())", ")"
-            )
+    dup = ""
+    if replace:
+        dup = " ON DUPLICATE KEY UPDATE "
+        for k in uniKeys:
+            dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
+        dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
 
-        dup = ""
-        if replace:
-            dup = " ON DUPLICATE KEY UPDATE "
-            for k in uniKeys:
-                dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-            dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
+    insertCommand = insertCommand + dup
 
-        insertCommand = insertCommand + dup
+    insertCommand = insertCommand.replace('\\""', '\\" "')
+    insertCommand = insertCommand.replace('""', "null")
+    insertCommand = insertCommand.replace('"None"', "null")
 
-        insertCommand = insertCommand.replace('\\""', '\\" "')
-        insertCommand = insertCommand.replace('""', "null")
-        insertCommand = insertCommand.replace('"None"', "null")
+    try:
+        message = writequery(
+            log=log,
+            sqlQuery=insertCommand,
+            dbConn=dbConn,
+            Force=True,
+            manyValueList=vals,
+        )
+    except pymysql.Error:
+        message = _insert_rows_individually(
+            batch[0],
+            dbConn,
+            log,
+            dbTableName,
+            uniqueKeyList,
+            dateModified,
+            replace,
+            reDate,
+        )
 
-        message = ""
-        # log.debug('adding new data to the %s table; query: %s' %
-        # (dbTableName, addValue))
-        try:
-            message = writequery(
-                log=log,
-                sqlQuery=insertCommand,
-                dbConn=dbConn,
-                Force=True,
-                manyValueList=vals,
-            )
-        except:
-            theseInserts = []
-            for aDict in batch[0]:
-                insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-                    dbConn=dbConn,
-                    log=log,
-                    dictionary=aDict,
-                    dbTableName=dbTableName,
-                    uniqueKeyList=uniqueKeyList,
-                    dateModified=dateModified,
-                    returnInsertOnly=True,
-                    replace=replace,
-                    reDatetime=reDate,
-                    skipChecks=True,
-                )
-                theseInserts.append(valueTuple)
-
-            message = ""
-            # log.debug('adding new data to the %s table; query: %s' %
-            # (dbTableName, addValue))
-            message = writequery(
-                log=log,
-                sqlQuery=insertCommand,
-                dbConn=dbConn,
-                Force=True,
-                manyValueList=theseInserts,
-            )
-
-        if message == "unknown column":
-            for aDict in batch:
-                convert_dictionary_to_mysql_table(
-                    dbConn=dbConn,
-                    log=log,
-                    dictionary=aDict,
-                    dbTableName=dbTableName,
-                    uniqueKeyList=uniqueKeyList,
-                    dateModified=dateModified,
-                    reDatetime=reDate,
-                    replace=replace,
-                )
-        else:
-            inserted = True
+    if message not in BENIGN_WRITE_MESSAGES:
+        error = "could not insert a batch of rows into %s: %s" % (dbTableName, message)
+        log.error(error)
+        raise RuntimeError(error)
 
     dbConn.commit()
 

@@ -44,6 +44,13 @@ if not os.path.exists(pathToOutputDir):
 
 class test_logs(unittest.TestCase):
 
+    def tmp_path_for(self, name):
+        import tempfile
+
+        tmpDir = tempfile.mkdtemp(prefix="test_logs_" + name + "_")
+        self.addCleanup(shutil.rmtree, tmpDir, True)
+        return tmpDir
+
     def test_logs_function(self):
         from fundamentals.logs import emptyLogger
 
@@ -58,6 +65,64 @@ class test_logs(unittest.TestCase):
         log = emptyLogger()
 
         log.error("could not read %s", 1, exc_info=True)
+
+    def test_group_write_handler_defines_open_and_do_rollover(self):
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        self.assertIn("_open", GroupWriteRotatingFileHandler.__dict__)
+        self.assertIn("doRollover", GroupWriteRotatingFileHandler.__dict__)
+
+    def test_group_write_handler_rollover_leaves_log_group_writable(self):
+        import stat
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        logFile = self.tmp_path_for("rollover") + "/rollover.log"
+        handler = GroupWriteRotatingFileHandler(logFile, maxBytes=10, backupCount=1)
+        try:
+            os.chmod(logFile, 0o600)
+
+            handler.doRollover()
+
+            mode = os.stat(logFile).st_mode
+            self.assertTrue(mode & stat.S_IWGRP)
+            self.assertFalse(mode & stat.S_IWOTH)
+        finally:
+            handler.close()
+
+    def test_group_write_handler_creates_log_group_writable_not_world_writable(self):
+        import stat
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        logFile = self.tmp_path_for("create") + "/create.log"
+        previous = os.umask(0o022)
+        try:
+            handler = GroupWriteRotatingFileHandler(logFile)
+        finally:
+            os.umask(previous)
+        try:
+            mode = os.stat(logFile).st_mode
+            self.assertTrue(mode & stat.S_IWGRP)
+            self.assertFalse(mode & stat.S_IWOTH)
+        finally:
+            handler.close()
+
+    def test_group_write_handler_restores_umask_when_open_fails(self):
+        from unittest import mock
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        logFile = self.tmp_path_for("umask") + "/umask.log"
+        previous = os.umask(0o027)
+        try:
+            with mock.patch(
+                "logging.handlers.RotatingFileHandler._open", side_effect=OSError
+            ):
+                with self.assertRaises(OSError):
+                    GroupWriteRotatingFileHandler(logFile)
+            current = os.umask(previous)
+        finally:
+            os.umask(previous)
+
+        self.assertEqual(current, 0o027)
 
     # x-class-to-test-named-worker-function
 

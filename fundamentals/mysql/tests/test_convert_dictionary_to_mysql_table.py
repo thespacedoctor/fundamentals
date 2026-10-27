@@ -6,6 +6,9 @@ import shutil
 import unittest
 import yaml
 import re
+import copy
+import sys
+from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -153,5 +156,154 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         )
 
         # x-print-testpage-for-pessto-marshall-web-object
+
+    def test_returns_inserts_for_mixed_type_keys_in_string_order(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a": "x", 1: "y"}
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            dbConn=dbConn,
+            log=log,
+            dictionary=dictionary,
+            dbTableName="testing_table",
+            uniqueKeyList=[],
+            dateModified=False,
+            returnInsertOnly=True,
+        )
+
+        # ASSERT
+        self.assertIn("(`1`,`a`", insertCommand)
+        self.assertEqual(valueTuple, ("y", "x"))
+
+    def test_does_not_mutate_caller_dictionary_when_returning_inserts(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {
+            "a newKey": "cool",
+            "nested": [["x", "y"], "a nested list value"],
+            "skipped": [None, "a value that is dropped"],
+            "uniquekey1": "cheese",
+        }
+        original = copy.deepcopy(dictionary)
+
+        # ACT
+        convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary=dictionary,
+            dbTableName="dy2028_testing_table",
+            uniqueKeyList=["uniquekey1"],
+            dateModified=True,
+            returnInsertOnly=True,
+        )
+
+        # ASSERT
+        self.assertEqual(dictionary, original)
+
+    def test_does_not_mutate_caller_dictionary_when_writing_to_database(self):
+        # ARRANGE
+        dictionary = {
+            "uni key": "cheese",
+            "skipped": [None, "a value that is dropped"],
+        }
+        original = copy.deepcopy(dictionary)
+
+        # ACT
+        self._write_to_database(
+            "dy2028_dictionary_table", dictionary, ["uni key"], dateModified=True
+        )
+
+        # ASSERT
+        self.assertEqual(dictionary, original)
+
+    def test_does_not_mutate_caller_unique_key_list(self):
+        # ARRANGE
+        dictionary = {"uni key": "cheese", "dec": "burgers"}
+        uniqueKeyList = ["uni key", "dec"]
+
+        # ACT
+        self._write_to_database(
+            "dy2028_unique_key_table", dictionary, uniqueKeyList, dateModified=False
+        )
+
+        # ASSERT
+        self.assertEqual(uniqueKeyList, ["uni key", "dec"])
+
+    def _write_to_database(self, tableName, dictionary, uniqueKeyList, dateModified):
+        from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
+
+        try:
+            convert_dictionary_to_mysql_table(
+                dbConn=dbConn,
+                log=log,
+                dictionary=dictionary,
+                dbTableName=tableName,
+                uniqueKeyList=uniqueKeyList,
+                dateModified=dateModified,
+            )
+        finally:
+            writequery(
+                log=log,
+                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                dbConn=dbConn,
+            )
+
+    def test_raises_when_column_check_query_fails(self):
+        # ARRANGE
+        from fundamentals.mysql import writequery
+
+        module = sys.modules["fundamentals.mysql.convert_dictionary_to_mysql_table"]
+        tableName = "dy2028_column_check_table"
+
+        # ACT / ASSERT
+        try:
+            with mock.patch.object(
+                module, "readquery", side_effect=RuntimeError("column check failed")
+            ):
+                with self.assertRaises(RuntimeError):
+                    module.convert_dictionary_to_mysql_table(
+                        dbConn=dbConn,
+                        log=log,
+                        dictionary={"a newKey": "cool", "another": "value"},
+                        dbTableName=tableName,
+                    )
+        finally:
+            writequery(
+                log=log,
+                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                dbConn=dbConn,
+            )
+
+    def test_raises_when_add_column_query_fails(self):
+        # ARRANGE
+        from fundamentals.mysql import writequery
+
+        module = sys.modules["fundamentals.mysql.convert_dictionary_to_mysql_table"]
+        tableName = "dy2028_add_column_table"
+
+        def failOnAlter(log, sqlQuery, dbConn, **kwargs):
+            if sqlQuery.startswith("ALTER TABLE"):
+                raise RuntimeError("add column failed")
+            return writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, **kwargs)
+
+        # ACT / ASSERT
+        try:
+            with mock.patch.object(module, "writequery", side_effect=failOnAlter):
+                with self.assertRaises(RuntimeError):
+                    module.convert_dictionary_to_mysql_table(
+                        dbConn=dbConn,
+                        log=log,
+                        dictionary={"a newKey": "cool", "another": "value"},
+                        dbTableName=tableName,
+                    )
+        finally:
+            writequery(
+                log=log,
+                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                dbConn=dbConn,
+            )
 
     # x-class-to-test-named-worker-function

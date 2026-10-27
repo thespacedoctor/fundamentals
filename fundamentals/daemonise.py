@@ -111,12 +111,16 @@ class daemonise:
         if os.path.exists(self.pidFile):
             with open(self.pidFile, mode="r") as f:
                 pid = int(f.read().strip())
+                running = True
                 try:
                     os.kill(pid, 0)
-                except OSError:
+                except ProcessLookupError:
+                    running = False
                     os.remove(self.pidFile)
-                else:
-                    running = True
+                except PermissionError:
+                    # PROCESS BELONGS TO ANOTHER USER, SO IT IS STILL RUNNING
+                    pass
+                if running:
                     print(f"{self.name} daemon is already running (PID = {pid}).")
 
         if not running:
@@ -184,8 +188,14 @@ class daemonise:
                 pid = f.read().strip()
             try:
                 os.kill(int(pid), signal.SIGTERM)
-            except:
+            except ProcessLookupError:
+                # PROCESS IS GONE SO THE PIDFILE IS STALE
                 os.remove(self.pidFile)
+            except OSError as e:
+                # KEEP THE PIDFILE: THE PROCESS MAY STILL BE RUNNING
+                self.log.error(f"could not stop {self.name} daemon (PID = {pid}): {e}")
+                print(f"{self.name} daemon could not be stopped: {e}")
+                return None
             print(f"{self.name} daemon has been stopped.")
         else:
             print(f"{self.name} daemon is not running.")
@@ -215,7 +225,7 @@ class daemonise:
 
     def restart(self):
         """*stop and start the daemon*"""
-        self.log.debug("starting the ``status`` method")
+        self.log.debug("starting the ``restart`` method")
 
         import time
 
@@ -228,5 +238,5 @@ class daemonise:
 
         self.start()
 
-        self.log.debug("completed the ``status`` method")
+        self.log.debug("completed the ``restart`` method")
         return None

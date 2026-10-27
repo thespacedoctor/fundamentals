@@ -48,10 +48,6 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     import pymysql
     import warnings
 
-    warnings.filterwarnings("error", category=pymysql.Warning)
-
-    rows = []
-
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
 
     try:
@@ -60,6 +56,40 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     except Exception as e:
         log.error("could not create the database cursor: %s" % (e,))
         raise IOError("could not create the database cursor: %s" % (e,))
+
+    try:
+        # SCOPE THE WARNINGS-AS-ERRORS FILTER TO THIS CALL ONLY
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", category=pymysql.Warning)
+            rows = _execute_read_query(log, cursor, sqlQuery, quiet)
+    finally:
+        # CLOSE THE CURSOR ON EVERY PATH
+        try:
+            cursor.close()
+        except Exception as e:
+            log.warning("could not close the db cursor " + str(e) + "\n")
+
+    log.debug("completed the ``readquery`` function")
+    return rows
+
+
+def _execute_read_query(log, cursor, sqlQuery, quiet):
+    """*Run the read query (with retries and error handling) on an open cursor*
+
+    **Key Arguments**
+
+    - ``log`` -- the logger
+    - ``cursor`` -- an open db cursor (closed by the caller)
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``quiet`` -- log MySQL errors and return no rows instead of raising
+
+    **Return**
+
+    - ``rows`` -- the rows returned by the sql query (empty if the error was ignored)
+    """
+    import pymysql
+
+    rows = []
     # EXECUTE THE SQL COMMAND
     tryAgain = True
     tries = 1
@@ -78,26 +108,12 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
                 raise
         except Exception as e:
             sqlQuery = sqlQuery[:1000]
+            log.warning(
+                "MySQL raised an error - read command not executed.\n"
+                + str(e)
+                + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+            )
             if quiet == False:
-                log.warning(
-                    "MySQL raised an error - read command not executed.\n"
-                    + str(e)
-                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-                )
                 raise e
-            else:
-                log.warning(
-                    "MySQL raised an error - read command not executed.\n"
-                    + str(e)
-                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-                )
-                pass
 
-    # CLOSE THE CURSOR
-    try:
-        cursor.close()
-    except Exception as e:
-        log.warning("could not close the db cursor " + str(e) + "\n")
-
-    log.debug("completed the ``readquery`` function")
     return rows

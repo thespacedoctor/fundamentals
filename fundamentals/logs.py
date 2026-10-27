@@ -9,6 +9,7 @@ Author
 
 from builtins import object
 import os
+import stat
 import sys
 import logging
 from logging import handlers
@@ -339,31 +340,28 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
     *rotating file handler for logging*
     """
 
+    def _open(self):
+        # NOTE: os.umask IS PROCESS-WIDE AND NOT THREAD-SAFE
+        # 0o002 GIVES 0664: GROUP CAN WRITE, OTHERS CAN ONLY READ
+        prevumask = os.umask(0o002)
+        try:
+            return handlers.RotatingFileHandler._open(self)
+        finally:
+            os.umask(prevumask)
+
     def doRollover(self):
         """
         *Override base class method to make the new log file group writable.*
         """
-        # Rotate the file first.
+        # ROTATE THE FILE FIRST
         handlers.RotatingFileHandler.doRollover(self)
 
-        # Add group write to the current permissions.
+        # ADD GROUP READ/WRITE AND WORLD READ; NEVER WORLD WRITE
         currMode = os.stat(self.baseFilename).st_mode
         os.chmod(
             self.baseFilename,
-            currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH,
+            (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
         )
-
-
-class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
-    """
-    *rotating file handler for logging*
-    """
-
-    def _open(self):
-        prevumask = os.umask(0)
-        rtv = logging.handlers.RotatingFileHandler._open(self)
-        os.umask(prevumask)
-        return rtv
 
 
 class emptyLogger(object):
