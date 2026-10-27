@@ -107,6 +107,36 @@ class test_tools_logger(unittest.TestCase):
         self.assertIs(su.setup()[2], loggingMock.return_value)
 
 
+class test_tools_settings_file_choice(unittest.TestCase):
+
+    def _write_settings(self, tmpDir, name, marker):
+        import os
+
+        path = os.path.join(tmpDir, name)
+        with open(path, "w") as stream:
+            stream.write("logging settings:\n    version: 1\nmarker: %s\n" % marker)
+        return path
+
+    def test_reads_settings_and_builds_logger_from_the_same_file_when_two_keys_are_given(
+        self,
+    ):
+        import tempfile
+        from unittest import mock
+        from fundamentals import tools
+
+        with tempfile.TemporaryDirectory() as tmpDir:
+            firstFile = self._write_settings(tmpDir, "first.yaml", "first")
+            secondFile = self._write_settings(tmpDir, "second.yaml", "second")
+            arguments = {"<settingsFile>": firstFile, "settingsFile": secondFile}
+
+            with mock.patch("fundamentals.tools.dl.setup_dryx_logging") as loggingMock:
+                su = tools(arguments=arguments, docString="", quitIfRunning=False)
+
+        settingsUsed = su.setup()[1]["marker"]
+        loggerFile = loggingMock.call_args.kwargs["yaml_file"]
+        self.assertEqual(loggerFile, {"first": firstFile, "second": secondFile}[settingsUsed])
+
+
 TUNNEL_YAML = """
 database settings:
     db: d
