@@ -220,3 +220,206 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
+
+
+BATCH_TABLE = "test_dy2025_insert_batches"
+
+
+def run_serially(log, function, inputArray, **kwargs):
+    """Stand-in for fmultiprocess so forked workers do not share the test connection."""
+    return [function(item, log=log, **kwargs) for item in inputArray]
+
+
+class test_insert_batches(unittest.TestCase):
+
+    def setUp(self):
+        from fundamentals.mysql import writequery
+
+        self.insertModule = sys.modules[
+            "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
+        ]
+        self.originalAutocommit = dbConn.get_autocommit()
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE, dbConn=dbConn
+        )
+
+    def tearDown(self):
+        from fundamentals.mysql import writequery
+
+        dbConn.autocommit(self.originalAutocommit)
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE, dbConn=dbConn
+        )
+
+    def _insert(self, rows, batchSize=2500):
+        from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
+
+        with mock.patch.object(self.insertModule, "fmultiprocess", run_serially):
+            insert_list_of_dictionaries_into_database_tables(
+                dbConn=dbConn,
+                log=log,
+                dictList=rows,
+                dbTableName=BATCH_TABLE,
+                batchSize=batchSize,
+                dateCreated=False,
+            )
+
+    def _select(self, columns):
+        from fundamentals.mysql import readquery
+
+        dbConn.commit()
+        return readquery(
+            log=log,
+            sqlQuery="SELECT %s FROM %s ORDER BY %s;" % (columns, BATCH_TABLE, columns),
+            dbConn=dbConn,
+        )
+
+    def _run_single_batch(self, rows, writequeryMock):
+        # PRIME THE TABLE WITH THE FIRST ROW, THEN RUN ONE BATCH DIRECTLY
+        self._insert(rows[:1])
+        with mock.patch.object(self.insertModule, "sharedList", [(rows[1:], 1)]):
+            with mock.patch.object(self.insertModule, "totalCount", len(rows)):
+                with mock.patch.object(self.insertModule, "globalDbConn", dbConn):
+                    with mock.patch.object(
+                        self.insertModule, "writequery", writequeryMock
+                    ):
+                        return self.insertModule._insert_single_batch_into_database(
+                            batchIndex=0,
+                            log=log,
+                            dbTableName=BATCH_TABLE,
+                            uniqueKeyList=[],
+                            dateModified=False,
+                            replace=False,
+                            batchSize=2500,
+                            reDatetime=False,
+                            dateCreated=False,
+                        )
+
+    def test_inserts_all_rows_when_remaining_rows_are_an_exact_multiple_of_batch_size(
+        self,
+    ):
+        # ARRANGE: 1 ROW CREATES THE TABLE, THE REMAINING 10 FILL 2 BATCHES OF 5
+        rows = [{"col1": i} for i in range(11)]
+
+        # ACT
+        self._insert(rows, batchSize=5)
+
+        # ASSERT
+        self.assertEqual([r["col1"] for r in self._select("col1")], list(range(11)))
+
+    def test_inserts_rows_whose_keys_contain_spaces_and_hyphens(self):
+        # ARRANGE
+        rows = [{"my key": i, "other-key": i * 2} for i in range(4)]
+
+        # ACT
+        self._insert(rows)
+
+        # ASSERT
+        result = self._select("my_key, other_key")
+        self.assertEqual(
+            [(r["my_key"], r["other_key"]) for r in result],
+            [(i, i * 2) for i in range(4)],
+        )
+
+    def test_normalise_key_replaces_separators_and_renames_mysql_keyword_dec(self):
+        # ARRANGE
+        keys = ["my key", "my-key", "dec", "DEC", "ra"]
+
+        # ACT
+        result = [self.insertModule._normalise_key(k) for k in keys]
+
+        # ASSERT
+        self.assertEqual(result, ["my_key", "my_key", "decl", "DECL", "ra"])
+
+    def test_fills_missing_keys_with_null_when_dictionaries_have_different_keys(self):
+        # ARRANGE
+        rows = [{"a": 1, "b": 2}, {"a": 3}, {"b": 4}]
+
+        # ACT
+        self._insert(rows)
+
+        # ASSERT
+        result = self._select("a, b")
+        self.assertEqual(
+            sorted((r["a"], r["b"]) for r in result if None not in (r["a"], r["b"])),
+            [(1, 2)],
+        )
+        self.assertEqual(
+            sorted(
+                [(r["a"], r["b"]) for r in result if None in (r["a"], r["b"])],
+                key=str,
+            ),
+            [(3, None), (None, 4)],
+        )
+
+    def test_restores_callers_autocommit_after_insert(self):
+        # ARRANGE
+        dbConn.autocommit(True)
+
+        # ACT
+        self._insert([{"col1": i} for i in range(4)])
+
+        # ASSERT
+        self.assertTrue(dbConn.get_autocommit())
+
+    def test_restores_callers_autocommit_when_insert_fails(self):
+        # ARRANGE
+        dbConn.autocommit(True)
+        rows = [{"col1": i} for i in range(4)]
+
+        # ACT
+        with mock.patch.object(
+            self.insertModule, "writequery", return_value="simulated write error"
+        ):
+            with self.assertRaises(RuntimeError):
+                self._insert(rows)
+
+        # ASSERT
+        self.assertTrue(dbConn.get_autocommit())
+
+    def test_raises_when_writequery_returns_an_error_message(self):
+        # ARRANGE
+        rows = [{"col1": i} for i in range(3)]
+        writequeryMock = mock.Mock(return_value="MySQL write command not executed")
+
+        # ACT / ASSERT
+        with self.assertRaises(RuntimeError):
+            self._run_single_batch(rows, writequeryMock)
+
+    def test_ignores_duplicate_key_message_from_writequery(self):
+        # ARRANGE
+        rows = [{"col1": i} for i in range(3)]
+        writequeryMock = mock.Mock(return_value="duplicate key error")
+
+        # ACT
+        result = self._run_single_batch(rows, writequeryMock)
+
+        # ASSERT
+        self.assertEqual(result, "None")
+
+    def test_does_not_swallow_keyboard_interrupt_from_writequery(self):
+        # ARRANGE: INTERRUPT ONCE, THEN SUCCEED - A BARE EXCEPT WOULD HIDE THE INTERRUPT
+        rows = [{"col1": i} for i in range(3)]
+        writequeryMock = mock.Mock(side_effect=[KeyboardInterrupt(), ""])
+
+        # ACT / ASSERT
+        with self.assertRaises(KeyboardInterrupt):
+            self._run_single_batch(rows, writequeryMock)
+
+    def test_falls_back_to_single_row_inserts_when_the_batch_insert_raises_a_database_error(
+        self,
+    ):
+        # ARRANGE
+        import pymysql
+
+        rows = [{"col1": i} for i in range(3)]
+        writequeryMock = mock.Mock(
+            side_effect=[pymysql.err.OperationalError(1213, "simulated"), ""]
+        )
+
+        # ACT
+        result = self._run_single_batch(rows, writequeryMock)
+
+        # ASSERT
+        self.assertEqual(result, "None")
+        self.assertEqual(writequeryMock.call_count, 2)
