@@ -342,7 +342,8 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
 
     def _open(self):
         # NOTE: os.umask IS PROCESS-WIDE AND NOT THREAD-SAFE
-        prevumask = os.umask(0)
+        # 0o002 GIVES 0664: GROUP CAN WRITE, OTHERS CAN ONLY READ
+        prevumask = os.umask(0o002)
         try:
             return handlers.RotatingFileHandler._open(self)
         finally:
@@ -355,11 +356,11 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         # ROTATE THE FILE FIRST
         handlers.RotatingFileHandler.doRollover(self)
 
-        # ADD GROUP WRITE TO THE CURRENT PERMISSIONS
+        # ADD GROUP READ/WRITE AND WORLD READ; NEVER WORLD WRITE
         currMode = os.stat(self.baseFilename).st_mode
         os.chmod(
             self.baseFilename,
-            currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IWOTH | stat.S_IROTH,
+            (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
         )
 
 

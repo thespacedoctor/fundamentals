@@ -85,6 +85,24 @@ class test_logs(unittest.TestCase):
 
             mode = os.stat(logFile).st_mode
             self.assertTrue(mode & stat.S_IWGRP)
+            self.assertFalse(mode & stat.S_IWOTH)
+        finally:
+            handler.close()
+
+    def test_group_write_handler_creates_log_group_writable_not_world_writable(self):
+        import stat
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        logFile = self.tmp_path_for("create") + "/create.log"
+        previous = os.umask(0o022)
+        try:
+            handler = GroupWriteRotatingFileHandler(logFile)
+        finally:
+            os.umask(previous)
+        try:
+            mode = os.stat(logFile).st_mode
+            self.assertTrue(mode & stat.S_IWGRP)
+            self.assertFalse(mode & stat.S_IWOTH)
         finally:
             handler.close()
 
