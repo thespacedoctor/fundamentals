@@ -19,7 +19,7 @@ import copy
 import json
 import yaml
 from decimal import Decimal
-from datetime import datetime
+from datetime import date, datetime
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
@@ -363,14 +363,12 @@ class list_of_dictionaries(object):
         """
         self.log.debug("starting the ``json`` method")
 
-        dataCopy = copy.deepcopy(self.listOfDictionaries)
-        for d in dataCopy:
-            for k, v in list(d.items()):
-                if isinstance(v, datetime):
-                    d[k] = v.strftime("%Y%m%dt%H%M%S")
-
         renderedData = json.dumps(
-            dataCopy, separators=(",", ": "), sort_keys=True, indent=4
+            self.listOfDictionaries,
+            separators=(",", ": "),
+            sort_keys=True,
+            indent=4,
+            default=self._json_default,
         )
 
         if filepath and len(self.listOfDictionaries):
@@ -386,6 +384,31 @@ class list_of_dictionaries(object):
 
         self.log.debug("completed the ``json`` method")
         return renderedData
+
+    @staticmethod
+    def _json_default(value):
+        """Convert values the json module cannot serialise natively
+
+        **Key Arguments**
+
+        - ``value`` -- the value json.dumps could not serialise
+
+
+        **Return**
+
+        - ``value`` -- a json serialisable representation of the value
+
+        """
+        # DATETIME IS A SUBCLASS OF DATE SO MUST BE CHECKED FIRST
+        if isinstance(value, datetime):
+            return value.strftime("%Y%m%dt%H%M%S")
+        if isinstance(value, date):
+            return value.isoformat()
+        if isinstance(value, Decimal):
+            return str(value)
+        raise TypeError(
+            f"Object of type {value.__class__.__name__} is not JSON serializable"
+        )
 
     def yaml(self, filepath=None):
         """*Render the data in yaml format*
@@ -440,9 +463,8 @@ class list_of_dictionaries(object):
             if dirPath:
                 os.makedirs(dirPath, exist_ok=True)
 
-            stream = open(filepath, "w")
-            yaml.dump(dataCopy, stream, default_flow_style=False)
-            stream.close()
+            with open(filepath, "w", encoding="utf-8") as stream:
+                yaml.dump(dataCopy, stream, default_flow_style=False)
 
         self.log.debug("completed the ``yaml`` method")
         return renderedData
@@ -503,9 +525,8 @@ class list_of_dictionaries(object):
             if dirPath:
                 os.makedirs(dirPath, exist_ok=True)
 
-            writeFile = open(filepath, mode="w")
-            writeFile.write(renderedData)
-            writeFile.close()
+            with open(filepath, "w", encoding="utf-8") as writeFile:
+                writeFile.write(renderedData)
 
         self.log.debug("completed the ``mysql`` method")
         return renderedData
@@ -531,7 +552,11 @@ class list_of_dictionaries(object):
 
         dataCopy = copy.deepcopy(self.listOfDictionaries)
 
-        tableColumnNames = list(dataCopy[0].keys())
+        # COLUMNS ARE THE UNION OF KEYS ACROSS ALL ROWS IN FIRST-SEEN ORDER
+        tableColumnNames = list(dict.fromkeys(k for row in dataCopy for k in row))
+        for row in dataCopy:
+            for c in tableColumnNames:
+                row.setdefault(c, "")
         columnWidths = []
         columnWidths[:] = [
             len(tableColumnNames[i]) for i in range(len(tableColumnNames))
@@ -598,6 +623,8 @@ class list_of_dictionaries(object):
                 elif isinstance(row[c], datetime):
                     thisDate = str(row[c])[:10]
                     row[c] = "%(thisDate)s" % locals()
+                elif isinstance(row[c], bytes):
+                    row[c] = row[c].decode("utf-8", errors="replace")
 
         # set the column widths
         for row in dataCopy:
@@ -616,7 +643,10 @@ class list_of_dictionaries(object):
                 header.append(c)
             elif csvType in ["human", "markdown", "reST"]:
                 header.append(c.ljust(columnWidths[i] + 2).rjust(columnWidths[i] + 3))
-                divider.append("-" * (columnWidths[i] + 3))
+                if csvType == "markdown":
+                    divider.append(":" + "-" * (columnWidths[i] + 2))
+                else:
+                    divider.append("-" * (columnWidths[i] + 3))
                 rstDivider.append("=" * (columnWidths[i] + 3))
 
         # table border for human readable
@@ -647,7 +677,7 @@ class list_of_dictionaries(object):
                 thisRow.append("")
             allRows.append(thisRow)
             if csvType in ["reST"]:
-                allRows.append(divider)
+                allRows.append(None)
 
         if csvType == "machine":
             writer.writerow(header)
@@ -664,7 +694,11 @@ class list_of_dictionaries(object):
             dividerWriter.writerow(divider)
 
         # write out the data
-        writer.writerows(allRows)
+        for thisRow in allRows:
+            if thisRow is None:
+                dividerWriter.writerow(divider)
+            else:
+                writer.writerow(thisRow)
         # table border for human readable
         if csvType in ["human"]:
             dividerWriter.writerow(divider)
@@ -672,14 +706,10 @@ class list_of_dictionaries(object):
         output = output.getvalue()
         output = output.strip()
         try:
-            output = output.decode("UTF-8")
-        except:
-            output = str(output)
-
-        if csvType in ["markdown"]:
-            output = output.replace("|--", "|:-")
-        if csvType in ["reST"]:
-            output = output.replace("|--", "+--").replace("--|", "--+")
+            output = output.decode("utf-8")
+        except UnicodeDecodeError:
+            # RAW BYTES CELLS CAN BE NON-UTF-8
+            output = output.decode("utf-8", errors="replace")
 
         self.log.debug("completed the ``_list_of_dictionaries_to_csv`` function")
 
