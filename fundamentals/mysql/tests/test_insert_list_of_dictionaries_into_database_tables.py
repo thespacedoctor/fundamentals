@@ -1031,3 +1031,48 @@ class test_batch_insert_round_trip(unittest.TestCase):
             sqlQuery="DROP TABLE IF EXISTS %s;" % self.quotedTable,
             dbConn=dbConn,
         )
+
+
+class test_stats_dependencies_loaded_in_parent(unittest.TestCase):
+    """numpy and pandas must be imported before the worker pool forks."""
+
+    def setUp(self):
+        self.insertModule = sys.modules[
+            "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
+        ]
+
+    def test_raises_import_error_naming_the_stats_extra_when_pandas_is_missing(self):
+        # ACT / ASSERT
+        with mock.patch.dict(sys.modules, {"pandas": None}):
+            with self.assertRaisesRegex(ImportError, r"pip install fundamentals\[stats\]"):
+                self.insertModule._require_stats_dependencies()
+
+    def test_imports_numpy_and_pandas_before_the_load_in_file_pool_starts(self):
+        # ARRANGE
+        calls = []
+        requireMock = mock.Mock(side_effect=lambda: calls.append("require"))
+        fmultiprocessMock = mock.Mock(side_effect=lambda **kwargs: calls.append("pool"))
+
+        # ACT
+        with mock.patch.object(self.insertModule, "_require_stats_dependencies", requireMock):
+            with mock.patch.object(self.insertModule, "fmultiprocess", fmultiprocessMock):
+                self.insertModule.insert_list_of_dictionaries_into_database_tables(
+                    dbConn=dbConn,
+                    log=log,
+                    dictList=[{"col1": i} for i in range(3)],
+                    dbTableName="ut_dy2032_stats_order",
+                    dbSettings=dbSettings,
+                    dateCreated=False,
+                )
+
+        # ASSERT
+        self.assertEqual(calls, ["require", "pool"])
+
+    def tearDown(self):
+        from fundamentals.mysql import writequery
+
+        writequery(
+            log=log,
+            sqlQuery="DROP TABLE IF EXISTS ut_dy2032_stats_order;",
+            dbConn=dbConn,
+        )

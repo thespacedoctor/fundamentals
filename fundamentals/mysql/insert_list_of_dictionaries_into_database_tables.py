@@ -71,6 +71,23 @@ def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
         log.warning("could not restore the autocommit setting: %s" % (e,))
 
 
+def _require_stats_dependencies():
+    """*import numpy and pandas in the calling process, so forked workers inherit them*
+
+    Importing them for the first time inside a forked worker can abort the interpreter on macOS.
+
+    Raises ``ImportError`` naming the ``stats`` extra if either is missing.
+    """
+    try:
+        import numpy
+        import pandas
+    except ImportError as e:
+        raise ImportError(
+            "loading rows with LOAD DATA needs numpy and pandas: "
+            "install them with `pip install fundamentals[stats]`"
+        ) from e
+
+
 def insert_list_of_dictionaries_into_database_tables(
     dbConn,
     log,
@@ -222,6 +239,7 @@ def insert_list_of_dictionaries_into_database_tables(
                 )
 
             else:
+                _require_stats_dependencies()
                 fmultiprocess(
                     log=log,
                     function=_add_dictlist_to_database_via_load_in_file,
