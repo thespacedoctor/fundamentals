@@ -20,7 +20,8 @@ import os
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
-import urllib
+from urllib.parse import quote
+from datetime import datetime
 import requests
 from multiprocessing.pool import ThreadPool
 
@@ -54,13 +55,17 @@ def multiobject_download(
     - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
     - ``timeout`` -- the timeout limit for downloads (secs)
     - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
-    - ``resetFilename`` -- a string to reset all filenames to
+    - ``resetFilename`` -- a string to reset all filenames to, or a list of filenames the same length as urlList (one per URL). ``indexFilenames`` does not apply to reset filenames
     - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
     - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
     **Return**
 
     - list of timestamped documents (same order as the input urlList)
+
+    **Raises**
+
+    - ``ValueError`` -- if ``downloadDirectory`` or ``resetFilename`` is a list that is not the same length as ``urlList``
 
     **Usage**
 
@@ -87,87 +92,30 @@ def multiobject_download(
     .. image:: https://i.imgur.com/QYoMm24.png width=600px
 
     """
-    import os
-    import re
-    from fundamentals.download import (
-        append_now_datestamp_to_filename,
-        extract_filename_from_url,
-    )
-
     # TIMEOUT IN SECONDS
     global gtimeout
     global llog
     llog = log
     gtimeout = float(timeout)
 
+    totalCount = len(urlList)
+    downloadDirectories = _expand_to_list(
+        downloadDirectory, totalCount, "downloadDirectory"
+    )
+    resetFilenames = _expand_to_list(resetFilename, totalCount, "resetFilename")
+
     # BUILD THE 2D ARRAY FOR MULTI_THREADED DOWNLOADS
     thisArray = []
-    bodies = []
-    localUrls = []
-    theseUrls = []
-    requestList = []
-
-    totalCount = len(urlList)
-
-    # IF ONLY ONE DOWNLOAD DIRECORY
-    if not isinstance(downloadDirectory, list):
-        for i, url in enumerate(urlList):
-            # EXTRACT THE FILENAME FROM THE URL
-            if resetFilename and len(resetFilename):
-                filename = resetFilename[i]
-            else:
-                filename = extract_filename_from_url(log, url)
-                if indexFilenames:
-                    filename = """%(i)03d_%(filename)s""" % locals()
-
-            if not filename:
-                from datetime import datetime, date, time
-
-                now = datetime.now()
-                filename = now.strftime("%Y%m%dt%H%M%S%f")
-
-            if timeStamp:
-                # APPEND TIMESTAMP TO THE FILENAME
-                filename = append_now_datestamp_to_filename(
-                    log, filename, longTime=longTime
-                )
-            # GENERATE THE LOCAL FILE URL
-            localFilepath = downloadDirectory + "/" + filename
-
-            # ADD BASIC AUTH TO THE URLS
-            if credentials != False:
-                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
-                if "://" in url:
-                    url = url.replace("://", "://" + url_pass)
-                else:
-                    url = url_pass + url
-            thisArray.extend([[url, localFilepath]])
-
-    else:
-        for url, d in zip(urlList, downloadDirectory):
-            # EXTRACT THE FILENAME FROM THE URL
-            if resetFilename:
-                filename = resetFilename
-            else:
-                filename = extract_filename_from_url(log, url)
-
-            if not filename:
-                continue
-
-            if timeStamp:
-                # APPEND TIMESTAMP TO THE FILENAME
-                filename = append_now_datestamp_to_filename(log, filename)
-            # GENERATE THE LOCAL FILE URL
-            localFilepath = d + "/" + filename
-            thisArray.extend([[url, localFilepath]])
-
-            # ADD BASIC AUTH TO THE URLS
-            if credentials != False:
-                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
-                if "://" in url:
-                    url = url.replace("://", "://" + url_pass)
-                else:
-                    url = url_pass + url
+    for i, (url, d, resetName) in enumerate(
+        zip(urlList, downloadDirectories, resetFilenames)
+    ):
+        filename = _local_filename(
+            log, url, i, resetName, timeStamp, longTime, indexFilenames
+        )
+        # ADD BASIC AUTH TO THE URLS (AFTER THE FILENAME IS EXTRACTED SO CREDENTIALS ARE NEVER LOGGED)
+        if credentials != False:
+            url = _add_credentials_to_url(url, credentials)
+        thisArray.append([url, d + "/" + filename])
 
     # CONCURRENTLY DOWNLOAD URLS
     results = ThreadPool(concurrentDownloads).imap_unordered(fetch_url, thisArray)
@@ -189,6 +137,61 @@ def multiobject_download(
     localPaths[:] = [o[1] for o in thisArray if o[1] in returnPaths]
 
     return localPaths
+
+
+def _expand_to_list(value, length, name):
+    """
+    *return ``value`` as a list of ``length`` items - a single value is repeated and a list must already be the right length*
+
+    **Raises**
+
+    - ``ValueError`` -- if ``value`` is a list of the wrong length
+    """
+    if isinstance(value, list):
+        if len(value) != length:
+            raise ValueError(
+                "%s has %s items but urlList has %s" % (name, len(value), length)
+            )
+        return value
+    return [value] * length
+
+
+def _add_credentials_to_url(url, credentials):
+    """
+    *return the url with percent-encoded basic-auth credentials embedded*
+    """
+    userInfo = "%s:%s@" % (
+        quote(credentials["username"], safe=""),
+        quote(credentials["password"], safe=""),
+    )
+    if "://" in url:
+        return url.replace("://", "://" + userInfo, 1)
+    return userInfo + url
+
+
+def _local_filename(log, url, index, resetName, timeStamp, longTime, indexFilenames):
+    """
+    *work out the local filename for the url at position ``index`` in the url list*
+    """
+    from fundamentals.download import (
+        append_now_datestamp_to_filename,
+        extract_filename_from_url,
+    )
+
+    if resetName:
+        filename = resetName
+    else:
+        filename = extract_filename_from_url(log, url)
+        if filename and indexFilenames:
+            filename = "%03d_%s" % (index, filename)
+
+    if not filename:
+        filename = datetime.now().strftime("%Y%m%dt%H%M%S%f")
+
+    if timeStamp:
+        # APPEND TIMESTAMP TO THE FILENAME
+        filename = append_now_datestamp_to_filename(log, filename, longTime=longTime)
+    return filename
 
 
 def fetch_url(entry):
