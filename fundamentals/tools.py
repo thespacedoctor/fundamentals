@@ -19,10 +19,10 @@ try:
 except:
     pass
 from collections import OrderedDict
+import logging
 import shutil
-from subprocess import Popen, PIPE, STDOUT
 from . import logs as dl
-import time
+from .ssh_tunnel import setup_ssh_tunnel
 from docopt import docopt
 
 try:
@@ -32,6 +32,15 @@ except ImportError:
 from os.path import expanduser
 import inspect
 import psutil
+
+SETTINGS_FILE_ARGUMENT_KEYS = (
+    "settingsFile",
+    "<settingsFile>",
+    "<pathToSettingsFile>",
+    "--settingsFile",
+    "pathToSettingsFile",
+    "--settings",
+)
 
 ###################################################################
 # CLASSES                                                         #
@@ -81,16 +90,15 @@ class tools(object):
         host: localhost
         user: utuser
         password: utpass
-        tunnel: true
+        tunnel:
+            remote user: username
+            remote ip: mydomain.co.uk
+            remote datbase host: mydatabaseName
+            port: 9002
 
-    # SSH TUNNEL - if a tunnel is required to connect to the database(s) then add setup here
+    # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
-    ssh tunnel:
-        remote user: username
-        remote ip: mydomain.co.uk
-        remote datbase host: mydatabaseName
-        port: 9002
 
     logging settings:
         formatters:
@@ -235,25 +243,25 @@ class tools(object):
                 )
 
         # UNPACK SETTINGS
-        stream = False
+        settingsPath = False
         if "<settingsFile>" in self.arguments and self.arguments["<settingsFile>"]:
-            stream = open(self.arguments["<settingsFile>"], "r")
+            settingsPath = self.arguments["<settingsFile>"]
         elif (
             "<pathToSettingsFile>" in self.arguments
             and self.arguments["<pathToSettingsFile>"]
         ):
-            stream = open(self.arguments["<pathToSettingsFile>"], "r")
+            settingsPath = self.arguments["<pathToSettingsFile>"]
         elif "--settingsFile" in self.arguments and self.arguments["--settingsFile"]:
-            stream = open(self.arguments["--settingsFile"], "r")
+            settingsPath = self.arguments["--settingsFile"]
         elif "--settings" in self.arguments and self.arguments["--settings"]:
-            stream = open(self.arguments["--settings"], "r")
+            settingsPath = self.arguments["--settings"]
         elif (
             "pathToSettingsFile" in self.arguments
             and self.arguments["pathToSettingsFile"]
         ):
-            stream = open(self.arguments["pathToSettingsFile"], "r")
+            settingsPath = self.arguments["pathToSettingsFile"]
         elif "settingsFile" in self.arguments and self.arguments["settingsFile"]:
-            stream = open(self.arguments["settingsFile"], "r")
+            settingsPath = self.arguments["settingsFile"]
         elif (
             (
                 "settingsFile" in self.arguments
@@ -307,13 +315,14 @@ class tools(object):
                             pathToSettings=self.configSettingsPath, create=True
                         )
             if "settingsFile" in self.arguments and self.arguments["settingsFile"]:
-                stream = open(self.arguments["settingsFile"], "r")
+                settingsPath = self.arguments["settingsFile"]
         else:
             pass
 
         # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
-        if stream is not False:
-            astream = stream.read()
+        if settingsPath is not False:
+            with open(settingsPath, "r") as stream:
+                astream = stream.read()
             home = expanduser("~")
             astream = astream.replace("~/", home + "/")
 
@@ -329,57 +338,10 @@ class tools(object):
             settings = {**advs, **settings}
 
         if self.createLogger:
-
-            # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
-            # SETTINGS
-            if "settings" in locals() and "logging settings" in settings:
-                if "settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["settingsFile"]
-                    )
-                elif "<settingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["<settingsFile>"]
-                    )
-                elif "<pathToSettingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["<pathToSettingsFile>"]
-                    )
-                elif "--settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["--settingsFile"]
-                    )
-                elif "pathToSettingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["pathToSettingsFile"]
-                    )
-                elif "--settings" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["--settings"])
-
-            elif "--logger" not in self.arguments or self.arguments["--logger"] is None:
-                log = dl.console_logger(level=self.logLevel)
-
-            self.log = log
+            self.log = self._build_logger(settings)
 
         else:
             self.log = None
-
-        # unpack remaining cl arguments using `exec` to setup the variable names
-        # automatically
-        for arg, val in list(self.arguments.items()):
-            if arg[0] == "-":
-                varname = arg.replace("-", "") + "Flag"
-            else:
-                varname = arg.replace("<", "").replace(">", "")
-            if varname == "import":
-                varname = "iimport"
-            if isinstance(val, str):
-                val = val.replace("'", "\\'")
-                exec(varname + " = '%s'" % (val,))
-            else:
-                exec(varname + " = %s" % (val,))
-            if arg == "--dbConn":
-                dbConn = val
 
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
@@ -461,92 +423,46 @@ class tools(object):
 
         return self.arguments, self.settings, self.log, self.dbConn
 
+    def _build_logger(self, settings):
+        """
+        *build the logger from the settings file named in the arguments, falling back to a console logger*
+
+        **Key Arguments**
+
+        - ``settings`` -- the merged settings dictionary
+
+        **Return**
+
+        - ``log`` -- the logger
+        """
+        if "logging settings" in settings:
+            for key in SETTINGS_FILE_ARGUMENT_KEYS:
+                if key in self.arguments:
+                    return dl.setup_dryx_logging(yaml_file=self.arguments[key])
+
+        return dl.console_logger(level=self.logLevel)
+
     def _setup_tunnel(self):
         """
-        *setup ssh tunnel if required*
+        *setup the ssh tunnel described by ``database settings: tunnel`` and connect to the remote database through it*
+
+        Raises ``fundamentals.ssh_tunnel.tunnel_error`` if the tunnel settings are invalid or the tunnel cannot be set up.
         """
         import pymysql as ms
 
-        # SETUP TUNNEL IF REQUIRED
-        if "ssh tunnel" in self.settings:
-            # TEST TUNNEL DOES NOT ALREADY EXIST
-            sshPort = self.settings["ssh tunnel"]["port"]
-            connected = self._checkServer(
-                self.settings["database settings"]["host"], sshPort
-            )
-            if connected:
-                pass
-            else:
-                # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
-                ru = self.settings["ssh tunnel"]["remote user"]
-                rip = self.settings["ssh tunnel"]["remote ip"]
-                rh = self.settings["ssh tunnel"]["remote datbase host"]
-
-                cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
-                p = Popen(cmd, shell=True, close_fds=True)
-                output = p.communicate()[0]
-
-                # TEST CONNECTION - QUIT AFTER SO MANY TRIES
-                connected = False
-                count = 0
-                while not connected:
-                    connected = self._checkServer(
-                        self.settings["database settings"]["host"], sshPort
-                    )
-                    time.sleep(1)
-                    count += 1
-                    if count == 5:
-                        self.log.error(
-                            "cound not setup tunnel to remote datbase" % locals()
-                        )
-                        sys.exit(0)
-
-        if (
-            "tunnel" in self.settings["database settings"]
-            and self.settings["database settings"]["tunnel"]
-        ):
-            # TEST TUNNEL DOES NOT ALREADY EXIST
-            sshPort = self.settings["database settings"]["tunnel"]["port"]
-            connected = self._checkServer(
-                self.settings["database settings"]["host"], sshPort
-            )
-            if connected:
-                pass
-            else:
-                # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
-                ru = self.settings["database settings"]["tunnel"]["remote user"]
-                rip = self.settings["database settings"]["tunnel"]["remote ip"]
-                rh = self.settings["database settings"]["tunnel"]["remote datbase host"]
-
-                cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
-                p = Popen(cmd, shell=True, close_fds=True)
-                output = p.communicate()[0]
-
-                # TEST CONNECTION - QUIT AFTER SO MANY TRIES
-                connected = False
-                count = 0
-                while not connected:
-                    connected = self._checkServer(
-                        self.settings["database settings"]["host"], sshPort
-                    )
-                    time.sleep(1)
-                    count += 1
-                    if count == 5:
-                        self.log.error(
-                            "cound not setup tunnel to remote datbase" % locals()
-                        )
-                        sys.exit(0)
+        databaseSettings = self.settings["database settings"]
+        sshPort = setup_ssh_tunnel(
+            tunnelParameters=databaseSettings["tunnel"],
+            log=self.log,
+            checkHost=databaseSettings["host"],
+        )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
-        host = self.settings["database settings"]["host"]
-        user = self.settings["database settings"]["user"]
-        passwd = self.settings["database settings"]["password"]
-        dbName = self.settings["database settings"]["db"]
         thisConn = ms.connect(
-            host=host,
-            user=user,
-            passwd=passwd,
-            db=dbName,
+            host=databaseSettings["host"],
+            user=databaseSettings["user"],
+            passwd=databaseSettings["password"],
+            db=databaseSettings["db"],
             port=sshPort,
             use_unicode=True,
             charset="utf8",
@@ -557,27 +473,6 @@ class tools(object):
         )
         thisConn.autocommit(True)
         self.remoteDBConn = thisConn
-
-        return None
-
-    def _checkServer(self, address, port):
-        """
-        *Check that the TCP Port we've decided to use for tunnelling is available*
-        """
-        # CREATE A TCP SOCKET
-        import socket
-
-        s = socket.socket()
-
-        try:
-            s.connect((address, port))
-            return True
-        except socket.error as e:
-            self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
-                % locals()
-            )
-            return False
 
         return None
 
@@ -639,13 +534,10 @@ class tools(object):
             try:
                 # COPY THE SETTINGS FILE TO THE REQUESTED LOCATION
                 shutil.copyfile(ds, pathToSettings)
-                try:
-                    readFile = codecs.open(pathToSettings, encoding="utf-8", mode="r")
+                with codecs.open(
+                    pathToSettings, encoding="utf-8", mode="r"
+                ) as readFile:
                     thisData = readFile.read()
-                    readFile.close()
-                except IOError as e:
-                    message = "could not open the file %s" % (pathToSettings,)
-                    raise IOError(message) from e
 
                 # JUST INCASE!
                 thisData = thisData.replace("/Users/Dave", os.getenv("HOME"))
@@ -654,20 +546,18 @@ class tools(object):
                     thisData = thisData.replace(defaultLog, alternativeLogPath)
 
                 # REWRITE CLEANED FILE
-                try:
-                    writeFile = codecs.open(pathToSettings, encoding="utf-8", mode="w")
-                except IOError as e:
-                    message = "could not open the file %s" % (pathToSettings,)
-                    raise IOError(message) from e
-                writeFile.write(thisData)
-                writeFile.close()
-                print(
-                    f"Default settings have been added to '{pathToSettings}'. Tailor these settings before proceeding to run {self.projectName}."
+                with codecs.open(
+                    pathToSettings, encoding="utf-8", mode="w"
+                ) as writeFile:
+                    writeFile.write(thisData)
+            except OSError as e:
+                logging.getLogger(__name__).error(
+                    f"could not create the settings file '{pathToSettings}': {e}"
                 )
-            except:
-                print(
-                    f"Please add any require settings to file '{pathToSettings}' before proceeding to run {self.projectName}."
-                )
+                raise
+            print(
+                f"Default settings have been added to '{pathToSettings}'. Tailor these settings before proceeding to run {self.projectName}."
+            )
             self.arguments["settingsFile"] = pathToSettings
 
         return exists
