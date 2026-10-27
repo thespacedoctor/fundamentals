@@ -212,9 +212,19 @@ class daemonise:
                 pid = int(f.read().strip())
             try:
                 os.kill(pid, 0)
-            except OSError:
+            except ProcessLookupError:
                 os.remove(self.pidFile)
                 print(f"{self.name} daemon is not running.")
+            except PermissionError:
+                # PROCESS BELONGS TO ANOTHER USER, SO IT IS STILL RUNNING
+                print(
+                    f"{self.name} daemon is running (PID = {pid}, "
+                    "owned by another user)."
+                )
+            except OSError as e:
+                # KEEP THE PIDFILE: THE PROCESS MAY STILL BE RUNNING
+                self.log.error(f"could not check {self.name} daemon (PID = {pid}): {e}")
+                print(f"{self.name} daemon status could not be determined: {e}")
             else:
                 print(f"{self.name} daemon is running (PID = {pid}).")
         else:
