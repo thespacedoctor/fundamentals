@@ -33,6 +33,15 @@ from os.path import expanduser
 import inspect
 import psutil
 
+SETTINGS_FILE_ARGUMENT_KEYS = (
+    "settingsFile",
+    "<settingsFile>",
+    "<pathToSettingsFile>",
+    "--settingsFile",
+    "pathToSettingsFile",
+    "--settings",
+)
+
 ###################################################################
 # CLASSES                                                         #
 ###################################################################
@@ -329,37 +338,7 @@ class tools(object):
             settings = {**advs, **settings}
 
         if self.createLogger:
-
-            # SETUP LOGGER -- DEFAULT TO CONSOLE LOGGER IF NONE PROVIDED IN
-            # SETTINGS
-            if "settings" in locals() and "logging settings" in settings:
-                if "settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["settingsFile"]
-                    )
-                elif "<settingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["<settingsFile>"]
-                    )
-                elif "<pathToSettingsFile>" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["<pathToSettingsFile>"]
-                    )
-                elif "--settingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["--settingsFile"]
-                    )
-                elif "pathToSettingsFile" in self.arguments:
-                    log = dl.setup_dryx_logging(
-                        yaml_file=self.arguments["pathToSettingsFile"]
-                    )
-                elif "--settings" in self.arguments:
-                    log = dl.setup_dryx_logging(yaml_file=self.arguments["--settings"])
-
-            elif "--logger" not in self.arguments or self.arguments["--logger"] is None:
-                log = dl.console_logger(level=self.logLevel)
-
-            self.log = log
+            self.log = self._build_logger(settings)
 
         else:
             self.log = None
@@ -443,6 +422,25 @@ class tools(object):
         """
 
         return self.arguments, self.settings, self.log, self.dbConn
+
+    def _build_logger(self, settings):
+        """
+        *build the logger from the settings file named in the arguments, falling back to a console logger*
+
+        **Key Arguments**
+
+        - ``settings`` -- the merged settings dictionary
+
+        **Return**
+
+        - ``log`` -- the logger
+        """
+        if "logging settings" in settings:
+            for key in SETTINGS_FILE_ARGUMENT_KEYS:
+                if key in self.arguments:
+                    return dl.setup_dryx_logging(yaml_file=self.arguments[key])
+
+        return dl.console_logger(level=self.logLevel)
 
     def _setup_tunnel(self):
         """
