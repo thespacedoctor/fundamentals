@@ -171,6 +171,30 @@ class test_is_port_open(unittest.TestCase):
         )
         self.assertTrue(result)
 
+    def test_sets_a_timeout_on_the_socket_before_connecting(self):
+        from fundamentals.ssh_tunnel import is_port_open, TUNNEL_CONNECT_TIMEOUT
+
+        with mock.patch("socket.socket") as socketMock:
+            sock = socketMock.return_value.__enter__.return_value
+            is_port_open("127.0.0.1", 9006, mock.MagicMock())
+
+        self.assertEqual(
+            [call[0] for call in sock.method_calls[:2]], ["settimeout", "connect"]
+        )
+        sock.settimeout.assert_called_once_with(TUNNEL_CONNECT_TIMEOUT)
+
+    def test_returns_false_when_the_connection_times_out(self):
+        import socket
+        from fundamentals.ssh_tunnel import is_port_open
+
+        with mock.patch("socket.socket") as socketMock:
+            socketMock.return_value.__enter__.return_value.connect.side_effect = (
+                socket.timeout("timed out")
+            )
+            result = is_port_open("127.0.0.1", 9006, mock.MagicMock())
+
+        self.assertFalse(result)
+
     def test_returns_false_when_the_socket_cannot_connect(self):
         import socket
         from fundamentals.ssh_tunnel import is_port_open
