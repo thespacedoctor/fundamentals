@@ -14,6 +14,11 @@ os.environ["TERM"] = "vt100"
 from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 import time
 
+# MYSQL ERROR CODES FOR A TABLE, INDEX OR ROW THAT ALREADY EXISTS
+TABLE_EXISTS_ERROR_CODE = 1050
+DUPLICATE_KEY_NAME_ERROR_CODE = 1061
+DUPLICATE_ENTRY_ERROR_CODE = 1062
+
 # ROWS SENT PER COMMIT WHEN INSERTING A LIST OF VALUES, TO STOP MYSQL SERVER BARFING
 INSERT_BATCH_SIZE = 100000
 
@@ -134,13 +139,13 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
         errorCode = e.args[0] if e.args else None
         errorMessage = str(e.args[1]) if len(e.args) > 1 else ""
 
-        if errorCode == 1050 and "already exists" in errorMessage:
+        if errorCode == TABLE_EXISTS_ERROR_CODE and "already exists" in errorMessage:
             log.info(str(e) + "\n")
-        elif errorCode == 1062:
+        elif errorCode == DUPLICATE_ENTRY_ERROR_CODE:
             # Duplicate Key error
             log.debug("Duplicate Key error: %s\n" % (str(e),))
             message = "duplicate key error"
-        elif errorCode == 1061:
+        elif errorCode == DUPLICATE_KEY_NAME_ERROR_CODE:
             # Duplicate Key error
             log.debug("index already exists: %s\n" % (str(e),))
             message = "index already exists"

@@ -445,7 +445,7 @@ def _add_dictlist_to_database_via_load_in_file(
 
     import numpy as np
     import pandas as pd
-    import random
+    import uuid
 
     log.debug("starting the ``_add_dictlist_to_database_via_load_in_file`` function")
 
@@ -453,8 +453,7 @@ def _add_dictlist_to_database_via_load_in_file(
     originalKeys, columns = _map_keys_to_columns(dictList)
 
     now = datetime.now()
-    rand = random.randint(0, 10000)
-    tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
+    tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{uuid.uuid4().hex}")
     quotedTmpTable = quote_identifier(tmpTable)
     quotedTable = quote_identifier(dbTablename)
 
