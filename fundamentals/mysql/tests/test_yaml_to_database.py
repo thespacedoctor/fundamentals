@@ -101,6 +101,7 @@ class test_yaml_to_database(unittest.TestCase):
 
 
 def test_empty_value_in_yaml_file_does_not_raise(tmp_path):
+    import requests
     from unittest import mock
     from fundamentals.mysql import yaml_to_database
 
@@ -110,8 +111,108 @@ def test_empty_value_in_yaml_file_does_not_raise(tmp_path):
 
     with mock.patch(
         "fundamentals.mysql.yaml_to_database.convert_dictionary_to_mysql_table"
-    ) as convert, mock.patch("requests.head", side_effect=OSError):
+    ) as convert, mock.patch("requests.head", side_effect=requests.ConnectionError):
         yaml2db.add_yaml_file_content_to_database(filepath=str(yamlFile))
 
     dictionary = convert.call_args.kwargs["dictionary"]
     assert dictionary["title"] == ""
+
+
+def _ingest_yaml_with_url(tmp_path, url, headSideEffect=None, headReturn=None):
+    """
+    Run a one-line yaml file through the ingester with ``requests.head`` and the database writer mocked. Return the ``head`` mock and the dictionary passed to the writer.
+    """
+    from unittest import mock
+    from fundamentals.mysql import yaml_to_database
+
+    yamlFile = tmp_path / "url.yaml"
+    yamlFile.write_text("table: test_table\ntitle: a title\nurl: %s\n" % (url,))
+    yaml2db = yaml_to_database(log=mock.Mock(), dbConn=mock.Mock())
+
+    with mock.patch(
+        "fundamentals.mysql.yaml_to_database.convert_dictionary_to_mysql_table"
+    ) as convert, mock.patch(
+        "requests.head", side_effect=headSideEffect, return_value=headReturn
+    ) as head:
+        yaml2db.add_yaml_file_content_to_database(filepath=str(yamlFile))
+
+    return head, convert.call_args.kwargs["dictionary"]
+
+
+def test_url_lookup_uses_a_ten_second_timeout(tmp_path):
+    from unittest import mock
+
+    response = mock.Mock(url="http://example.com/final")
+
+    head, dictionary = _ingest_yaml_with_url(
+        tmp_path, "http://example.com/short", headReturn=response
+    )
+
+    assert head.call_args.kwargs["timeout"] == 10
+    assert dictionary["url"] == "http://example.com/final"
+
+
+def test_url_lookup_is_skipped_for_non_http_schemes(tmp_path):
+    head, dictionary = _ingest_yaml_with_url(tmp_path, "file:///etc/passwd")
+
+    head.assert_not_called()
+    assert dictionary["url"] == "file:///etc/passwd"
+
+
+def test_original_url_is_kept_when_request_raises_request_exception(tmp_path):
+    import requests
+
+    head, dictionary = _ingest_yaml_with_url(
+        tmp_path, "http://example.com/short", headSideEffect=requests.Timeout
+    )
+
+    assert dictionary["url"] == "http://example.com/short"
+
+
+def test_original_url_is_kept_when_url_is_malformed(tmp_path):
+    head, dictionary = _ingest_yaml_with_url(tmp_path, "http://[not-a-host")
+
+    head.assert_not_called()
+    assert dictionary["url"] == "http://[not-a-host"
+
+
+def test_unexpected_exceptions_from_url_lookup_are_not_swallowed(tmp_path):
+    import pytest
+
+    with pytest.raises(KeyboardInterrupt):
+        _ingest_yaml_with_url(
+            tmp_path, "http://example.com/short", headSideEffect=KeyboardInterrupt
+        )
+
+
+def test_yaml_without_url_is_added_without_a_request(tmp_path):
+    from unittest import mock
+    from fundamentals.mysql import yaml_to_database
+
+    yamlFile = tmp_path / "nourl.yaml"
+    yamlFile.write_text("table: test_table\ntitle: a title\n")
+    yaml2db = yaml_to_database(log=mock.Mock(), dbConn=mock.Mock())
+
+    with mock.patch(
+        "fundamentals.mysql.yaml_to_database.convert_dictionary_to_mysql_table"
+    ) as convert, mock.patch("requests.head") as head:
+        yaml2db.add_yaml_file_content_to_database(filepath=str(yamlFile))
+
+    head.assert_not_called()
+    assert "url" not in convert.call_args.kwargs["dictionary"]
+    assert convert.call_args.kwargs["uniqueKeyList"] == []
+
+
+def test_ingesting_a_yaml_file_leaves_urllib3_warnings_enabled(tmp_path):
+    import warnings
+    import requests
+    from urllib3.exceptions import InsecureRequestWarning
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        _ingest_yaml_with_url(
+            tmp_path, "http://example.com/short", headSideEffect=requests.Timeout
+        )
+        warnings.warn("tls check", InsecureRequestWarning)
+
+    assert [w for w in caught if w.category is InsecureRequestWarning]
