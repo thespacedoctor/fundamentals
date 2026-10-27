@@ -284,10 +284,6 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
 
 class ColorFormatter(logging.Formatter):
 
-    format = (
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
-    )
-
     def setFormat(
         self,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)",
@@ -295,41 +291,38 @@ class ColorFormatter(logging.Formatter):
     ):
         reset = "\u001b[0m"
         bold = "\u001b[1m"
-        white = "\u001b[38;5;15m"
         green = "\u001b[38;5;76m"
         red = "\u001b[38;5;196m"
         yellow = "\u001b[38;5;226m"
         blue = "\u001b[38;5;39m"
-        purple = "\u001b[38;5;56m"
-        grey = "\u001b[38;5;245m"
         ul = "\u001b[4m"
 
         self.FORMATS = {
-            logging.PRINT: f"%(message)s",
+            logging.PRINT: "%(message)s",
             logging.DEBUG: format.replace(
                 "%(levelname)s", f"{yellow}%(levelname)s{reset}"
             )
-            .replace("%(message)s", f"%(message)s")
+            .replace("%(message)s", "%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
             logging.INFO: format.replace("%(levelname)s", f"{blue}%(levelname)s{reset}")
-            .replace("%(message)s", f"%(message)s")
+            .replace("%(message)s", "%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
             logging.WARNING: format.replace(
                 "%(levelname)s", f"{green}%(levelname)s{reset}"
             )
-            .replace("%(message)s", f"%(message)s")
+            .replace("%(message)s", "%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
             logging.ERROR: format.replace("%(levelname)s", f"{red}%(levelname)s{reset}")
-            .replace("%(message)s", f"%(message)s")
+            .replace("%(message)s", "%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
             logging.CRITICAL: format.replace(
                 "%(levelname)s", f"{bold}{ul}{red}%(levelname)s{reset}"
             )
-            .replace("%(message)s", f"%(message)s")
+            .replace("%(message)s", "%(message)s")
             .replace("%(pathname)s", f"{ul}%(pathname)s{reset}")
             + reset,
         }
@@ -387,20 +380,20 @@ class emptyLogger(object):
 
     """
 
-    def info(self, argu):
+    def info(self, *args, **kwargs):
         pass
 
-    def error(self, argu):
+    def error(self, *args, **kwargs):
         pass
 
-    def debug(self, argu):
+    def debug(self, *args, **kwargs):
         pass
 
-    def critical(self, argu):
+    def critical(self, *args, **kwargs):
         pass
 
-    def warning(self, argu):
+    def warning(self, *args, **kwargs):
         pass
 
-    def print(self, argu):
+    def print(self, *args, **kwargs):
         pass
