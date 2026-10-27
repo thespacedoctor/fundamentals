@@ -57,6 +57,7 @@ class utKit(object):
         # SETUP LOGGING
         self.loggerConfig = """
         version: 1
+        disable_existing_loggers: False
         formatters:
             file_style:
                 format: '* %(asctime)s - %(name)s - %(levelname)s (%(pathname)s > %(funcName)s > %(lineno)d) - %(message)s  '

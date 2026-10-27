@@ -1,6 +1,7 @@
 from __future__ import print_function
 from builtins import str
 import os
+import logging
 import unittest
 import shutil
 import unittest
@@ -123,6 +124,121 @@ class test_logs(unittest.TestCase):
             os.umask(previous)
 
         self.assertEqual(current, 0o027)
+
+    def write_logging_yaml(self, name, rootLevel, logFile, consoleLevel="DEBUG"):
+        yamlFile = self.tmp_path_for(name) + "/" + name + ".yaml"
+        content = (
+            "version: 1\n"
+            "handlers:\n"
+            "    console:\n"
+            "        class: logging.StreamHandler\n"
+            f"        level: {consoleLevel}\n"
+            "    file:\n"
+            "        class: logging.handlers.GroupWriteRotatingFileHandler\n"
+            "        level: DEBUG\n"
+            f"        filename: {logFile}\n"
+            + (
+                "root:\n"
+                f"    level: {rootLevel}\n"
+                "    handlers: [file, console]\n"
+                if rootLevel is not None
+                else ""
+            )
+        )
+        with open(yamlFile, "w") as f:
+            f.write(content)
+        return yamlFile
+
+    def root_group_write_handler_files(self):
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        return [
+            h.baseFilename
+            for h in logging.getLogger().handlers
+            if isinstance(h, GroupWriteRotatingFileHandler)
+        ]
+
+    def restore_logging_state_after_test(self):
+        rootLogger = logging.getLogger()
+        moduleLogger = logging.getLogger("fundamentals.logs")
+        savedRoot = (rootLogger.handlers[:], rootLogger.level)
+        savedModule = (moduleLogger.handlers[:], moduleLogger.level)
+
+        def restore():
+            for logger, (savedHandlers, savedLevel) in (
+                (rootLogger, savedRoot),
+                (moduleLogger, savedModule),
+            ):
+                for handler in logger.handlers[:]:
+                    if handler not in savedHandlers:
+                        handler.close()
+                logger.handlers[:] = savedHandlers
+                logger.setLevel(savedLevel)
+
+        self.addCleanup(restore)
+
+    def test_setup_dryx_logging_second_call_applies_second_yaml_handlers_and_levels(
+        self,
+    ):
+        from fundamentals.logs import setup_dryx_logging
+
+        self.restore_logging_state_after_test()
+        firstLog = self.tmp_path_for("first") + "/first.log"
+        secondLog = self.tmp_path_for("second") + "/second.log"
+        firstYaml = self.write_logging_yaml("first", "WARNING", firstLog)
+        secondYaml = self.write_logging_yaml("second", "DEBUG", secondLog, "ERROR")
+        setup_dryx_logging(yaml_file=firstYaml)
+
+        logger = setup_dryx_logging(yaml_file=secondYaml)
+
+        rootFiles = self.root_group_write_handler_files()
+        self.assertEqual(rootFiles, [os.path.abspath(secondLog)])
+        self.assertEqual(logging.getLogger().level, logging.DEBUG)
+        consoleHandlers = [h for h in logger.handlers if h.name == "consoleLog"]
+        self.assertEqual(len(consoleHandlers), 1)
+        self.assertEqual(consoleHandlers[0].level, logging.ERROR - 6)
+
+    def test_setup_dryx_logging_repeat_call_with_same_yaml_does_not_duplicate_handlers(
+        self,
+    ):
+        from fundamentals.logs import setup_dryx_logging
+
+        self.restore_logging_state_after_test()
+        logFile = self.tmp_path_for("repeat") + "/repeat.log"
+        yamlFile = self.write_logging_yaml("repeat", "WARNING", logFile)
+        setup_dryx_logging(yaml_file=yamlFile)
+
+        logger = setup_dryx_logging(yaml_file=yamlFile)
+
+        self.assertEqual(
+            len([h for h in logger.handlers if h.name == "consoleLog"]), 1
+        )
+        self.assertEqual(len(self.root_group_write_handler_files()), 1)
+
+    def test_setup_dryx_logging_defaults_to_info_when_yaml_has_no_root_key(self):
+        from fundamentals.logs import setup_dryx_logging
+
+        self.restore_logging_state_after_test()
+        logFile = self.tmp_path_for("noroot") + "/noroot.log"
+        yamlFile = self.write_logging_yaml("noroot", None, logFile)
+
+        logger = setup_dryx_logging(yaml_file=yamlFile)
+
+        self.assertEqual(logger.getEffectiveLevel(), logging.INFO)
+
+    def test_setup_dryx_logging_raises_value_error_naming_invalid_level(self):
+        from fundamentals.logs import setup_dryx_logging
+
+        self.restore_logging_state_after_test()
+        logFile = self.tmp_path_for("badlevel") + "/badlevel.log"
+        yamlFile = self.write_logging_yaml(
+            "badlevel", "WARNING", logFile, consoleLevel="LOUD"
+        )
+
+        with self.assertRaises(ValueError) as raised:
+            setup_dryx_logging(yaml_file=yamlFile)
+
+        self.assertIn("LOUD", str(raised.exception))
 
     # x-class-to-test-named-worker-function
 
