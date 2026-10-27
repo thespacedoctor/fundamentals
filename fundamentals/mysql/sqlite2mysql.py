@@ -139,14 +139,31 @@ class sqlite2mysql(object):
 
         See class docstring for usage
         """
-        from fundamentals.renderer import list_of_dictionaries
-        from fundamentals.mysql import directory_script_runner
-
         self.log.debug("starting the ``convert_sqlite_to_mysql`` method")
 
         con = lite.connect(self.pathToSqlite)
-        con.row_factory = lite.Row
-        cur = con.cursor()
+        try:
+            con.row_factory = lite.Row
+            cur = con.cursor()
+            try:
+                self._copy_tables(cur)
+            finally:
+                cur.close()
+        finally:
+            con.close()
+
+        self.log.debug("completed the ``convert_sqlite_to_mysql`` method")
+        return None
+
+    def _copy_tables(self, cur):
+        """*copy every table read through the sqlite cursor into the mysql database*
+
+        **Key Arguments**
+
+        - ``cur`` -- an open sqlite cursor (closed by the caller)
+        """
+        from fundamentals.renderer import list_of_dictionaries
+        from fundamentals.mysql import directory_script_runner
 
         # GET ALL TABLE NAMES
         cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -161,9 +178,7 @@ class sqlite2mysql(object):
 
             # CREATE TABLE collection_books (folder_id, fingerprint, primary key(folder_id, fingerprint));
             # GENEREATE THE MYSQL CREATE STATEMENTS FOR EACH TABLE
-            cur.execute(
-                "SELECT sql FROM sqlite_master WHERE name = '%(table)s';" % locals()
-            )
+            cur.execute("SELECT sql FROM sqlite_master WHERE name = ?;", (table,))
             createStatement = cur.fetchone()
             createStatement = createStatement[0].replace('"', "`") + ";"
             if "DEFAULT" not in createStatement:
@@ -239,7 +254,8 @@ primary key(""",
                 )
 
             # GRAB THE DATA TO ADD TO THE MYSQL DATABASE TABLES
-            cur.execute("SELECT * from '%(table)s';" % locals())
+            quotedTable = '"' + table.replace('"', '""') + '"'
+            cur.execute("SELECT * FROM %s;" % (quotedTable,))
             rows = cur.fetchall()
 
             allRows = []
@@ -274,11 +290,6 @@ primary key(""",
                 replace=True,
                 dbSettings=self.settings["database settings"],
             )
-
-        con.close()
-
-        self.log.debug("completed the ``convert_sqlite_to_mysql`` method")
-        return None
 
     # use the tab-trigger below for new method
     # xt-class-method

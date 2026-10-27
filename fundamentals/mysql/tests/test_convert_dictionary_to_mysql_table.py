@@ -11,6 +11,7 @@ import sys
 from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
+from fundamentals.mysql.sql_identifiers import quote_identifier
 from os.path import expanduser
 
 home = expanduser("~")
@@ -48,7 +49,15 @@ if not os.path.exists(pathToOutputDir):
 reDatetime = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
 
 
+def strip_string_literals(sql):
+    """*remove every quoted SQL string literal (backslash escapes and doubled quotes allowed) from a statement*"""
+    return re.sub(r"\"(?:[^\"\\]|\\.|\"\")*\"|'(?:[^'\\]|\\.|'')*'", "''", sql)
+
+
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
+
+    def setUp(self):
+        self.columns = []
 
     def test_convert_dictionary_to_mysql_table_function(self):
         from fundamentals.mysql import writequery
@@ -232,7 +241,9 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         # ASSERT
         self.assertEqual(uniqueKeyList, ["uni key", "dec"])
 
-    def _write_to_database(self, tableName, dictionary, uniqueKeyList, dateModified):
+    def _write_to_database(
+        self, tableName, dictionary, uniqueKeyList, dateModified, afterWrite=None
+    ):
         from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 
         try:
@@ -244,10 +255,12 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
                 uniqueKeyList=uniqueKeyList,
                 dateModified=dateModified,
             )
+            if afterWrite:
+                afterWrite()
         finally:
             writequery(
                 log=log,
-                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
                 dbConn=dbConn,
             )
 
@@ -273,7 +286,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         finally:
             writequery(
                 log=log,
-                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
                 dbConn=dbConn,
             )
 
@@ -302,8 +315,104 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         finally:
             writequery(
                 log=log,
-                sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
+                sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
                 dbConn=dbConn,
             )
+
+    def test_escapes_list_wrapped_value_in_insert_statement(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a": ['x"; DROP TABLE t; -- ', "c"]}
+
+        # ACT
+        insertCommand = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary=dictionary,
+            dbTableName="sweep2_dictsql_t",
+            returnInsertOnly=True,
+            batchInserts=False,
+        )
+
+        # ASSERT
+        self.assertNotIn("DROP TABLE", strip_string_literals(insertCommand))
+
+    def test_escapes_plain_string_value_in_insert_statement(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a": "x'; DROP TABLE t; -- ", "b": 'y"; DROP TABLE t; -- '}
+
+        # ACT
+        insertCommand = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary=dictionary,
+            dbTableName="sweep2_dictsql_t",
+            returnInsertOnly=True,
+            batchInserts=False,
+        )
+
+        # ASSERT
+        self.assertNotIn("DROP TABLE", strip_string_literals(insertCommand))
+
+    def test_binds_string_values_unescaped_in_batch_value_tuple(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a": 'say "hi" \\ bye', "b": ['x"y', "comment"]}
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary=dictionary,
+            dbTableName="sweep2_dictsql_t",
+            returnInsertOnly=True,
+        )
+
+        # ASSERT
+        self.assertEqual(valueTuple, ('say "hi" \\ bye', 'x"y'))
+        self.assertNotIn("hi", insertCommand)
+
+    def test_quotes_table_and_column_names_in_batch_insert_command(self):
+        # ARRANGE
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        dictionary = {"a`b": "x", "100%": "y"}
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary=dictionary,
+            dbTableName="sweep2_dictsql_t`x",
+            returnInsertOnly=True,
+        )
+
+        # ASSERT
+        self.assertTrue(insertCommand.startswith("INSERT INTO `sweep2_dictsql_t``x` ("))
+        self.assertIn("(`100%%`,`a``b`,", insertCommand)
+
+    def test_writes_dictionary_with_awkward_names_to_database(self):
+        # ARRANGE
+        from fundamentals.mysql import get_database_table_column_names
+
+        tableName = "sweep2_dictsql_awkward`table"
+        dictionary = {"it's a key": "v1", "tick`key": "v2", "uni": "u"}
+
+        # ACT
+        self._write_to_database(
+            tableName,
+            dictionary,
+            ["it's a key"],
+            dateModified=False,
+            afterWrite=lambda: self.columns.extend(
+                get_database_table_column_names(
+                    dbConn=dbConn, log=log, dbTable=tableName
+                )
+            ),
+        )
+
+        # ASSERT
+        self.assertIn("it's_a_key", self.columns)
+        self.assertIn("tick`key", self.columns)
 
     # x-class-to-test-named-worker-function
