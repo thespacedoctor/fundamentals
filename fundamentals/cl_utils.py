@@ -15,6 +15,8 @@ Options:
 """
 
 import os
+import subprocess
+import sys
 
 os.environ["TERM"] = "vt100"
 try:
@@ -31,6 +33,26 @@ from fundamentals import tools, times
 
 def tab_complete(text, state):
     return (glob.glob(text + "*") + [None])[state]
+
+
+def open_file(path, log):
+    """*open a file with the operating system's default application, without a shell*
+
+    **Key Arguments:**
+
+    - ``path`` -- path to the file to open
+    - ``log`` -- logger
+
+    A failure to open the file is logged as a warning and never raised. Platforms other than macOS and Windows do nothing.
+    """
+    try:
+        if sys.platform == "darwin":
+            subprocess.run(["open", path], check=False)
+        elif sys.platform == "win32":
+            os.startfile(path)
+    except OSError as e:
+        log.warning("could not open `%s`: %s" % (path, e))
+    return None
 
 
 def main(arguments=None):
@@ -78,6 +100,9 @@ def main(arguments=None):
     log.info("--- STARTING TO RUN THE cl_utils.py AT %s" % (startTime,))
 
     if a["init"]:
+        from os.path import expanduser
+
+        open_file(expanduser("~/.config/fundamentals/fundamentals.yaml"), log)
         return
 
     # CALL FUNCTIONS/OBJECTS
