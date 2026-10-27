@@ -3,6 +3,7 @@
 
 **Unreleased**
 
+* **FIXED:** `fileChunker` closes its file when reading ends, and adds `close()` and `with` support (DY-2018)
 * **FIXED:** `append_now_datestamp_to_filename` puts the datestamp before the last extension (`a.tar.gz` gives `a.tar_<stamp>.gz`) and no longer adds `.xhtml` to a name with no extension; a filename that is not a string raises `TypeError` (DY-2014)
 * **FIXED:** `recursive_directory_listing` no longer hangs on an unreadable subfolder or loops on a symlink to a parent folder; it now lists with `os.walk`, so the order changes (each folder's subfolders, then its files, depth first), and an invalid `whatToList` raises `ValueError` instead of calling `sys.exit(0)` (DY-2012)
 * **FIXED:** `extract_filename_from_url` takes the filename from the URL path only, so a query string or fragment no longer ends up in the name; a URL with no path now gives `untitled.html` (DY-2017)
