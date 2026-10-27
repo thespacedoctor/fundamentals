@@ -7,6 +7,7 @@ import shutil
 import tempfile
 import threading
 import unittest
+from unittest import mock
 import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
@@ -73,6 +74,7 @@ class test_recursive_directory_listing(unittest.TestCase):
                 os.chmod(os.path.join(root, d), 0o755)
         shutil.rmtree(self.baseDir)
 
+    @unittest.skipIf(os.geteuid() == 0, "chmod 000 is ignored for root")
     def test_returns_when_subdirectory_is_unreadable(self):
         lockedDir = os.path.join(self.baseDir, "u", "locked")
         os.makedirs(lockedDir)
@@ -113,6 +115,16 @@ class test_recursive_directory_listing(unittest.TestCase):
         with self.assertRaises(ValueError):
             recursive_directory_listing(log, self.baseDir, whatToList="bogus")
 
+    def test_logs_error_when_what_to_list_is_invalid(self):
+        from fundamentals.files import recursive_directory_listing
+
+        mockLog = mock.Mock()
+
+        with self.assertRaises(ValueError):
+            recursive_directory_listing(mockLog, self.baseDir, whatToList="bogus")
+
+        mockLog.error.assert_called_once()
+
     def test_raises_value_error_when_what_to_list_is_invalid_for_empty_directory(self):
         from fundamentals.files import recursive_directory_listing
 
@@ -135,6 +147,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             recursive_directory_listing(log, missingDir, whatToList="all")
 
+    @unittest.skipIf(os.geteuid() == 0, "chmod 000 is ignored for root")
     def test_raises_permission_error_when_base_folder_is_unreadable(self):
         from fundamentals.files import recursive_directory_listing
 

@@ -66,12 +66,14 @@ def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
     baseFolderPath = os.fspath(baseFolderPath)
 
     if whatToList not in VALID_WHAT_TO_LIST:
-        raise ValueError(
+        message = (
             'could not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]'
             % (baseFolderPath,)
         )
+        log.error(message)
+        raise ValueError(message)
 
-    def _log_unreadable(error):
+    def _handle_walk_error(error):
         # A BAD BASE FOLDER IS A CALLER MISTAKE; ONLY SUBDIRECTORIES ARE SKIPPED
         if error.filename == baseFolderPath:
             raise error
@@ -79,7 +81,7 @@ def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
 
     matchedPathList = []
     for parentDir, dirNames, fileNames in os.walk(
-        baseFolderPath, followlinks=False, onerror=_log_unreadable
+        baseFolderPath, followlinks=False, onerror=_handle_walk_error
     ):
         # SYMLINKED DIRECTORIES APPEAR IN dirNames BUT ARE NOT DESCENDED INTO
         if whatToList in ("all", "dirs"):
