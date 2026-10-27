@@ -45,6 +45,8 @@ class fileChunker(object):
 
     The file is also closed once the iterator is exhausted, or when ``fc.close()`` is called.
 
+    After the file closes, by exhaustion or by ``close()``, iteration stops.
+
     """
 
     def __init__(self, filepath, batchSize):
@@ -74,10 +76,10 @@ class fileChunker(object):
         if self.readFile.closed:
             raise StopIteration
         batch = []
-        for lines in range(self.batchSize):
-            l = self.readFile.readline()
-            if len(l):
-                batch.append(l)
+        for _ in range(self.batchSize):
+            line = self.readFile.readline()
+            if len(line):
+                batch.append(line)
         if len(batch) == 0:
             self.close()
             raise StopIteration
