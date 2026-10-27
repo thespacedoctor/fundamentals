@@ -48,8 +48,6 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     import pymysql
     import warnings
 
-    warnings.filterwarnings("error", category=pymysql.Warning)
-
     rows = []
 
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
@@ -60,44 +58,50 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     except Exception as e:
         log.error("could not create the database cursor: %s" % (e,))
         raise IOError("could not create the database cursor: %s" % (e,))
-    # EXECUTE THE SQL COMMAND
-    tryAgain = True
-    tries = 1
-    while tryAgain:
-        tryAgain = False
-        try:
-            cursor.execute(sqlQuery)
-            rows = cursor.fetchall()
-        except pymysql.err.InternalError as e:
-            if tries < 61:
-                tryAgain = True
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
-                tries += 1
-            else:
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
-                raise
-        except Exception as e:
-            sqlQuery = sqlQuery[:1000]
-            if quiet == False:
-                log.warning(
-                    "MySQL raised an error - read command not executed.\n"
-                    + str(e)
-                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-                )
-                raise e
-            else:
-                log.warning(
-                    "MySQL raised an error - read command not executed.\n"
-                    + str(e)
-                    + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-                )
-                pass
 
-    # CLOSE THE CURSOR
     try:
-        cursor.close()
-    except Exception as e:
-        log.warning("could not close the db cursor " + str(e) + "\n")
+        # SCOPE THE WARNINGS-AS-ERRORS FILTER TO THIS CALL ONLY
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", category=pymysql.Warning)
+            # EXECUTE THE SQL COMMAND
+            tryAgain = True
+            tries = 1
+            while tryAgain:
+                tryAgain = False
+                try:
+                    cursor.execute(sqlQuery)
+                    rows = cursor.fetchall()
+                except pymysql.err.InternalError as e:
+                    if tries < 61:
+                        tryAgain = True
+                        log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
+                        tries += 1
+                    else:
+                        log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
+                        raise
+                except Exception as e:
+                    sqlQuery = sqlQuery[:1000]
+                    if quiet == False:
+                        log.warning(
+                            "MySQL raised an error - read command not executed.\n"
+                            + str(e)
+                            + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+                        )
+                        raise e
+                    else:
+                        log.warning(
+                            "MySQL raised an error - read command not executed.\n"
+                            + str(e)
+                            + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+                        )
+                        pass
+
+    finally:
+        # CLOSE THE CURSOR ON EVERY PATH
+        try:
+            cursor.close()
+        except Exception as e:
+            log.warning("could not close the db cursor " + str(e) + "\n")
 
     log.debug("completed the ``readquery`` function")
     return rows
