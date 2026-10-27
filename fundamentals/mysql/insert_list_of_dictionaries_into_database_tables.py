@@ -17,9 +17,9 @@ from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.mysql.sql_identifiers import (
     normalise_column_name,
     quote_identifier,
-    quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql.sql_inserts import build_batch_insert_command
 from fundamentals.mysql.sql_values import null_if_missing
 from builtins import str
 from builtins import range
@@ -38,8 +38,8 @@ sharedList = []
 # MESSAGES FROM writequery THAT ARE EXPECTED WHEN USING INSERT IGNORE
 BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
 
-
-_normalise_key = normalise_column_name
+# ASSIGNMENTS ADDED TO THE ON DUPLICATE KEY UPDATE TAIL OF A BATCH INSERT
+BATCH_REPLACE_EXTRA_UPDATES = ("updated=1", "dateLastModified=NOW()")
 
 
 def _map_keys_to_columns(rows):
@@ -52,7 +52,7 @@ def _map_keys_to_columns(rows):
     """
     originalKeys = sorted(set().union(*(list(d.keys()) for d in rows)), key=str)
     raise_on_duplicate_columns(originalKeys)
-    return originalKeys, [_normalise_key(k) for k in originalKeys]
+    return originalKeys, [normalise_column_name(k) for k in originalKeys]
 
 
 def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
@@ -284,43 +284,6 @@ def _insert_rows_individually(
     return ""
 
 
-def _build_batch_insert_command(dbTableName, columns, replace, dateCreated):
-    """*build the multi-row insert command, with ``%s`` placeholders for the values*
-
-    Every identifier is quoted, and ``%`` inside an identifier is doubled because pymysql formats the command afterwards.
-    The exception is the ``ON DUPLICATE KEY UPDATE`` tail when the values are only placeholders: pymysql then batches the rows and sends that tail as it is, so ``%`` stays single.
-
-    **Key Arguments**
-
-    - ``dbTableName`` -- the table to insert into
-    - ``columns`` -- the column names, in the order of the values
-    - ``replace`` -- update the row if a duplicate key is found?
-    - ``dateCreated`` -- also fill the dateCreated column?
-
-    **Return**
-
-    - ``insertCommand`` -- the command to hand to writequery
-    """
-    quotedColumns = [quote_identifier_for_format(c) for c in columns]
-    placeholders = ", ".join(["%s"] * len(columns))
-    insertCommand = "INSERT IGNORE INTO %s (%s%s) VALUES (%s%s)" % (
-        quote_identifier_for_format(dbTableName),
-        ",".join(quotedColumns),
-        ", dateCreated" if dateCreated else "",
-        placeholders,
-        ", NOW()" if dateCreated else "",
-    )
-    if replace:
-        # PYMYSQL ONLY FORMATS THE TAIL WHEN IT CANNOT BATCH THE ROWS (NOW() IN THE VALUES)
-        tailColumns = quotedColumns
-        if not dateCreated:
-            tailColumns = [quote_identifier(c) for c in columns]
-        assignments = ["%s=VALUES(%s)" % (c, c) for c in tailColumns]
-        assignments += ["updated=1", "dateLastModified=NOW()"]
-        insertCommand += " ON DUPLICATE KEY UPDATE " + ", ".join(assignments)
-    return insertCommand
-
-
 def _insert_single_batch_into_database(
     batchIndex,
     log,
@@ -386,8 +349,13 @@ def _insert_single_batch_into_database(
     originalKeys, uniKeys = _map_keys_to_columns(batch[0])
 
     vals = [tuple([null_if_missing(d.get(k)) for k in originalKeys]) for d in batch[0]]
-    insertCommand = _build_batch_insert_command(
-        dbTableName, uniKeys, replace, dateCreated
+    insertCommand = build_batch_insert_command(
+        "INSERT IGNORE",
+        dbTableName,
+        uniKeys,
+        replace,
+        dateCreated,
+        extraUpdates=BATCH_REPLACE_EXTRA_UPDATES,
     )
 
     try:

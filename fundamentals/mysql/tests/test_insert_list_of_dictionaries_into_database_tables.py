@@ -656,10 +656,12 @@ class test_insert_batches(unittest.TestCase):
 
     def test_normalise_key_replaces_separators_and_renames_mysql_keyword_dec(self):
         # ARRANGE
+        from fundamentals.mysql.sql_identifiers import normalise_column_name
+
         keys = ["my key", "my-key", "dec", "DEC", "ra"]
 
         # ACT
-        result = [self.insertModule._normalise_key(k) for k in keys]
+        result = [normalise_column_name(k) for k in keys]
 
         # ASSERT
         self.assertEqual(result, ["my_key", "my_key", "decl", "DECL", "ra"])

@@ -13,9 +13,9 @@ from fundamentals import times
 from fundamentals.mysql.sql_identifiers import (
     normalise_column_name,
     quote_identifier,
-    quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql.sql_inserts import build_batch_insert_command
 from fundamentals.mysql.sql_values import null_if_missing
 from pymysql.converters import escape_item
 import collections as c
@@ -61,32 +61,6 @@ def _remove_conversion_noise(value):
     ]:
         value = value.replace(noise, "")
     return value
-
-
-def _build_batch_insert(
-    insertVerb, dbTableName, formattedKeyList, values, replace, dateCreated
-):
-    """*build an insert command with ``%s`` placeholders, and the tuple of values to bind to it*
-
-    **Return**
-
-    - ``insertCommand``, ``valueTuple`` -- the command and the values to bind
-    """
-    quotedKeys = [quote_identifier_for_format(k) for k in formattedKeyList]
-    placeholders = ", ".join(["%s"] * len(values))
-    insertCommand = "%s INTO %s (%s%s) VALUES (%s%s)" % (
-        insertVerb,
-        quote_identifier_for_format(dbTableName),
-        ",".join(quotedKeys),
-        ", dateCreated" if dateCreated else "",
-        placeholders,
-        ", NOW()" if dateCreated else "",
-    )
-    if replace:
-        insertCommand += " ON DUPLICATE KEY UPDATE " + ", ".join(
-            "%s=VALUES(%s)" % (k, k) for k in quotedKeys
-        )
-    return insertCommand, tuple(values)
 
 
 def _build_literal_insert(
@@ -538,9 +512,10 @@ def convert_dictionary_to_mysql_table(
                 writequery(log=log, sqlQuery=addUniqueKey, dbConn=dbConn)
 
     if returnInsertOnly == True and batchInserts == True:
-        return _build_batch_insert(
-            insertVerb, dbTableName, formattedKeyList, myValues, replace, dateCreated
+        insertCommand = build_batch_insert_command(
+            insertVerb, dbTableName, formattedKeyList, replace, dateCreated
         )
+        return insertCommand, tuple(myValues)
 
     addValue = _build_literal_insert(
         insertVerb,

@@ -505,6 +505,28 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             )
         )
 
+    def test_keeps_percent_signs_single_in_the_batch_update_tail_without_date_created(
+        self,
+    ):
+        # ARRANGE: PYMYSQL BATCHES THE ROWS WHEN NOW() IS NOT IN THE VALUES AND SENDS THE TAIL UNFORMATTED
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary={"100%": 1},
+            dbTableName="sweep2_dictsql_t",
+            returnInsertOnly=True,
+            replace=True,
+            dateCreated=False,
+        )
+
+        # ASSERT
+        self.assertIn("(`100%%`) VALUES (%s)", insertCommand)
+        self.assertTrue(
+            insertCommand.endswith("ON DUPLICATE KEY UPDATE `100%`=VALUES(`100%`)")
+        )
+
     def test_python_none_and_empty_string_become_null_but_none_text_stays(self):
         # ARRANGE
         from fundamentals.mysql import convert_dictionary_to_mysql_table
