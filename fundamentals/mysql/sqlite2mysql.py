@@ -86,10 +86,10 @@ class sqlite2mysql(object):
     **Key Arguments**
 
     - ``log`` -- logger
-    - ``settings`` -- the settings dictionary
+    - ``settings`` -- the settings dictionary. Optional; when it holds a ``database settings`` entry, that is passed on so the bulk insert can open one connection per process. Default *False*
     - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
     - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
-    - ``dbConn`` -- mysql database connection
+    - ``dbConn`` -- mysql database connection. **Required**: a ``ValueError`` is raised if it is missing
 
 
     **Usage**
@@ -108,7 +108,8 @@ class sqlite2mysql(object):
         log=log,
         settings=settings,
         pathToSqlite="/path/to/sqlite.db",
-        tablePrefix="external"
+        tablePrefix="external",
+        dbConn=dbConn
     )
     converter.convert_sqlite_to_mysql()
     ```
@@ -117,7 +118,11 @@ class sqlite2mysql(object):
 
     # Initialisation
 
-    def __init__(self, log, pathToSqlite, tablePrefix="", settings=False, dbConn=False):
+    def __init__(self, log, pathToSqlite, tablePrefix="", settings=False, dbConn=None):
+        if dbConn is None or dbConn is False:
+            raise ValueError(
+                "sqlite2mysql requires a database connection: pass dbConn=<connection>"
+            )
         self.log = log
         log.debug("instansiating a new 'sqlite2mysql' object")
         self.settings = settings
@@ -261,7 +266,10 @@ primary key(""",
                 insert_list_of_dictionaries_into_database_tables,
             )
 
-            # USE dbSettings TO ACTIVATE MULTIPROCESSING
+            # USE dbSettings TO ACTIVATE MULTIPROCESSING, IF SETTINGS WERE GIVEN
+            insertKwargs = {}
+            if self.settings and "database settings" in self.settings:
+                insertKwargs["dbSettings"] = self.settings["database settings"]
             insert_list_of_dictionaries_into_database_tables(
                 dbConn=self.dbConn,
                 log=self.log,
@@ -272,7 +280,7 @@ primary key(""",
                 dateCreated=dateCreated,
                 batchSize=10000,
                 replace=True,
-                dbSettings=self.settings["database settings"],
+                **insertKwargs,
             )
 
         con.close()
