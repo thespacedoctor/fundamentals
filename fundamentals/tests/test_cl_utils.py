@@ -52,4 +52,18 @@ class test_cl_utils(unittest.TestCase):
         # cl_utils.main(args)
         return
 
+    def test_init_runs_without_spawning_any_process(self):
+        from unittest import mock
+
+        fakeSetup = mock.MagicMock()
+        fakeSetup.setup.return_value = ({"init": True}, {}, mock.MagicMock(), None)
+
+        with mock.patch.object(
+            cl_utils, "tools", return_value=fakeSetup
+        ), mock.patch.object(cl_utils, "Popen", create=True) as popen:
+            result = cl_utils.main({"init": True})
+
+        self.assertIsNone(result)
+        popen.assert_not_called()
+
     # x-class-to-test-named-worker-function
