@@ -10,7 +10,11 @@ Author
 import six
 from fundamentals.mysql import writequery, table_exists, readquery
 from fundamentals import tools, times
-from fundamentals.mysql.sql_identifiers import quote_identifier
+from fundamentals.mysql.sql_identifiers import (
+    normalise_column_name,
+    quote_identifier,
+    raise_on_duplicate_columns,
+)
 from pymysql.converters import escape_item
 import collections as c
 import datetime
@@ -251,6 +255,10 @@ def convert_dictionary_to_mysql_table(
     else:
         insertVerb = "INSERT IGNORE"
 
+    if isinstance(dictionary, dict):
+        # REFUSE KEYS THAT GIVE THE SAME COLUMN, BEFORE ANY TABLE IS CREATED
+        raise_on_duplicate_columns(dictionary.keys())
+
     if returnInsertOnly == False:
         # TEST THE ARGUMENTS
         if str(type(dbConn).__name__) != "Connection":
@@ -382,12 +390,7 @@ def convert_dictionary_to_mysql_table(
     odictionary = c.OrderedDict(sorted(dictionary.items(), key=lambda kv: str(kv[0])))
     for key, value in list(odictionary.items()):
         key = str(key)
-        formattedKey = key.replace(" ", "_").replace("-", "_")
-        # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
-        if formattedKey == "dec":
-            formattedKey = "decl"
-        if formattedKey == "DEC":
-            formattedKey = "DECL"
+        formattedKey = normalise_column_name(key)
 
         # RAISES VALUEERROR FOR AN EMPTY OR OTHERWISE INVALID COLUMN NAME
         quote_identifier(formattedKey)
@@ -519,13 +522,9 @@ def convert_dictionary_to_mysql_table(
         # GENERATE THE INDEX NAME - THEN CREATE INDEX IF IT DOES NOT YET EXIST
         if len(uniqueKeyList):
             for i in range(len(uniqueKeyList)):
-                uniqueKeyList[i] = uniqueKeyList[i].replace(" ", "_").replace("-", "_")
-                if uniqueKeyList[i] == "dec":
-                    uniqueKeyList[i] = "decl"
-                if uniqueKeyList[i] == "DEC":
-                    uniqueKeyList[i] = "DECL"
+                uniqueKeyList[i] = normalise_column_name(uniqueKeyList[i])
 
-            indexName = uniqueKeyList[0].replace(" ", "_").replace("-", "_")
+            indexName = uniqueKeyList[0]
             for i in range(len(uniqueKeyList) - 1):
                 indexName += "_" + uniqueKeyList[i + 1]
 

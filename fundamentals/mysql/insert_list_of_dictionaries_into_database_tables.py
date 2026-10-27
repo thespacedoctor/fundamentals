@@ -15,6 +15,10 @@ import re
 import time
 from fundamentals.fmultiprocess import fmultiprocess
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
+from fundamentals.mysql.sql_identifiers import (
+    normalise_column_name,
+    raise_on_duplicate_columns,
+)
 from fundamentals import tools
 from builtins import str
 from builtins import range
@@ -34,15 +38,7 @@ sharedList = []
 BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
 
 
-def _normalise_key(key):
-    """*return the database column name for a dictionary key*"""
-    formattedKey = str(key).replace(" ", "_").replace("-", "_")
-    # DEC IS A KEYWORD IN MYSQL - MATCHES THE RENAME IN convert_dictionary_to_mysql_table
-    if formattedKey == "dec":
-        formattedKey = "decl"
-    if formattedKey == "DEC":
-        formattedKey = "DECL"
-    return formattedKey
+_normalise_key = normalise_column_name
 
 
 def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
@@ -342,6 +338,7 @@ def _insert_single_batch_into_database(
 
     # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
     originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])), key=str)
+    raise_on_duplicate_columns(originalKeys)
     uniKeys = [_normalise_key(k) for k in originalKeys]
 
     myKeys = "`,`".join(uniKeys)
