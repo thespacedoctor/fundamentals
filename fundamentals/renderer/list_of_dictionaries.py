@@ -131,8 +131,9 @@ class list_of_dictionaries(object):
         if filepath and renderedData != "NO MATCH":
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
@@ -187,8 +188,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
@@ -245,8 +247,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
@@ -299,8 +302,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
@@ -372,8 +376,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = codecs.open(filepath, encoding="utf-8", mode="w")
             writeFile.write(renderedData)
@@ -431,8 +436,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             stream = open(filepath, "w")
             yaml.dump(dataCopy, stream, default_flow_style=False)
@@ -479,8 +485,6 @@ class list_of_dictionaries(object):
         """
         self.log.debug("starting the ``mysql`` method")
 
-        import re
-
         if (
             createStatement
             and "create table if not exists" not in createStatement.lower()
@@ -495,8 +499,9 @@ class list_of_dictionaries(object):
         if filepath and len(self.listOfDictionaries):
 
             # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists(os.path.dirname(filepath)):
-                os.makedirs(os.path.dirname(filepath))
+            dirPath = os.path.dirname(filepath)
+            if dirPath:
+                os.makedirs(dirPath, exist_ok=True)
 
             writeFile = open(filepath, mode="w")
             writeFile.write(renderedData)

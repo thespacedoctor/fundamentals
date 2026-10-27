@@ -109,3 +109,15 @@ class test_list_of_dictionaries(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
+
+
+def test_csv_writes_file_when_filepath_has_no_directory(tmp_path, monkeypatch):
+    from fundamentals.renderer import list_of_dictionaries
+
+    monkeypatch.chdir(tmp_path)
+    dataList = [{"owner": "daisy", "pet": "dog", "address": "belfast, uk"}]
+    dataSet = list_of_dictionaries(log=log, listOfDictionaries=dataList)
+
+    dataSet.csv(filepath="out.csv")
+
+    assert (tmp_path / "out.csv").exists()
