@@ -6,6 +6,12 @@
 * **FIXED:** `tag` and the `LOAD DATA` path of `insert_list_of_dictionaries_into_database_tables` now write their scratch files to a private temporary folder that is removed afterwards, even on error, instead of leaving files in `/tmp`; `sqlite2mysql` no longer creates an unused `/tmp/headjack/` folder
 * **FIXED:** `fmultiprocess` now terminates and joins its worker pool when a task raises, the timeout is reached or the call is interrupted with Ctrl-C, instead of leaving workers running (DY-1701)
 * **FIXED:** removed the unused `docs/requirements.txt`, which pinned vulnerable docs packages (mistune, Jinja2, Markdown) and raised 16 Dependabot alerts
+* **FIXED:** `datetime_relative_to_now` now reports minutes correctly; everything under an hour used to show `+0min`
+* **FIXED:** `emptyLogger` methods now accept format arguments and keyword arguments such as `exc_info`
+* **FIXED:** the `list_of_dictionaries` file writers (csv, table, reST, markdown, json, yaml, mysql) no longer crash when given a filename without a folder
+* **FIXED:** `tools.ordered_load` (used by `orderedSettings=True`) works again and now uses the safe YAML loader
+* **FIXED:** `yaml_to_database` no longer crashes on an empty value
+* **FIXED:** `download._fetch` no longer imports the undeclared `eventlet` package, which made every call fail when it was not installed
 
 **v2.8.3 - May 21, 2026**
 
