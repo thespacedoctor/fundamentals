@@ -9,7 +9,6 @@ Author
 
 from fundamentals import tools
 from builtins import str
-import sys
 import os
 import yaml
 
@@ -33,6 +32,13 @@ def setup_database_connection(pathToYamlFile):
     **Return**
 
     - ``dbConn`` -- connection to the MySQL database.
+
+
+    **Raises**
+
+    - ``OSError`` -- if the settings file cannot be read.
+    - ``yaml.YAMLError`` -- if the settings file is not valid YAML.
+    - the original ``pymysql`` exception if the connection cannot be established.
 
 
     **Usage**
@@ -64,11 +70,11 @@ def setup_database_connection(pathToYamlFile):
         logging.info(
             "importing the yaml database connection dictionary from " + pathToYamlFile
         )
-        stream = open(pathToYamlFile, "r")
-        connDict = yaml.safe_load(stream)
-    except:
+        with open(pathToYamlFile, "r") as stream:
+            connDict = yaml.safe_load(stream)
+    except (OSError, yaml.YAMLError):
         logging.critical("could not load the connect dictionary from " + pathToYamlFile)
-        sys.exit(1)
+        raise
     # ESTABLISH A DB CONNECTION
     try:
         logging.info(
@@ -96,6 +102,7 @@ def setup_database_connection(pathToYamlFile):
             + str(e)
             + "\n"
         )
+        raise
     return dbConn
 
 

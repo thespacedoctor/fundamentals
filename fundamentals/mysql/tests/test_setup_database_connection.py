@@ -52,3 +52,36 @@ class test_setup_database_connection(unittest.TestCase):
             pathToYamlFile=pathToInputDir + "/db_settings.yaml"
         )
         # print(this)
+
+    def test_raises_original_error_when_connection_fails(self):
+        from unittest import mock
+        import pymysql
+        from fundamentals.mysql import setup_database_connection
+
+        settingsPath = pathToOutputDir + "/connection_failure_settings.yaml"
+        with open(settingsPath, "w") as stream:
+            stream.write("db: unit_tests\nhost: localhost\nuser: u\npassword: p\n")
+
+        with mock.patch(
+            "pymysql.connect", side_effect=pymysql.err.OperationalError(2003, "refused")
+        ):
+            with self.assertRaises(pymysql.err.OperationalError):
+                setup_database_connection(pathToYamlFile=settingsPath)
+
+    def test_raises_oserror_when_settings_file_is_missing(self):
+        from fundamentals.mysql import setup_database_connection
+
+        with self.assertRaises(OSError):
+            setup_database_connection(
+                pathToYamlFile=pathToOutputDir + "/no_such_settings.yaml"
+            )
+
+    def test_raises_yaml_error_when_settings_file_is_malformed(self):
+        from fundamentals.mysql import setup_database_connection
+
+        settingsPath = pathToOutputDir + "/malformed_settings.yaml"
+        with open(settingsPath, "w") as stream:
+            stream.write("db: [unclosed\n")
+
+        with self.assertRaises(yaml.YAMLError):
+            setup_database_connection(pathToYamlFile=settingsPath)
