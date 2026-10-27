@@ -60,8 +60,10 @@ class test_database_tunnel(unittest.TestCase):
     def test_raises_tunnel_error_rather_than_exiting_when_tunnel_never_connects(self):
         from fundamentals.ssh_tunnel import tunnel_error
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", return_value=False
-        ), mock.patch("fundamentals.ssh_tunnel.time.sleep"):
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen"),
+            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+            mock.patch("fundamentals.ssh_tunnel.time.sleep"),
+        ):
             with self.assertRaises(tunnel_error):
                 _connect(_settings(tunnel=TUNNEL))

@@ -61,9 +61,7 @@ class test_tools_logger(unittest.TestCase):
         import logging
         from fundamentals import tools
 
-        su = tools(
-            arguments={"--logger": "x"}, docString="", quitIfRunning=False
-        )
+        su = tools(arguments={"--logger": "x"}, docString="", quitIfRunning=False)
 
         log = su.setup()[2]
 
@@ -94,7 +92,9 @@ class test_tools_logger(unittest.TestCase):
         from unittest import mock
         from fundamentals import tools
 
-        settingsFile = os.path.dirname(os.path.dirname(__file__)) + "/test_settings.yaml"
+        settingsFile = (
+            os.path.dirname(os.path.dirname(__file__)) + "/test_settings.yaml"
+        )
 
         with mock.patch("fundamentals.tools.dl.setup_dryx_logging") as loggingMock:
             su = tools(
@@ -175,8 +175,75 @@ class test_tools_tunnel(unittest.TestCase):
         from unittest import mock
         from fundamentals.ssh_tunnel import tunnel_error
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", return_value=False
-        ), mock.patch("fundamentals.ssh_tunnel.time.sleep"):
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen"),
+            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+            mock.patch("fundamentals.ssh_tunnel.time.sleep"),
+        ):
             with self.assertRaises(tunnel_error):
                 self._build_tools("\n" + TUNNEL_DICT_YAML)
+
+
+class test_tools_settings_files(unittest.TestCase):
+
+    def test_closes_the_settings_file_it_reads(self):
+        import gc
+        import os
+        import warnings
+        from fundamentals import tools
+
+        settingsFile = (
+            os.path.dirname(os.path.dirname(__file__)) + "/test_settings.yaml"
+        )
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", ResourceWarning)
+            tools(
+                arguments={"settingsFile": settingsFile},
+                docString="",
+                quitIfRunning=False,
+                createLogger=False,
+            )
+            gc.collect()
+
+        unclosed = [w for w in caught if issubclass(w.category, ResourceWarning)]
+        self.assertEqual(unclosed, [])
+
+    def _create_default_settings(self, copyEffect):
+        import os
+        import tempfile
+        from unittest import mock
+        from fundamentals import tools
+
+        with tempfile.TemporaryDirectory() as tmpDir:
+            self.settingsPath = tmpDir + "/.config/proj/proj.yaml"
+            previousDirectory = os.getcwd()
+            os.chdir(tmpDir)
+            try:
+                with (
+                    mock.patch.dict(os.environ, {"HOME": tmpDir}),
+                    mock.patch(
+                        "fundamentals.tools.shutil.copyfile", side_effect=copyEffect
+                    ),
+                ):
+                    tools(
+                        arguments={"settingsFile": None},
+                        docString="",
+                        projectName="proj",
+                        quitIfRunning=False,
+                        createLogger=False,
+                    )
+            finally:
+                os.chdir(previousDirectory)
+
+    def test_raises_oserror_and_logs_the_path_when_settings_cannot_be_created(self):
+        with self.assertLogs("fundamentals.tools", level="ERROR") as logged:
+            with self.assertRaises(OSError):
+                self._create_default_settings(PermissionError(13, "Permission denied"))
+
+        self.assertIn(self.settingsPath, "\n".join(logged.output))
+        self.assertIn("Permission denied", "\n".join(logged.output))
+
+    def test_does_not_swallow_errors_that_are_not_oserrors(self):
+        with self.assertRaises(ValueError):
+            self._create_default_settings(ValueError("not an os error"))

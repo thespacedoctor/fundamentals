@@ -18,9 +18,10 @@ def _run_main(moduleName, argv, workOwner, workName):
     log = mock.MagicMock()
     dbConn = mock.sentinel.dbConn
     settings = {"database settings": {}}
-    with mock.patch.object(module, "tools") as toolsMock, mock.patch.object(
-        workOwner or module, workName
-    ) as workMock:
+    with (
+        mock.patch.object(module, "tools") as toolsMock,
+        mock.patch.object(workOwner or module, workName) as workMock,
+    ):
         toolsMock.return_value.setup.return_value = (arguments, settings, log, dbConn)
         module.main(arguments=arguments)
     return workMock, settings, log, dbConn
@@ -81,8 +82,9 @@ class test_directory_script_runner_main(unittest.TestCase):
 class test_yaml_to_database_main(unittest.TestCase):
 
     def test_adds_a_single_file_and_honours_the_delete_flag(self):
-        with mock.patch("os.path.isfile", return_value=True), mock.patch(
-            "builtins.print"
+        with (
+            mock.patch("os.path.isfile", return_value=True),
+            mock.patch("builtins.print"),
         ):
             workMock, settings, log, dbConn = _run_main(
                 "fundamentals.mysql.yaml_to_database",
@@ -97,8 +99,9 @@ class test_yaml_to_database_main(unittest.TestCase):
         )
 
     def test_ingests_a_directory_when_path_is_not_a_file(self):
-        with mock.patch("os.path.isfile", return_value=False), mock.patch(
-            "builtins.print"
+        with (
+            mock.patch("os.path.isfile", return_value=False),
+            mock.patch("builtins.print"),
         ):
             workMock, settings, log, dbConn = _run_main(
                 "fundamentals.mysql.yaml_to_database",

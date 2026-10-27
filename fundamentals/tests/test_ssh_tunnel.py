@@ -24,8 +24,11 @@ class test_setup_ssh_tunnel(unittest.TestCase):
     def test_starts_ssh_with_an_argv_list_and_no_shell(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock, mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock,
+            mock.patch(
+                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
+            ),
         ):
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
@@ -40,8 +43,9 @@ class test_setup_ssh_tunnel(unittest.TestCase):
     def test_does_not_start_ssh_when_the_tunnel_already_exists(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock, mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", return_value=True
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock,
+            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True),
         ):
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
@@ -51,9 +55,12 @@ class test_setup_ssh_tunnel(unittest.TestCase):
     def test_returns_as_soon_as_the_connection_check_succeeds(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
-        ) as checkMock:
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen"),
+            mock.patch(
+                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
+            ) as checkMock,
+        ):
             setup_ssh_tunnel(TUNNEL, self.log)
 
         self.assertEqual(checkMock.call_count, 2)
@@ -64,8 +71,11 @@ class test_setup_ssh_tunnel(unittest.TestCase):
 
         results = [False] * TUNNEL_CHECK_ATTEMPTS
         results[-1] = True
-        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", side_effect=[False] + results
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen"),
+            mock.patch(
+                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False] + results
+            ),
         ):
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
@@ -74,8 +84,9 @@ class test_setup_ssh_tunnel(unittest.TestCase):
     def test_raises_tunnel_error_not_system_exit_when_it_never_connects(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
 
-        with mock.patch("fundamentals.ssh_tunnel.Popen"), mock.patch(
-            "fundamentals.ssh_tunnel.is_port_open", return_value=False
+        with (
+            mock.patch("fundamentals.ssh_tunnel.Popen"),
+            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
         ):
             with self.assertRaises(tunnel_error) as context:
                 setup_ssh_tunnel(TUNNEL, self.log)
@@ -85,9 +96,12 @@ class test_setup_ssh_tunnel(unittest.TestCase):
     def test_raises_tunnel_error_when_ssh_cannot_be_started(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
 
-        with mock.patch(
-            "fundamentals.ssh_tunnel.Popen", side_effect=FileNotFoundError("ssh")
-        ), mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False):
+        with (
+            mock.patch(
+                "fundamentals.ssh_tunnel.Popen", side_effect=FileNotFoundError("ssh")
+            ),
+            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+        ):
             with self.assertRaises(tunnel_error):
                 setup_ssh_tunnel(TUNNEL, self.log)
 
@@ -125,8 +139,11 @@ class test_setup_ssh_tunnel(unittest.TestCase):
         ]
         for parameters in unsafe:
             with self.subTest(parameters=parameters):
-                with mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock, mock.patch(
-                    "fundamentals.ssh_tunnel.is_port_open", return_value=False
+                with (
+                    mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock,
+                    mock.patch(
+                        "fundamentals.ssh_tunnel.is_port_open", return_value=False
+                    ),
                 ):
                     with self.assertRaises(tunnel_error):
                         setup_ssh_tunnel(parameters, self.log)

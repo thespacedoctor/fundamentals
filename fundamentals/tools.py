@@ -19,6 +19,7 @@ try:
 except:
     pass
 from collections import OrderedDict
+import logging
 import shutil
 from . import logs as dl
 from .ssh_tunnel import setup_ssh_tunnel
@@ -242,25 +243,25 @@ class tools(object):
                 )
 
         # UNPACK SETTINGS
-        stream = False
+        settingsPath = False
         if "<settingsFile>" in self.arguments and self.arguments["<settingsFile>"]:
-            stream = open(self.arguments["<settingsFile>"], "r")
+            settingsPath = self.arguments["<settingsFile>"]
         elif (
             "<pathToSettingsFile>" in self.arguments
             and self.arguments["<pathToSettingsFile>"]
         ):
-            stream = open(self.arguments["<pathToSettingsFile>"], "r")
+            settingsPath = self.arguments["<pathToSettingsFile>"]
         elif "--settingsFile" in self.arguments and self.arguments["--settingsFile"]:
-            stream = open(self.arguments["--settingsFile"], "r")
+            settingsPath = self.arguments["--settingsFile"]
         elif "--settings" in self.arguments and self.arguments["--settings"]:
-            stream = open(self.arguments["--settings"], "r")
+            settingsPath = self.arguments["--settings"]
         elif (
             "pathToSettingsFile" in self.arguments
             and self.arguments["pathToSettingsFile"]
         ):
-            stream = open(self.arguments["pathToSettingsFile"], "r")
+            settingsPath = self.arguments["pathToSettingsFile"]
         elif "settingsFile" in self.arguments and self.arguments["settingsFile"]:
-            stream = open(self.arguments["settingsFile"], "r")
+            settingsPath = self.arguments["settingsFile"]
         elif (
             (
                 "settingsFile" in self.arguments
@@ -314,13 +315,14 @@ class tools(object):
                             pathToSettings=self.configSettingsPath, create=True
                         )
             if "settingsFile" in self.arguments and self.arguments["settingsFile"]:
-                stream = open(self.arguments["settingsFile"], "r")
+                settingsPath = self.arguments["settingsFile"]
         else:
             pass
 
         # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
-        if stream is not False:
-            astream = stream.read()
+        if settingsPath is not False:
+            with open(settingsPath, "r") as stream:
+                astream = stream.read()
             home = expanduser("~")
             astream = astream.replace("~/", home + "/")
 
@@ -532,13 +534,10 @@ class tools(object):
             try:
                 # COPY THE SETTINGS FILE TO THE REQUESTED LOCATION
                 shutil.copyfile(ds, pathToSettings)
-                try:
-                    readFile = codecs.open(pathToSettings, encoding="utf-8", mode="r")
+                with codecs.open(
+                    pathToSettings, encoding="utf-8", mode="r"
+                ) as readFile:
                     thisData = readFile.read()
-                    readFile.close()
-                except IOError as e:
-                    message = "could not open the file %s" % (pathToSettings,)
-                    raise IOError(message) from e
 
                 # JUST INCASE!
                 thisData = thisData.replace("/Users/Dave", os.getenv("HOME"))
@@ -547,20 +546,18 @@ class tools(object):
                     thisData = thisData.replace(defaultLog, alternativeLogPath)
 
                 # REWRITE CLEANED FILE
-                try:
-                    writeFile = codecs.open(pathToSettings, encoding="utf-8", mode="w")
-                except IOError as e:
-                    message = "could not open the file %s" % (pathToSettings,)
-                    raise IOError(message) from e
-                writeFile.write(thisData)
-                writeFile.close()
-                print(
-                    f"Default settings have been added to '{pathToSettings}'. Tailor these settings before proceeding to run {self.projectName}."
+                with codecs.open(
+                    pathToSettings, encoding="utf-8", mode="w"
+                ) as writeFile:
+                    writeFile.write(thisData)
+            except OSError as e:
+                logging.getLogger(__name__).error(
+                    f"could not create the settings file '{pathToSettings}': {e}"
                 )
-            except:
-                print(
-                    f"Please add any require settings to file '{pathToSettings}' before proceeding to run {self.projectName}."
-                )
+                raise
+            print(
+                f"Default settings have been added to '{pathToSettings}'. Tailor these settings before proceeding to run {self.projectName}."
+            )
             self.arguments["settingsFile"] = pathToSettings
 
         return exists
