@@ -20,13 +20,47 @@ Options:
 from builtins import object
 import sys
 import os
+import re
 import sqlite3 as lite
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import writequery
+from fundamentals.mysql.sql_identifiers import quote_identifier
 
 from datetime import datetime, date, time
+
+# THE START OF A SQLITE CREATE TABLE STATEMENT, UP TO AND INCLUDING THE TABLE NAME
+CREATE_TABLE_HEADER_REGEX = re.compile(
+    r"\A\s*CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?"
+    r'(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|\[[^\]]+\]|\w+)',
+    re.IGNORECASE,
+)
+
+
+# TOKENS OF A SQLITE STATEMENT: STRING LITERALS AND COMMENTS ARE KEPT AS THEY ARE, DOUBLE-QUOTED NAMES ARE CONVERTED
+SQLITE_TOKEN_REGEX = re.compile(
+    r"('(?:[^']|'')*'|--[^\n]*|/\*.*?\*/)" r'|"((?:[^"]|"")*)"',
+    re.DOTALL,
+)
+
+
+def quote_sqlite_identifiers(sqliteSql):
+    """*Return the sqlite SQL with each double-quoted name changed to a MySQL backtick-quoted name*
+
+    String literals and comments are left as they are, so a double quote inside a default value is not changed.
+
+    **Key Arguments**
+
+    - ``sqliteSql`` -- the sqlite SQL text
+    """
+
+    def convert(match):
+        if match.group(1) is not None:
+            return match.group(1)
+        return quote_identifier(match.group(2).replace('""', '"'))
+
+    return SQLITE_TOKEN_REGEX.sub(convert, sqliteSql)
 
 
 def main(arguments=None):
@@ -167,7 +201,17 @@ class sqlite2mysql(object):
             # GENEREATE THE MYSQL CREATE STATEMENTS FOR EACH TABLE
             cur.execute("SELECT sql FROM sqlite_master WHERE name = ?;", (table,))
             createStatement = cur.fetchone()
-            createStatement = createStatement[0].replace('"', "`") + ";"
+            createStatement = createStatement[0]
+            headerMatch = CREATE_TABLE_HEADER_REGEX.match(createStatement)
+            if headerMatch is None:
+                raise ValueError(
+                    "cannot find the table name in the sqlite statement: %s"
+                    % (createStatement,)
+                )
+            # THE BODY IS CONVERTED ON ITS OWN SO THE QUOTED TABLE NAME IS NEVER REWRITTEN
+            createStatement = (
+                quote_sqlite_identifiers(createStatement[headerMatch.end() :]) + ";"
+            )
             if "DEFAULT" not in createStatement:
                 if "primary key(" in createStatement:
                     tmp = createStatement.split("primary key(")
@@ -186,14 +230,6 @@ class sqlite2mysql(object):
             createStatement = createStatement.replace("DEFAULT 'f'", "DEFAULT '0'")
             createStatement = createStatement.replace(",'t'", ",'1'")
             createStatement = createStatement.replace(",'f'", ",'0'")
-            if "CREATE TABLE `" in createStatement:
-                createStatement = createStatement.replace(
-                    "CREATE TABLE `", "CREATE TABLE IF NOT EXISTS `" + self.tablePrefix
-                )
-            else:
-                createStatement = createStatement.replace(
-                    "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS " + self.tablePrefix
-                )
             if ", primary key(" in createStatement:
                 createStatement = createStatement.replace(
                     ", primary key(",
@@ -239,6 +275,12 @@ primary key(""",
                 createStatement = createStatement.replace(
                     "`dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,\n", ""
                 )
+
+            createStatement = (
+                "CREATE TABLE IF NOT EXISTS "
+                + quote_identifier(self.tablePrefix + table)
+                + createStatement
+            )
 
             # GRAB THE DATA TO ADD TO THE MYSQL DATABASE TABLES
             quotedTable = '"' + table.replace('"', '""') + '"'

@@ -9,6 +9,7 @@ import sys
 from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
+from fundamentals.mysql.sql_identifiers import quote_identifier
 from os.path import expanduser
 
 home = expanduser("~")
@@ -120,7 +121,7 @@ class test_sqlite2mysql(unittest.TestCase):
         import fundamentals.mysql
         from fundamentals.mysql import sqlite2mysql
 
-        tableName = "it's a \"table\""
+        tableName = 'it\'s a "table"'
         path = self._make_sqlite_file(tableName)
         this = sqlite2mysql(
             log=log,
@@ -133,7 +134,7 @@ class test_sqlite2mysql(unittest.TestCase):
 
         # ACT
         with (
-            mock.patch.object(sqliteModule, "writequery"),
+            mock.patch.object(sqliteModule, "writequery") as writeQuery,
             mock.patch.object(
                 fundamentals.mysql, "insert_list_of_dictionaries_into_database_tables"
             ) as insertList,
@@ -143,6 +144,13 @@ class test_sqlite2mysql(unittest.TestCase):
         # ASSERT
         kwargs = insertList.call_args.kwargs
         self.assertEqual(kwargs["dbTableName"], this.tablePrefix + tableName)
+        createdTable = quote_identifier(kwargs["dbTableName"])
+        self.assertTrue(
+            writeQuery.call_args.kwargs["sqlQuery"].startswith(
+                "CREATE TABLE IF NOT EXISTS " + createdTable + " ("
+            ),
+            writeQuery.call_args.kwargs["sqlQuery"],
+        )
         self.assertEqual(kwargs["dictList"], [{"name": "row one"}])
 
     def test_sqlite2mysql_closes_sqlite_connection_and_cursor_when_conversion_fails(
@@ -193,6 +201,72 @@ class test_sqlite2mysql(unittest.TestCase):
 
         # ASSERT
         self.assertEqual(sorted(closed), ["connection", "cursor"])
+
+    def _captured_create_statements(self, createSql, tablePrefix="Pre"):
+        import sqlite3
+        import fundamentals.mysql
+        from fundamentals.mysql import sqlite2mysql
+
+        path = pathToOutputDir + "/sweep2_ddl_%d.sqlite" % (abs(hash(createSql)),)
+        if os.path.exists(path):
+            os.remove(path)
+        con = sqlite3.connect(path)
+        for statement in createSql:
+            con.execute(statement)
+        con.commit()
+        con.close()
+
+        this = sqlite2mysql(
+            log=log,
+            settings=settings,
+            pathToSqlite=path,
+            tablePrefix=tablePrefix,
+            dbConn=dbConn,
+        )
+        sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
+        with (
+            mock.patch.object(sqliteModule, "writequery") as writeQuery,
+            mock.patch.object(
+                fundamentals.mysql, "insert_list_of_dictionaries_into_database_tables"
+            ),
+        ):
+            this.convert_sqlite_to_mysql()
+        return [call.kwargs["sqlQuery"] for call in writeQuery.call_args_list]
+
+    def test_sqlite2mysql_quotes_table_prefix_in_create_statement(self):
+        # ARRANGE
+        hostilePrefix = "safe` (x INT); DROP TABLE victim; -- "
+        createSql = ('CREATE TABLE "Child" ("Tag" TEXT NOT NULL)',)
+
+        # ACT
+        statements = self._captured_create_statements(createSql, hostilePrefix)
+
+        # ASSERT
+        self.assertEqual(len(statements), 1)
+        expectedHeader = "CREATE TABLE IF NOT EXISTS `safe`` (x INT); DROP TABLE victim; -- _Child` ("
+        self.assertTrue(statements[0].startswith(expectedHeader), statements[0])
+
+    def test_sqlite2mysql_keeps_double_quotes_inside_string_literals(self):
+        # ARRANGE
+        createSql = (
+            'CREATE TABLE "Child" ("Note" TEXT DEFAULT \'say "hi"\', "Tag" TEXT)',
+        )
+
+        # ACT
+        statements = self._captured_create_statements(createSql)
+
+        # ASSERT
+        self.assertIn("`Note` TEXT DEFAULT 'say \"hi\"', `Tag` TEXT", statements[0])
+
+    def test_sqlite2mysql_escapes_backtick_inside_column_name(self):
+        # ARRANGE
+        createSql = ('CREATE TABLE "Child" ("odd`name" TEXT)',)
+
+        # ACT
+        statements = self._captured_create_statements(createSql)
+
+        # ASSERT
+        self.assertIn("(`odd``name` TEXT", statements[0])
 
     def test_sqlite2mysql_function(self):
 
