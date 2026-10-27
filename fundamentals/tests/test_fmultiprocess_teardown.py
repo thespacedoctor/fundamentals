@@ -1,6 +1,10 @@
 """Tests that ``fmultiprocess`` tears its worker pool down however the map ends.
 
 The tests are plain pytest functions and need no settings file or database.
+
+Each test finds the pool's workers through the ``pool_workers`` fixture, which records every
+``multiprocess`` pool created during the test. Other child processes of the test run (for
+example under pytest-xdist) are never counted, so the file is safe to run in parallel.
 """
 
 import contextlib
@@ -13,7 +17,8 @@ import sys
 import textwrap
 import time
 
-import psutil
+import multiprocess
+import multiprocess.pool as pool_module
 import pytest
 
 # HOW LONG A POOL WORKER GETS TO EXIT ON ITS OWN BEFORE IT COUNTS AS LEAKED
@@ -64,45 +69,50 @@ def cyclic_gc_disabled():
         gc.collect()
 
 
-def is_pool_worker_candidate(child):
-    """Return True for a running child that is not the interpreter's resource tracker.
+class PoolWorkerTracker:
+    """Records the pools created during a test and reports their workers that still run."""
 
-    The first lock or pool a process creates starts one long-lived resource tracker. It is
-    not a pool worker and is meant to outlive the call.
-    """
+    def __init__(self):
+        self.pools = []
+
+    def alive(self):
+        return [
+            worker
+            for pool in self.pools
+            for worker in list(getattr(pool, "_pool", []))
+            if worker.is_alive()
+        ]
+
+    def alive_after_grace(self):
+        deadline = time.time() + WORKER_EXIT_GRACE_SECONDS
+        while self.alive() and time.time() < deadline:
+            time.sleep(0.05)
+        return self.alive()
+
+    def kill_all(self):
+        """Stop every worker this test started, so none outlives a failing test."""
+        gc.collect()
+        for worker in self.alive():
+            with contextlib.suppress(Exception):
+                worker.kill()
+        self.alive_after_grace()
+
+
+@pytest.fixture
+def pool_workers(monkeypatch):
+    tracker = PoolWorkerTracker()
+    originalInit = pool_module.Pool.__init__
+
+    def recordingInit(self, *args, **kwargs):
+        # RECORD BEFORE CONSTRUCTION SO A POOL THAT FAILS PART-WAY IS STILL TRACKED
+        tracker.pools.append(self)
+        originalInit(self, *args, **kwargs)
+
+    monkeypatch.setattr(pool_module.Pool, "__init__", recordingInit)
     try:
-        isTracker = any("resource_tracker" in part for part in child.cmdline())
-        return (
-            child.is_running()
-            and child.status() != psutil.STATUS_ZOMBIE
-            and not isTracker
-        )
-    except psutil.NoSuchProcess:
-        return False
-
-
-def live_children():
-    return [
-        child
-        for child in psutil.Process().children(recursive=True)
-        if is_pool_worker_candidate(child)
-    ]
-
-
-def children_still_alive_after_grace(pidsBefore):
-    candidates = [child for child in live_children() if child.pid not in pidsBefore]
-    _, stillAlive = psutil.wait_procs(candidates, timeout=WORKER_EXIT_GRACE_SECONDS)
-    return [child for child in stillAlive if is_pool_worker_candidate(child)]
-
-
-def stop_children_not_in(pidsBefore):
-    """Stop every child this test started, so no worker outlives a failing test."""
-    gc.collect()
-    started = [child for child in live_children() if child.pid not in pidsBefore]
-    for child in started:
-        with contextlib.suppress(psutil.NoSuchProcess):
-            child.kill()
-    psutil.wait_procs(started, timeout=WORKER_EXIT_GRACE_SECONDS)
+        yield tracker
+    finally:
+        tracker.kill_all()
 
 
 def test_fmultiprocess_returns_results_in_input_order(log):
@@ -120,14 +130,32 @@ def test_fmultiprocess_returns_results_in_input_order(log):
     assert results == [value * 2 for value in inputArray]
 
 
-def test_fmultiprocess_stops_its_workers_when_a_task_raises(log, cyclic_gc_disabled):
+def test_fmultiprocess_stops_its_workers_when_a_task_raises(
+    log, cyclic_gc_disabled, pool_workers
+):
     from fundamentals import fmultiprocess
 
-    # ARRANGE
-    pidsBefore = {child.pid for child in live_children()}
+    # ACT
+    with pytest.raises(ValueError, match="synthetic task failure"):
+        fmultiprocess(
+            log=log,
+            function=task_that_fails_once,
+            inputArray=list(range(8)),
+            poolSize=2,
+        )
 
-    try:
-        # ACT
+    # ASSERT: THE CALL REALLY STARTED A POOL, AND NONE OF ITS WORKERS STILL RUNS
+    assert len(pool_workers.pools) == 1
+    assert pool_workers.alive_after_grace() == []
+
+
+def test_fmultiprocess_stops_its_workers_when_three_calls_fail(
+    log, cyclic_gc_disabled, pool_workers
+):
+    from fundamentals import fmultiprocess
+
+    # ACT
+    for _ in range(3):
         with pytest.raises(ValueError, match="synthetic task failure"):
             fmultiprocess(
                 log=log,
@@ -135,89 +163,144 @@ def test_fmultiprocess_stops_its_workers_when_a_task_raises(log, cyclic_gc_disab
                 inputArray=list(range(8)),
                 poolSize=2,
             )
-        leaked = children_still_alive_after_grace(pidsBefore)
 
-        # ASSERT
-        assert leaked == []
-    finally:
-        stop_children_not_in(pidsBefore)
-
-
-def test_fmultiprocess_stops_its_workers_when_three_calls_fail(log, cyclic_gc_disabled):
-    from fundamentals import fmultiprocess
-
-    # ARRANGE
-    pidsBefore = {child.pid for child in live_children()}
-
-    try:
-        # ACT
-        for _ in range(3):
-            with pytest.raises(ValueError, match="synthetic task failure"):
-                fmultiprocess(
-                    log=log,
-                    function=task_that_fails_once,
-                    inputArray=list(range(8)),
-                    poolSize=2,
-                )
-        leaked = children_still_alive_after_grace(pidsBefore)
-
-        # ASSERT
-        assert leaked == []
-    finally:
-        stop_children_not_in(pidsBefore)
+    # ASSERT
+    assert len(pool_workers.pools) == 3
+    assert pool_workers.alive_after_grace() == []
 
 
 def test_fmultiprocess_stops_its_workers_when_the_progress_bar_times_out(
-    log, cyclic_gc_disabled
+    log, cyclic_gc_disabled, pool_workers
 ):
     from fundamentals import fmultiprocess
 
     # ARRANGE
-    pidsBefore = {child.pid for child in live_children()}
     startTime = time.time()
 
-    try:
-        # ACT
-        with pytest.raises(TimeoutError, match="timeout limit"):
-            fmultiprocess(
-                log=log,
-                function=task_that_sleeps,
-                inputArray=[1, 2],
-                poolSize=2,
-                timeout=1,
-                progressBar=True,
-            )
-        leaked = children_still_alive_after_grace(pidsBefore)
+    # ACT
+    with pytest.raises(TimeoutError, match="timeout limit"):
+        fmultiprocess(
+            log=log,
+            function=task_that_sleeps,
+            inputArray=[1, 2],
+            poolSize=2,
+            timeout=1,
+            progressBar=True,
+        )
+    elapsed = time.time() - startTime
 
-        # ASSERT: THE TEARDOWN RETURNED PROMPTLY AND LEFT NO WORKER BEHIND
-        assert leaked == []
-        assert time.time() - startTime < LONG_TASK_SECONDS / 2
-    finally:
-        stop_children_not_in(pidsBefore)
+    # ASSERT: THE TEARDOWN RETURNED PROMPTLY AND LEFT NO WORKER BEHIND
+    assert len(pool_workers.pools) == 1
+    assert elapsed < LONG_TASK_SECONDS / 2
+    assert pool_workers.alive_after_grace() == []
 
 
-def test_fmultiprocess_stops_its_workers_when_get_times_out(log, cyclic_gc_disabled):
+def test_fmultiprocess_stops_its_workers_when_get_times_out(
+    log, cyclic_gc_disabled, pool_workers
+):
     from fundamentals import fmultiprocess
 
     # ARRANGE
-    pidsBefore = {child.pid for child in live_children()}
+    startTime = time.time()
 
-    try:
-        # ACT
-        with pytest.raises(Exception, match=""):
-            fmultiprocess(
-                log=log,
-                function=task_that_sleeps,
-                inputArray=[1, 2],
-                poolSize=2,
-                timeout=1,
-            )
-        leaked = children_still_alive_after_grace(pidsBefore)
+    # ACT
+    with pytest.raises(multiprocess.TimeoutError):
+        fmultiprocess(
+            log=log,
+            function=task_that_sleeps,
+            inputArray=[1, 2],
+            poolSize=2,
+            timeout=1,
+        )
+    elapsed = time.time() - startTime
 
-        # ASSERT
-        assert leaked == []
-    finally:
-        stop_children_not_in(pidsBefore)
+    # ASSERT: THE TEARDOWN RETURNED PROMPTLY AND LEFT NO WORKER BEHIND
+    assert len(pool_workers.pools) == 1
+    assert elapsed < LONG_TASK_SECONDS / 2
+    assert pool_workers.alive_after_grace() == []
+
+
+def test_fmultiprocess_stops_its_workers_when_map_async_fails(
+    log, cyclic_gc_disabled, pool_workers, monkeypatch
+):
+    from fundamentals import fmultiprocess
+
+    # ARRANGE
+    def failingMapAsync(self, *args, **kwargs):
+        raise RuntimeError("synthetic map_async failure")
+
+    monkeypatch.setattr(pool_module.Pool, "map_async", failingMapAsync)
+
+    # ACT
+    with pytest.raises(RuntimeError, match="synthetic map_async failure"):
+        fmultiprocess(
+            log=log, function=task_that_doubles, inputArray=[1, 2], poolSize=2
+        )
+
+    # ASSERT
+    assert len(pool_workers.pools) == 1
+    assert pool_workers.alive_after_grace() == []
+
+
+def test_fmultiprocess_stops_started_workers_when_interrupted_while_building_the_pool(
+    log, cyclic_gc_disabled, pool_workers, monkeypatch
+):
+    from fundamentals import fmultiprocess
+
+    # ARRANGE: THE WORKERS START, THEN CTRL-C ARRIVES BEFORE THE POOL CONSTRUCTOR RETURNS
+    originalRepopulate = pool_module.Pool._repopulate_pool
+
+    def interruptedRepopulate(self):
+        originalRepopulate(self)
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(pool_module.Pool, "_repopulate_pool", interruptedRepopulate)
+
+    # ACT
+    with pytest.raises(KeyboardInterrupt):
+        fmultiprocess(
+            log=log, function=task_that_doubles, inputArray=[1, 2], poolSize=2
+        )
+
+    # ASSERT: WORKERS REALLY STARTED, AND NONE OF THEM STILL RUNS
+    assert sum(len(pool._pool) for pool in pool_workers.pools) >= 1
+    assert pool_workers.alive_after_grace() == []
+
+
+def test_fmultiprocess_terminates_the_pool_when_interrupted_during_clean_shutdown(
+    log, cyclic_gc_disabled, pool_workers, monkeypatch
+):
+    from fundamentals import fmultiprocess
+
+    # ARRANGE: THE MAP SUCCEEDS, THEN CTRL-C ARRIVES DURING THE FIRST join()
+    originalJoin = pool_module.Pool.join
+    originalTerminate = pool_module.Pool.terminate
+    joinCalls = []
+    terminateCalls = []
+
+    def interruptedJoin(self):
+        joinCalls.append(self)
+        if len(joinCalls) == 1:
+            raise KeyboardInterrupt
+        originalJoin(self)
+
+    def recordingTerminate(self):
+        terminateCalls.append(self)
+        originalTerminate(self)
+
+    monkeypatch.setattr(pool_module.Pool, "join", interruptedJoin)
+    monkeypatch.setattr(pool_module.Pool, "terminate", recordingTerminate)
+
+    # ACT
+    with pytest.raises(KeyboardInterrupt):
+        fmultiprocess(
+            log=log, function=task_that_doubles, inputArray=[1, 2], poolSize=2
+        )
+
+    # ASSERT: THE POOL WAS TERMINATED AND JOINED, AND NO WORKER SURVIVED
+    assert len(terminateCalls) >= 1
+    assert len(joinCalls) >= 2
+    assert pool_workers.alive_after_grace() == []
 
 
 INTERRUPT_SCRIPT = textwrap.dedent(
@@ -267,6 +350,9 @@ INTERRUPT_SCRIPT = textwrap.dedent(
 ).format(longTask=LONG_TASK_SECONDS)
 
 
+# "SELF" SIGNALS ONLY THE PARENT AND IS THE DISCRIMINATING CASE: IT FAILS ON THE OLD CODE, WHICH
+# LEFT THE IDLE WORKERS RUNNING. "GROUP" SIGNALS THE WORKERS TOO, AS A REAL CTRL-C DOES; IT IS THE
+# REALISTIC REGRESSION CASE AND PASSES ON BOTH THE OLD AND THE FIXED CODE
 @pytest.mark.parametrize("signalTarget", ["self", "group"])
 def test_fmultiprocess_tears_the_pool_down_and_returns_on_keyboard_interrupt(
     tmp_path, signalTarget

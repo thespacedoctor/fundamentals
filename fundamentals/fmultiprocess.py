@@ -12,6 +12,47 @@ import os
 os.environ["TERM"] = "vt100"
 
 
+def _guarded_pool_class():
+    """Return a ``multiprocess`` pool class that stops its own workers if construction is interrupted.
+
+    ``Pool.__init__`` stops workers it has already started only for an ``Exception``, so a
+    ``KeyboardInterrupt`` raised part-way through construction leaves them running.
+    """
+    from multiprocess.pool import Pool
+
+    class GuardedPool(Pool):
+        def __init__(self, *args, **kwargs):
+            try:
+                super().__init__(*args, **kwargs)
+            except BaseException:
+                workers = list(getattr(self, "_pool", []))
+                for worker in workers:
+                    if worker.exitcode is None:
+                        worker.terminate()
+                for worker in workers:
+                    worker.join()
+                raise
+
+    return GuardedPool
+
+
+def _shut_down_pool(pool, isMapComplete):
+    """Close the pool after a complete map and terminate it after any other exit.
+
+    An interrupt during the clean ``close`` and ``join`` also ends in ``terminate`` and ``join``.
+    """
+    try:
+        if isMapComplete:
+            pool.close()
+        else:
+            pool.terminate()
+        pool.join()
+    except BaseException:
+        pool.terminate()
+        pool.join()
+        raise
+
+
 def fmultiprocess(
     log,
     function,
@@ -69,7 +110,9 @@ def fmultiprocess(
 
     if turnOffMP == False:
         import psutil
-        from multiprocess import cpu_count, Pool
+        from multiprocess import cpu_count
+
+        Pool = _guarded_pool_class()
 
         from ctypes import c_int32
 
@@ -140,15 +183,18 @@ def fmultiprocess(
             timeout = 60 * 60
         start_time = time.time()
 
-        if poolSize:
-            p = Pool(processes=poolSize, initializer=startFunc, initargs=(log, l, c))
-        else:
-            p = Pool(initializer=startFunc, initargs=(log, l, c))
-
         # ANY EXIT OTHER THAN A CLEAN MAP (A RAISING TASK, A TIMEOUT, CTRL-C) MUST
         # TERMINATE THE POOL, OR ITS WORKERS OUTLIVE THE CALL AND HANG THE INTERPRETER AT EXIT
+        p = None
         isMapComplete = False
         try:
+            if poolSize:
+                p = Pool(
+                    processes=poolSize, initializer=startFunc, initargs=(log, l, c)
+                )
+            else:
+                p = Pool(initializer=startFunc, initargs=(log, l, c))
+
             futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
             if progressBar:
                 import tqdm
@@ -179,11 +225,8 @@ def fmultiprocess(
                 raise
             isMapComplete = True
         finally:
-            if isMapComplete:
-                p.close()
-            else:
-                p.terminate()
-            p.join()
+            if p is not None:
+                _shut_down_pool(p, isMapComplete)
 
     else:
         resultArray = []
