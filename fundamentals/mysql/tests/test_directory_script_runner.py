@@ -6,6 +6,9 @@ import shutil
 import unittest
 import yaml
 import sys
+import stat
+import tempfile
+from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -178,3 +181,111 @@ class test_directory_script_runner(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
+
+
+FAKE_MYSQL = """#!/bin/sh
+printf '%s\\n' "$@" > "__OUT__/args.txt"
+printf '%s' "$FAKE_TEST_VAR" > "__OUT__/var.txt"
+sleep 0.3
+cat > "__OUT__/stdin.txt"
+"""
+
+
+class test_directory_script_runner_subprocess(unittest.TestCase):
+    """run the loginPath branch against a fake `mysql` executable"""
+
+    def setUp(self):
+        self.workDir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.workDir, True)
+        self.scriptDir = os.path.join(self.workDir, "scripts")
+        os.makedirs(self.scriptDir)
+        binDir = os.path.join(self.workDir, "bin")
+        os.makedirs(binDir)
+        fakePath = os.path.join(binDir, "mysql")
+        with open(fakePath, "w") as f:
+            f.write(FAKE_MYSQL.replace("__OUT__", self.workDir))
+        os.chmod(fakePath, os.stat(fakePath).st_mode | stat.S_IEXEC)
+
+        envPatch = mock.patch.dict(
+            os.environ,
+            {
+                "PATH": binDir + ":" + os.environ["PATH"],
+                "FAKE_TEST_VAR": "kept",
+            },
+        )
+        envPatch.start()
+        self.addCleanup(envPatch.stop)
+
+        cwd = os.getcwd()
+        os.chdir(self.workDir)
+        self.addCleanup(os.chdir, cwd)
+
+    def _write_script(self, name, content="SELECT 1;"):
+        path = os.path.join(self.scriptDir, name)
+        with open(path, "w") as f:
+            f.write(content)
+        return path
+
+    def _read(self, name):
+        with open(os.path.join(self.workDir, name)) as f:
+            return f.read()
+
+    def _run(self, **kwargs):
+        from fundamentals.mysql import directory_script_runner
+
+        directory_script_runner(
+            log=log,
+            pathToScriptDirectory=self.scriptDir,
+            databaseName=kwargs.pop("databaseName", "unit_tests"),
+            loginPath=kwargs.pop("loginPath", "unittesting"),
+            **kwargs,
+        )
+
+    def test_does_not_execute_shell_syntax_in_script_filename(self):
+        self._write_script("a$(touch injected_marker).sql", "SELECT 42;")
+
+        self._run()
+
+        self.assertFalse(os.path.exists(os.path.join(self.workDir, "injected_marker")))
+        self.assertEqual(self._read("stdin.txt"), "SELECT 42;")
+
+    def test_passes_login_path_and_database_name_as_literal_arguments(self):
+        self._write_script("a.sql")
+
+        self._run(loginPath="lp;touch m1", databaseName="db; touch m2")
+
+        self.assertEqual(
+            self._read("args.txt").splitlines(),
+            ["--login-path=lp;touch m1", "--force", "db; touch m2"],
+        )
+        self.assertFalse(os.path.exists(os.path.join(self.workDir, "m1")))
+        self.assertFalse(os.path.exists(os.path.join(self.workDir, "m2")))
+
+    def test_delete_mode_waits_for_mysql_before_removing_script(self):
+        scriptPath = self._write_script("a.sql", "SELECT 7;")
+
+        self._run(waitForResult="delete")
+
+        self.assertEqual(self._read("stdin.txt"), "SELECT 7;")
+        self.assertFalse(os.path.exists(scriptPath))
+
+    def test_keeps_existing_environment_variables_for_mysql(self):
+        self._write_script("a.sql")
+
+        self._run()
+
+        self.assertEqual(self._read("var.txt"), "kept")
+
+    def test_does_not_raise_when_path_and_home_are_unset(self):
+        self._write_script("a.sql")
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        fakeProcess = mock.Mock()
+        fakeProcess.communicate.return_value = (b"", b"")
+
+        with mock.patch.dict(os.environ):
+            del os.environ["PATH"]
+            os.environ.pop("HOME", None)
+            with mock.patch.object(module, "Popen", return_value=fakeProcess) as popen:
+                self._run()
+
+        self.assertIn("/usr/local/bin", popen.call_args.kwargs["env"]["PATH"])
