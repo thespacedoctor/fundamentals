@@ -71,6 +71,23 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         except:
             normalDist = []
 
+    def test_mask_length_matches_array_length_for_all_window_sizes(self):
+        import numpy as np
+        from fundamentals.stats import rolling_window_sigma_clip
+
+        rng = np.random.default_rng(42)
+        for windowSize in [5, 6, 10, 11, 12]:
+            for arrayLength in [windowSize, windowSize + 1, windowSize + 2, 20, 50]:
+                array = list(rng.normal(loc=100, scale=3.0, size=arrayLength))
+                arrayMask = rolling_window_sigma_clip(
+                    log=log, array=array, clippingSigma=2.2, windowSize=windowSize
+                )
+                self.assertEqual(
+                    len(arrayMask),
+                    len(array),
+                    "windowSize=%s arrayLength=%s" % (windowSize, arrayLength),
+                )
+
     def test_rolling_window_sigma_clip_function_exception(self):
 
         from fundamentals.stats import rolling_window_sigma_clip

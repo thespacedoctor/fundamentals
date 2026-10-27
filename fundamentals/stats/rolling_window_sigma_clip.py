@@ -50,7 +50,6 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
 
     from astropy.stats import sigma_clip, mad_std
 
-    midWindow = int((windowSize + 1) / 2)
     # ACCOMODATE SMALL LIST SIZES
     if len(array) < 5:
         return len(array) * [False]
@@ -64,14 +63,12 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
             stdfunc=mad_std,
         )
         return list(masked.mask)
-    startOfWindow = 0
-    endOfWindow = windowSize
+    # THE WINDOW CENTRE IS THE ELEMENT WHOSE MASK IS TAKEN FROM EACH INTERIOR WINDOW
+    windowCentre = int(windowSize / 2)
+    numWindows = len(array) - windowSize + 1
     maskedArray = []
-    dataIndex = 0
-    while len(array) >= endOfWindow:
-        arrayWindow = array[startOfWindow:endOfWindow]
-        startOfWindow += 1
-        endOfWindow += 1
+    for startOfWindow in range(numWindows):
+        arrayWindow = array[startOfWindow : startOfWindow + windowSize]
         masked = sigma_clip(
             arrayWindow,
             sigma_lower=clippingSigma,
@@ -80,18 +77,15 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
             cenfunc="median",
             stdfunc=mad_std,
         )
+        windowMask = list(masked.mask)
 
-        if dataIndex == 0:
-            # 0,1,2...midWindow-1
-            maskedArray += list(masked.mask)[0:midWindow]
-            dataIndex += midWindow
-        elif len(array) == endOfWindow - 1:
-            # -midWindow...-2,-1
-            maskedArray += list(masked.mask)[-midWindow:]
-            dataIndex += midWindow
-        else:
-            maskedArray += [list(masked.mask)[midWindow - 1]]
-            dataIndex += 1
+        if startOfWindow == 0:
+            # HEAD: 0,1,2...windowCentre-1
+            maskedArray += windowMask[:windowCentre]
+        maskedArray += [windowMask[windowCentre]]
+        if startOfWindow == numWindows - 1:
+            # TAIL: -(windowSize-windowCentre-1)...-2,-1
+            maskedArray += windowMask[windowCentre + 1 :]
 
     log.debug("completed the ``rolling_window_sigma_clip`` function")
     return maskedArray
