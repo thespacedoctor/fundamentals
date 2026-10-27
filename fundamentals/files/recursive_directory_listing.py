@@ -7,11 +7,12 @@ Author
 : David Young
 """
 
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
+
+VALID_WHAT_TO_LIST = ("all", "dirs", "files")
 
 
 def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
@@ -62,49 +63,31 @@ def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
     """
     log.debug("starting the ``recursive_directory_listing`` function")
 
-    ## VARIABLES ##
+    if whatToList not in VALID_WHAT_TO_LIST:
+        raise ValueError(
+            'could not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]'
+            % (baseFolderPath,)
+        )
+
+    def _log_unreadable(error):
+        log.warning("skipping unreadable directory: %s" % (error,))
+
     matchedPathList = []
-    parentDirectoryList = [
-        baseFolderPath,
-    ]
-
-    count = 0
-    while os.listdir(baseFolderPath) and count < 20:
-        count += 1
-
-        while len(parentDirectoryList) != 0:
-            childDirList = []
-            for parentDir in parentDirectoryList:
-                try:
-                    thisDirList = os.listdir(parentDir)
-                except Exception as e:
-                    log.error(e)
-                    continue
-
-                for d in thisDirList:
-                    fullPath = os.path.join(parentDir, d)
-
-                    if whatToList == "all":
-                        matched = True
-                    elif whatToList == "dirs":
-                        matched = os.path.isdir(fullPath)
-                    elif whatToList == "files":
-                        matched = os.path.isfile(fullPath)
-                    else:
-                        log.error(
-                            'cound not list files in %s, `whatToList` variable incorrect: [ "files" | "dirs" | "all" ]'
-                            % (baseFolderPath,)
-                        )
-                        sys.exit(0)
-
-                    if matched:
-                        matchedPathList.append(fullPath)
-
-                    # UPDATE DIRECTORY LISTING
-                    if os.path.isdir(fullPath):
-                        childDirList.append(fullPath)
-
-                parentDirectoryList = childDirList
+    for parentDir, dirNames, fileNames in os.walk(
+        baseFolderPath, followlinks=False, onerror=_log_unreadable
+    ):
+        # SYMLINKED DIRECTORIES APPEAR IN dirNames BUT ARE NOT DESCENDED INTO
+        if whatToList in ("all", "dirs"):
+            matchedPathList.extend(os.path.join(parentDir, d) for d in dirNames)
+        if whatToList == "all":
+            matchedPathList.extend(os.path.join(parentDir, f) for f in fileNames)
+        elif whatToList == "files":
+            # EXCLUDE BROKEN SYMLINKS AND SPECIAL FILES, AS BEFORE
+            matchedPathList.extend(
+                fullPath
+                for fullPath in (os.path.join(parentDir, f) for f in fileNames)
+                if os.path.isfile(fullPath)
+            )
 
     log.debug("completed the ``recursive_directory_listing`` function")
     return matchedPathList
