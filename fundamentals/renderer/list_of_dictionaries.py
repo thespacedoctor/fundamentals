@@ -492,7 +492,7 @@ class list_of_dictionaries(object):
 
         this output the following:
 
-        ```plain
+        ```text
         INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("belfast, uk" ,"2016-09-14T16:21:36" ,"daisy" ,"dog")  ON DUPLICATE KEY UPDATE  address="belfast, uk", dateCreated="2016-09-14T16:21:36", owner="daisy", pet="dog" ;
         INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("the moon" ,"2016-09-14T16:21:36" ,"john" ,"snake")  ON DUPLICATE KEY UPDATE  address="the moon", dateCreated="2016-09-14T16:21:36", owner="john", pet="snake" ;
         INSERT INTO `testing_table` (address,dateCreated,owner,pet) VALUES ("larne" ,"2016-09-14T16:21:36" ,"susan" ,"crocodile")  ON DUPLICATE KEY UPDATE  address="larne", dateCreated="2016-09-14T16:21:36", owner="susan", pet="crocodile" ;

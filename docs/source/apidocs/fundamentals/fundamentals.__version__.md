@@ -26,7 +26,7 @@
 ````{py:data} __version__
 :canonical: fundamentals.__version__.__version__
 :value: >
-   '2.7.9.dev5'
+   '2.8.3'
 
 ```{autodoc2-docstring} fundamentals.__version__.__version__
 ```

@@ -19,6 +19,10 @@
   - ```{autodoc2-docstring} fundamentals.cl_utils.main
     :summary:
     ```
+* - {py:obj}`open_file <fundamentals.cl_utils.open_file>`
+  - ```{autodoc2-docstring} fundamentals.cl_utils.open_file
+    :summary:
+    ```
 * - {py:obj}`tab_complete <fundamentals.cl_utils.tab_complete>`
   - ```{autodoc2-docstring} fundamentals.cl_utils.tab_complete
     :summary:
@@ -31,6 +35,13 @@
 :canonical: fundamentals.cl_utils.main
 
 ```{autodoc2-docstring} fundamentals.cl_utils.main
+```
+````
+
+````{py:function} open_file(path, log)
+:canonical: fundamentals.cl_utils.open_file
+
+```{autodoc2-docstring} fundamentals.cl_utils.open_file
 ```
 ````
 

@@ -291,7 +291,7 @@ class yaml_to_database(object):
             dbConn=dbConn
         )
         yaml2db.add_yaml_file_content_to_database(
-            filepath=${1:"/path/to/file.yaml"},
+            filepath="/path/to/file.yaml",
             deleteFile=True
         )
         ```

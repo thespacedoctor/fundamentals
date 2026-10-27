@@ -37,6 +37,22 @@ Bases: {py:obj}`object`
 ```{autodoc2-docstring} fundamentals.files.fileChunker.fileChunker.__init__
 ```
 
+````{py:method} __enter__()
+:canonical: fundamentals.files.fileChunker.fileChunker.__enter__
+
+```{autodoc2-docstring} fundamentals.files.fileChunker.fileChunker.__enter__
+```
+
+````
+
+````{py:method} __exit__(exc_type, exc_value, traceback)
+:canonical: fundamentals.files.fileChunker.fileChunker.__exit__
+
+```{autodoc2-docstring} fundamentals.files.fileChunker.fileChunker.__exit__
+```
+
+````
+
 ````{py:method} __iter__()
 :canonical: fundamentals.files.fileChunker.fileChunker.__iter__
 
@@ -49,6 +65,14 @@ Bases: {py:obj}`object`
 :canonical: fundamentals.files.fileChunker.fileChunker.__next__
 
 ```{autodoc2-docstring} fundamentals.files.fileChunker.fileChunker.__next__
+```
+
+````
+
+````{py:method} close()
+:canonical: fundamentals.files.fileChunker.fileChunker.close
+
+```{autodoc2-docstring} fundamentals.files.fileChunker.fileChunker.close
 ```
 
 ````

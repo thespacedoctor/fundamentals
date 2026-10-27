@@ -27,6 +27,10 @@
 :class: autosummary longtable
 :align: left
 
+* - {py:obj}`BENIGN_WRITE_MESSAGES <fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES>`
+  - ```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES
+    :summary:
+    ```
 * - {py:obj}`count <fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.count>`
   - ```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.count
     :summary:
@@ -46,6 +50,16 @@
 ````
 
 ### API
+
+````{py:data} BENIGN_WRITE_MESSAGES
+:canonical: fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES
+:value: >
+   ('', 'duplicate key error')
+
+```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES
+```
+
+````
 
 ````{py:data} count
 :canonical: fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.count
@@ -67,7 +81,7 @@
 
 ````
 
-````{py:function} insert_list_of_dictionaries_into_database_tables(dbConn, log, dictList, dbTableName, uniqueKeyList=[], dateModified=False, dateCreated=True, batchSize=2500, replace=False, dbSettings=False)
+````{py:function} insert_list_of_dictionaries_into_database_tables(dbConn, log, dictList, dbTableName, uniqueKeyList=None, dateModified=False, dateCreated=True, batchSize=2500, replace=False, dbSettings=False)
 :canonical: fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.insert_list_of_dictionaries_into_database_tables
 
 ```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.insert_list_of_dictionaries_into_database_tables
