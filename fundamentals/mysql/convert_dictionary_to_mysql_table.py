@@ -13,9 +13,10 @@ from fundamentals import times
 from fundamentals.mysql.sql_identifiers import (
     normalise_column_name,
     quote_identifier,
-    quote_identifier_for_format,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql.sql_inserts import build_batch_insert_command
+from fundamentals.mysql.sql_values import null_if_missing
 from pymysql.converters import escape_item
 import collections as c
 import datetime
@@ -38,10 +39,9 @@ def _sql_literal(value):
 
 
 def _database_value(value):
-    """*return the value as it should be stored: None and empty strings become NULL (None), numbers and strings are kept, anything else is stored as text*"""
-    if value is None or value == "":
-        return None
-    if isinstance(value, (str, int, float, bool)):
+    """*return the value as it should be stored: missing values become NULL (None), numbers and strings are kept, anything else is stored as text*"""
+    value = null_if_missing(value)
+    if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
 
@@ -61,32 +61,6 @@ def _remove_conversion_noise(value):
     ]:
         value = value.replace(noise, "")
     return value
-
-
-def _build_batch_insert(
-    insertVerb, dbTableName, formattedKeyList, values, replace, dateCreated
-):
-    """*build an insert command with ``%s`` placeholders, and the tuple of values to bind to it*
-
-    **Return**
-
-    - ``insertCommand``, ``valueTuple`` -- the command and the values to bind
-    """
-    quotedKeys = [quote_identifier_for_format(k) for k in formattedKeyList]
-    placeholders = ", ".join(["%s"] * len(values))
-    insertCommand = "%s INTO %s (%s%s) VALUES (%s%s)" % (
-        insertVerb,
-        quote_identifier_for_format(dbTableName),
-        ",".join(quotedKeys),
-        ", dateCreated" if dateCreated else "",
-        placeholders,
-        ", NOW()" if dateCreated else "",
-    )
-    if replace:
-        insertCommand += " ON DUPLICATE KEY UPDATE " + ", ".join(
-            "%s=VALUES(%s)" % (k, k) for k in quotedKeys
-        )
-    return insertCommand, tuple(values)
 
 
 def _build_literal_insert(
@@ -277,7 +251,6 @@ def convert_dictionary_to_mysql_table(
                 raise ValueError(message)
 
         for k, v in list(dictionary.items()):
-            # log.debug('k: %s, v: %s' % (k, v,))
             if isinstance(v, list) and len(v) != 2:
                 message = (
                     'Please make sure the list values in "dictionary" 2 items in length'
@@ -413,9 +386,6 @@ def convert_dictionary_to_mysql_table(
                 + _sql_literal(dbTableName)
             )
             try:
-                # log.debug('checking if the column '+formattedKey+' exists
-                # in the '+dbTableName+' table')
-
                 rows = readquery(
                     log=log,
                     sqlQuery=colExists,
@@ -435,7 +405,6 @@ def convert_dictionary_to_mysql_table(
                 if not isinstance(value, list):
                     value = [value]
                 if reDatetime.search(str(value[0])):
-                    # log.debug('Ok - a datetime string was found')
                     qCreateColumn += " datetime DEFAULT NULL"
                 elif (
                     formattedKey == "updated_parsed"
@@ -474,9 +443,6 @@ def convert_dictionary_to_mysql_table(
                 elif isinstance(value[0], list):
                     qCreateColumn += " varchar(1024) DEFAULT NULL"
                 else:
-                    # log.debug('Do not know what format to add this key in
-                    # MySQL - removing from dictionary: %s, %s'
-                    # % (key, type(value[0])))
                     formattedKeyList.pop()
                     myValues.pop()
                     qCreateColumn = None
@@ -499,8 +465,6 @@ def convert_dictionary_to_mysql_table(
                         writequery(log=log, sqlQuery=qCreateColumn, dbConn=dbConn)
 
                     except Exception as e:
-                        # log.debug('qCreateColumn: %s' % (qCreateColumn,
-                        # ))
                         log.error(
                             "could not create the "
                             + formattedKey
@@ -533,7 +497,6 @@ def convert_dictionary_to_mysql_table(
             rows = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
 
             exists = rows[0]["COUNT(*)"]
-            # log.debug('uniqueKeyList: %s' % (uniqueKeyList,))
             if exists == 0:
                 uniqueColumns = ",".join(quote_identifier(k) for k in uniqueKeyList)
 
@@ -546,13 +509,13 @@ def convert_dictionary_to_mysql_table(
                     + uniqueColumns
                     + ")"
                 )
-                # log.debug('HERE IS THE COMMAND:'+addUniqueKey)
                 writequery(log=log, sqlQuery=addUniqueKey, dbConn=dbConn)
 
     if returnInsertOnly == True and batchInserts == True:
-        return _build_batch_insert(
-            insertVerb, dbTableName, formattedKeyList, myValues, replace, dateCreated
+        insertCommand = build_batch_insert_command(
+            insertVerb, dbTableName, formattedKeyList, replace, dateCreated
         )
+        return insertCommand, tuple(myValues)
 
     addValue = _build_literal_insert(
         insertVerb,
@@ -569,8 +532,6 @@ def convert_dictionary_to_mysql_table(
 
     message = ""
     try:
-        # log.debug('adding new data to the %s table; query: %s' %
-        # (dbTableName, addValue))"
         writequery(log=log, sqlQuery=addValue, dbConn=dbConn)
 
     except Exception as e:

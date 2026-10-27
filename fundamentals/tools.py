@@ -25,22 +25,37 @@ from . import logs as dl
 from .ssh_tunnel import setup_ssh_tunnel
 from docopt import docopt
 
-try:
-    from StringIO import StringIO
-except ImportError:
-    pass
 from os.path import expanduser
 import inspect
 import psutil
 
+# IN ORDER OF PRECEDENCE: THE FIRST KEY WITH A VALUE NAMES THE SETTINGS FILE
 SETTINGS_FILE_ARGUMENT_KEYS = (
-    "settingsFile",
     "<settingsFile>",
     "<pathToSettingsFile>",
     "--settingsFile",
-    "pathToSettingsFile",
     "--settings",
+    "pathToSettingsFile",
+    "settingsFile",
 )
+
+
+def find_settings_path(arguments):
+    """*Return the settings file named in the arguments, or None if no argument names one*
+
+    **Key Arguments**
+
+    - ``arguments`` -- the command-line arguments dictionary
+
+    **Return**
+
+    - ``settingsPath`` -- the value of the first key in ``SETTINGS_FILE_ARGUMENT_KEYS`` that has a value
+    """
+    for key in SETTINGS_FILE_ARGUMENT_KEYS:
+        if arguments.get(key):
+            return arguments[key]
+    return None
+
 
 ###################################################################
 # CLASSES                                                         #
@@ -243,26 +258,8 @@ class tools(object):
                 )
 
         # UNPACK SETTINGS
-        settingsPath = False
-        if "<settingsFile>" in self.arguments and self.arguments["<settingsFile>"]:
-            settingsPath = self.arguments["<settingsFile>"]
-        elif (
-            "<pathToSettingsFile>" in self.arguments
-            and self.arguments["<pathToSettingsFile>"]
-        ):
-            settingsPath = self.arguments["<pathToSettingsFile>"]
-        elif "--settingsFile" in self.arguments and self.arguments["--settingsFile"]:
-            settingsPath = self.arguments["--settingsFile"]
-        elif "--settings" in self.arguments and self.arguments["--settings"]:
-            settingsPath = self.arguments["--settings"]
-        elif (
-            "pathToSettingsFile" in self.arguments
-            and self.arguments["pathToSettingsFile"]
-        ):
-            settingsPath = self.arguments["pathToSettingsFile"]
-        elif "settingsFile" in self.arguments and self.arguments["settingsFile"]:
-            settingsPath = self.arguments["settingsFile"]
-        elif (
+        settingsPath = find_settings_path(self.arguments) or False
+        if settingsPath is False and (
             (
                 "settingsFile" in self.arguments
                 and self.arguments["settingsFile"] == None
@@ -316,8 +313,6 @@ class tools(object):
                         )
             if "settingsFile" in self.arguments and self.arguments["settingsFile"]:
                 settingsPath = self.arguments["settingsFile"]
-        else:
-            pass
 
         # FOR SETTINGS FILE PATHS PASSED DIRECTORY VIA THE CL
         if settingsPath is not False:
@@ -435,10 +430,9 @@ class tools(object):
 
         - ``log`` -- the logger
         """
-        if "logging settings" in settings:
-            for key in SETTINGS_FILE_ARGUMENT_KEYS:
-                if key in self.arguments:
-                    return dl.setup_dryx_logging(yaml_file=self.arguments[key])
+        settingsPath = find_settings_path(self.arguments)
+        if "logging settings" in settings and settingsPath:
+            return dl.setup_dryx_logging(yaml_file=settingsPath)
 
         return dl.console_logger(level=self.logLevel)
 

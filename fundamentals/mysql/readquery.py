@@ -7,10 +7,9 @@ Author
 : David Young
 """
 
-from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
+from fundamentals.mysql._retry import run_with_retries
 from builtins import str
 import os
-import time
 
 os.environ["TERM"] = "vt100"
 
@@ -89,7 +88,7 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
     """
     rows = []
     try:
-        rows = _fetch_with_retries(log, cursor, sqlQuery)
+        rows = run_with_retries(log, lambda: _fetch_rows(cursor, sqlQuery))
     except Exception as e:
         sqlQuery = sqlQuery[:1000]
         log.warning(
@@ -103,14 +102,11 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
     return rows
 
 
-def _fetch_with_retries(log, cursor, sqlQuery):
-    """*Run the read query, retrying transient MySQL errors with a bounded backoff*
-
-    Errors that are not transient, and transient errors that outlast the backoff, are raised.
+def _fetch_rows(cursor, sqlQuery):
+    """*Run the read query once and return its rows*
 
     **Key Arguments**
 
-    - ``log`` -- the logger
     - ``cursor`` -- an open db cursor
     - ``sqlQuery`` -- the MySQL command to execute
 
@@ -118,18 +114,5 @@ def _fetch_with_retries(log, cursor, sqlQuery):
 
     - ``rows`` -- the rows returned by the sql query
     """
-    delays = iter(RETRY_DELAYS)
-    attempt = 1
-    while True:
-        try:
-            cursor.execute(sqlQuery)
-            return cursor.fetchall()
-        except RETRYABLE_ERRORS as e:
-            delay = next_retry_delay(e, delays)
-            if delay is None:
-                raise
-            log.warning(
-                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
-            )
-            time.sleep(delay)
-            attempt += 1
+    cursor.execute(sqlQuery)
+    return cursor.fetchall()

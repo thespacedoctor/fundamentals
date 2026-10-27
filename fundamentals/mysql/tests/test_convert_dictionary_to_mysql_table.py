@@ -505,11 +505,39 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             )
         )
 
+    def test_keeps_percent_signs_single_in_the_batch_update_tail_without_date_created(
+        self,
+    ):
+        # ARRANGE: PYMYSQL BATCHES THE ROWS WHEN NOW() IS NOT IN THE VALUES AND SENDS THE TAIL UNFORMATTED
+        from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+        # ACT
+        insertCommand, valueTuple = convert_dictionary_to_mysql_table(
+            log=log,
+            dictionary={"100%": 1},
+            dbTableName="sweep2_dictsql_t",
+            returnInsertOnly=True,
+            replace=True,
+            dateCreated=False,
+        )
+
+        # ASSERT
+        self.assertIn("(`100%%`) VALUES (%s)", insertCommand)
+        self.assertTrue(
+            insertCommand.endswith("ON DUPLICATE KEY UPDATE `100%`=VALUES(`100%`)")
+        )
+
     def test_python_none_and_empty_string_become_null_but_none_text_stays(self):
         # ARRANGE
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
-        dictionary = {"a": None, "b": "", "c": "None", "d": ["", "comment"]}
+        dictionary = {
+            "a": None,
+            "b": "",
+            "c": "None",
+            "d": ["", "comment"],
+            "e": "null",
+        }
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
@@ -521,8 +549,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         literalCommand = self._insert_statement(dictionary)
 
         # ASSERT
-        self.assertEqual(valueTuple, (None, None, "None", None))
-        self.assertIn("VALUES (NULL,NULL,'None',NULL, NOW())", literalCommand)
+        self.assertEqual(valueTuple, (None, None, "None", None, "null"))
+        self.assertIn("VALUES (NULL,NULL,'None',NULL,'null', NOW())", literalCommand)
 
     def test_batch_value_tuple_keeps_numbers_and_booleans_native(self):
         # ARRANGE

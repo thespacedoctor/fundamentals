@@ -20,8 +20,9 @@ REMOTE_DATABASE_PORT = 3306
 MAX_PORT = 65535
 
 # SAFE VALUES MUST NOT START WITH A DASH (SSH WOULD READ THEM AS AN OPTION)
-SAFE_USER = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._-]*$")
-SAFE_HOST = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._-]*$")
+SAFE_NAME_PATTERN = r"^[A-Za-z0-9_][A-Za-z0-9._-]*$"
+SAFE_USER = re.compile(SAFE_NAME_PATTERN)
+SAFE_HOST = re.compile(SAFE_NAME_PATTERN)
 SAFE_ADDRESS = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._:-]*$")
 
 
@@ -54,7 +55,9 @@ def setup_ssh_tunnel(tunnelParameters, log, checkHost="127.0.0.1"):
 
     Raises ``tunnel_error`` if the settings are invalid, ssh cannot be started or the tunnel does not connect.
     """
-    ru, rip, rh, sshPort = _validate_tunnel_parameters(tunnelParameters)
+    remoteUser, remoteIp, remoteHost, sshPort = _validate_tunnel_parameters(
+        tunnelParameters
+    )
 
     if is_port_open(checkHost, sshPort, log):
         log.debug("ssh tunnel already exists - moving on")
@@ -63,9 +66,9 @@ def setup_ssh_tunnel(tunnelParameters, log, checkHost="127.0.0.1"):
     argv = [
         "ssh",
         "-fnN",
-        f"{ru}@{rip}",
+        f"{remoteUser}@{remoteIp}",
         "-L",
-        f"{sshPort}:{rh}:{REMOTE_DATABASE_PORT}",
+        f"{sshPort}:{remoteHost}:{REMOTE_DATABASE_PORT}",
     ]
     try:
         output = Popen(argv, close_fds=True).communicate()[0]

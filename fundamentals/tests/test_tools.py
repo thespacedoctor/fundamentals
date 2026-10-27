@@ -57,15 +57,34 @@ class test_tools_arguments(unittest.TestCase):
 
 class test_tools_logger(unittest.TestCase):
 
+    def _assert_is_console_logger(self, log, level):
+        import logging
+
+        rootHandlers = logging.getLogger().handlers
+        consoleHandlers = [
+            h
+            for h in rootHandlers
+            if type(h) is logging.StreamHandler and h.level == level
+        ]
+        self.assertIsInstance(log, logging.Logger)
+        self.assertEqual(len(consoleHandlers), 1)
+        self.assertEqual(logging.getLogger().level, level)
+
     def test_falls_back_to_console_logger_when_logger_argument_is_set(self):
         import logging
+        from unittest import mock
         from fundamentals import tools
 
-        su = tools(arguments={"--logger": "x"}, docString="", quitIfRunning=False)
+        with mock.patch("fundamentals.tools.dl.setup_dryx_logging") as loggingMock:
+            su = tools(
+                arguments={"--logger": "x"},
+                docString="",
+                quitIfRunning=False,
+                logLevel="WARNING",
+            )
 
-        log = su.setup()[2]
-
-        self.assertIsInstance(log, logging.Logger)
+        loggingMock.assert_not_called()
+        self._assert_is_console_logger(su.setup()[2], logging.WARNING)
 
     def test_falls_back_to_console_logger_when_no_argument_names_a_settings_file(
         self,
@@ -82,10 +101,18 @@ class test_tools_logger(unittest.TestCase):
 
             with mock.patch("fundamentals.tools.inspect.stack") as stackMock:
                 stackMock.return_value = [None, callerFrame]
-                su = tools(arguments={}, docString="", quitIfRunning=False)
+                with mock.patch(
+                    "fundamentals.tools.dl.setup_dryx_logging"
+                ) as loggingMock:
+                    su = tools(
+                        arguments={},
+                        docString="",
+                        quitIfRunning=False,
+                        logLevel="ERROR",
+                    )
 
-        log = su.setup()[2]
-        self.assertIsInstance(log, logging.Logger)
+        loggingMock.assert_not_called()
+        self._assert_is_console_logger(su.setup()[2], logging.ERROR)
 
     def test_builds_logger_from_settings_file_when_it_has_logging_settings(self):
         import os
@@ -105,6 +132,36 @@ class test_tools_logger(unittest.TestCase):
 
         loggingMock.assert_called_once_with(yaml_file=settingsFile)
         self.assertIs(su.setup()[2], loggingMock.return_value)
+
+
+class test_tools_settings_file_choice(unittest.TestCase):
+
+    def _write_settings(self, tmpDir, name, marker):
+        import os
+
+        path = os.path.join(tmpDir, name)
+        with open(path, "w") as stream:
+            stream.write("logging settings:\n    version: 1\nmarker: %s\n" % marker)
+        return path
+
+    def test_reads_settings_and_builds_logger_from_the_same_file_when_two_keys_are_given(
+        self,
+    ):
+        import tempfile
+        from unittest import mock
+        from fundamentals import tools
+
+        with tempfile.TemporaryDirectory() as tmpDir:
+            firstFile = self._write_settings(tmpDir, "first.yaml", "first")
+            secondFile = self._write_settings(tmpDir, "second.yaml", "second")
+            arguments = {"<settingsFile>": firstFile, "settingsFile": secondFile}
+
+            with mock.patch("fundamentals.tools.dl.setup_dryx_logging") as loggingMock:
+                su = tools(arguments=arguments, docString="", quitIfRunning=False)
+
+        settingsUsed = su.setup()[1]["marker"]
+        loggerFile = loggingMock.call_args.kwargs["yaml_file"]
+        self.assertEqual(loggerFile, {"first": firstFile, "second": secondFile}[settingsUsed])
 
 
 TUNNEL_YAML = """

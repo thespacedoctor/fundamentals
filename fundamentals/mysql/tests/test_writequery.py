@@ -269,9 +269,8 @@ class test_writequery(unittest.TestCase):
         from fundamentals.mysql import writequery
 
         cursor = FakeCursor(closeError=RuntimeError("close failed"))
-        writequeryModule = sys.modules["fundamentals.mysql.writequery"]
 
-        with mock.patch.object(writequeryModule.time, "sleep") as sleep:
+        with mock.patch("time.sleep") as sleep:
             writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
 
         sleep.assert_not_called()

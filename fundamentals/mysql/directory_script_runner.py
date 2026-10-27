@@ -45,6 +45,8 @@ import os
 import time
 import collections
 import datetime
+import tempfile
+import threading
 from subprocess import Popen, PIPE, DEVNULL
 
 os.environ["TERM"] = "vt100"
@@ -95,7 +97,7 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts are started together and run in parallel, and the function returns once they have all finished (failures are logged but the success and failure rules are not applied), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts are started together and run in parallel, and the function returns at once (a background thread waits for each script and logs any failure, but the success and failure rules are not applied; the thread stops if the program exits first), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
 
@@ -209,16 +211,23 @@ def directory_script_runner(
             scriptname = os.path.basename(v)
             try:
                 with open(v, "rb") as scriptFile:
-                    p = Popen(
-                        mysqlCmd,
-                        stdin=scriptFile,
-                        stdout=DEVNULL,
-                        stderr=PIPE,
-                        close_fds=True,
-                        env=mysqlEnv,
-                    )
+                    # A TEMP FILE CANNOT FILL UP AND STALL A PROCESS NOBODY IS READING YET
+                    stderrSink = tempfile.TemporaryFile() if isBackground else PIPE
+                    try:
+                        p = Popen(
+                            mysqlCmd,
+                            stdin=scriptFile,
+                            stdout=DEVNULL,
+                            stderr=stderrSink,
+                            close_fds=True,
+                            env=mysqlEnv,
+                        )
+                    except BaseException:
+                        if isBackground:
+                            stderrSink.close()
+                        raise
                     if isBackground:
-                        backgroundProcesses.append((scriptname, p))
+                        backgroundProcesses.append((scriptname, p, stderrSink))
                         continue
                     # WAIT SO MYSQL HAS READ THE SCRIPT BEFORE IT IS PROCESSED
                     stderr = p.communicate()[1]
@@ -258,7 +267,12 @@ def directory_script_runner(
                     log=log,
                 )
 
-        _reap_background_processes(backgroundProcesses, log)
+        if backgroundProcesses:
+            threading.Thread(
+                target=_reap_background_processes,
+                args=(backgroundProcesses, log),
+                daemon=True,
+            ).start()
 
     log.debug("completed the ``directory_script_runner`` function")
     return None
@@ -267,13 +281,18 @@ def directory_script_runner(
 def _reap_background_processes(backgroundProcesses, log):
     """*wait for each background mysql process so none is left as a zombie, and log any failure*
 
+    Runs on a daemon thread, so the caller of ``directory_script_runner`` is not kept waiting. The stderr temp file of each process is read, then closed (which deletes it).
+
     **Key Arguments:**
 
-    - ``backgroundProcesses`` -- list of (scriptname, Popen) tuples for the running mysql processes
+    - ``backgroundProcesses`` -- list of (scriptname, Popen, stderr temp file) tuples for the running mysql processes
     - ``log`` -- logger
     """
-    for scriptname, p in backgroundProcesses:
-        stderr = p.communicate()[1]
+    for scriptname, p, stderrFile in backgroundProcesses:
+        with stderrFile:
+            p.wait()
+            stderrFile.seek(0)
+            stderr = stderrFile.read()
         if p.returncode:
             log.error(
                 "MySQL Script `%s` failed with return code %s: '%s'"
