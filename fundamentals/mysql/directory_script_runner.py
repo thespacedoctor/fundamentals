@@ -96,7 +96,7 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts are started together and run in parallel, and the function returns once they have all finished (failures are logged but the success and failure rules are not applied), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
 
@@ -136,7 +136,7 @@ def directory_script_runner(
 
     This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
-    Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+    Finally to execute the scripts within a directory in parallel, without applying the success and failure rules (faster, but failures are only logged):
 
     ```python
     from fundamentals.mysql import directory_script_runner
@@ -204,6 +204,8 @@ def directory_script_runner(
         mysqlEnv = _mysql_environment()
         isWaiting = waitForResult == True
         isDelete = waitForResult == "delete"
+        isBackground = not (isWaiting or isDelete)
+        backgroundProcesses = []
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
             try:
@@ -212,13 +214,15 @@ def directory_script_runner(
                         mysqlCmd,
                         stdin=scriptFile,
                         stdout=DEVNULL,
-                        stderr=PIPE if (isWaiting or isDelete) else DEVNULL,
+                        stderr=PIPE,
                         close_fds=True,
                         env=mysqlEnv,
                     )
+                    if isBackground:
+                        backgroundProcesses.append((scriptname, p))
+                        continue
                     # WAIT SO MYSQL HAS READ THE SCRIPT BEFORE IT IS PROCESSED
-                    if isWaiting or isDelete:
-                        stderr = p.communicate()[1]
+                    stderr = p.communicate()[1]
             except OSError as e:
                 # MISSING MYSQL BINARY OR UNREADABLE SCRIPT
                 log.error("MySQL Script `%s` could not be run: '%s'" % (scriptname, e))
@@ -255,7 +259,27 @@ def directory_script_runner(
                     log=log,
                 )
 
+        _reap_background_processes(backgroundProcesses, log)
+
     log.debug("completed the ``directory_script_runner`` function")
+    return None
+
+
+def _reap_background_processes(backgroundProcesses, log):
+    """*wait for each background mysql process so none is left as a zombie, and log any failure*
+
+    **Key Arguments:**
+
+    - ``backgroundProcesses`` -- list of (scriptname, Popen) tuples for the running mysql processes
+    - ``log`` -- logger
+    """
+    for scriptname, p in backgroundProcesses:
+        stderr = p.communicate()[1]
+        if p.returncode:
+            log.error(
+                "MySQL Script `%s` failed with return code %s: '%s'"
+                % (scriptname, p.returncode, stderr)
+            )
     return None
 
 
