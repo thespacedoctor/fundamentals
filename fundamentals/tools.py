@@ -465,7 +465,6 @@ class tools(object):
         """
         *setup ssh tunnel if required*
         """
-        from subprocess import Popen, PIPE, STDOUT
         import pymysql as ms
 
         # SETUP TUNNEL IF REQUIRED
@@ -645,8 +644,8 @@ class tools(object):
                     thisData = readFile.read()
                     readFile.close()
                 except IOError as e:
-                    message = "could not open the file %s" % (pathToReadFile,)
-                    raise IOError(message)
+                    message = "could not open the file %s" % (pathToSettings,)
+                    raise IOError(message) from e
 
                 # JUST INCASE!
                 thisData = thisData.replace("/Users/Dave", os.getenv("HOME"))
@@ -659,7 +658,7 @@ class tools(object):
                     writeFile = codecs.open(pathToSettings, encoding="utf-8", mode="w")
                 except IOError as e:
                     message = "could not open the file %s" % (pathToSettings,)
-                    raise IOError(message)
+                    raise IOError(message) from e
                 writeFile.write(thisData)
                 writeFile.close()
                 print(
@@ -677,7 +676,7 @@ class tools(object):
     # xt-class-method
 
 
-def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
+def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
 
@@ -688,8 +687,4 @@ def ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict):
     OrderedLoader.add_constructor(
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping
     )
-    return yaml.safe_load(stream, OrderedLoader)
-
-
-if __name__ == "__main__":
-    main()
+    return yaml.load(stream, OrderedLoader)
