@@ -63,6 +63,41 @@ def quote_sqlite_identifiers(sqliteSql):
     return SQLITE_TOKEN_REGEX.sub(convert, sqliteSql)
 
 
+# AN IDENTIFIER ONCE THE DOUBLE QUOTES HAVE BEEN CHANGED TO BACKTICKS, OR A BARE WORD
+IDENTIFIER_PATTERN = r"(?:`(?:[^`]|``)+`|\w+)"
+# THE CLAUSES THAT CAN FOLLOW A REFERENCES CLAUSE
+REFERENCES_PATTERN = (
+    r"REFERENCES\s+" + IDENTIFIER_PATTERN + r"\s*(?:\([^)]*\))?"
+    r"(?:\s+ON\s+(?:UPDATE|DELETE)\s+(?:SET\s+NULL|SET\s+DEFAULT|NO\s+ACTION|CASCADE|RESTRICT)"
+    r"|\s+MATCH\s+\w+"
+    r"|\s+(?:NOT\s+)?DEFERRABLE(?:\s+INITIALLY\s+(?:DEFERRED|IMMEDIATE))?)*"
+)
+# A TABLE-LEVEL CONSTRAINT, WITH THE COMMA THAT SEPARATES IT FROM THE DEFINITION BEFORE IT
+TABLE_FOREIGN_KEY_REGEX = re.compile(
+    r",\s*(?:CONSTRAINT\s+" + IDENTIFIER_PATTERN + r"\s+)?"
+    r"FOREIGN\s+KEY\s*\([^)]*\)\s*" + REFERENCES_PATTERN,
+    re.IGNORECASE,
+)
+COLUMN_REFERENCES_REGEX = re.compile(r"\s+" + REFERENCES_PATTERN, re.IGNORECASE)
+
+
+def remove_foreign_keys(createBody):
+    """*Return the body of a CREATE TABLE statement without its foreign key constraints*
+
+    The MySQL copy is a plain mirror of the data, so it does not keep foreign keys. A MySQL foreign key needs the parent table to exist first, an index on the referenced columns, and key columns of the same type and length. A copy of sqlite ``TEXT`` columns meets none of these.
+
+    **Key Arguments**
+
+    - ``createBody`` -- the CREATE TABLE statement after the table name, with names quoted with backticks
+
+    **Return**
+
+    - ``createBody`` -- the text without column-level ``REFERENCES`` clauses and without table-level ``FOREIGN KEY`` constraints
+    """
+    createBody = TABLE_FOREIGN_KEY_REGEX.sub("", createBody)
+    return COLUMN_REFERENCES_REGEX.sub("", createBody)
+
+
 def main(arguments=None):
     """
     The main function used when ``yaml_to_database.py`` when installed as a cl tool
@@ -210,7 +245,10 @@ class sqlite2mysql(object):
                 )
             # THE BODY IS CONVERTED ON ITS OWN SO THE QUOTED TABLE NAME IS NEVER REWRITTEN
             createStatement = (
-                quote_sqlite_identifiers(createStatement[headerMatch.end() :]) + ";"
+                remove_foreign_keys(
+                    quote_sqlite_identifiers(createStatement[headerMatch.end() :])
+                )
+                + ";"
             )
             if "DEFAULT" not in createStatement:
                 if "primary key(" in createStatement:

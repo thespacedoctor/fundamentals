@@ -268,6 +268,44 @@ class test_sqlite2mysql(unittest.TestCase):
         # ASSERT
         self.assertIn("(`odd``name` TEXT", statements[0])
 
+    def test_sqlite2mysql_drops_column_level_foreign_key_from_create_statement(self):
+        # ARRANGE
+        createSql = (
+            'CREATE TABLE "Parent" ("ID" INTEGER PRIMARY KEY, "UUID" TEXT NOT NULL)',
+            'CREATE TABLE "Child" ('
+            '"ID" INTEGER PRIMARY KEY, '
+            '"EntryUUID" TEXT NOT NULL REFERENCES "Parent"("UUID") '
+            "ON UPDATE CASCADE ON DELETE CASCADE, "
+            '"Tag" TEXT NOT NULL)',
+        )
+
+        # ACT
+        statements = self._captured_create_statements(createSql)
+
+        # ASSERT
+        childStatement = [s for s in statements if "`Pre_Child`" in s][0]
+        self.assertNotIn("REFERENCES", childStatement.upper())
+        self.assertNotIn("CASCADE", childStatement.upper())
+        self.assertIn("`EntryUUID` TEXT NOT NULL, `Tag` TEXT NOT NULL", childStatement)
+
+    def test_sqlite2mysql_drops_table_level_foreign_key_from_create_statement(self):
+        # ARRANGE
+        createSql = (
+            'CREATE TABLE "Parent" ("ID" INTEGER PRIMARY KEY, "UUID" TEXT NOT NULL)',
+            'CREATE TABLE "Child" ("pid" TEXT NOT NULL, "Tag" TEXT, '
+            'CONSTRAINT "fk_parent" FOREIGN KEY ("pid") REFERENCES "Parent" ("UUID") '
+            "ON DELETE SET NULL)",
+        )
+
+        # ACT
+        statements = self._captured_create_statements(createSql)
+
+        # ASSERT
+        childStatement = [s for s in statements if "`Pre_Child`" in s][0]
+        self.assertNotIn("FOREIGN KEY", childStatement.upper())
+        self.assertNotIn("REFERENCES", childStatement.upper())
+        self.assertIn("(`pid` TEXT NOT NULL, `Tag` TEXT,", childStatement)
+
     def test_sqlite2mysql_function(self):
 
         from fundamentals.mysql import sqlite2mysql
