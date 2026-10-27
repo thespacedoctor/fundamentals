@@ -5,6 +5,8 @@ import unittest
 import shutil
 import unittest
 import warnings
+from unittest import mock
+import pymysql
 import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
@@ -46,13 +48,18 @@ if not os.path.exists(pathToOutputDir):
 class FakeCursor:
     """A stand-in cursor that records closure and can raise on execute."""
 
-    def __init__(self, executeError=None, rows=()):
+    def __init__(self, executeError=None, rows=(), errorCount=None):
         self.executeError = executeError
+        self.errorCount = errorCount
         self.rows = list(rows)
         self.isClosed = False
+        self.executeCalls = 0
 
     def execute(self, sqlQuery):
-        if self.executeError:
+        self.executeCalls += 1
+        if self.executeError and (
+            self.errorCount is None or self.executeCalls <= self.errorCount
+        ):
             raise self.executeError
 
     def fetchall(self):
@@ -150,5 +157,77 @@ class test_readquery(unittest.TestCase):
         readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(FakeCursor()))
 
         self.assertEqual(warnings.filters, filtersBefore)
+
+    def test_makes_one_execute_then_raises_when_internal_error(self):
+        from fundamentals.mysql import readquery
+
+        cursor = FakeCursor(executeError=pymysql.err.InternalError(1, "internal"))
+
+        with mock.patch("time.sleep") as sleep:
+            with self.assertRaises(pymysql.err.InternalError):
+                readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+
+        self.assertEqual(cursor.executeCalls, 1)
+        sleep.assert_not_called()
+
+    def test_makes_one_execute_and_returns_no_rows_when_internal_error_and_quiet(self):
+        from fundamentals.mysql import readquery
+
+        cursor = FakeCursor(executeError=pymysql.err.InternalError(1, "internal"))
+
+        rows = readquery(
+            log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=True
+        )
+
+        self.assertEqual(rows, [])
+        self.assertEqual(cursor.executeCalls, 1)
+
+    def test_makes_one_execute_then_raises_when_operational_error_is_not_transient(
+        self,
+    ):
+        from fundamentals.mysql import readquery
+
+        cursor = FakeCursor(
+            executeError=pymysql.err.OperationalError(1054, "Unknown column 'x'")
+        )
+
+        with self.assertRaises(pymysql.err.OperationalError):
+            readquery(log=log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor))
+
+        self.assertEqual(cursor.executeCalls, 1)
+
+    def test_returns_rows_after_retrying_transient_error_with_backoff(self):
+        from fundamentals.mysql import readquery
+
+        cursor = FakeCursor(
+            executeError=pymysql.err.OperationalError(1213, "Deadlock found"),
+            rows=[{"id": 1}],
+            errorCount=2,
+        )
+
+        with mock.patch("time.sleep") as sleep:
+            rows = readquery(
+                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
+            )
+
+        self.assertEqual(rows, [{"id": 1}])
+        self.assertEqual(cursor.executeCalls, 3)
+        self.assertEqual(sleep.call_count, 2)
+
+    def test_raises_after_bounded_backoff_when_transient_error_persists(self):
+        from fundamentals.mysql import readquery
+
+        cursor = FakeCursor(
+            executeError=pymysql.err.OperationalError(2013, "Lost connection")
+        )
+
+        with mock.patch("time.sleep") as sleep:
+            with self.assertRaises(pymysql.err.OperationalError):
+                readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+
+        delays = [call.args[0] for call in sleep.call_args_list]
+        self.assertEqual(cursor.executeCalls, len(delays) + 1)
+        self.assertGreater(len(delays), 1)
+        self.assertLessEqual(sum(delays), 60)
 
     # x-class-to-test-named-worker-function

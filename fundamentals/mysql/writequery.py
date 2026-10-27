@@ -12,7 +12,11 @@ import os
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
+from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 import time
+
+# ROWS SENT PER COMMIT WHEN INSERTING A LIST OF VALUES, TO STOP MYSQL SERVER BARFING
+INSERT_BATCH_SIZE = 100000
 
 
 def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
@@ -115,38 +119,38 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
     if sqlQuery.endswith(","):
         sqlQuery = sqlQuery[:-1]
 
-    tryAgain = True
-    tries = 1
-    while tryAgain:
-        tryAgain = False
+    try:
+        _send_with_retries(log, cursor, sqlQuery, dbConn, manyValueList)
+    except pymysql.err.ProgrammingError as e:
+        message = (
+            "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
+            % (sqlQuery, str(e))
+        )
+        if Force == False:
+            log.error(message)
+            raise
+        else:
+            log.warning(message)
+    except pymysql.Error as e:
         try:
-            if manyValueList == False:
-                cursor.execute(sqlQuery)
-            else:
-                # cursor.executemany(sqlQuery, manyValueList)
-                # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER BARFING
-                batch = 100000
-                offset = 0
-                stop = 0
+            e = e.args
+        except:
+            pass
 
-                while stop == 0:
-                    thisList = manyValueList[offset : offset + batch]
-                    offset += batch
-                    a = len(thisList)
-                    cursor.executemany(sqlQuery, thisList)
-                    dbConn.commit()
-                    if len(thisList) < batch:
-                        stop = 1
-        except (pymysql.err.InternalError, pymysql.err.OperationalError) as e:
-            if tries < 61:
-                tryAgain = True
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
-                tries += 1
-            else:
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
-                raise
-
-        except pymysql.err.ProgrammingError as e:
+        if e[0] == 1050 and "already exists" in e[1]:
+            log.info(str(e) + "\n")
+        elif e[0] == 1062:
+            # Duplicate Key error
+            log.debug("Duplicate Key error: %s\n" % (str(e),))
+            message = "duplicate key error"
+        elif e[0] == 1061:
+            # Duplicate Key error
+            log.debug("index already exists: %s\n" % (str(e),))
+            message = "index already exists"
+        elif "Duplicate entry" in str(e):
+            log.debug("Duplicate Key error: %s\n" % (str(e),))
+            message = "duplicate key error"
+        else:
             message = (
                 "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
                 % (sqlQuery, str(e))
@@ -156,85 +160,83 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
                 raise
             else:
                 log.warning(message)
-        except pymysql.Error as e:
-            try:
-                e = e.args
-            except:
-                pass
 
-            if e[0] == 1050 and "already exists" in e[1]:
-                log.info(str(e) + "\n")
-            elif e[0] == 1062:
-                # Duplicate Key error
-                log.debug("Duplicate Key error: %s\n" % (str(e),))
-                message = "duplicate key error"
-            elif e[0] == 1061:
-                # Duplicate Key error
-                log.debug("index already exists: %s\n" % (str(e),))
-                message = "index already exists"
-            elif "Duplicate entry" in str(e):
-                log.debug("Duplicate Key error: %s\n" % (str(e),))
-                message = "duplicate key error"
-            elif "Deadlock" in str(e):
-                i = 0
-                while i < 10:
-                    time.sleep(1)
-                    i += 1
-                    try:
-                        if manyValueList == False:
-                            cursor.execute(sqlQuery)
-                        else:
-                            # cursor.executemany(sqlQuery, manyValueList)
-                            # INSET LARGE LISTS IN BATCHES TO STOP MYSQL SERVER
-                            # BARFING
-                            batch = 100000
-                            offset = 0
-                            stop = 0
-
-                            while stop == 0:
-                                thisList = manyValueList[offset : offset + batch]
-                                offset += batch
-                                a = len(thisList)
-                                cursor.executemany(sqlQuery, thisList)
-                                dbConn.commit()
-                                if len(thisList) < batch:
-                                    stop = 1
-                        i = 20
-                    except:
-                        pass
-                if i == 10:
-                    log.error("Deadlock: %s\n" % (str(e),))
-                    message = "Deadlock error"
-                    raise
-
-            else:
-                message = (
-                    "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
-                    % (sqlQuery, str(e))
-                )
-                if Force == False:
-                    log.error(message)
-                    raise
-                else:
-                    log.warning(message)
-
-        except pymysql.Warning as e:
-            log.info(str(e))
-        except Exception as e:
-            if "truncated" in str(e):
-                log.error("%s\n Here is the sqlquery:\n%s\n" % (str(e), sqlQuery))
-                if manyValueList:
-                    log.error("... and the values:\n%s\n" % (thisList,))
-            elif "Duplicate entry" in str(e):
-                log.warning("Duplicate Key error: %s\n" % (str(e),))
-                message = "duplicate key error"
-            else:
+    except pymysql.Warning as e:
+        log.info(str(e))
+    except Exception as e:
+        if "truncated" in str(e):
+            log.error("%s\n Here is the sqlquery:\n%s\n" % (str(e), sqlQuery))
+            if manyValueList:
                 log.error(
-                    "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
-                    % (sqlQuery, str(e))
+                    "... and the first batch of values:\n%s\n"
+                    % (manyValueList[:INSERT_BATCH_SIZE],)
                 )
-                if Force == False:
-                    raise
-                return -1
+        elif "Duplicate entry" in str(e):
+            log.warning("Duplicate Key error: %s\n" % (str(e),))
+            message = "duplicate key error"
+        else:
+            log.error(
+                "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
+                % (sqlQuery, str(e))
+            )
+            if Force == False:
+                raise
+            return -1
     dbConn.commit()
     return message
+
+
+def _send_with_retries(log, cursor, sqlQuery, dbConn, manyValueList):
+    """*Send the write query, retrying transient MySQL errors with a bounded backoff*
+
+    Errors that are not transient, and transient errors that outlast the backoff, are raised.
+
+    **Key Arguments**
+
+    - ``log`` -- the logger
+    - ``cursor`` -- an open db cursor
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``manyValueList`` -- a list of value tuples if executing more than one insert
+    """
+    delays = iter(RETRY_DELAYS)
+    # BATCHES ALREADY COMMITTED ARE NEVER SENT AGAIN WHEN A LATER BATCH IS RETRIED
+    progress = {"committedRows": 0}
+    attempt = 1
+    while True:
+        try:
+            if manyValueList == False:
+                cursor.execute(sqlQuery)
+            else:
+                _insert_in_batches(cursor, sqlQuery, dbConn, manyValueList, progress)
+            return
+        except RETRYABLE_ERRORS as e:
+            delay = next_retry_delay(e, delays)
+            if delay is None:
+                raise
+            log.warning(
+                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
+            )
+            time.sleep(delay)
+            attempt += 1
+
+
+def _insert_in_batches(cursor, sqlQuery, dbConn, manyValueList, progress):
+    """*Insert the value list in committed batches, resuming after the last committed batch*
+
+    **Key Arguments**
+
+    - ``cursor`` -- an open db cursor
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``manyValueList`` -- a list of value tuples
+    - ``progress`` -- dictionary holding ``committedRows``, updated after each commit
+    """
+    while True:
+        offset = progress["committedRows"]
+        thisList = manyValueList[offset : offset + INSERT_BATCH_SIZE]
+        cursor.executemany(sqlQuery, thisList)
+        dbConn.commit()
+        progress["committedRows"] = offset + len(thisList)
+        if len(thisList) < INSERT_BATCH_SIZE:
+            return
