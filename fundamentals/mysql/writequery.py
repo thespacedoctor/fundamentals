@@ -132,18 +132,16 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
         else:
             log.warning(message)
     except pymysql.Error as e:
-        try:
-            e = e.args
-        except:
-            pass
+        errorCode = e.args[0] if e.args else None
+        errorMessage = str(e.args[1]) if len(e.args) > 1 else ""
 
-        if e[0] == 1050 and "already exists" in e[1]:
+        if errorCode == 1050 and "already exists" in errorMessage:
             log.info(str(e) + "\n")
-        elif e[0] == 1062:
+        elif errorCode == 1062:
             # Duplicate Key error
             log.debug("Duplicate Key error: %s\n" % (str(e),))
             message = "duplicate key error"
-        elif e[0] == 1061:
+        elif errorCode == 1061:
             # Duplicate Key error
             log.debug("index already exists: %s\n" % (str(e),))
             message = "index already exists"

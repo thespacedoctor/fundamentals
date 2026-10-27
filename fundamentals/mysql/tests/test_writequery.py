@@ -375,6 +375,27 @@ class test_writequery(unittest.TestCase):
                 self.assertEqual(len(cursor.executed), 1)
                 sleep.assert_not_called()
 
+    def test_raises_the_original_error_when_it_has_only_one_argument(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor([pymysql.err.Error("no code, no message tuple")])
+
+        with self.assertRaises(pymysql.err.Error) as raised:
+            writequery(log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor))
+
+        self.assertEqual(raised.exception.args, ("no code, no message tuple",))
+
+    def test_returns_a_message_when_a_forced_error_has_no_error_code(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor([pymysql.err.Error()])
+
+        message = writequery(
+            log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor), Force=True
+        )
+
+        self.assertIn("MySQL write command not executed", message)
+
     def test_raises_after_one_execute_when_error_is_not_transient(self):
         from fundamentals.mysql import writequery
 
