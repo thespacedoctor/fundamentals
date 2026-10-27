@@ -5,11 +5,14 @@ import unittest
 import shutil
 import unittest
 import yaml
+from unittest.mock import patch
+from fundamentals.download import append_now_datestamp_to_filename
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
 
 home = expanduser("~")
+STAMP = "20160316t154123"
 
 packageDirectory = utKit("").get_project_root()
 settingsFile = packageDirectory + "/test_settings.yaml"
@@ -41,11 +44,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-from unittest.mock import patch
-from fundamentals.download import append_now_datestamp_to_filename
-
-STAMP = "20160316t154123"
-
 
 class test_append_now_datestamp_to_filename(unittest.TestCase):
 
@@ -71,10 +69,15 @@ class test_append_now_datestamp_to_filename(unittest.TestCase):
 
         self.assertEqual(result, "a.tar_" + STAMP + ".gz")
 
-    def test_defaults_to_xhtml_when_filename_has_no_extension(self):
+    def test_adds_no_extension_when_filename_has_none(self):
         result = append_now_datestamp_to_filename(log=log, filename="noext")
 
-        self.assertEqual(result, "noext_" + STAMP + ".xhtml")
+        self.assertEqual(result, "noext_" + STAMP)
+
+    def test_keeps_folders_when_filename_is_a_path(self):
+        result = append_now_datestamp_to_filename(log=log, filename="some/dir/a.html")
+
+        self.assertEqual(result, "some/dir/a_" + STAMP + ".html")
 
     def test_raises_type_error_when_filename_is_not_a_string(self):
         with self.assertRaisesRegex(TypeError, "filename must be a string"):
