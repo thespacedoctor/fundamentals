@@ -8,9 +8,11 @@ Author
 """
 
 from fundamentals import tools
+from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 from builtins import str
 import sys
 import os
+import time
 
 os.environ["TERM"] = "vt100"
 
@@ -87,33 +89,49 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
 
     - ``rows`` -- the rows returned by the sql query (empty if the error was ignored)
     """
-    import pymysql
-
     rows = []
-    # EXECUTE THE SQL COMMAND
-    tryAgain = True
-    tries = 1
-    while tryAgain:
-        tryAgain = False
-        try:
-            cursor.execute(sqlQuery)
-            rows = cursor.fetchall()
-        except pymysql.err.InternalError as e:
-            if tries < 61:
-                tryAgain = True
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
-                tries += 1
-            else:
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
-                raise
-        except Exception as e:
-            sqlQuery = sqlQuery[:1000]
-            log.warning(
-                "MySQL raised an error - read command not executed.\n"
-                + str(e)
-                + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-            )
-            if quiet == False:
-                raise e
+    try:
+        rows = _fetch_with_retries(log, cursor, sqlQuery)
+    except Exception as e:
+        sqlQuery = sqlQuery[:1000]
+        log.warning(
+            "MySQL raised an error - read command not executed.\n"
+            + str(e)
+            + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+        )
+        if quiet == False:
+            raise e
 
     return rows
+
+
+def _fetch_with_retries(log, cursor, sqlQuery):
+    """*Run the read query, retrying transient MySQL errors with a bounded backoff*
+
+    Errors that are not transient, and transient errors that outlast the backoff, are raised.
+
+    **Key Arguments**
+
+    - ``log`` -- the logger
+    - ``cursor`` -- an open db cursor
+    - ``sqlQuery`` -- the MySQL command to execute
+
+    **Return**
+
+    - ``rows`` -- the rows returned by the sql query
+    """
+    delays = iter(RETRY_DELAYS)
+    attempt = 1
+    while True:
+        try:
+            cursor.execute(sqlQuery)
+            return cursor.fetchall()
+        except RETRYABLE_ERRORS as e:
+            delay = next_retry_delay(e, delays)
+            if delay is None:
+                raise
+            log.warning(
+                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
+            )
+            time.sleep(delay)
+            attempt += 1

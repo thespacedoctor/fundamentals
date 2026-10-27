@@ -67,6 +67,36 @@ class FakeCursor:
         self.isClosed = True
 
 
+class ScriptedCursor:
+    """A stand-in cursor that replays a script of outcomes, one per execute or executemany call.
+
+    Each outcome is an exception instance to raise or None to succeed. Once the script is
+    exhausted every further call succeeds."""
+
+    def __init__(self, outcomes=()):
+        self.outcomes = list(outcomes)
+        self.executed = []
+        self.manyBatches = []
+        self.isClosed = False
+
+    def _next_outcome(self):
+        if self.outcomes:
+            outcome = self.outcomes.pop(0)
+            if outcome:
+                raise outcome
+
+    def execute(self, sqlQuery):
+        self.executed.append(sqlQuery)
+        self._next_outcome()
+
+    def executemany(self, sqlQuery, valueList):
+        self.manyBatches.append(list(valueList))
+        self._next_outcome()
+
+    def close(self):
+        self.isClosed = True
+
+
 class FakeConnection:
     """A stand-in db connection handing out a single pre-built cursor."""
 
@@ -260,5 +290,147 @@ class test_writequery(unittest.TestCase):
             writequery(
                 log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=False
             )
+
+    def test_makes_one_execute_and_logs_when_table_already_exists(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor(
+            [pymysql.err.OperationalError(1050, "Table 't' already exists")]
+        )
+
+        message = writequery(
+            log=log, sqlQuery="CREATE TABLE t", dbConn=FakeConnection(cursor)
+        )
+
+        self.assertEqual(len(cursor.executed), 1)
+        self.assertEqual(message, "")
+
+    def test_makes_one_execute_when_index_already_exists(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor(
+            [pymysql.err.OperationalError(1061, "Duplicate key name 'k'")]
+        )
+
+        message = writequery(
+            log=log, sqlQuery="CREATE INDEX k", dbConn=FakeConnection(cursor)
+        )
+
+        self.assertEqual(len(cursor.executed), 1)
+        self.assertEqual(message, "index already exists")
+
+    def test_succeeds_after_retrying_deadlock_twice(self):
+        from fundamentals.mysql import writequery
+
+        deadlock = pymysql.err.OperationalError(1213, "Deadlock found")
+        cursor = ScriptedCursor([deadlock, deadlock])
+
+        with mock.patch("time.sleep") as sleep:
+            message = writequery(
+                log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
+            )
+
+        self.assertEqual(len(cursor.executed), 3)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertEqual(message, "")
+
+    def test_retries_each_transient_error_code(self):
+        from fundamentals.mysql import writequery
+
+        for code in (1213, 1205, 2006, 2013):
+            with self.subTest(code=code):
+                cursor = ScriptedCursor(
+                    [pymysql.err.OperationalError(code, "transient")]
+                )
+
+                with mock.patch("time.sleep"):
+                    writequery(
+                        log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
+                    )
+
+                self.assertEqual(len(cursor.executed), 2)
+
+    def test_raises_after_one_execute_when_error_is_not_transient(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor(
+            [pymysql.err.OperationalError(1054, "Unknown column 'x'")]
+        )
+
+        with mock.patch("time.sleep") as sleep:
+            with self.assertRaises(pymysql.err.OperationalError):
+                writequery(
+                    log=log,
+                    sqlQuery="SELECT x",
+                    dbConn=FakeConnection(cursor),
+                    Force=False,
+                )
+
+        self.assertEqual(len(cursor.executed), 1)
+        sleep.assert_not_called()
+
+    def test_returns_message_after_one_execute_when_error_is_not_transient_and_force(
+        self,
+    ):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor(
+            [pymysql.err.OperationalError(1054, "Unknown column 'x'")]
+        )
+
+        message = writequery(
+            log=log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor), Force=True
+        )
+
+        self.assertEqual(len(cursor.executed), 1)
+        self.assertIn("Unknown column", message)
+
+    def test_raises_after_one_execute_when_internal_error_is_not_transient(self):
+        from fundamentals.mysql import writequery
+
+        cursor = ScriptedCursor([pymysql.err.InternalError(1, "internal")])
+
+        with self.assertRaises(pymysql.err.InternalError):
+            writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+
+        self.assertEqual(len(cursor.executed), 1)
+
+    def test_raises_after_bounded_backoff_when_transient_error_persists(self):
+        from fundamentals.mysql import writequery
+
+        deadlock = pymysql.err.OperationalError(1213, "Deadlock found")
+        cursor = ScriptedCursor([deadlock] * 100)
+
+        with mock.patch("time.sleep") as sleep:
+            with self.assertRaises(pymysql.err.OperationalError):
+                writequery(log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor))
+
+        delays = [call.args[0] for call in sleep.call_args_list]
+        self.assertEqual(len(cursor.executed), len(delays) + 1)
+        self.assertGreater(len(delays), 1)
+        self.assertLessEqual(sum(delays), 60)
+        self.assertEqual(delays, sorted(delays))
+
+    def test_does_not_resend_committed_batches_when_retrying_executemany(self):
+        from fundamentals.mysql import writequery
+
+        writequeryModule = sys.modules["fundamentals.mysql.writequery"]
+        deadlock = pymysql.err.OperationalError(1213, "Deadlock found")
+        cursor = ScriptedCursor([None, deadlock])
+        values = [(1,), (2,), (3,), (4,), (5,)]
+
+        with mock.patch("time.sleep"):
+            with mock.patch.object(writequeryModule, "INSERT_BATCH_SIZE", 2):
+                writequery(
+                    log=log,
+                    sqlQuery="INSERT INTO t (id) VALUES (%s)",
+                    dbConn=FakeConnection(cursor),
+                    manyValueList=values,
+                )
+
+        self.assertEqual(
+            cursor.manyBatches,
+            [[(1,), (2,)], [(3,), (4,)], [(3,), (4,)], [(5,)]],
+        )
 
     # x-class-to-test-named-worker-function
