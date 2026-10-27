@@ -44,26 +44,8 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # unpack remaining cl arguments using `exec` to setup the variable names
-    # automatically
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, str):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToSqliteDB = arguments["<pathToSqliteDB>"]
+    tablePrefix = arguments["<tablePrefix>"]
 
     from fundamentals.mysql import sqlite2mysql
 

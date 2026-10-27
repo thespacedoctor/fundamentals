@@ -405,26 +405,11 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES
-    # AUTOMATICALLY
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, ("".__class__, "".__class__)):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToDirectory = arguments["<pathToDirectory>"]
+    loginPath = arguments["<loginPath>"]
+    databaseName = arguments["<databaseName>"]
+    successFlag = arguments["--success"]
+    failureFlag = arguments["--failure"]
 
     if successFlag and successFlag.lower() == "none":
         successFlag = None

@@ -364,23 +364,6 @@ class tools(object):
         else:
             self.log = None
 
-        # unpack remaining cl arguments using `exec` to setup the variable names
-        # automatically
-        for arg, val in list(self.arguments.items()):
-            if arg[0] == "-":
-                varname = arg.replace("-", "") + "Flag"
-            else:
-                varname = arg.replace("<", "").replace(">", "")
-            if varname == "import":
-                varname = "iimport"
-            if isinstance(val, str):
-                val = val.replace("'", "\\'")
-                exec(varname + " = '%s'" % (val,))
-            else:
-                exec(varname + " = %s" % (val,))
-            if arg == "--dbConn":
-                dbConn = val
-
         # SETUP A DATABASE CONNECTION BASED ON WHAT ARGUMENTS HAVE BEEN PASSED
         dbConn = False
         tunnel = False
