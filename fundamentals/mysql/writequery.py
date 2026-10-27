@@ -68,16 +68,52 @@ def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
     import pymysql
     import warnings
 
-    warnings.filterwarnings("error", category=pymysql.Warning)
-    message = ""
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
     except Exception as e:
         log.error("could not create the database cursor.")
-    # EXECUTE THE SQL COMMAND
+        raise
 
+    try:
+        # SCOPE THE WARNINGS-AS-ERRORS FILTER TO THIS CALL ONLY
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", category=pymysql.Warning)
+            message = _execute_write_query(
+                log, cursor, sqlQuery, dbConn, Force, manyValueList
+            )
+    finally:
+        # CLOSE THE CURSOR ON EVERY PATH, WITHOUT MASKING ANY IN-FLIGHT ERROR
+        try:
+            cursor.close()
+        except Exception as e:
+            log.warning("could not close the db cursor " + str(e) + "\n")
+
+    log.debug("completed the ``writequery`` function")
+    return message
+
+
+def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
+    """*Run the write query (with retries and error handling) on an open cursor*
+
+    **Key Arguments**
+
+    - ``log`` -- the logger
+    - ``cursor`` -- an open db cursor (closed by the caller)
+    - ``sqlQuery`` -- the MySQL command to execute
+    - ``dbConn`` -- the db connection
+    - ``Force`` -- do not raise if an error occurs, move onto the next command
+    - ``manyValueList`` -- a list of value tuples if executing more than one insert
+
+    **Return**
+
+    - ``message`` -- error/warning message, or -1 if a non-MySQL error was forced past
+    """
+    import pymysql
+
+    message = ""
+    # EXECUTE THE SQL COMMAND
     log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
-    if sqlQuery[-1] == ",":
+    if sqlQuery.endswith(","):
         sqlQuery = sqlQuery[:-1]
 
     tryAgain = True
@@ -199,24 +235,7 @@ def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
                     % (sqlQuery, str(e))
                 )
                 if Force == False:
-                    sys.exit(0)
-                cursor.close()
+                    raise
                 return -1
     dbConn.commit()
-    # CLOSE THE CURSOR
-    cOpen = True
-    count = 0
-    while cOpen:
-        try:
-            cursor.close()
-            cOpen = False
-        except Exception as e:
-            time.sleep(1)
-            count += 1
-            if count == 10:
-                log.warning("could not close the db cursor " + str(e) + "\n")
-                raise e
-                count = 0
-
-    log.debug("completed the ``writequery`` function")
     return message
