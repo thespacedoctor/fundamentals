@@ -251,10 +251,6 @@ primary key(""",
                     dateCreated = False
                 allRows.append(thisDict)
 
-            # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists("/tmp/headjack/"):
-                os.makedirs("/tmp/headjack/")
-
             writequery(
                 log=self.log,
                 sqlQuery=createStatement,
@@ -278,27 +274,6 @@ primary key(""",
                 replace=True,
                 dbSettings=self.settings["database settings"],
             )
-
-            # # DUMP THE DATA INTO A MYSQL DATABASE
-            # dataSet = list_of_dictionaries(
-            #     log=self.log,
-            #     listOfDictionaries=allRows
-            # )
-            # originalList = dataSet.list
-            # now = datetime.now()
-            # now = now.strftime("%Y%m%dt%H%M%S%f.sql")
-            # mysqlData = dataSet.mysql(
-            # tableName=self.tablePrefix + table, filepath="/tmp/headjack/" +
-            # now, createStatement=createStatement)
-
-            # directory_script_runner(
-            #     log=self.log,
-            #     pathToScriptDirectory="/tmp/headjack/",
-            #     databaseName=self.settings["database settings"]["db"],
-            #     loginPath=self.settings["database settings"]["loginPath"],
-            #     successRule="delete",
-            #     failureRule="failed"
-            # )
 
         con.close()
 
