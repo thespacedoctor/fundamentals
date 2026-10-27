@@ -57,15 +57,34 @@ class test_tools_arguments(unittest.TestCase):
 
 class test_tools_logger(unittest.TestCase):
 
+    def _assert_is_console_logger(self, log, level):
+        import logging
+
+        rootHandlers = logging.getLogger().handlers
+        consoleHandlers = [
+            h
+            for h in rootHandlers
+            if type(h) is logging.StreamHandler and h.level == level
+        ]
+        self.assertIsInstance(log, logging.Logger)
+        self.assertEqual(len(consoleHandlers), 1)
+        self.assertEqual(logging.getLogger().level, level)
+
     def test_falls_back_to_console_logger_when_logger_argument_is_set(self):
         import logging
+        from unittest import mock
         from fundamentals import tools
 
-        su = tools(arguments={"--logger": "x"}, docString="", quitIfRunning=False)
+        with mock.patch("fundamentals.tools.dl.setup_dryx_logging") as loggingMock:
+            su = tools(
+                arguments={"--logger": "x"},
+                docString="",
+                quitIfRunning=False,
+                logLevel="WARNING",
+            )
 
-        log = su.setup()[2]
-
-        self.assertIsInstance(log, logging.Logger)
+        loggingMock.assert_not_called()
+        self._assert_is_console_logger(su.setup()[2], logging.WARNING)
 
     def test_falls_back_to_console_logger_when_no_argument_names_a_settings_file(
         self,
@@ -82,10 +101,18 @@ class test_tools_logger(unittest.TestCase):
 
             with mock.patch("fundamentals.tools.inspect.stack") as stackMock:
                 stackMock.return_value = [None, callerFrame]
-                su = tools(arguments={}, docString="", quitIfRunning=False)
+                with mock.patch(
+                    "fundamentals.tools.dl.setup_dryx_logging"
+                ) as loggingMock:
+                    su = tools(
+                        arguments={},
+                        docString="",
+                        quitIfRunning=False,
+                        logLevel="ERROR",
+                    )
 
-        log = su.setup()[2]
-        self.assertIsInstance(log, logging.Logger)
+        loggingMock.assert_not_called()
+        self._assert_is_console_logger(su.setup()[2], logging.ERROR)
 
     def test_builds_logger_from_settings_file_when_it_has_logging_settings(self):
         import os
