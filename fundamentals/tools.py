@@ -25,10 +25,6 @@ from . import logs as dl
 from .ssh_tunnel import setup_ssh_tunnel
 from docopt import docopt
 
-try:
-    from StringIO import StringIO
-except ImportError:
-    pass
 from os.path import expanduser
 import inspect
 import psutil
