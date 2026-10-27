@@ -13,3 +13,12 @@ class test_ordered_load(unittest.TestCase):
 
         self.assertIsInstance(settings, OrderedDict)
         self.assertEqual(list(settings.keys()), ["zebra", "apple", "mango"])
+
+    def test_refuses_to_construct_python_objects(self):
+        import yaml
+        from fundamentals.tools import ordered_load
+
+        stream = "x: !!python/object/apply:os.getcwd []\n"
+
+        with self.assertRaises(yaml.constructor.ConstructorError):
+            ordered_load(stream)
