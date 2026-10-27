@@ -8,6 +8,7 @@ import unittest
 import yaml
 import sys
 import stat
+import subprocess
 import tempfile
 from unittest import mock
 from fundamentals.utKit import utKit
@@ -345,6 +346,45 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
 
         self.assertEqual(popen.call_count, 1)
         self.assertTrue(os.path.exists(os.path.join(self.scriptDir, "a.sql")))
+
+    def test_background_mode_logs_error_naming_script_and_return_code_when_mysql_fails(
+        self,
+    ):
+        scriptPath = self._write_script("broken.sql")
+
+        with mock.patch.dict(
+            os.environ, {"FAKE_EXIT": "3", "FAKE_STDERR": "ERROR 1064 syntax"}
+        ):
+            with self.assertLogs(self.log, level="ERROR") as logs:
+                self._run(waitForResult=False, failureRule="failed")
+
+        self.assertTrue(os.path.exists(scriptPath))
+        self.assertIn("broken.sql", "\n".join(logs.output))
+        self.assertIn("return code 3", "\n".join(logs.output))
+        self.assertIn("ERROR 1064 syntax", "\n".join(logs.output))
+
+    def test_background_mode_logs_no_error_when_mysql_succeeds(self):
+        self._write_script("ok.sql")
+
+        with self.assertNoLogs(self.log, level="ERROR"):
+            self._run(waitForResult=False)
+
+    def test_background_mode_reaps_every_mysql_process_before_returning(self):
+        self._write_script("a.sql")
+        self._write_script("b.sql")
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        started = []
+
+        def recordPopen(*args, **kwargs):
+            process = subprocess.Popen(*args, **kwargs)
+            started.append(process)
+            return process
+
+        with mock.patch.object(module, "Popen", side_effect=recordPopen):
+            self._run(waitForResult=False)
+
+        self.assertEqual(len(started), 2)
+        self.assertTrue(all(process.returncode is not None for process in started))
 
     def test_delete_mode_logs_error_naming_script_when_mysql_fails(self):
         scriptPath = self._write_script("broken.sql")
