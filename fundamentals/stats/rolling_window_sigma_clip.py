@@ -26,7 +26,7 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
     - `log` -- logger
     - `array` -- the array to clean up (arrays of length < 5 are not clipped but returned unmasked)
     - `clippingSigma` -- the minimum sigma to clip (using median-absolute distribution as sigma proxy)
-    - `windowSize` -- the size of the window to use when calculating the median distribution (window of 11 will use 5 values each side of the value in question)
+    - `windowSize` -- the size of the window to use when calculating the median distribution (must be odd; window of 11 will use 5 values each side of the value in question)
 
     **Usage:**
 
@@ -50,6 +50,11 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
 
     from astropy.stats import sigma_clip, mad_std
 
+    if windowSize % 2 == 0:
+        message = "windowSize must be odd, got %s" % (windowSize,)
+        log.error(message)
+        raise ValueError(message)
+
     # ACCOMODATE SMALL LIST SIZES
     if len(array) < 5:
         return len(array) * [False]
@@ -63,8 +68,8 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
             stdfunc=mad_std,
         )
         return list(masked.mask)
-    # THE WINDOW CENTRE IS THE ELEMENT WHOSE MASK IS TAKEN FROM EACH INTERIOR WINDOW
-    windowCentre = int(windowSize / 2)
+    # THE WINDOW CENTRE IS THE ELEMENT WHOSE MASK IS TAKEN FROM EACH WINDOW
+    windowCentre = windowSize // 2
     numWindows = len(array) - windowSize + 1
     maskedArray = []
     for startOfWindow in range(numWindows):
@@ -77,14 +82,14 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
             cenfunc="median",
             stdfunc=mad_std,
         )
-        windowMask = list(masked.mask)
+        windowMask = masked.mask.tolist()
 
         if startOfWindow == 0:
             # HEAD: 0,1,2...windowCentre-1
             maskedArray += windowMask[:windowCentre]
         maskedArray += [windowMask[windowCentre]]
         if startOfWindow == numWindows - 1:
-            # TAIL: -(windowSize-windowCentre-1)...-2,-1
+            # TAIL: -windowCentre...-2,-1
             maskedArray += windowMask[windowCentre + 1 :]
 
     log.debug("completed the ``rolling_window_sigma_clip`` function")
