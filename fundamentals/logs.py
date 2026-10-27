@@ -157,9 +157,6 @@ def setup_dryx_logging(yaml_file):
     import logging
     import logging.config
 
-    # IMPORT CUSTOM HANDLER THAT ALLOWS GROUP WRITING
-    handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
-
     # ADD log.print() LEVEL (NO-OP IF IT ALREADY EXISTS)
     addLoggingLevel("PRINT", logging.INFO + 5)
 
@@ -187,6 +184,9 @@ def setup_dryx_logging(yaml_file):
     addConsole = "console" in rootSettings["handlers"]
     if addConsole:
         rootSettings["handlers"].remove("console")
+
+    # KEEP LOGGERS THAT ALREADY EXIST SO REPEAT CALLS DO NOT SILENCE THEM
+    yamlContent.setdefault("disable_existing_loggers", False)
 
     if len(rootSettings["handlers"]):
         logging.config.dictConfig(yamlContent)
@@ -413,6 +413,11 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
             self.baseFilename,
             (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
         )
+
+
+# REGISTER THE HANDLER AT IMPORT SO dictConfig CAN RESOLVE
+# logging.handlers.GroupWriteRotatingFileHandler WHATEVER THE IMPORT ORDER
+handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
 
 
 class emptyLogger(object):
