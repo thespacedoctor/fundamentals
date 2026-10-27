@@ -14,12 +14,10 @@ from future import standard_library
 
 standard_library.install_aliases()
 from builtins import zip
-from builtins import str
 import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 from urllib.parse import quote
 from datetime import datetime
 import requests
@@ -187,7 +185,7 @@ def _local_filename(log, url, index, resetName, timeStamp, longTime, indexFilena
 
 def fetch_url(entry):
     """
-    *download one url to a local file, retrying on failure*
+    *download one url to a local file, retrying on network failure*
 
     **Key Arguments**
 
@@ -213,13 +211,18 @@ def fetch_url(entry):
             log.warning(
                 f"Getting status code {r.status_code} on download attempt {attempt}/{MAX_TRIES}."
             )
-        except Exception as e:
+        except requests.RequestException as e:
             # ONLY THE EXCEPTION TYPE IS LOGGED AS ITS MESSAGE CAN HOLD THE URL
             timeout *= 2
             log.warning(
                 f"{type(e).__name__} on attempt number {attempt}/{MAX_TRIES}. Increasing timeout to {timeout}s"
             )
             _remove_file(path)
+        except OSError as e:
+            # A LOCAL FILE ERROR (PERMISSION, DISK FULL, MISSING DIRECTORY) WILL NOT CLEAR BY RETRYING
+            log.error(f"could not write {path}: {type(e).__name__}")
+            _remove_file(path)
+            return None
         finally:
             if r is not None:
                 r.close()

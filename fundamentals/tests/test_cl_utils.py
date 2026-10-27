@@ -1,13 +1,10 @@
 from __future__ import print_function
-from builtins import str
 import os
 import unittest
 import shutil
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
-from docopt import docopt
 from fundamentals import cl_utils
 
 doc = cl_utils.__doc__

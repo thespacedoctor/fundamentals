@@ -1,10 +1,7 @@
 from __future__ import print_function
-from builtins import str
 import os
 import unittest
 import shutil
-import unittest
-import yaml
 import re
 import copy
 import datetime

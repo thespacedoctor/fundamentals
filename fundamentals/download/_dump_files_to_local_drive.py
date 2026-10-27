@@ -8,11 +8,9 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 
 
 def _dump_files_to_local_drive(bodies, theseUrls, log):

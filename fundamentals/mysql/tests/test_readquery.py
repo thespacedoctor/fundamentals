@@ -1,13 +1,10 @@
 from __future__ import print_function
-from builtins import str
 import os
 import unittest
 import shutil
-import unittest
 import warnings
 from unittest import mock
 import pymysql
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -218,7 +215,7 @@ class test_readquery(unittest.TestCase):
         from fundamentals.mysql import readquery
 
         cursor = FakeCursor(
-            executeError=pymysql.err.OperationalError(2013, "Lost connection")
+            executeError=pymysql.err.OperationalError(1213, "Deadlock found")
         )
 
         with mock.patch("time.sleep") as sleep:
@@ -229,5 +226,27 @@ class test_readquery(unittest.TestCase):
         self.assertEqual(cursor.executeCalls, len(delays) + 1)
         self.assertGreater(len(delays), 1)
         self.assertLessEqual(sum(delays), 60)
+
+    def test_does_not_retry_on_the_same_connection_after_the_connection_is_lost(self):
+        from fundamentals.mysql import readquery
+
+        # PYMYSQL CLOSES ITS SOCKET WHEN THE CONNECTION DROPS, SO A RETRY CANNOT SUCCEED
+        for code in (2006, 2013):
+            with self.subTest(code=code):
+                cursor = FakeCursor(
+                    executeError=pymysql.err.OperationalError(code, "Lost connection")
+                )
+
+                with mock.patch("time.sleep") as sleep:
+                    with self.assertRaises(pymysql.err.OperationalError) as raised:
+                        readquery(
+                            log=log,
+                            sqlQuery="SELECT 1",
+                            dbConn=FakeConnection(cursor),
+                        )
+
+                self.assertEqual(raised.exception.args[0], code)
+                self.assertEqual(cursor.executeCalls, 1)
+                sleep.assert_not_called()
 
     # x-class-to-test-named-worker-function

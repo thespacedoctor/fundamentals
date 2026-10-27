@@ -15,6 +15,7 @@ from subprocess import Popen
 TUNNEL_REQUIRED_KEYS = ("remote user", "remote ip", "remote datbase host", "port")
 TUNNEL_CHECK_ATTEMPTS = 5
 TUNNEL_CHECK_DELAY = 1
+TUNNEL_CONNECT_TIMEOUT = 5
 REMOTE_DATABASE_PORT = 3306
 MAX_PORT = 65535
 
@@ -99,6 +100,7 @@ def is_port_open(address, port, log):
     """
     with socket.socket() as s:
         log.debug(f"Attempting to connect to `{address}` on port `{port}`")
+        s.settimeout(TUNNEL_CONNECT_TIMEOUT)
         try:
             s.connect((address, port))
         except socket.error as e:

@@ -41,12 +41,11 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 import time
 import collections
 import datetime
-from subprocess import Popen, PIPE, STDOUT, DEVNULL
+from subprocess import Popen, PIPE, DEVNULL
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools

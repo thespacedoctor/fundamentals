@@ -1,11 +1,7 @@
 from __future__ import print_function
-from builtins import str
 import os
 import unittest
 import shutil
-import unittest
-import yaml
-from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser

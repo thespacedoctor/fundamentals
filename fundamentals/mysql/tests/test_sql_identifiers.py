@@ -47,6 +47,16 @@ class test_quote_identifier(unittest.TestCase):
         with self.assertRaises(ValueError):
             quote_identifier(5)
 
+    def test_quote_for_format_doubles_percent_signs_and_backticks(self):
+        # ARRANGE
+        from fundamentals.mysql.sql_identifiers import quote_identifier_for_format
+
+        # ACT
+        result = quote_identifier_for_format("a`b%c")
+
+        # ASSERT
+        self.assertEqual(result, "`a``b%%c`")
+
 
 if __name__ == "__main__":
     unittest.main()

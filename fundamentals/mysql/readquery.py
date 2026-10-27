@@ -7,10 +7,8 @@ Author
 : David Young
 """
 
-from fundamentals import tools
 from fundamentals.mysql._retry import RETRY_DELAYS, RETRYABLE_ERRORS, next_retry_delay
 from builtins import str
-import sys
 import os
 import time
 
@@ -100,7 +98,7 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
             + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
         )
         if quiet == False:
-            raise e
+            raise
 
     return rows
 

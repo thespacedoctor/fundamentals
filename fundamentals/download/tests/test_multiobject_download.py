@@ -3,8 +3,6 @@ from builtins import str
 import os
 import unittest
 import shutil
-import unittest
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -41,7 +39,6 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
-import re
 import sys
 import tempfile
 from multiprocessing.pool import ThreadPool
@@ -307,3 +304,71 @@ class test_multiobject_download_fetching(unittest.TestCase):
         logged = str(self.log.mock_calls)
         self.assertNotIn("s3cret", logged)
         self.assertNotIn("alice", logged)
+
+    def test_retries_a_request_exception_and_then_succeeds(self):
+        import requests
+
+        responses = [requests.ConnectionError("down"), make_response([b"ok"])]
+
+        with mock.patch(REQUESTS_GET, side_effect=responses) as get:
+            result = multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=self.log,
+                timeStamp=False,
+            )
+
+        self.assertEqual(result, [self.path("a.html")])
+        self.assertEqual(get.call_count, 2)
+
+    def test_does_not_retry_a_local_os_error_and_removes_the_partial_file(self):
+        secretUrl = "http://alice:s3cret@example.com/a.html"
+        response = make_response(
+            [b"half"], streamError=OSError(28, "No space left " + secretUrl)
+        )
+
+        with mock.patch(REQUESTS_GET, return_value=response) as get:
+            result = multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=self.log,
+                timeStamp=False,
+            )
+
+        self.assertEqual(result, [None])
+        self.assertEqual(get.call_count, 1)
+        self.assertFalse(os.path.exists(self.path("a.html")))
+
+    def test_logs_the_file_path_and_error_type_but_not_the_message_for_a_local_os_error(
+        self,
+    ):
+        secretUrl = "http://alice:s3cret@example.com/a.html"
+        response = make_response(
+            [b"half"], streamError=PermissionError("denied " + secretUrl)
+        )
+
+        with mock.patch(REQUESTS_GET, return_value=response):
+            multiobject_download(
+                urlList=THREE_URLS[:1],
+                downloadDirectory=self.tmpDir,
+                log=self.log,
+                timeStamp=False,
+            )
+
+        logged = str(self.log.error.mock_calls + self.log.warning.mock_calls)
+        self.assertIn(self.path("a.html"), logged)
+        self.assertIn("PermissionError", logged)
+        self.assertNotIn("s3cret", logged)
+        self.assertNotIn("example.com", logged)
+
+    def test_does_not_retry_when_the_download_file_cannot_be_opened(self):
+        missingPath = os.path.join(self.tmpDir, "missing", "a.html")
+        entry = (THREE_URLS[0], missingPath, 5, self.log)
+
+        with mock.patch(REQUESTS_GET, return_value=make_response()) as get:
+            result = sys.modules[
+                "fundamentals.download.multiobject_download"
+            ].fetch_url(entry)
+
+        self.assertIsNone(result)
+        self.assertEqual(get.call_count, 1)

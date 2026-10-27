@@ -8,7 +8,6 @@ Author
 """
 
 from builtins import object
-import sys
 import os
 import logging
 import logging.config

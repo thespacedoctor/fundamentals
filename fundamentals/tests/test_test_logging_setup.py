@@ -64,11 +64,16 @@ class test_test_logging_setup(unittest.TestCase):
 
         self.assertFalse(existing.disabled)
 
+    @unittest.skipIf(
+        os.geteuid() == 0,
+        "root can write to a read-only directory, so the test proves nothing",
+    )
     def test_collection_succeeds_when_home_is_read_only(self):
         homeDir = tempfile.mkdtemp(prefix="test_readonly_home_")
         self.addCleanup(shutil.rmtree, homeDir, True)
         os.chmod(homeDir, stat.S_IRUSR | stat.S_IXUSR)
         self.addCleanup(os.chmod, homeDir, stat.S_IRWXU)
+        self.assertFalse(os.access(homeDir, os.W_OK))
 
         result = subprocess.run(
             [
