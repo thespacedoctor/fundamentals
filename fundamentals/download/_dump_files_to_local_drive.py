@@ -29,9 +29,8 @@ def _dump_files_to_local_drive(bodies, theseUrls, log):
     **Return**
 
 
-    - ``None``
+    - ``failedPaths`` -- list of the target paths that were not written (body was ``None`` or the write failed). An empty list means every file was written
     """
-    j = 0
     log.debug("attempting to write file data to local drive")
     log.debug(
         "%s URLS = %s"
@@ -40,17 +39,23 @@ def _dump_files_to_local_drive(bodies, theseUrls, log):
             str(theseUrls),
         )
     )
-    for body in bodies:
+    failedPaths = []
+    for body, path in zip(bodies, theseUrls):
+        if not path:
+            continue
+        if body is None:
+            log.warning(
+                "no data was downloaded for %s, so no file was written" % (path,)
+            )
+            failedPaths.append(path)
+            continue
         try:
-            if theseUrls[j]:
-                with open(theseUrls[j], "wb") as f:
-                    f.write(body)
-                f.close()
-            j += 1
+            with open(path, "wb") as f:
+                f.write(body)
         except Exception as e:
             log.error(
-                "could not write downloaded file to local drive - failed with this error %s: "
-                % (str(e),)
+                "could not write downloaded file %s to local drive - failed with this error %s: "
+                % (path, str(e))
             )
-            return -1
-    return
+            failedPaths.append(path)
+    return failedPaths

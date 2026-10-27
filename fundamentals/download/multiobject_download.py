@@ -20,14 +20,16 @@ import os
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
-import urllib
+from urllib.parse import quote
+from datetime import datetime
 import requests
 from multiprocessing.pool import ThreadPool
 
-gtimeout = 10.0
-llog = ""
 import random
 import time
+
+CHUNK_SIZE = 65536
+MAX_TRIES = 5
 
 
 def multiobject_download(
@@ -54,13 +56,17 @@ def multiobject_download(
     - ``longTime`` -- use a longer timestamp when appending to the filename (greater uniqueness)
     - ``timeout`` -- the timeout limit for downloads (secs)
     - ``concurrentDownloads`` -- the number of concurrent downloads allowed at any one time
-    - ``resetFilename`` -- a string to reset all filenames to
+    - ``resetFilename`` -- a string to reset all filenames to, or a list of filenames the same length as urlList (one per URL). ``indexFilenames`` does not apply to reset filenames
     - ``credentials`` -- basic http credentials { 'username' : "...", "password", "..." }
     - ``indexFilenames`` -- prepend filenames with index (where url appears in urllist)
 
     **Return**
 
-    - list of timestamped documents (same order as the input urlList)
+    - list of local file paths, the same length and order as the input urlList. A download that fails (after retries) gives ``None`` in its slot and leaves no partial file
+
+    **Raises**
+
+    - ``ValueError`` -- if ``downloadDirectory`` or ``resetFilename`` is a list that is not the same length as ``urlList``
 
     **Usage**
 
@@ -70,7 +76,7 @@ def multiobject_download(
     localUrls = multiobject_download(
         urlList=["https://www.python.org/dev/peps/pep-0257/","https://en.wikipedia.org/wiki/Docstring"],
         downloadDirectory="/tmp",
-        log="log",
+        log=log,
         timeStamp=True,
         timeout=180,
         concurrentDownloads=2,
@@ -79,7 +85,7 @@ def multiobject_download(
         longTime=True
     )
 
-    print localUrls
+    print(localUrls)
     # OUT: ['/tmp/untitled_20160316t160650610780.html',
     # '/tmp/Docstring_20160316t160650611136.html']
     ```
@@ -87,142 +93,145 @@ def multiobject_download(
     .. image:: https://i.imgur.com/QYoMm24.png width=600px
 
     """
-    import os
-    import re
+    timeout = float(timeout)
+    totalCount = len(urlList)
+    downloadDirectories = _expand_to_list(
+        downloadDirectory, totalCount, "downloadDirectory"
+    )
+    resetFilenames = _expand_to_list(resetFilename, totalCount, "resetFilename")
+
+    # BUILD THE 2D ARRAY FOR MULTI_THREADED DOWNLOADS
+    thisArray = []
+    for i, (url, d, resetName) in enumerate(
+        zip(urlList, downloadDirectories, resetFilenames)
+    ):
+        filename = _local_filename(
+            log, url, i, resetName, timeStamp, longTime, indexFilenames
+        )
+        # ADD BASIC AUTH TO THE URLS (AFTER THE FILENAME IS EXTRACTED SO CREDENTIALS ARE NEVER LOGGED)
+        if credentials != False:
+            url = _add_credentials_to_url(url, credentials)
+        thisArray.append([url, d + "/" + filename, timeout, log])
+
+    # CONCURRENTLY DOWNLOAD URLS - RESULTS COME BACK IN THE ORDER OF urlList
+    localPaths = []
+    with ThreadPool(concurrentDownloads) as pool:
+        for urlNum, path in enumerate(pool.imap(fetch_url, thisArray), start=1):
+            localPaths.append(path)
+            if urlNum > 1:
+                # CURSOR UP ONE LINE AND CLEAR LINE
+                sys.stdout.write("\x1b[1A\x1b[2K")
+            percent = (float(urlNum) / float(totalCount)) * 100.0
+            print(
+                "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded"
+                % locals()
+            )
+
+    return localPaths
+
+
+def _expand_to_list(value, length, name):
+    """
+    *return ``value`` as a list of ``length`` items - a single value is repeated and a list must already be the right length*
+
+    **Raises**
+
+    - ``ValueError`` -- if ``value`` is a list of the wrong length
+    """
+    if isinstance(value, list):
+        if len(value) != length:
+            raise ValueError(
+                "%s has %s items but urlList has %s" % (name, len(value), length)
+            )
+        return value
+    return [value] * length
+
+
+def _add_credentials_to_url(url, credentials):
+    """
+    *return the url with percent-encoded basic-auth credentials embedded*
+    """
+    userInfo = "%s:%s@" % (
+        quote(credentials["username"], safe=""),
+        quote(credentials["password"], safe=""),
+    )
+    if "://" in url:
+        return url.replace("://", "://" + userInfo, 1)
+    return userInfo + url
+
+
+def _local_filename(log, url, index, resetName, timeStamp, longTime, indexFilenames):
+    """
+    *work out the local filename for the url at position ``index`` in the url list*
+    """
     from fundamentals.download import (
         append_now_datestamp_to_filename,
         extract_filename_from_url,
     )
 
-    # TIMEOUT IN SECONDS
-    global gtimeout
-    global llog
-    llog = log
-    gtimeout = float(timeout)
-
-    # BUILD THE 2D ARRAY FOR MULTI_THREADED DOWNLOADS
-    thisArray = []
-    bodies = []
-    localUrls = []
-    theseUrls = []
-    requestList = []
-
-    totalCount = len(urlList)
-
-    # IF ONLY ONE DOWNLOAD DIRECORY
-    if not isinstance(downloadDirectory, list):
-        for i, url in enumerate(urlList):
-            # EXTRACT THE FILENAME FROM THE URL
-            if resetFilename and len(resetFilename):
-                filename = resetFilename[i]
-            else:
-                filename = extract_filename_from_url(log, url)
-                if indexFilenames:
-                    filename = """%(i)03d_%(filename)s""" % locals()
-
-            if not filename:
-                from datetime import datetime, date, time
-
-                now = datetime.now()
-                filename = now.strftime("%Y%m%dt%H%M%S%f")
-
-            if timeStamp:
-                # APPEND TIMESTAMP TO THE FILENAME
-                filename = append_now_datestamp_to_filename(
-                    log, filename, longTime=longTime
-                )
-            # GENERATE THE LOCAL FILE URL
-            localFilepath = downloadDirectory + "/" + filename
-
-            # ADD BASIC AUTH TO THE URLS
-            if credentials != False:
-                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
-                if "://" in url:
-                    url = url.replace("://", "://" + url_pass)
-                else:
-                    url = url_pass + url
-            thisArray.extend([[url, localFilepath]])
-
+    if resetName:
+        filename = resetName
     else:
-        for url, d in zip(urlList, downloadDirectory):
-            # EXTRACT THE FILENAME FROM THE URL
-            if resetFilename:
-                filename = resetFilename
-            else:
-                filename = extract_filename_from_url(log, url)
+        filename = extract_filename_from_url(log, url)
+        if filename and indexFilenames:
+            filename = "%03d_%s" % (index, filename)
 
-            if not filename:
-                continue
+    if not filename:
+        filename = datetime.now().strftime("%Y%m%dt%H%M%S%f")
 
-            if timeStamp:
-                # APPEND TIMESTAMP TO THE FILENAME
-                filename = append_now_datestamp_to_filename(log, filename)
-            # GENERATE THE LOCAL FILE URL
-            localFilepath = d + "/" + filename
-            thisArray.extend([[url, localFilepath]])
-
-            # ADD BASIC AUTH TO THE URLS
-            if credentials != False:
-                url_pass = f'{credentials["username"]}:{credentials["password"]}@'
-                if "://" in url:
-                    url = url.replace("://", "://" + url_pass)
-                else:
-                    url = url_pass + url
-
-    # CONCURRENTLY DOWNLOAD URLS
-    results = ThreadPool(concurrentDownloads).imap_unordered(fetch_url, thisArray)
-    urlNum = 0
-    returnPaths = []
-    for path in results:
-        returnPaths.append(path)
-        urlNum += 1
-        if urlNum > 1:
-            # CURSOR UP ONE LINE AND CLEAR LINE
-            sys.stdout.write("\x1b[1A\x1b[2K")
-        percent = (float(urlNum) / float(totalCount)) * 100.0
-        print(
-            "  %(urlNum)s / %(totalCount)s (%(percent)1.1f%%) URLs downloaded"
-            % locals()
-        )
-
-    localPaths = []
-    localPaths[:] = [o[1] for o in thisArray if o[1] in returnPaths]
-
-    return localPaths
+    if timeStamp:
+        # APPEND TIMESTAMP TO THE FILENAME
+        filename = append_now_datestamp_to_filename(log, filename, longTime=longTime)
+    return filename
 
 
 def fetch_url(entry):
-    downloaded = False
-    tries = 5
-    count = 0
-    uri, path = entry
-    timeout = gtimeout
+    """
+    *download one url to a local file, retrying on failure*
 
-    randSleep = random.randint(1, 101) / 20.0
+    **Key Arguments**
 
-    time.sleep(randSleep)
+    - ``entry`` -- a (url, local path, timeout in seconds, logger) tuple
 
-    while not downloaded and count < tries:
+    **Return**
+
+    - the local path, or ``None`` if every attempt failed. Failed attempts never leave a partial file behind and the url (which may hold credentials) is never logged
+    """
+    uri, path, timeout, log = entry
+
+    time.sleep(random.randint(1, 101) / 20.0)
+
+    for attempt in range(1, MAX_TRIES + 1):
+        r = None
         try:
             r = requests.get(uri, stream=True, timeout=timeout)
-        except:
-            count += 1
+            if r.status_code == 200:
+                with open(path, "wb") as f:
+                    for chunk in r.iter_content(CHUNK_SIZE):
+                        f.write(chunk)
+                return path
+            log.warning(
+                f"Getting status code {r.status_code} on download attempt {attempt}/{MAX_TRIES}."
+            )
+        except Exception as e:
+            # ONLY THE EXCEPTION TYPE IS LOGGED AS ITS MESSAGE CAN HOLD THE URL
             timeout *= 2
-            llog.warning(
-                f"timeout on attempt number {count}/{tries}. Increasing to {timeout}s"
+            log.warning(
+                f"{type(e).__name__} on attempt number {attempt}/{MAX_TRIES}. Increasing timeout to {timeout}s"
             )
-            continue
-
-        if r.status_code == 200:
-            with open(path, "wb") as f:
-                for chunk in r:
-                    f.write(chunk)
-            return path
-        else:
-            count += 1
-            llog.warning(
-                f"Getting status code {r.status_code} on download attempt {count}/{tries}."
-            )
-            downloaded = False
+            _remove_file(path)
+        finally:
+            if r is not None:
+                r.close()
 
     return None
+
+
+def _remove_file(path):
+    """
+    *delete a file, ignoring the case where it was never created*
+    """
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
