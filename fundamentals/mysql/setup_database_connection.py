@@ -56,7 +56,6 @@ def setup_database_connection(pathToYamlFile):
     ```
 
     """
-    import sys
     import logging
     import pymysql as ms
 
