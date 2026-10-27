@@ -204,6 +204,4 @@ class database(object):
                 )
                 return False
 
-        return None
-
     # xt-class-method

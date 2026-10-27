@@ -41,6 +41,7 @@ shutil.copytree(pathToInputDir, pathToOutputDir)
 if not os.path.exists(pathToOutputDir):
     os.makedirs(pathToOutputDir)
 
+
 class test_datetime_relative_to_now(unittest.TestCase):
 
     def test_reports_minutes_for_a_date_five_minutes_ago(self):
