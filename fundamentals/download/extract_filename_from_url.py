@@ -10,6 +10,7 @@ Author
 from builtins import str
 import sys
 import os
+from urllib.parse import urlparse
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
@@ -48,7 +49,9 @@ def extract_filename_from_url(log, url):
     try:
         log.debug("extracting filename from url " + url)
         reEoURL = re.compile(r"([\w\.\_\-]*)$")
-        filename = reEoURL.findall(url)[0]
+        # USE THE PATH ONLY, IGNORING ANY QUERY STRING OR FRAGMENT
+        urlPath = urlparse(url).path
+        filename = reEoURL.findall(urlPath)[0]
         # log.debug(filename)
         if len(filename) == 0:
             filename = "untitled.html"
