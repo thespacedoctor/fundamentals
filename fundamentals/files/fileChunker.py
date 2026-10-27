@@ -71,6 +71,8 @@ class fileChunker(object):
         self.readFile.close()
 
     def __next__(self):
+        if self.readFile.closed:
+            raise StopIteration
         batch = []
         for lines in range(self.batchSize):
             l = self.readFile.readline()
