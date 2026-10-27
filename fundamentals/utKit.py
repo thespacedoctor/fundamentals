@@ -140,8 +140,6 @@ class utKit(object):
         - ``rootPath`` -- the root path of a project
 
         """
-        import os
-
         rootPath = os.path.dirname(__file__)
 
         return rootPath
@@ -170,7 +168,3 @@ class utKit(object):
             successRule=None,
             failureRule=None,
         )
-
-
-if __name__ == "__main__":
-    main()
