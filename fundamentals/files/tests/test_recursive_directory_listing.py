@@ -118,6 +118,24 @@ class test_recursive_directory_listing(unittest.TestCase):
         with self.assertRaises(ValueError):
             recursive_directory_listing(log, self.baseDir, whatToList="bogus")
 
+    def test_raises_file_not_found_error_when_base_folder_is_missing(self):
+        from fundamentals.files import recursive_directory_listing
+
+        missingDir = os.path.join(self.baseDir, "missing")
+
+        with self.assertRaises(FileNotFoundError):
+            recursive_directory_listing(log, missingDir, whatToList="all")
+
+    def test_raises_permission_error_when_base_folder_is_unreadable(self):
+        from fundamentals.files import recursive_directory_listing
+
+        lockedDir = os.path.join(self.baseDir, "locked")
+        os.mkdir(lockedDir)
+        os.chmod(lockedDir, 0o000)
+
+        with self.assertRaises(PermissionError):
+            recursive_directory_listing(log, lockedDir, whatToList="all")
+
     def test_lists_files_dirs_or_all_with_joined_paths(self):
         os.makedirs(os.path.join(self.baseDir, "d1", "d2"))
         filePath = os.path.join(self.baseDir, "d1", "d2", "f.txt")

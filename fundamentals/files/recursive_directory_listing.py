@@ -70,6 +70,9 @@ def recursive_directory_listing(log, baseFolderPath, whatToList="all"):
         )
 
     def _log_unreadable(error):
+        # A BAD BASE FOLDER IS A CALLER MISTAKE; ONLY SUBDIRECTORIES ARE SKIPPED
+        if error.filename == baseFolderPath:
+            raise error
         log.warning("skipping unreadable directory: %s" % (error,))
 
     matchedPathList = []
