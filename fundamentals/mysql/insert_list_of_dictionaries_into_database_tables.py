@@ -45,6 +45,26 @@ def _normalise_key(key):
     return formattedKey
 
 
+def _quote_identifier(name):
+    """*return a table or column name quoted for use in a MySQL statement*
+
+    Backticks inside the name are doubled so the name cannot close the quoting early.
+    """
+    return "`" + str(name).replace("`", "``") + "`"
+
+
+def _map_keys_to_columns(rows):
+    """*map every key used in a list of dictionaries to its database column name*
+
+    **Return**
+
+    - ``originalKeys`` -- the sorted, de-duplicated keys of all the dictionaries
+    - ``columnNames`` -- the database column name for each key, in the same order
+    """
+    originalKeys = sorted(set().union(*(list(d.keys()) for d in rows)), key=str)
+    return originalKeys, [_normalise_key(k) for k in originalKeys]
+
+
 def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
     """*restore the caller's autocommit setting*
 
@@ -218,6 +238,7 @@ def insert_list_of_dictionaries_into_database_tables(
                     dbTablename=dbTableName,
                     dbSettings=dbSettings,
                     dateModified=dateModified,
+                    replace=replace,
                     turnOffMP=False,
                     progressBar=True,
                 )
@@ -343,8 +364,7 @@ def _insert_single_batch_into_database(
         insertVerb = "INSERT IGNORE"
 
     # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
-    originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])), key=str)
-    uniKeys = [_normalise_key(k) for k in originalKeys]
+    originalKeys, uniKeys = _map_keys_to_columns(batch[0])
 
     myKeys = "`,`".join(uniKeys)
     vals = [
@@ -413,82 +433,83 @@ def _insert_single_batch_into_database(
 
 
 def _add_dictlist_to_database_via_load_in_file(
-    masterListIndex, dbTablename, dbSettings, dateModified=False
+    masterListIndex, log, dbTablename, dbSettings, dateModified=False, replace=False
 ):
     """*load a list of dictionaries into a database table with load data infile*
 
     **Key Arguments**
 
     - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
+    - ``log`` -- logger
     - ``dbTablename`` -- the name of the database table to add the list to
     - ``dbSettings`` -- the dictionary of database settings
-    - ``log`` -- logger
     - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    - ``replace`` -- update rows that already exist? If False, duplicates are skipped
 
 
     **Return**
 
     - None
 
-
-    **Usage**
-
-    .. todo::
-
-        add usage info
-        create a sublime snippet for usage
-
-    ```python
-    usage code
-    ```
-
     """
     global sharedList
 
-    from fundamentals.logs import emptyLogger
     import numpy as np
     import pandas as pd
+    import random
 
-    log = emptyLogger()
     log.debug("starting the ``_add_dictlist_to_database_via_load_in_file`` function")
 
     dictList = sharedList[masterListIndex][0]
-
-    count = sharedList[masterListIndex][1]
-    if count > totalCount:
-        count = totalCount
-    ltotalCount = totalCount
-
-    # SETUP ALL DATABASE CONNECTIONS
-    dbConn = database(log=log, dbSettings=dbSettings).connect()
+    originalKeys, columns = _map_keys_to_columns(dictList)
 
     now = datetime.now()
-
-    import random
-
     rand = random.randint(0, 10000)
-
     tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
-
-    # CREATE A TEMPORY TABLE TO ADD DATA TO
-    sqlQuery = (
-        """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;"""
-        % locals()
-    )
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-    sqlQuery = """ALTER TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-    csvColumns = [k for d in dictList for k in list(d.keys())]
-    csvColumns = list(set(csvColumns))
-    csvColumnsString = ("`, `").join(csvColumns)
-    csvColumnsString = f"`{csvColumnsString}`"
-    csvColumnsString = csvColumnsString.replace("`dec`", "`decl`")
+    quotedTmpTable = _quote_identifier(tmpTable)
+    quotedTable = _quote_identifier(dbTablename)
 
     df = pd.DataFrame(dictList)
     df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
 
+    # SETUP ALL DATABASE CONNECTIONS
+    dbConn = database(log=log, dbSettings=dbSettings).connect()
+    try:
+        # CREATE A TEMPORY TABLE TO ADD DATA TO
+        sqlQuery = (
+            "CREATE TEMPORARY TABLE %(quotedTmpTable)s SELECT * FROM %(quotedTable)s WHERE 1=0;"
+            % locals()
+        )
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+
+        sqlQuery = "ALTER TABLE %(quotedTmpTable)s DISABLE KEYS;" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+
+        _load_dataframe_into_table(
+            log, dbConn, df, originalKeys, columns, tmpTable, quotedTmpTable
+        )
+
+        updateClause = _build_update_clause(columns, dateModified) if replace else ""
+        sqlQuery = """
+INSERT IGNORE INTO %(quotedTable)s
+SELECT * FROM %(quotedTmpTable)s%(updateClause)s;""" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+
+        sqlQuery = "DROP TEMPORARY TABLE %(quotedTmpTable)s;" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+
+        dbConn.commit()
+    finally:
+        dbConn.close()
+
+    log.debug("completed the ``_add_dictlist_to_database_via_load_in_file`` function")
+    return None
+
+
+def _load_dataframe_into_table(
+    log, dbConn, df, originalKeys, columns, tmpTable, quotedTmpTable
+):
+    """*write a dataframe to a scratch csv file and LOAD DATA it into the temporary table*"""
     with tempfile.TemporaryDirectory(prefix="fundamentals-load-") as tmpDir:
         csvPath = os.path.join(tmpDir, tmpTable + ".csv")
         df.to_csv(
@@ -496,7 +517,7 @@ def _add_dictlist_to_database_via_load_in_file(
             sep="|",
             index=False,
             quotechar='"',
-            columns=csvColumns,
+            columns=originalKeys,
             encoding="utf-8",
         )
 
@@ -508,36 +529,24 @@ def _add_dictlist_to_database_via_load_in_file(
                 % csvPath
             )
         sqlCsvPath = csvPath.replace("'", "''")
+        csvColumnsString = ", ".join(_quote_identifier(c) for c in columns)
         sqlQuery = """LOAD DATA LOCAL INFILE '%(sqlCsvPath)s'
-INTO TABLE %(tmpTable)s
+INTO TABLE %(quotedTmpTable)s
 FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
 IGNORE 1 LINES
 (%(csvColumnsString)s);""" % locals()
-
         writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-        updateStatement = ""
-        for i in csvColumns:
-            updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
-        if dateModified:
-            updateStatement += "dateLastModified = NOW(), updated = 1"
-        else:
-            updateStatement = updateStatement[0:-2]
 
-        sqlQuery = """
-INSERT IGNORE INTO %(dbTablename)s
-SELECT * FROM %(tmpTable)s
-ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
-        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-        sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
-        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-    dbConn.commit()
-    dbConn.close()
-
-    log.debug("completed the ``_add_dictlist_to_database_via_load_in_file`` function")
-    return None
+def _build_update_clause(columns, dateModified):
+    """*return the ON DUPLICATE KEY UPDATE clause that overwrites duplicates with the new values*"""
+    assignments = [
+        "%(c)s = VALUES(%(c)s)" % {"c": _quote_identifier(column)} for column in columns
+    ]
+    if dateModified:
+        assignments.append("dateLastModified = NOW()")
+        assignments.append("updated = 1")
+    return "\nON DUPLICATE KEY UPDATE " + ", ".join(assignments)
 
 
 # use the tab-trigger below for new function

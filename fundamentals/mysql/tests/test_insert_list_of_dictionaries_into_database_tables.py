@@ -134,6 +134,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
                     ):
                         self.insertModule._add_dictlist_to_database_via_load_in_file(
                             masterListIndex=0,
+                            log=log,
                             dbTablename=LOAD_IN_FILE_TABLE,
                             dbSettings=dbSettings,
                         )
@@ -220,6 +221,238 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
+
+
+class test_load_in_file_statements(unittest.TestCase):
+    """The LOAD DATA worker run against a mocked connection that records its SQL."""
+
+    def setUp(self):
+        self.insertModule = sys.modules[
+            "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
+        ]
+        self.sqlStatements = []
+        self.writequeryLogs = []
+        self.connectionMock = mock.Mock()
+        self.databaseMock = mock.Mock()
+        self.databaseMock.return_value.connect.return_value = self.connectionMock
+
+    def _run_load(
+        self,
+        rows,
+        dbTablename="sweep2_insert_statements",
+        replace=False,
+        dateModified=False,
+        failOnStatement=None,
+    ):
+        def recordWritequery(log, sqlQuery, dbConn, **kwargs):
+            self.sqlStatements.append(sqlQuery)
+            self.writequeryLogs.append(log)
+            if failOnStatement and failOnStatement in sqlQuery:
+                raise RuntimeError("simulated writequery failure")
+            return ""
+
+        with mock.patch.object(self.insertModule, "sharedList", [(rows, len(rows))]):
+            with mock.patch.object(self.insertModule, "totalCount", len(rows)):
+                with mock.patch.object(self.insertModule, "database", self.databaseMock):
+                    with mock.patch.object(
+                        self.insertModule, "writequery", recordWritequery
+                    ):
+                        self.insertModule._add_dictlist_to_database_via_load_in_file(
+                            masterListIndex=0,
+                            log=log,
+                            dbTablename=dbTablename,
+                            dbSettings=dbSettings,
+                            dateModified=dateModified,
+                            replace=replace,
+                        )
+
+    def _statement_containing(self, text):
+        return next(q for q in self.sqlStatements if text in q)
+
+    def test_does_not_update_duplicates_when_replace_is_false(self):
+        # ARRANGE
+        rows = [{"col1": 1, "col2": 2.0}]
+
+        # ACT
+        self._run_load(rows, replace=False)
+
+        # ASSERT
+        insertStatement = self._statement_containing("INSERT IGNORE")
+        self.assertNotIn("ON DUPLICATE KEY UPDATE", insertStatement)
+
+    def test_updates_duplicates_when_replace_is_true(self):
+        # ARRANGE
+        rows = [{"col1": 1, "col2": 2.0}]
+
+        # ACT
+        self._run_load(rows, replace=True)
+
+        # ASSERT
+        insertStatement = self._statement_containing("INSERT IGNORE")
+        self.assertIn("ON DUPLICATE KEY UPDATE `col1` = VALUES(`col1`)", insertStatement)
+
+    def test_maps_dec_and_keys_with_separators_to_column_names_in_every_column_list(
+        self,
+    ):
+        # ARRANGE
+        rows = [{"dec": 1.5, "my key": 2, "other-key": 3}]
+
+        # ACT
+        self._run_load(rows, replace=True)
+
+        # ASSERT
+        loadStatement = self._statement_containing("LOAD DATA")
+        insertStatement = self._statement_containing("INSERT IGNORE")
+        for statement in (loadStatement, insertStatement):
+            for column in ("`decl`", "`my_key`", "`other_key`"):
+                self.assertIn(column, statement)
+            for original in ("`dec`", "`my key`", "`other-key`"):
+                self.assertNotIn(original, statement)
+        self.assertIn("VALUES(`decl`)", insertStatement)
+
+    def test_fills_missing_keys_with_null_when_dictionaries_have_different_keys(self):
+        # ARRANGE
+        rows = [{"a": 1, "b": 2}, {"a": 3}]
+
+        # ACT
+        self._run_load(rows)
+
+        # ASSERT
+        self.assertIn("(`a`, `b`)", self._statement_containing("LOAD DATA"))
+
+    def test_backtick_quotes_table_and_temporary_table_identifiers(self):
+        # ARRANGE
+        rows = [{"col1": 1}]
+
+        # ACT
+        self._run_load(rows, dbTablename="sweep2_insert_statements")
+
+        # ASSERT
+        createStatement = self._statement_containing("CREATE TEMPORARY TABLE")
+        self.assertIn("FROM `sweep2_insert_statements` WHERE 1=0", createStatement)
+        self.assertRegex(createStatement, r"CREATE TEMPORARY TABLE `tmp_[0-9a-z]+`")
+        insertStatement = self._statement_containing("INSERT IGNORE")
+        self.assertIn("INTO `sweep2_insert_statements`", insertStatement)
+        self.assertRegex(insertStatement, r"SELECT \* FROM `tmp_[0-9a-z]+`")
+        self.assertRegex(
+            self._statement_containing("LOAD DATA"), r"INTO TABLE `tmp_[0-9a-z]+`"
+        )
+
+    def test_doubles_backticks_inside_table_and_column_names(self):
+        # ARRANGE
+        rows = [{"we`ird": 1}]
+
+        # ACT
+        self._run_load(rows, dbTablename="sweep2`insert")
+
+        # ASSERT
+        self.assertIn("FROM `sweep2``insert` WHERE", self._statement_containing("CREATE"))
+        self.assertIn("(`we``ird`)", self._statement_containing("LOAD DATA"))
+
+    def test_closes_the_connection_when_the_load_raises(self):
+        # ARRANGE
+        rows = [{"col1": 1}]
+
+        # ACT
+        with self.assertRaises(RuntimeError):
+            self._run_load(rows, failOnStatement="LOAD DATA")
+
+        # ASSERT
+        self.connectionMock.close.assert_called_once_with()
+
+    def test_closes_the_connection_when_the_load_succeeds(self):
+        # ARRANGE / ACT
+        self._run_load([{"col1": 1}])
+
+        # ASSERT
+        self.connectionMock.commit.assert_called_once_with()
+        self.connectionMock.close.assert_called_once_with()
+
+    def test_uses_the_callers_logger(self):
+        # ARRANGE / ACT
+        self._run_load([{"col1": 1}])
+
+        # ASSERT
+        self.assertEqual(self.databaseMock.call_args.kwargs["log"], log)
+        self.assertTrue(all(writequeryLog is log for writequeryLog in self.writequeryLogs))
+
+
+REPLACE_TABLE = "sweep2_insert_replace"
+
+
+class test_load_in_file_duplicates(unittest.TestCase):
+    """The LOAD DATA worker against the real test database."""
+
+    def setUp(self):
+        from fundamentals.mysql import writequery
+
+        self.insertModule = sys.modules[
+            "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
+        ]
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=dbConn
+        )
+        writequery(
+            log=log,
+            sqlQuery="CREATE TABLE %s (id INT PRIMARY KEY, `my_key` INT, decl DOUBLE);"
+            % REPLACE_TABLE,
+            dbConn=dbConn,
+        )
+        writequery(
+            log=log,
+            sqlQuery="INSERT INTO %s VALUES (1, 10, 1.5);" % REPLACE_TABLE,
+            dbConn=dbConn,
+        )
+
+    def tearDown(self):
+        from fundamentals.mysql import writequery
+
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=dbConn
+        )
+
+    def _load_duplicate_and_new_row(self, replace):
+        from fundamentals.mysql import readquery
+
+        rows = [
+            {"id": 1, "my key": 99, "dec": 9.5},
+            {"id": 2, "my key": 20, "dec": 2.5},
+        ]
+        with mock.patch.object(self.insertModule, "sharedList", [(rows, 2)]):
+            with mock.patch.object(self.insertModule, "totalCount", 2):
+                self.insertModule._add_dictlist_to_database_via_load_in_file(
+                    masterListIndex=0,
+                    log=log,
+                    dbTablename=REPLACE_TABLE,
+                    dbSettings=dbSettings,
+                    replace=replace,
+                )
+        dbConn.commit()
+        return readquery(
+            log=log,
+            sqlQuery="SELECT id, my_key, decl FROM %s ORDER BY id;" % REPLACE_TABLE,
+            dbConn=dbConn,
+        )
+
+    def test_keeps_existing_row_and_adds_new_row_when_replace_is_false(self):
+        # ACT
+        result = self._load_duplicate_and_new_row(replace=False)
+
+        # ASSERT
+        self.assertEqual(
+            [(r["id"], r["my_key"], r["decl"]) for r in result],
+            [(1, 10, 1.5), (2, 20, 2.5)],
+        )
+
+    def test_overwrites_existing_row_and_adds_new_row_when_replace_is_true(self):
+        # ACT
+        result = self._load_duplicate_and_new_row(replace=True)
+
+        # ASSERT
+        self.assertEqual(
+            [(r["id"], r["my_key"], r["decl"]) for r in result],
+            [(1, 99, 9.5), (2, 20, 2.5)],
+        )
 
 
 BATCH_TABLE = "test_dy2025_insert_batches"
