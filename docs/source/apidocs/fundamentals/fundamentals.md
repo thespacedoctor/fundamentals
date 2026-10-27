@@ -33,6 +33,7 @@ fundamentals.cl_utils
 fundamentals.daemonise
 fundamentals.fmultiprocess
 fundamentals.logs
+fundamentals.ssh_tunnel
 fundamentals.times
 fundamentals.tools
 fundamentals.utKit

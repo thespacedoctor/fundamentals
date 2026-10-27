@@ -33,9 +33,31 @@
     ```
 ````
 
+### Data
+
+````{list-table}
+:class: autosummary longtable
+:align: left
+
+* - {py:obj}`SETTINGS_FILE_ARGUMENT_KEYS <fundamentals.tools.SETTINGS_FILE_ARGUMENT_KEYS>`
+  - ```{autodoc2-docstring} fundamentals.tools.SETTINGS_FILE_ARGUMENT_KEYS
+    :summary:
+    ```
+````
+
 ### API
 
-````{py:function} ordered_load(stream, Loader=yaml.loader, object_pairs_hook=OrderedDict)
+````{py:data} SETTINGS_FILE_ARGUMENT_KEYS
+:canonical: fundamentals.tools.SETTINGS_FILE_ARGUMENT_KEYS
+:value: >
+   ('settingsFile', '<settingsFile>', '<pathToSettingsFile>', '--settingsFile', 'pathToSettingsFile', '...
+
+```{autodoc2-docstring} fundamentals.tools.SETTINGS_FILE_ARGUMENT_KEYS
+```
+
+````
+
+````{py:function} ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict)
 :canonical: fundamentals.tools.ordered_load
 
 ```{autodoc2-docstring} fundamentals.tools.ordered_load
