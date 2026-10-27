@@ -37,7 +37,7 @@ def insert_list_of_dictionaries_into_database_tables(
     log,
     dictList,
     dbTableName,
-    uniqueKeyList=[],
+    uniqueKeyList=None,
     dateModified=False,
     dateCreated=True,
     batchSize=2500,
@@ -85,6 +85,9 @@ def insert_list_of_dictionaries_into_database_tables(
     log.debug(
         "starting the ````insert_list_of_dictionaries_into_database_tables`` function"
     )
+
+    if uniqueKeyList is None:
+        uniqueKeyList = []
 
     global count
     global totalCount
