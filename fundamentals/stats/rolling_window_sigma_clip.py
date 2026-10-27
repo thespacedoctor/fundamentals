@@ -49,8 +49,8 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
         from astropy.stats import sigma_clip, mad_std
     except ImportError as e:
         message = (
-            "rolling_window_sigma_clip requires astropy and numpy, "
-            "install them with: pip install fundamentals[stats]"
+            "rolling_window_sigma_clip requires astropy, "
+            "install it with: pip install fundamentals[stats]"
         )
         log.error(message)
         raise ImportError(message) from e

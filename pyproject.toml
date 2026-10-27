@@ -31,7 +31,9 @@ dependencies = [
     'unicodecsv',
     'pymysql',
     'multiprocess',
-    'six'
+    'six',
+    'numpy',
+    'pandas'
 ]
 
 [project.urls]
@@ -39,9 +41,7 @@ dependencies = [
 
 [project.optional-dependencies]
 stats = [
-    "astropy",
-    "numpy",
-    "pandas"
+    "astropy"
 ]
 docs = [
     "build",

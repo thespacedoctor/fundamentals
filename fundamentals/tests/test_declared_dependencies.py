@@ -99,12 +99,19 @@ class test_declared_dependencies(unittest.TestCase):
 
         self.assertNotIn(PACKAGE_NAME, names)
 
-    def test_stats_extra_holds_astropy_and_numpy(self):
+    def test_stats_extra_holds_astropy(self):
         extras = _declared_pyproject().get("optional-dependencies", {})
 
         names = {_distribution_name(r) for r in extras.get("stats", [])}
 
-        self.assertTrue({"astropy", "numpy"} <= names)
+        self.assertIn("astropy", names)
+
+    def test_numpy_and_pandas_are_core_dependencies(self):
+        dependencies = _declared_pyproject().get("dependencies", [])
+
+        names = {_distribution_name(d) for d in dependencies}
+
+        self.assertTrue({"numpy", "pandas"} <= names)
 
     def test_unicodecsv_is_a_core_dependency(self):
         dependencies = _declared_pyproject().get("dependencies", [])

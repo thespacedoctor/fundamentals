@@ -505,19 +505,13 @@ class test_load_in_file_duplicates(unittest.TestCase):
             [(1, 99, 9.5), (2, 20, 2.5)],
         )
 
-class test_stats_dependencies_loaded_in_parent(unittest.TestCase):
+class test_dataframe_libraries_loaded_in_parent(unittest.TestCase):
     """numpy and pandas must be imported before the worker pool forks."""
 
     def setUp(self):
         self.insertModule = sys.modules[
             "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
         ]
-
-    def test_raises_import_error_naming_the_stats_extra_when_pandas_is_missing(self):
-        # ACT / ASSERT
-        with mock.patch.dict(sys.modules, {"pandas": None}):
-            with self.assertRaisesRegex(ImportError, r"pip install fundamentals\[stats\]"):
-                self.insertModule._require_stats_dependencies()
 
     def test_imports_numpy_and_pandas_before_the_load_in_file_pool_starts(self):
         # ARRANGE
@@ -526,7 +520,7 @@ class test_stats_dependencies_loaded_in_parent(unittest.TestCase):
         fmultiprocessMock = mock.Mock(side_effect=lambda **kwargs: calls.append("pool"))
 
         # ACT
-        with mock.patch.object(self.insertModule, "_require_stats_dependencies", requireMock):
+        with mock.patch.object(self.insertModule, "_import_dataframe_libraries", requireMock):
             with mock.patch.object(self.insertModule, "fmultiprocess", fmultiprocessMock):
                 self.insertModule.insert_list_of_dictionaries_into_database_tables(
                     dbConn=dbConn,
