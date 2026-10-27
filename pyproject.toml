@@ -21,20 +21,28 @@ classifiers = [
 ]
 dependencies = [
     'pyyaml',
-    'fundamentals',
     'future',
     'docopt',
     'psutil',
     'python-dateutil',
     'requests',
     'python-daemon',
-    'tqdm'
+    'tqdm',
+    'unicodecsv',
+    'pymysql',
+    'multiprocess',
+    'six'
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/thespacedoctor/fundamentals"
 
 [project.optional-dependencies]
+stats = [
+    "astropy",
+    "numpy",
+    "pandas"
+]
 docs = [
     "build",
     "sphinx",
@@ -58,7 +66,8 @@ docs = [
 tests = [
     "pytest",
     "pytest-cov",
-    "nose2"
+    "nose2",
+    "pyprof2calltree"
 ]
 dev = [
     "fundamentals[tests, docs]",
