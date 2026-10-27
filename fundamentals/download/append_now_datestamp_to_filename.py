@@ -25,8 +25,13 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     - ``filename`` -- the filename
     - ``longTime`` -- use a longer time-stmap. Default *False*
 
-    Return:
-        - ``dsFilename`` -- datestamped filename
+    **Return**
+
+    - ``dsFilename`` -- datestamped filename. Only the last extension is kept (`a.tar.gz` becomes `a.tar_<stamp>.gz`) and a name with no extension gets `.xhtml`
+
+    **Raises**
+
+    - ``TypeError`` -- if ``filename`` is not a string
 
     **Usage**
 
@@ -45,21 +50,14 @@ def append_now_datestamp_to_filename(log, filename, longTime=False):
     """
     from fundamentals.download import get_now_datetime_filestamp
 
-    try:
-        # log.debug("appending date stamp to the filename : "+filename)
-        sliced = filename.split(".")
-        dsFilename = sliced[0] + "_" + get_now_datetime_filestamp(longTime=longTime)
-        if len(sliced) == 2:
-            dsFilename += "." + sliced[1]
-        else:
-            dsFilename += ".xhtml"
-    except Exception as e:
-        log.error(
-            "could not append date stamp to the filename : "
-            + filename
-            + " : "
-            + str(e)
-            + "\n"
-        )
+    if not isinstance(filename, str):
+        message = "filename must be a string, not %s" % (type(filename).__name__,)
+        log.error("could not append date stamp to the filename : %s", message)
+        raise TypeError(message)
+
+    root, extension = os.path.splitext(filename)
+    # NAMES WITH NO EXTENSION DEFAULT TO .xhtml
+    extension = extension or ".xhtml"
+    dsFilename = root + "_" + get_now_datetime_filestamp(longTime=longTime) + extension
 
     return dsFilename
