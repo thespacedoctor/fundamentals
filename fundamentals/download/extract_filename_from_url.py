@@ -10,6 +10,7 @@ Author
 from builtins import str
 import sys
 import os
+from urllib.parse import urlparse
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
@@ -43,7 +44,6 @@ def extract_filename_from_url(log, url):
 
     """
     import re
-    from urllib.parse import urlparse
 
     # EXTRACT THE FILENAME FROM THE URL
     try:
