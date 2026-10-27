@@ -99,6 +99,101 @@ class test_sqlite2mysql(unittest.TestCase):
 
         self.assertEqual(makedirsCalls, [])
 
+    def _make_sqlite_file(self, tableName):
+        import sqlite3
+
+        path = pathToOutputDir + "/sweep2_dictsql_%d.sqlite" % (abs(hash(tableName)),)
+        if os.path.exists(path):
+            os.remove(path)
+        con = sqlite3.connect(path)
+        con.execute('CREATE TABLE "%s" (name TEXT)' % (tableName.replace('"', '""'),))
+        con.execute(
+            'INSERT INTO "%s" (name) VALUES (?)' % (tableName.replace('"', '""'),),
+            ("row one",),
+        )
+        con.commit()
+        con.close()
+        return path
+
+    def test_sqlite2mysql_copies_table_whose_name_contains_a_quote(self):
+        # ARRANGE
+        import fundamentals.mysql
+        from fundamentals.mysql import sqlite2mysql
+
+        tableName = "it's a \"table\""
+        path = self._make_sqlite_file(tableName)
+        this = sqlite2mysql(
+            log=log,
+            settings=settings,
+            pathToSqlite=path,
+            tablePrefix="Pre_",
+            dbConn=dbConn,
+        )
+        sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
+
+        # ACT
+        with (
+            mock.patch.object(sqliteModule, "writequery"),
+            mock.patch.object(
+                fundamentals.mysql, "insert_list_of_dictionaries_into_database_tables"
+            ) as insertList,
+        ):
+            this.convert_sqlite_to_mysql()
+
+        # ASSERT
+        kwargs = insertList.call_args.kwargs
+        self.assertEqual(kwargs["dbTableName"], this.tablePrefix + tableName)
+        self.assertEqual(kwargs["dictList"], [{"name": "row one"}])
+
+    def test_sqlite2mysql_closes_sqlite_connection_and_cursor_when_conversion_fails(
+        self,
+    ):
+        # ARRANGE
+        import sqlite3
+        from fundamentals.mysql import sqlite2mysql
+
+        closed = []
+
+        class RecordingCursor(sqlite3.Cursor):
+            def close(self):
+                closed.append("cursor")
+                super().close()
+
+        class RecordingConnection(sqlite3.Connection):
+            def cursor(self, factory=RecordingCursor):
+                return super().cursor(factory)
+
+            def close(self):
+                closed.append("connection")
+                super().close()
+
+        path = self._make_sqlite_file("plain_table")
+        this = sqlite2mysql(
+            log=log,
+            settings=settings,
+            pathToSqlite=path,
+            tablePrefix="Pre_",
+            dbConn=dbConn,
+        )
+        sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
+        fakeLite = mock.Mock(wraps=sqlite3)
+        fakeLite.connect.side_effect = lambda p: sqlite3.connect(
+            p, factory=RecordingConnection
+        )
+
+        # ACT
+        with (
+            mock.patch.object(sqliteModule, "lite", fakeLite),
+            mock.patch.object(
+                sqliteModule, "writequery", side_effect=RuntimeError("write failed")
+            ),
+        ):
+            with self.assertRaises(RuntimeError):
+                this.convert_sqlite_to_mysql()
+
+        # ASSERT
+        self.assertEqual(sorted(closed), ["connection", "cursor"])
+
     def test_sqlite2mysql_function(self):
 
         from fundamentals.mysql import sqlite2mysql

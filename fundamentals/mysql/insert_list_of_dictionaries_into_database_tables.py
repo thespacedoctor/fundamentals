@@ -15,6 +15,11 @@ import re
 import time
 from fundamentals.fmultiprocess import fmultiprocess
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
+from fundamentals.mysql.sql_identifiers import (
+    normalise_column_name,
+    quote_identifier,
+    raise_on_duplicate_columns,
+)
 from fundamentals import tools
 from builtins import str
 from builtins import range
@@ -34,23 +39,7 @@ sharedList = []
 BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
 
 
-def _normalise_key(key):
-    """*return the database column name for a dictionary key*"""
-    formattedKey = str(key).replace(" ", "_").replace("-", "_")
-    # DEC IS A KEYWORD IN MYSQL - MATCHES THE RENAME IN convert_dictionary_to_mysql_table
-    if formattedKey == "dec":
-        formattedKey = "decl"
-    if formattedKey == "DEC":
-        formattedKey = "DECL"
-    return formattedKey
-
-
-def _quote_identifier(name):
-    """*return a table or column name quoted for use in a MySQL statement*
-
-    Backticks inside the name are doubled so the name cannot close the quoting early.
-    """
-    return "`" + str(name).replace("`", "``") + "`"
+_normalise_key = normalise_column_name
 
 
 def _map_keys_to_columns(rows):
@@ -62,6 +51,7 @@ def _map_keys_to_columns(rows):
     - ``columnNames`` -- the database column name for each key, in the same order
     """
     originalKeys = sorted(set().union(*(list(d.keys()) for d in rows)), key=str)
+    raise_on_duplicate_columns(originalKeys)
     return originalKeys, [_normalise_key(k) for k in originalKeys]
 
 
@@ -466,8 +456,8 @@ def _add_dictlist_to_database_via_load_in_file(
     now = datetime.now()
     rand = random.randint(0, 10000)
     tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
-    quotedTmpTable = _quote_identifier(tmpTable)
-    quotedTable = _quote_identifier(dbTablename)
+    quotedTmpTable = quote_identifier(tmpTable)
+    quotedTable = quote_identifier(dbTablename)
 
     df = pd.DataFrame(dictList)
     df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
@@ -529,7 +519,7 @@ def _load_dataframe_into_table(
                 % csvPath
             )
         sqlCsvPath = csvPath.replace("'", "''")
-        csvColumnsString = ", ".join(_quote_identifier(c) for c in columns)
+        csvColumnsString = ", ".join(quote_identifier(c) for c in columns)
         sqlQuery = """LOAD DATA LOCAL INFILE '%(sqlCsvPath)s'
 INTO TABLE %(quotedTmpTable)s
 FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
@@ -541,7 +531,7 @@ IGNORE 1 LINES
 def _build_update_clause(columns, dateModified):
     """*return the ON DUPLICATE KEY UPDATE clause that overwrites duplicates with the new values*"""
     assignments = [
-        "%(c)s = VALUES(%(c)s)" % {"c": _quote_identifier(column)} for column in columns
+        "%(c)s = VALUES(%(c)s)" % {"c": quote_identifier(column)} for column in columns
     ]
     if dateModified:
         assignments.append("dateLastModified = NOW()")
