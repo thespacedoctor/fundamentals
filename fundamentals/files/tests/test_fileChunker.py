@@ -95,6 +95,17 @@ class test_fileChunker(unittest.TestCase):
         with self.assertRaises(StopIteration):
             next(fileIterator)
 
+    def test_fileChunker_raises_stop_iteration_when_closed_mid_iteration(self):
+
+        from fundamentals.files import fileChunker
+
+        fileIterator = fileChunker(filepath=largeFile, batchSize=10)
+        next(fileIterator)
+        fileIterator.close()
+
+        with self.assertRaises(StopIteration):
+            next(fileIterator)
+
     def test_fileChunker_chains_original_error_when_file_missing(self):
 
         from fundamentals.files import fileChunker
