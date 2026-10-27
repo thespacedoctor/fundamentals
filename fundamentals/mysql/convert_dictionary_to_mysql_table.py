@@ -28,7 +28,7 @@ def convert_dictionary_to_mysql_table(
     log,
     dictionary,
     dbTableName,
-    uniqueKeyList=[],
+    uniqueKeyList=None,
     dbConn=False,
     createHelperTables=False,
     dateModified=False,
@@ -131,6 +131,9 @@ def convert_dictionary_to_mysql_table(
     """
 
     log.debug("starting the ``convert_dictionary_to_mysql_table`` function")
+
+    if uniqueKeyList is None:
+        uniqueKeyList = []
 
     if not reDatetime:
         reDatetime = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
@@ -379,7 +382,7 @@ def convert_dictionary_to_mysql_table(
                     if qCreateColumn:
                         # ADD COMMENT TO GIVE THE ORGINAL KEYWORD IF formatted FOR
                         # MYSQL
-                        if key is not formattedKey:
+                        if key != formattedKey:
                             qCreateColumn += (
                                 " COMMENT 'original keyword: " + key + """'"""
                             )
@@ -575,7 +578,7 @@ def convert_dictionary_to_mysql_table(
         )
         log.error(message)
         print(message)
-        raise Exception
+        raise Exception(message) from e
 
     log.debug("completed the ``convert_dictionary_to_mysql_table`` function")
     return None, None
