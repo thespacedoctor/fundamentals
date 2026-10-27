@@ -145,11 +145,11 @@ def directory_script_runner(
         pathToScriptDirectory="/path/to/mysql_scripts",
         databaseName="imports",
         loginPath="myLoginDetails",
-        waitForResults=False
+        waitForResult=False
     )
     ```
 
-    Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+    Setting ``waitForResult`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
 
     """
     log.debug("starting the ``directory_script_runner`` function")
@@ -298,13 +298,12 @@ def execute_mysql_script(pathToScript, dbConn, log):
     pathToReadFile = pathToScript
     try:
         log.debug("attempting to open the file %s" % (pathToReadFile,))
-        readFile = codecs.open(pathToReadFile, encoding="utf-8", mode="r")
-        thisData = readFile.read()
-        readFile.close()
+        with codecs.open(pathToReadFile, encoding="utf-8", mode="r") as readFile:
+            thisData = readFile.read()
     except IOError as e:
         message = "could not open the file %s" % (pathToReadFile,)
         log.critical(message)
-        raise IOError(message)
+        raise IOError(message) from e
 
     thisData = thisData.replace(";;", ";").replace("DELIMITER ;", "")
 

@@ -87,7 +87,6 @@ def multiobject_download(
     .. image:: https://i.imgur.com/QYoMm24.png width=600px
 
     """
-    import sys
     import os
     import re
     from fundamentals.download import (

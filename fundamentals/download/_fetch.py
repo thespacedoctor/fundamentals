@@ -35,9 +35,7 @@ def _fetch(
     """
     import logging as log
     import socket
-    from eventlet import Timeout
     import urllib
-    import sys
 
     # TRY AND DOWNLOAD X TIMES BEFORE QUITING
     tries = 10
@@ -48,7 +46,7 @@ def _fetch(
             log.debug("downloading " + url.get_full_url())
             body = urllib.request.urlopen(url).read()
             downloaded = True
-        except socket.timeout as e:
+        except socket.timeout:
             print("timeout on URL, trying again")
             count += 1
         except Exception as e:

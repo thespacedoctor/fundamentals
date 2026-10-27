@@ -14,7 +14,6 @@ Options:
     -s, --settings <pathToSettingsFile>    the settings file
 """
 
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
@@ -28,9 +27,8 @@ except ImportError:
         readline = None  # or just pass — basic input() still works
 import glob
 import pickle
-from docopt import docopt
 from fundamentals import tools, times
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 
 
 def tab_complete(text, state):

@@ -52,6 +52,13 @@ class test_logs(unittest.TestCase):
 
         # x-print-testpage-for-pessto-marshall-web-object
 
+    def test_empty_logger_accepts_format_args_and_keyword_args(self):
+        from fundamentals.logs import emptyLogger
+
+        log = emptyLogger()
+
+        log.error("could not read %s", 1, exc_info=True)
+
     # x-class-to-test-named-worker-function
 
 

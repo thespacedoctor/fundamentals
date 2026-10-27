@@ -139,7 +139,7 @@ class daemonise:
                 stdout=open(self.outLog, "a"),
                 stderr=open(self.errLog, "a"),
                 signal_map={signal.SIGTERM: self.cleanup},
-            ) as context:
+            ):
                 self.action(**self.akws)
 
         self.log.info("completed the ``get`` method")

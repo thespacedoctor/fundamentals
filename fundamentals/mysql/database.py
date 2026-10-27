@@ -186,23 +186,22 @@ class database(object):
         # CREATE A TCP SOCKET
         import socket
 
-        s = socket.socket()
-        self.log.debug(
-            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals()
-        )
-        try:
-            s.connect((address, port))
+        with socket.socket() as s:
             self.log.debug(
-                """Connected to `%(address)s` on port `%(port)s`""" % locals()
-            )
-            return True
-        except socket.error as e:
-            self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
+                """Attempting to connect to `%(address)s` on port `%(port)s`"""
                 % locals()
             )
-            return False
-
-        return None
+            try:
+                s.connect((address, port))
+                self.log.debug(
+                    """Connected to `%(address)s` on port `%(port)s`""" % locals()
+                )
+                return True
+            except socket.error as e:
+                self.log.warning(
+                    """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
+                    % locals()
+                )
+                return False
 
     # xt-class-method

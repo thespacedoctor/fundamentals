@@ -89,10 +89,7 @@ def fmultiprocess(
 
     logFound = "log" in inspect.signature(function).parameters
 
-    global theseBatches
-
     if turnOffMP == False:
-        import psutil
         from multiprocess import Pool
 
         from ctypes import c_int32
@@ -110,14 +107,6 @@ def fmultiprocess(
                 counter_lock = l
                 import logging
 
-                streamHandlers = [
-                    h for h in log.handlers if not isinstance(h, logging.FileHandler)
-                ]
-                streamHandlersLevel = [
-                    h.level
-                    for h in log.handlers
-                    if not isinstance(h, logging.FileHandler)
-                ]
                 [
                     h.setLevel(logging.WARNING)
                     for h in log.handlers

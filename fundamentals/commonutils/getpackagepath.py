@@ -16,7 +16,6 @@ def getpackagepath():
 
     *Used in unit testing code*
     """
-    moduleDirectory = os.path.dirname(__file__)
     packagePath = os.path.dirname(__file__) + "/../"
 
     return packagePath

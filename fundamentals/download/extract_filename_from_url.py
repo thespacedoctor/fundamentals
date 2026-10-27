@@ -47,12 +47,12 @@ def extract_filename_from_url(log, url):
     # EXTRACT THE FILENAME FROM THE URL
     try:
         log.debug("extracting filename from url " + url)
-        reEoURL = re.compile("([\w\.\_\-]*)$")
+        reEoURL = re.compile(r"([\w\.\_\-]*)$")
         filename = reEoURL.findall(url)[0]
         # log.debug(filename)
         if len(filename) == 0:
             filename = "untitled.html"
-        if not (re.search("\.", filename)):
+        if not (re.search(r"\.", filename)):
             filename = filename + ".html"
     except Exception as e:
         filename = None

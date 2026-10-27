@@ -240,14 +240,12 @@ class yaml_to_database(object):
 
         try:
             self.log.debug("attempting to open the file %s" % (filepath,))
-            readFile = codecs.open(filepath, encoding="utf-8", mode="r")
-            thisData = readFile.read()
-            readFile.close()
+            with codecs.open(filepath, encoding="utf-8", mode="r") as readFile:
+                thisData = readFile.read()
         except IOError as e:
             message = "could not open the file %s" % (filepath,)
             self.log.critical(message)
-            raise IOError(message)
-        readFile.close()
+            raise IOError(message) from e
 
         matchObject = re.finditer(
             r"(^|\n)(?P<key>[^\:]*)\:\s(?P<value>.*?)(\n|$)",
@@ -257,12 +255,9 @@ class yaml_to_database(object):
 
         yamlContent = {}
         for match in matchObject:
-            if match.group("value")[0] == '"' and match.group("value")[-1] == '"':
-                v = match.group("value")[1:-1]
-            elif match.group("value")[0] == "'" and match.group("value")[-1] == "'":
-                v = match.group("value")[1:-1]
-            else:
-                v = match.group("value")
+            v = match.group("value")
+            if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                v = v[1:-1]
             yamlContent[match.group("key")] = v
 
         if "table" not in yamlContent:

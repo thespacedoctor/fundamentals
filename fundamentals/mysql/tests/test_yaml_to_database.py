@@ -98,3 +98,20 @@ class test_yaml_to_database(unittest.TestCase):
         # x-print-testpage-for-pessto-marshall-web-object
 
     # x-class-to-test-named-worker-function
+
+
+def test_empty_value_in_yaml_file_does_not_raise(tmp_path):
+    from unittest import mock
+    from fundamentals.mysql import yaml_to_database
+
+    yamlFile = tmp_path / "empty_value.yaml"
+    yamlFile.write_text("table: test_table\ntitle: \nurl: http://example.com\n")
+    yaml2db = yaml_to_database(log=mock.Mock(), dbConn=mock.Mock())
+
+    with mock.patch(
+        "fundamentals.mysql.yaml_to_database.convert_dictionary_to_mysql_table"
+    ) as convert, mock.patch("requests.head", side_effect=OSError):
+        yaml2db.add_yaml_file_content_to_database(filepath=str(yamlFile))
+
+    dictionary = convert.call_args.kwargs["dictionary"]
+    assert dictionary["title"] == ""
