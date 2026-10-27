@@ -121,16 +121,14 @@ class tools(object):
                 class: logging.handlers.GroupWriteRotatingFileHandler
                 level: WARNING
                 formatter: file_style
-
-
-                    filename: /Users/Dave/.config/myprojectName/myprojectName.log
-                    mode: w+
-                    maxBytes: 102400
-                    backupCount: 1
-            root:
-                level: WARNING
-                handlers: [file,console]
-        ```
+                filename: /Users/Dave/.config/myprojectName/myprojectName.log
+                mode: w+
+                maxBytes: 102400
+                backupCount: 1
+        root:
+            level: WARNING
+            handlers: [file,console]
+    ```
     """
 
     # Initialisation
