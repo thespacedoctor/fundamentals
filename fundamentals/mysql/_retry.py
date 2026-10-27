@@ -10,16 +10,15 @@ Author
 import pymysql
 
 # MYSQL ERROR CODES THAT CLEAR THEMSELVES, SO THE SAME QUERY IS WORTH SENDING AGAIN
+# 2006 (SERVER GONE AWAY) AND 2013 (LOST CONNECTION) ARE LEFT OUT ON PURPOSE: PYMYSQL CLOSES
+# ITS SOCKET WHEN THEY HAPPEN, SO A RETRY ON THE SAME CONNECTION CANNOT WORK, AND A WRITE
+# MAY ALREADY HAVE COMMITTED, SO SENDING IT AGAIN COULD REPEAT IT
 DEADLOCK_ERROR_CODE = 1213
 LOCK_WAIT_TIMEOUT_ERROR_CODE = 1205
-SERVER_GONE_AWAY_ERROR_CODE = 2006
-LOST_CONNECTION_ERROR_CODE = 2013
 TRANSIENT_ERROR_CODES = frozenset(
     {
         DEADLOCK_ERROR_CODE,
         LOCK_WAIT_TIMEOUT_ERROR_CODE,
-        SERVER_GONE_AWAY_ERROR_CODE,
-        LOST_CONNECTION_ERROR_CODE,
     }
 )
 
@@ -57,7 +56,7 @@ def is_transient_error(error):
 
     **Return**
 
-    - ``isTransient`` -- True for deadlock, lock wait timeout, server gone away and lost connection
+    - ``isTransient`` -- True for deadlock and lock wait timeout
     """
     return bool(error.args) and error.args[0] in TRANSIENT_ERROR_CODES
 

@@ -337,7 +337,7 @@ class test_writequery(unittest.TestCase):
     def test_retries_each_transient_error_code(self):
         from fundamentals.mysql import writequery
 
-        for code in (1213, 1205, 2006, 2013):
+        for code in (1213, 1205):
             with self.subTest(code=code):
                 cursor = ScriptedCursor(
                     [pymysql.err.OperationalError(code, "transient")]
@@ -349,6 +349,31 @@ class test_writequery(unittest.TestCase):
                     )
 
                 self.assertEqual(len(cursor.executed), 2)
+
+    def test_does_not_resend_a_write_after_the_connection_is_lost(self):
+        from fundamentals.mysql import writequery
+
+        # THE WRITE MAY HAVE COMMITTED BEFORE THE CONNECTION DROPPED, AND THE CONNECTION IS DEAD
+        for code in (2006, 2013):
+            with self.subTest(code=code):
+                cursor = ScriptedCursor(
+                    [
+                        pymysql.err.OperationalError(code, "connection lost"),
+                        pymysql.err.InterfaceError(0, ""),
+                    ]
+                )
+
+                with mock.patch("time.sleep") as sleep:
+                    with self.assertRaises(pymysql.err.OperationalError) as raised:
+                        writequery(
+                            log=log,
+                            sqlQuery="INSERT INTO t VALUES (1)",
+                            dbConn=FakeConnection(cursor),
+                        )
+
+                self.assertEqual(raised.exception.args[0], code)
+                self.assertEqual(len(cursor.executed), 1)
+                sleep.assert_not_called()
 
     def test_raises_after_one_execute_when_error_is_not_transient(self):
         from fundamentals.mysql import writequery
