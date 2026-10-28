@@ -86,16 +86,46 @@ def db_conn(session_setup):
     return session_setup.dbConn
 
 
+@pytest.fixture(scope="class")
+def session_attributes(request, log, settings, dbConn):
+    """
+    *Set ``log``, ``settings`` and ``dbConn`` as attributes of a ``unittest.TestCase`` class*
+
+    Request it with ``@pytest.mark.usefixtures("session_attributes")`` on the class, then use ``self.log``, ``self.settings`` and ``self.dbConn`` in the tests. A class that does not ask for it never opens the database connection, so pure unit tests still run when the database is down. Plain test functions take ``log``, ``settings`` and ``dbConn`` as arguments instead.
+    """
+    request.cls.log = log
+    request.cls.settings = settings
+    request.cls.dbConn = dbConn
+
+
 @pytest.fixture(scope="module")
-def session_names(request, log, settings, dbConn):
+def output_dir(request, tmp_path_factory):
     """
-    *Make ``log``, ``settings`` and ``dbConn`` available as module-level names in a test module*
+    *A fresh output folder for a test module, filled with a copy of its ``input`` folder*
 
-    Test modules request this fixture with ``pytestmark = pytest.mark.usefixtures("session_names")``. It lets the tests in a module, including ``unittest.TestCase`` methods, keep using the plain names ``log``, ``settings`` and ``dbConn`` without any set-up at import time.
+    The folder lives in the pytest temporary directory of the current run, so two test runs in the same checkout never share or delete each other's files, and the ``input`` folder is never written to.
 
-    This only works under pytest, and it is transitional. A follow-up will move the modules to ``request.cls`` or fixture arguments and remove the injection.
+    **Return**
+
+    - ``outputDir`` -- the path of the folder, ending in ``/``
     """
-    request.module.__dict__.update(log=log, settings=settings, dbConn=dbConn)
+    moduleFile = request.module.__file__
+    moduleName = os.path.splitext(os.path.basename(moduleFile))[0]
+    outputDir = tmp_path_factory.mktemp(moduleName)
+    inputDir = os.path.join(os.path.dirname(moduleFile), "input")
+    if os.path.isdir(inputDir):
+        shutil.copytree(inputDir, outputDir, dirs_exist_ok=True)
+    return str(outputDir) + os.sep
+
+
+@pytest.fixture(scope="class")
+def output_dir_attribute(request, output_dir):
+    """
+    *Set the module output folder as ``pathToOutputDir`` on a ``unittest.TestCase`` class*
+
+    Request it with ``@pytest.mark.usefixtures("output_dir_attribute")`` on the class. Plain test functions take ``output_dir`` as an argument instead.
+    """
+    request.cls.pathToOutputDir = output_dir
 
 
 @pytest.fixture(autouse=True)
@@ -106,7 +136,7 @@ def reset_db_connection(request):
     After each test that uses ``dbConn`` or ``session_names``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database. A failed reset is logged as a warning, so it never hides the real test failure.
     """
     dbConn = None
-    if {"dbConn", "session_names"} & set(request.fixturenames):
+    if {"dbConn", "session_attributes"} & set(request.fixturenames):
         dbConn = request.getfixturevalue("dbConn")
 
     yield
