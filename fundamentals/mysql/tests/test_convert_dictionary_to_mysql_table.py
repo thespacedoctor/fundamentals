@@ -1,7 +1,5 @@
 from __future__ import print_function
-import os
 import unittest
-import shutil
 import re
 import copy
 import datetime
@@ -9,26 +7,6 @@ import sys
 from unittest import mock
 from fundamentals.mysql.sql_identifiers import quote_identifier
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 reDatetime = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}T")
 
@@ -48,6 +26,7 @@ def string_literals(sql):
     ]
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
     def setUp(self):
@@ -58,7 +37,11 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         sqlQuery = "DROP TABLE IF EXISTS `testing_table`; CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL  AUTO_INCREMENT,`uniquekey1` varchar(45) NOT NULL default 'ha',`uniqueKey2` varchar(45) NOT NULL default 'ha', `dateCreated` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP, `dateModified` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`) )"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
         dictionary = {
@@ -70,8 +53,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
         message = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="testing_table",
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
@@ -85,7 +68,11 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
         dictionary = {
@@ -97,8 +84,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
         message = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="testing_table",
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
@@ -113,7 +100,11 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
         dictionary = {
@@ -125,8 +116,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
         message = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="testing_table",
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
@@ -147,8 +138,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
         inserts = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="testing_table",
             uniqueKeyList=["uniquekey1", "uniqueKey2"],
@@ -168,8 +159,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="testing_table",
             uniqueKeyList=[],
@@ -195,7 +186,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="dy2028_testing_table",
             uniqueKeyList=["uniquekey1"],
@@ -242,8 +233,8 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         try:
             convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
+                dbConn=self.dbConn,
+                log=self.log,
                 dictionary=dictionary,
                 dbTableName=tableName,
                 uniqueKeyList=uniqueKeyList,
@@ -253,9 +244,9 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
                 afterWrite()
         finally:
             writequery(
-                log=log,
+                log=self.log,
                 sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
 
     def test_raises_when_column_check_query_fails(self):
@@ -272,16 +263,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             ):
                 with self.assertRaises(RuntimeError):
                     module.convert_dictionary_to_mysql_table(
-                        dbConn=dbConn,
-                        log=log,
+                        dbConn=self.dbConn,
+                        log=self.log,
                         dictionary={"a newKey": "cool", "another": "value"},
                         dbTableName=tableName,
                     )
         finally:
             writequery(
-                log=log,
+                log=self.log,
                 sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
 
     def test_raises_when_add_column_query_fails(self):
@@ -301,16 +292,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             with mock.patch.object(module, "writequery", side_effect=failOnAlter):
                 with self.assertRaises(RuntimeError):
                     module.convert_dictionary_to_mysql_table(
-                        dbConn=dbConn,
-                        log=log,
+                        dbConn=self.dbConn,
+                        log=self.log,
                         dictionary={"a newKey": "cool", "another": "value"},
                         dbTableName=tableName,
                     )
         finally:
             writequery(
-                log=log,
+                log=self.log,
                 sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
 
     def test_escapes_list_wrapped_value_in_insert_statement(self):
@@ -321,7 +312,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -339,7 +330,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -357,7 +348,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -375,7 +366,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t`x",
             returnInsertOnly=True,
@@ -400,7 +391,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             dateModified=False,
             afterWrite=lambda: self.columns.extend(
                 get_database_table_column_names(
-                    dbConn=dbConn, log=log, dbTable=tableName
+                    dbConn=self.dbConn, log=self.log, dbTable=tableName
                 )
             ),
         )
@@ -413,7 +404,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         from fundamentals.mysql import convert_dictionary_to_mysql_table
 
         return convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -440,9 +431,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         insertCommand = self._insert_statement(dictionary, replace=True)
 
         # ASSERT
-        self.assertEqual(
-            string_literals(insertCommand), ["x , y", "z", "x , y", "z"]
-        )
+        self.assertEqual(string_literals(insertCommand), ["x , y", "z", "x , y", "z"])
         self.assertIn("ON DUPLICATE KEY UPDATE `a`='x , y', `b`='z'", insertCommand)
 
     def test_does_not_leave_trailing_comma_on_update_clause(self):
@@ -477,7 +466,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary={"order": "x", "b": "y"},
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -499,7 +488,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary={"100%": 1},
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -527,7 +516,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -546,7 +535,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
 
         # ACT
         insertCommand, valueTuple = convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName="sweep2_dictsql_t",
             returnInsertOnly=True,
@@ -591,14 +580,14 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             "order": "x , y",
             "uni": "k",
             "last": "null",
-            "quote": 'q"uo\'te \\ end',
+            "quote": "q\"uo'te \\ end",
             "blank": "",
         }
 
         def write(dictionary):
             convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=log,
+                dbConn=self.dbConn,
+                log=self.log,
                 dictionary=dictionary,
                 dbTableName=tableName,
                 uniqueKeyList=["uni"],
@@ -611,16 +600,16 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
             write(awkward)
             write({**awkward, "order": "changed , again"})
             rows = readquery(
-                log=log,
+                log=self.log,
                 sqlQuery="SELECT `order`, `last`, `quote`, `blank` FROM `%s`"
                 % (tableName,),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
         finally:
             writequery(
-                log=log,
+                log=self.log,
                 sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
 
         # ASSERT
@@ -630,7 +619,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
                 {
                     "order": "changed , again",
                     "last": "null",
-                    "quote": 'q"uo\'te \\ end',
+                    "quote": "q\"uo'te \\ end",
                     "blank": None,
                 }
             ],
@@ -648,7 +637,7 @@ class test_convert_dictionary_to_mysql_table(unittest.TestCase):
         # ACT / ASSERT
         with self.assertRaises(ValueError):
             convert_dictionary_to_mysql_table(
-                log=log,
+                log=self.log,
                 dictionary={"a": "x"},
                 dbTableName="",
                 returnInsertOnly=True,

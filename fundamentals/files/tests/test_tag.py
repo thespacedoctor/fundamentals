@@ -13,37 +13,18 @@ from subprocess import Popen, PIPE
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
 # xt-setup-unit-testing-files-and-folders
 
 
 STRAY_PLIST_PATTERN = "/tmp/fund-*.plist"
 
 
+@pytest.mark.usefixtures("session_attributes", "output_dir_attribute")
 class test_tag(unittest.TestCase):
 
     def setUp(self):
         self.originalTempdir = tempfile.tempdir
-        self.redirectedTmp = os.path.join(pathToOutputDir, "redirected_tmp")
+        self.redirectedTmp = os.path.join(self.pathToOutputDir, "redirected_tmp")
         shutil.rmtree(self.redirectedTmp, ignore_errors=True)
         os.makedirs(self.redirectedTmp)
         tempfile.tempdir = self.redirectedTmp
@@ -76,8 +57,8 @@ class test_tag(unittest.TestCase):
 
         with mock.patch.object(self.tagModule, "Popen", side_effect=spyPopen):
             tag(
-                log=log,
-                filepath=pathToOutputDir + "/file_needing_tagged.dat",
+                log=self.log,
+                filepath=self.pathToOutputDir + "/file_needing_tagged.dat",
                 tags="test,tags, fundamentals",
                 rating=3,
                 wherefrom="http://www.thespacedoctor.co.uk",
@@ -95,8 +76,8 @@ class test_tag(unittest.TestCase):
         with mock.patch.object(self.tagModule, "Popen", side_effect=OSError("boom")):
             with self.assertRaises(OSError):
                 tag(
-                    log=log,
-                    filepath=pathToOutputDir + "/file_needing_tagged.dat",
+                    log=self.log,
+                    filepath=self.pathToOutputDir + "/file_needing_tagged.dat",
                     tags="test,tags",
                     wherefrom="http://www.thespacedoctor.co.uk",
                 )
@@ -112,7 +93,7 @@ class test_tag(unittest.TestCase):
         oddTmp = os.path.join(self.redirectedTmp, "o'brien `touch INJECTED` $HOME")
         os.makedirs(oddTmp)
         tempfile.tempdir = oddTmp
-        taggedFile = pathToOutputDir + "/file_needing_tagged.dat"
+        taggedFile = self.pathToOutputDir + "/file_needing_tagged.dat"
 
         # CLEAR EXISTING TAGS SO THE ASSERTION BELOW PROVES THIS CALL WROTE THEM
         Popen(
@@ -121,7 +102,7 @@ class test_tag(unittest.TestCase):
             stderr=PIPE,
         ).communicate()
 
-        tag(log=log, filepath=taggedFile, tags="quoted,path")
+        tag(log=self.log, filepath=taggedFile, tags="quoted,path")
 
         self.assertFalse(os.path.exists("INJECTED"))
         self.assertEqual(self._list_tree(oddTmp), [])
@@ -142,8 +123,8 @@ class test_tag(unittest.TestCase):
         from fundamentals.files.tag import tag
 
         tag(
-            log=log,
-            filepath=pathToOutputDir + "/file_needing_tagged.dat",
+            log=self.log,
+            filepath=self.pathToOutputDir + "/file_needing_tagged.dat",
             tags="test,tags, fundamentals",
             rating=3,
             wherefrom="http://www.thespacedoctor.co.uk",
@@ -154,7 +135,7 @@ class test_tag(unittest.TestCase):
         from fundamentals.files import tag
 
         try:
-            this = tag(log=log, fakeKey="break the code")
+            this = tag(log=self.log, fakeKey="break the code")
             assert False
         except Exception as e:
             assert True

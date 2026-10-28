@@ -1,29 +1,11 @@
 from __future__ import print_function
 import os
 import unittest
-import shutil
 from fundamentals import cl_utils
 from os.path import expanduser
 
 doc = cl_utils.__doc__
 home = expanduser("~")
-
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
 class test_cl_utils(unittest.TestCase):

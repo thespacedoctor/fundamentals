@@ -1,28 +1,6 @@
 from __future__ import print_function
-import os
 import unittest
-import shutil
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
 class _FakeCursor(object):
@@ -54,6 +32,7 @@ class _FakeConnection(object):
         return self.cursorObject
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_table_exists(unittest.TestCase):
 
     def test_table_exists_function(self):
@@ -62,20 +41,28 @@ class test_table_exists(unittest.TestCase):
 
         sqlQuery = "CREATE TABLE IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
         from fundamentals.mysql import table_exists
 
         tableName = "testing_table"
-        this = table_exists(dbConn=dbConn, log=log, dbTableName=tableName)
+        this = table_exists(dbConn=self.dbConn, log=self.log, dbTableName=tableName)
         # print("%(tableName)s exists: %(this)s" % locals())
 
         from fundamentals.mysql import writequery
 
         sqlQuery = "DROP TABLE `testing_table`;"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
     def test_table_exists_function02(self):
@@ -83,7 +70,7 @@ class test_table_exists(unittest.TestCase):
         from fundamentals.mysql import table_exists
 
         tableName = "stupid_named_table"
-        this = table_exists(dbConn=dbConn, log=log, dbTableName=tableName)
+        this = table_exists(dbConn=self.dbConn, log=self.log, dbTableName=tableName)
         # print("%(tableName)s exists: %(this)s" % locals())
 
         # x-print-testpage-for-pessto-marshall-web-object
@@ -96,7 +83,7 @@ class test_table_exists(unittest.TestCase):
         fakeConn = _FakeConnection(rows=[(0,)])
 
         # ACT
-        exists = table_exists(dbConn=fakeConn, log=log, dbTableName=injection)
+        exists = table_exists(dbConn=fakeConn, log=self.log, dbTableName=injection)
 
         # ASSERT
         sql, params = fakeConn.cursorObject.executed[0]
@@ -113,7 +100,7 @@ class test_table_exists(unittest.TestCase):
         fakeConn = _FakeConnection(rows=[(1,)])
 
         # ACT
-        exists = table_exists(dbConn=fakeConn, log=log, dbTableName="some_table")
+        exists = table_exists(dbConn=fakeConn, log=self.log, dbTableName="some_table")
 
         # ASSERT
         self.assertTrue(exists)
@@ -126,7 +113,7 @@ class test_table_exists(unittest.TestCase):
 
         # ACT / ASSERT
         with self.assertRaises(RuntimeError):
-            table_exists(dbConn=fakeConn, log=log, dbTableName="some_table")
+            table_exists(dbConn=fakeConn, log=self.log, dbTableName="some_table")
         self.assertTrue(fakeConn.cursorObject.closed)
 
     def test_ignores_same_named_table_in_another_schema(self):
@@ -134,7 +121,7 @@ class test_table_exists(unittest.TestCase):
         from fundamentals.mysql import table_exists
 
         # ACT
-        exists = table_exists(dbConn=dbConn, log=log, dbTableName="TABLES")
+        exists = table_exists(dbConn=self.dbConn, log=self.log, dbTableName="TABLES")
 
         # ASSERT
         self.assertFalse(exists)

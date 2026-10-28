@@ -5,25 +5,6 @@ import unittest
 import shutil
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 import sys
 import tempfile
@@ -36,6 +17,7 @@ CREDENTIALS = {"username": "alice", "password": "s3cret"}
 URLS = ["http://example.com/a.html", "http://example.com/b.html"]
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_multiobject_download(unittest.TestCase):
 
     def setUp(self):
@@ -49,7 +31,10 @@ class test_multiobject_download(unittest.TestCase):
         kwargs.setdefault("timeStamp", False)
         with mock.patch(FETCH_URL, side_effect=self.record_fetch):
             result = multiobject_download(
-                urlList=urlList, downloadDirectory=downloadDirectory, log=log, **kwargs
+                urlList=urlList,
+                downloadDirectory=downloadDirectory,
+                log=self.log,
+                **kwargs,
             )
         return result, sorted((e[0], e[1]) for e in self.entries)
 

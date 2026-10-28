@@ -1,28 +1,6 @@
 from __future__ import print_function
-import os
 import unittest
-import shutil
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
 class _FakeCursor(object):
@@ -51,6 +29,7 @@ class _FakeConnection(object):
         return self.cursorObject
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_get_database_table_column_names(unittest.TestCase):
 
     def test_get_database_table_column_names_function(self):
@@ -58,7 +37,7 @@ class test_get_database_table_column_names(unittest.TestCase):
         from fundamentals.mysql import get_database_table_column_names
 
         columnNames = get_database_table_column_names(
-            dbConn=dbConn, log=log, dbTable="testing_table"
+            dbConn=self.dbConn, log=self.log, dbTable="testing_table"
         )
         # print(columnNames)
 
@@ -72,7 +51,7 @@ class test_get_database_table_column_names(unittest.TestCase):
 
         # ACT
         columnNames = get_database_table_column_names(
-            dbConn=fakeConn, log=log, dbTable="t`; DROP TABLE t; -- "
+            dbConn=fakeConn, log=self.log, dbTable="t`; DROP TABLE t; -- "
         )
 
         # ASSERT
@@ -87,22 +66,22 @@ class test_get_database_table_column_names(unittest.TestCase):
 
         tableName = "sweep2_dictsql_empty_table"
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="CREATE TABLE IF NOT EXISTS `%s` (`id` INT NOT NULL, `name` VARCHAR(10))"
             % (tableName,),
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
         # ACT
         try:
             columnNames = get_database_table_column_names(
-                dbConn=dbConn, log=log, dbTable=tableName
+                dbConn=self.dbConn, log=self.log, dbTable=tableName
             )
         finally:
             writequery(
-                log=log,
+                log=self.log,
                 sqlQuery="DROP TABLE IF EXISTS `%s`" % (tableName,),
-                dbConn=dbConn,
+                dbConn=self.dbConn,
             )
 
         # ASSERT
@@ -114,7 +93,7 @@ class test_get_database_table_column_names(unittest.TestCase):
 
         # ACT
         columnNames = get_database_table_column_names(
-            dbConn=dbConn, log=log, dbTable="sweep2_dictsql_no_such_table"
+            dbConn=self.dbConn, log=self.log, dbTable="sweep2_dictsql_no_such_table"
         )
 
         # ASSERT
@@ -128,7 +107,7 @@ class test_get_database_table_column_names(unittest.TestCase):
 
         # ACT
         columnNames = get_database_table_column_names(
-            dbConn=fakeConn, log=log, dbTable="some_table"
+            dbConn=fakeConn, log=self.log, dbTable="some_table"
         )
 
         # ASSERT

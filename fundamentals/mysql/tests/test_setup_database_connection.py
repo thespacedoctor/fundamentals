@@ -2,27 +2,16 @@ from __future__ import print_function
 from builtins import str
 import os
 import unittest
-import shutil
+import pytest
 import unittest
 import yaml
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
 pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
+@pytest.mark.usefixtures("output_dir_attribute")
 class test_setup_database_connection(unittest.TestCase):
 
     def test_setup_database_connection_function(self):
@@ -39,7 +28,7 @@ class test_setup_database_connection(unittest.TestCase):
         import pymysql
         from fundamentals.mysql import setup_database_connection
 
-        settingsPath = pathToOutputDir + "/connection_failure_settings.yaml"
+        settingsPath = self.pathToOutputDir + "/connection_failure_settings.yaml"
         with open(settingsPath, "w") as stream:
             stream.write("db: unit_tests\nhost: localhost\nuser: u\npassword: p\n")
 
@@ -54,13 +43,13 @@ class test_setup_database_connection(unittest.TestCase):
 
         with self.assertRaises(OSError):
             setup_database_connection(
-                pathToYamlFile=pathToOutputDir + "/no_such_settings.yaml"
+                pathToYamlFile=self.pathToOutputDir + "/no_such_settings.yaml"
             )
 
     def test_raises_yaml_error_when_settings_file_is_malformed(self):
         from fundamentals.mysql import setup_database_connection
 
-        settingsPath = pathToOutputDir + "/malformed_settings.yaml"
+        settingsPath = self.pathToOutputDir + "/malformed_settings.yaml"
         with open(settingsPath, "w") as stream:
             stream.write("db: [unclosed\n")
 
@@ -72,7 +61,7 @@ class test_setup_database_connection(unittest.TestCase):
 
         for name, content in (("empty", ""), ("list", "- one\n- two\n")):
             with self.subTest(name=name):
-                settingsPath = pathToOutputDir + "/" + name + "_settings.yaml"
+                settingsPath = self.pathToOutputDir + "/" + name + "_settings.yaml"
                 with open(settingsPath, "w") as stream:
                     stream.write(content)
 

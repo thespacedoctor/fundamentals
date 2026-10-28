@@ -11,31 +11,10 @@ from unittest import mock
 import yaml
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-
 LISTING_TIMEOUT_SECONDS = 5
 
 
-def list_with_timeout(**kwargs):
+def list_with_timeout(log, **kwargs):
     """Run recursive_directory_listing in a daemon thread; return its result or None on timeout."""
     from fundamentals.files import recursive_directory_listing
 
@@ -49,6 +28,7 @@ def list_with_timeout(**kwargs):
     return None if worker.is_alive() else result[0]
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_recursive_directory_listing(unittest.TestCase):
 
     def setUp(self):
@@ -66,7 +46,9 @@ class test_recursive_directory_listing(unittest.TestCase):
         os.makedirs(lockedDir)
         os.chmod(lockedDir, 0o000)
 
-        matched = list_with_timeout(baseFolderPath=self.baseDir, whatToList="all")
+        matched = list_with_timeout(
+            self.log, baseFolderPath=self.baseDir, whatToList="all"
+        )
 
         self.assertIsNotNone(matched, "listing did not return within the timeout")
         self.assertEqual(
@@ -79,7 +61,9 @@ class test_recursive_directory_listing(unittest.TestCase):
         os.makedirs(subDir)
         os.symlink(self.baseDir, os.path.join(subDir, "loop"))
 
-        matched = list_with_timeout(baseFolderPath=self.baseDir, whatToList="all")
+        matched = list_with_timeout(
+            self.log, baseFolderPath=self.baseDir, whatToList="all"
+        )
 
         self.assertIsNotNone(matched, "listing did not return within the timeout")
         self.assertEqual(
@@ -99,7 +83,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         open(os.path.join(self.baseDir, "f.txt"), "w").close()
 
         with self.assertRaises(ValueError):
-            recursive_directory_listing(log, self.baseDir, whatToList="bogus")
+            recursive_directory_listing(self.log, self.baseDir, whatToList="bogus")
 
     def test_logs_error_when_what_to_list_is_invalid(self):
         from fundamentals.files import recursive_directory_listing
@@ -115,7 +99,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         from fundamentals.files import recursive_directory_listing
 
         with self.assertRaises(ValueError):
-            recursive_directory_listing(log, self.baseDir, whatToList="bogus")
+            recursive_directory_listing(self.log, self.baseDir, whatToList="bogus")
 
     def test_raises_file_not_found_error_when_base_folder_is_missing(self):
         from fundamentals.files import recursive_directory_listing
@@ -123,7 +107,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         missingDir = os.path.join(self.baseDir, "missing")
 
         with self.assertRaises(FileNotFoundError):
-            recursive_directory_listing(log, missingDir, whatToList="all")
+            recursive_directory_listing(self.log, missingDir, whatToList="all")
 
     def test_raises_file_not_found_error_when_pathlib_base_folder_is_missing(self):
         from fundamentals.files import recursive_directory_listing
@@ -131,7 +115,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         missingDir = pathlib.Path(self.baseDir) / "missing"
 
         with self.assertRaises(FileNotFoundError):
-            recursive_directory_listing(log, missingDir, whatToList="all")
+            recursive_directory_listing(self.log, missingDir, whatToList="all")
 
     @unittest.skipIf(os.geteuid() == 0, "chmod 000 is ignored for root")
     def test_raises_permission_error_when_base_folder_is_unreadable(self):
@@ -142,7 +126,7 @@ class test_recursive_directory_listing(unittest.TestCase):
         os.chmod(lockedDir, 0o000)
 
         with self.assertRaises(PermissionError):
-            recursive_directory_listing(log, lockedDir, whatToList="all")
+            recursive_directory_listing(self.log, lockedDir, whatToList="all")
 
     def test_lists_files_dirs_or_all_with_joined_paths(self):
         os.makedirs(os.path.join(self.baseDir, "d1", "d2"))
@@ -156,15 +140,15 @@ class test_recursive_directory_listing(unittest.TestCase):
         from fundamentals.files import recursive_directory_listing
 
         self.assertEqual(
-            sorted(recursive_directory_listing(log, self.baseDir, "all")),
+            sorted(recursive_directory_listing(self.log, self.baseDir, "all")),
             sorted(dirPaths + [filePath]),
         )
         self.assertEqual(
-            sorted(recursive_directory_listing(log, self.baseDir, "dirs")),
+            sorted(recursive_directory_listing(self.log, self.baseDir, "dirs")),
             sorted(dirPaths),
         )
         self.assertEqual(
-            recursive_directory_listing(log, self.baseDir, "files"), [filePath]
+            recursive_directory_listing(self.log, self.baseDir, "files"), [filePath]
         )
 
     def test_recursive_directory_listing_function(self):
@@ -172,21 +156,21 @@ class test_recursive_directory_listing(unittest.TestCase):
         from fundamentals.files import recursive_directory_listing
 
         theseFiles = recursive_directory_listing(
-            log, baseFolderPath="/tmp", whatToList="all"
+            self.log, baseFolderPath="/tmp", whatToList="all"
         )
         # print(theseFiles)
 
         from fundamentals.files import recursive_directory_listing
 
         theseFiles = recursive_directory_listing(
-            log, baseFolderPath="/tmp", whatToList="files"
+            self.log, baseFolderPath="/tmp", whatToList="files"
         )
         # print(theseFiles)
 
         from fundamentals.files import recursive_directory_listing
 
         theseFiles = recursive_directory_listing(
-            log, baseFolderPath="/tmp", whatToList="dirs"
+            self.log, baseFolderPath="/tmp", whatToList="dirs"
         )
         # print(theseFiles)
 

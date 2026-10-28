@@ -1,31 +1,9 @@
 from __future__ import print_function
-import os
 import unittest
-import shutil
 import warnings
 from unittest import mock
 import pymysql
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
 class FakeCursor:
@@ -62,13 +40,16 @@ class FakeConnection:
         return self.fakeCursor
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_readquery(unittest.TestCase):
 
     def test_readquery_function(self):
 
         from fundamentals.mysql import readquery
 
-        rows = readquery(log=log, sqlQuery="show tables", dbConn=dbConn, quiet=False)
+        rows = readquery(
+            log=self.log, sqlQuery="show tables", dbConn=self.dbConn, quiet=False
+        )
 
     def test_readquery_error_function(self):
 
@@ -76,7 +57,7 @@ class test_readquery(unittest.TestCase):
 
         try:
             rows = readquery(
-                log=log, sqlQuery="rubbish query", dbConn=dbConn, quiet=False
+                log=self.log, sqlQuery="rubbish query", dbConn=self.dbConn, quiet=False
             )
             assert False
         except Exception as e:
@@ -89,7 +70,7 @@ class test_readquery(unittest.TestCase):
 
         try:
             rows = readquery(
-                log=log, sqlQuery="rubbish query", dbConn=dbConn, quiet=True
+                log=self.log, sqlQuery="rubbish query", dbConn=self.dbConn, quiet=True
             )
             assert True
         except Exception as e:
@@ -105,7 +86,10 @@ class test_readquery(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             readquery(
-                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=False
+                log=self.log,
+                sqlQuery="SELECT 1",
+                dbConn=FakeConnection(cursor),
+                quiet=False,
             )
 
         self.assertTrue(cursor.isClosed)
@@ -116,7 +100,7 @@ class test_readquery(unittest.TestCase):
         cursor = FakeCursor(executeError=ValueError("boom"))
 
         rows = readquery(
-            log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=True
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=True
         )
 
         self.assertEqual(rows, [])
@@ -127,7 +111,9 @@ class test_readquery(unittest.TestCase):
 
         cursor = FakeCursor(rows=[{"id": 1}])
 
-        rows = readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+        rows = readquery(
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
+        )
 
         self.assertEqual(rows, [{"id": 1}])
         self.assertTrue(cursor.isClosed)
@@ -137,7 +123,9 @@ class test_readquery(unittest.TestCase):
 
         filtersBefore = list(warnings.filters)
 
-        readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(FakeCursor()))
+        readquery(
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(FakeCursor())
+        )
 
         self.assertEqual(warnings.filters, filtersBefore)
 
@@ -148,7 +136,9 @@ class test_readquery(unittest.TestCase):
 
         with mock.patch("time.sleep") as sleep:
             with self.assertRaises(pymysql.err.InternalError):
-                readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+                readquery(
+                    log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
+                )
 
         self.assertEqual(cursor.executeCalls, 1)
         sleep.assert_not_called()
@@ -159,7 +149,7 @@ class test_readquery(unittest.TestCase):
         cursor = FakeCursor(executeError=pymysql.err.InternalError(1, "internal"))
 
         rows = readquery(
-            log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=True
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), quiet=True
         )
 
         self.assertEqual(rows, [])
@@ -175,7 +165,7 @@ class test_readquery(unittest.TestCase):
         )
 
         with self.assertRaises(pymysql.err.OperationalError):
-            readquery(log=log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor))
+            readquery(log=self.log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor))
 
         self.assertEqual(cursor.executeCalls, 1)
 
@@ -190,7 +180,7 @@ class test_readquery(unittest.TestCase):
 
         with mock.patch("time.sleep") as sleep:
             rows = readquery(
-                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
+                log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
             )
 
         self.assertEqual(rows, [{"id": 1}])
@@ -206,7 +196,9 @@ class test_readquery(unittest.TestCase):
 
         with mock.patch("time.sleep") as sleep:
             with self.assertRaises(pymysql.err.OperationalError):
-                readquery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+                readquery(
+                    log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor)
+                )
 
         delays = [call.args[0] for call in sleep.call_args_list]
         self.assertEqual(cursor.executeCalls, len(delays) + 1)
@@ -226,7 +218,7 @@ class test_readquery(unittest.TestCase):
                 with mock.patch("time.sleep") as sleep:
                     with self.assertRaises(pymysql.err.OperationalError) as raised:
                         readquery(
-                            log=log,
+                            log=self.log,
                             sqlQuery="SELECT 1",
                             dbConn=FakeConnection(cursor),
                         )

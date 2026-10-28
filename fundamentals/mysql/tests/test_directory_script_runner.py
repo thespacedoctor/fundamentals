@@ -11,30 +11,8 @@ import contextlib
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = dbConn = None
 
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-# shutil.copytree(pathToInputDir + "/mysql_scripts",
-#                 pathToOutputDir + "/mysql_scripts")
-
-
+@pytest.mark.usefixtures("session_attributes", "output_dir_attribute")
 class test_directory_script_runner(unittest.TestCase):
 
     def test_directory_script_runner_function(self):
@@ -42,8 +20,8 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
             databaseName="unit_tests",
             loginPath="unittesting",
         )
@@ -53,8 +31,8 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
             databaseName="unit_tests",
             loginPath="unittesting",
             successRule="passed",
@@ -66,8 +44,8 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
             databaseName="unit_tests",
             loginPath="unittesting",
             successRule="delete",
@@ -79,8 +57,8 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
             databaseName="unit_tests",
             loginPath="unittesting",
             successRule="delete",
@@ -92,8 +70,8 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
             force=True,
             databaseName="unit_tests",
             loginPath="unittesting",
@@ -106,47 +84,47 @@ class test_directory_script_runner(unittest.TestCase):
         from fundamentals.mysql import directory_script_runner
 
         directory_script_runner(
-            log=log,
-            pathToScriptDirectory=pathToOutputDir + "/mysql_scripts",
-            dbConn=dbConn,
+            log=self.log,
+            pathToScriptDirectory=self.pathToOutputDir + "/mysql_scripts",
+            dbConn=self.dbConn,
             successRule="delete",
             failureRule="failed",
         )
 
     def test_01_execute_mysql_script_function_01(self):
 
-        pathToScript = pathToOutputDir + "/mysql_scripts/marshall_schema.sql"
+        pathToScript = self.pathToOutputDir + "/mysql_scripts/marshall_schema.sql"
 
         from fundamentals.mysql import execute_mysql_script
 
         exception = execute_mysql_script(
-            pathToScript=pathToScript, log=log, dbConn=dbConn
+            pathToScript=pathToScript, log=self.log, dbConn=self.dbConn
         )
         if exception:
             print(exception)
 
         pathToScript = (
-            pathToOutputDir
+            self.pathToOutputDir
             + "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot copy.sql"
         )
 
         from fundamentals.mysql import execute_mysql_script
 
         exception = execute_mysql_script(
-            pathToScript=pathToScript, log=log, dbConn=dbConn
+            pathToScript=pathToScript, log=self.log, dbConn=self.dbConn
         )
         if exception:
             print(exception)
 
         pathToScript = (
-            pathToOutputDir
+            self.pathToOutputDir
             + "/mysql_scripts/42340d_since_20160921_tns_conesearch_phot.sql"
         )
 
         from fundamentals.mysql import execute_mysql_script
 
         exception = execute_mysql_script(
-            pathToScript=pathToScript, log=log, dbConn=dbConn
+            pathToScript=pathToScript, log=self.log, dbConn=self.dbConn
         )
         if exception:
             print(exception)
@@ -157,7 +135,7 @@ class test_directory_script_runner(unittest.TestCase):
 
         try:
             directory_script_runner(
-                log=log, settings=settings, fakeKey="break the code"
+                log=self.log, settings=self.settings, fakeKey="break the code"
             )
             assert False
         except Exception as e:
@@ -229,11 +207,12 @@ class FakeMysqlProcesses:
             )
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_directory_script_runner_subprocess(unittest.TestCase):
     """run the loginPath branch against a fake `mysql` executable"""
 
     def setUp(self):
-        self.log = log
+        self.log = self.log
         self.workDir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.workDir, True)
         self.scriptDir = os.path.join(self.workDir, "scripts")
@@ -437,7 +416,9 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
         self.assertEqual(len(started), 2)
         self.assertTrue(all(process.returncode is not None for process in started))
 
-    def test_background_mode_returns_before_mysql_finishes_and_reaps_it_afterwards(self):
+    def test_background_mode_returns_before_mysql_finishes_and_reaps_it_afterwards(
+        self,
+    ):
         self._write_script("a.sql")
         module = sys.modules["fundamentals.mysql.directory_script_runner"]
         release = threading.Event()

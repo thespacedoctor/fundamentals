@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 import textwrap
+import unittest
 
 import pymysql
 import pytest
@@ -40,14 +41,8 @@ IMPORT_ALL_TEST_MODULES = textwrap.dedent("""
     """)
 
 CONNECTION_PROBE = textwrap.dedent("""
-    import pytest
-
-    pytestmark = pytest.mark.usefixtures("session_names")
-    dbConn = None
-
-
     # THESE TWO TESTS RELY ON PYTEST RUNNING THEM IN FILE ORDER
-    def test_a_leaves_an_open_transaction_in_manual_commit_mode():
+    def test_a_leaves_an_open_transaction_in_manual_commit_mode(dbConn):
         dbConn.autocommit(False)
         cursor = dbConn.cursor()
         cursor.execute("CREATE TEMPORARY TABLE probe_rows (a INT) ENGINE=InnoDB")
@@ -55,7 +50,7 @@ CONNECTION_PROBE = textwrap.dedent("""
         cursor.close()
 
 
-    def test_b_finds_the_connection_reset():
+    def test_b_finds_the_connection_reset(dbConn):
         cursor = dbConn.cursor()
         cursor.execute("SELECT COUNT(*) FROM probe_rows")
         rowCount = cursor.fetchone()[0]
@@ -89,6 +84,18 @@ BROKEN_CONNECTION_PROBE = textwrap.dedent("""
     def test_teardown_survives_a_connection_that_cannot_be_reset(dbConn):
         assert dbConn is not None
     """)
+
+
+OUTPUT_DIR_PROBE = textwrap.dedent("""
+    import os
+
+
+    def test_reports_the_output_folder(output_dir):
+        print("OUTPUT_DIR=" + output_dir)
+        assert os.path.isdir(output_dir)
+    """)
+
+OUTPUT_DIR_MARKER = "OUTPUT_DIR="
 
 
 def find_test_modules(root):
@@ -202,15 +209,66 @@ def test_teardown_survives_a_connection_that_cannot_be_reset(package_copy):
     assert "could not reset the test database connection" in result.stdout
 
 
-@pytest.mark.usefixtures("session_names")
-def test_session_names_are_injected_into_the_test_module(
-    request, log, settings, dbConn
-):
-    moduleNamespace = request.module.__dict__
+@pytest.mark.usefixtures("session_attributes")
+class SessionAttributesTest(unittest.TestCase):
+    def test_log_is_set_on_the_test_class(self):
+        self.assertIsInstance(self.log, logging.Logger)
 
-    assert moduleNamespace["log"] is log
-    assert moduleNamespace["settings"] is settings
-    assert moduleNamespace["dbConn"] is dbConn
+    def test_settings_are_set_on_the_test_class(self):
+        self.assertEqual(self.settings["database settings"]["db"], "unit_tests")
+
+    def test_dbconn_is_set_on_the_test_class(self):
+        self.assertTrue(self.dbConn.open)
+
+
+@pytest.mark.usefixtures("output_dir_attribute")
+class OutputDirAttributeTest(unittest.TestCase):
+    def test_output_dir_is_set_on_the_test_class(self):
+        self.assertTrue(os.path.isdir(self.pathToOutputDir))
+
+
+def test_output_dir_is_a_copy_of_the_input_folder_outside_the_source_tree(output_dir):
+    inputDir = os.path.join(os.path.dirname(__file__), "input")
+
+    assert output_dir.endswith("/")
+    assert not os.path.realpath(output_dir).startswith(
+        os.path.realpath(os.path.dirname(__file__))
+    )
+    assert set(os.listdir(inputDir)) <= set(os.listdir(output_dir))
+
+
+def test_output_dir_changes_do_not_reach_the_input_folder(output_dir):
+    inputDir = os.path.join(os.path.dirname(__file__), "input")
+    inputFiles = set(os.listdir(inputDir))
+
+    with open(os.path.join(output_dir, "written_by_a_test.txt"), "w") as stream:
+        stream.write("x")
+
+    assert set(os.listdir(inputDir)) == inputFiles
+
+
+def run_output_dir_probe(copyRoot, directoryName):
+    result = write_probe(copyRoot, directoryName, OUTPUT_DIR_PROBE, ["-s"])
+    assert result.returncode == 0, result.stdout + result.stderr
+    markerLines = [
+        line for line in result.stdout.splitlines() if OUTPUT_DIR_MARKER in line
+    ]
+    return markerLines[0].split(OUTPUT_DIR_MARKER)[1]
+
+
+def test_two_test_runs_get_different_output_folders(package_copy):
+    firstOutput = run_output_dir_probe(package_copy, "probe_output_one")
+    secondOutput = run_output_dir_probe(package_copy, "probe_output_two")
+
+    assert firstOutput != secondOutput
+
+
+def test_a_test_run_creates_no_output_folder_next_to_the_tests(package_copy):
+    run_output_dir_probe(package_copy, "probe_output_clean")
+
+    assert not os.path.exists(
+        os.path.join(package_copy, "probe_output_clean", "output")
+    )
 
 
 def test_log_fixture_is_a_logger(log):

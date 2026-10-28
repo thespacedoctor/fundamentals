@@ -1,32 +1,10 @@
 from __future__ import print_function
 from builtins import str
-import os
 import unittest
-import shutil
 import unittest
 import yaml
 import time
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 # xt-setup-unit-testing-files-and-folders
 
@@ -38,6 +16,7 @@ def f(n, anotherKeyword="nothing"):
     return result
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_multiprocess(unittest.TestCase):
 
     def test_multiprocess_function(self):
@@ -48,7 +27,7 @@ class test_multiprocess(unittest.TestCase):
         inputArray = list(range(1000))
         t1 = time.time()
         result = fmultiprocess(
-            log=log, function=f, inputArray=inputArray, anotherKeyword="cheese"
+            log=self.log, function=f, inputArray=inputArray, anotherKeyword="cheese"
         )
 
         took = time.time() - t1
@@ -67,7 +46,9 @@ class test_multiprocess(unittest.TestCase):
         from fundamentals import fmultiprocess
 
         try:
-            this = fmultiprocess(log=log, settings=settings, fakeKey="break the code")
+            this = fmultiprocess(
+                log=self.log, settings=self.settings, fakeKey="break the code"
+            )
             this.get()
             assert False
         except Exception as e:

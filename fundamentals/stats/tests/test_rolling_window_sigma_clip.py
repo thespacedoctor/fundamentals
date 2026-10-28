@@ -1,37 +1,15 @@
 from __future__ import print_function
 from builtins import str
-import os
 import unittest
-import shutil
 import unittest
 import yaml
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
 
 # xt-setup-unit-testing-files-and-folders
 # xt-utkit-refresh-database
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_rolling_window_sigma_clip(unittest.TestCase):
 
     def test_rolling_window_sigma_clip_function(self):
@@ -47,7 +25,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         from fundamentals.stats import rolling_window_sigma_clip
 
         arrayMask = rolling_window_sigma_clip(
-            log=log, array=normalDist, clippingSigma=2.2, windowSize=11
+            log=self.log, array=normalDist, clippingSigma=2.2, windowSize=11
         )
 
         # JUST KEEP UNMASKED VALUES
@@ -69,7 +47,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         for arrayLength, windowSize in pairs:
             array = list(rng.normal(loc=100, scale=3.0, size=arrayLength))
             arrayMask = rolling_window_sigma_clip(
-                log=log, array=array, clippingSigma=2.2, windowSize=windowSize
+                log=self.log, array=array, clippingSigma=2.2, windowSize=windowSize
             )
             self.assertEqual(
                 len(arrayMask),
@@ -83,7 +61,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         array = [100.0 + (i % 5) for i in range(20)]
         with self.assertRaises(ValueError):
             rolling_window_sigma_clip(
-                log=log, array=array, clippingSigma=2.2, windowSize=10
+                log=self.log, array=array, clippingSigma=2.2, windowSize=10
             )
 
     def test_odd_window_mask_matches_original_implementation_output(self):
@@ -98,7 +76,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
         expectedMask = [i in expectedMaskedIndices for i in range(30)]
 
         arrayMask = rolling_window_sigma_clip(
-            log=log, array=array, clippingSigma=2.2, windowSize=7
+            log=self.log, array=array, clippingSigma=2.2, windowSize=7
         )
 
         self.assertEqual(list(arrayMask), expectedMask)
@@ -109,7 +87,7 @@ class test_rolling_window_sigma_clip(unittest.TestCase):
 
         try:
             this = rolling_window_sigma_clip(
-                log=log, settings=settings, fakeKey="break the code"
+                log=self.log, settings=self.settings, fakeKey="break the code"
             )
             this.get()
             assert False

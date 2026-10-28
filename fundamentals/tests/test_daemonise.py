@@ -8,45 +8,26 @@ import tempfile
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
 
 # xt-setup-unit-testing-files-and-folders
 # xt-utkit-refresh-database
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_daemonise(unittest.TestCase):
 
     def test_daemonise_function(self):
 
         from fundamentals import daemonise
 
-        this = daemonise(log=log, settings=settings, name="nice")
+        this = daemonise(log=self.log, settings=self.settings, name="nice")
 
     def test_daemonise_function_exception(self):
 
         from fundamentals import daemonise
 
         try:
-            this = daemonise(log=log, settings=settings, fakeKey="break the code")
+            this = daemonise(log=self.log, settings=self.settings, fakeKey="break the code")
             this.get()
             assert False
         except Exception as e:
