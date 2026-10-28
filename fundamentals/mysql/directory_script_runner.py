@@ -104,7 +104,7 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts run in parallel, at most ``maxParallelScripts`` at a time, and the function returns at once (background threads start each script, wait for it and log any failure, but the success and failure rules are not applied; the interpreter waits for these threads, so scripts still queued are run before the program exits), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts run in parallel, at most ``maxParallelScripts`` at a time, and the function returns at once (background threads start each script, wait for it and log any failure, but the success and failure rules are not applied; the interpreter waits for these threads, so program exit blocks until every queued script has finished, and a mysql process that hangs blocks the exit; there is no timeout), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
     - ``maxParallelScripts`` -- the most mysql processes that run at once when ``waitForResult`` is 'False'. The limit applies to each call separately (every call has its own pool), not to the program as a whole. Must be a positive integer; any other value raises a `ValueError` in every mode, even when ``waitForResult`` is not 'False'. Default *8*
@@ -302,7 +302,7 @@ def _validate_max_parallel_scripts(maxParallelScripts):
 def _start_background_scripts(scriptPaths, mysqlCmd, mysqlEnv, maxParallelScripts, log):
     """*run the scripts on worker threads, so no more than ``maxParallelScripts`` mysql processes run at once*
 
-    Returns as soon as the workers have started. Each worker takes the next script (oldest first), runs it and waits for it to finish before taking another, so every process is reaped and the caller is never kept waiting. The workers are not daemon threads, so the interpreter waits for them (and the queued scripts) before it exits.
+    Returns as soon as the workers have started. Each worker takes the next script (oldest first), runs it and waits for it to finish before taking another, so every process is reaped and the caller is never kept waiting. The workers are not daemon threads, so program exit blocks until every queued script has finished. A mysql process that hangs therefore blocks the exit, and there is no timeout.
 
     **Key Arguments:**
 
@@ -319,8 +319,12 @@ def _start_background_scripts(scriptPaths, mysqlCmd, mysqlEnv, maxParallelScript
     queuedCount = len(scriptPaths) - maxParallelScripts
     if queuedCount > 0:
         log.info(
-            "%s scripts queued behind the limit of %s parallel mysql processes"
-            % (queuedCount, maxParallelScripts)
+            "%s %s queued behind the limit of %s parallel mysql scripts"
+            % (
+                queuedCount,
+                "script" if queuedCount == 1 else "scripts",
+                maxParallelScripts,
+            )
         )
 
     for _ in range(min(maxParallelScripts, len(scriptPaths))):
@@ -381,13 +385,34 @@ def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
             p.wait()
         finally:
             if p.poll() is None:
-                p.kill()
-                p.wait()
+                _kill_and_reap(p, os.path.basename(scriptPath), log)
         stderr = _read_stderr_tail(stderrFile)
     if p.returncode:
         log.error(
             "MySQL Script `%s` failed with return code %s: '%s'"
             % (os.path.basename(scriptPath), p.returncode, stderr)
+        )
+    return None
+
+
+def _kill_and_reap(p, scriptname, log):
+    """*kill a mysql process and wait for it, logging (not raising) any OS error*
+
+    Used while another exception is in flight, so an error here must not replace it.
+
+    **Key Arguments:**
+
+    - ``p`` -- the running Popen process
+    - ``scriptname`` -- name of the script the process is running, for the log
+    - ``log`` -- logger
+    """
+    try:
+        p.kill()
+        p.wait()
+    except OSError as e:
+        log.warning(
+            "MySQL Script `%s` process could not be killed and reaped: '%s'"
+            % (scriptname, e)
         )
     return None
 

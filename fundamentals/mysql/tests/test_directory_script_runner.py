@@ -221,6 +221,7 @@ class FakeMysqlProcesses:
             self.peak = max(self.peak, self.running)
             self.condition.notify_all()
         process = mock.Mock(returncode=0)
+        process.poll.return_value = 0
         process.wait.side_effect = self._wait
         return process
 
@@ -459,6 +460,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             return (b"", b"")
 
         fakeProcess = mock.Mock(returncode=0)
+        fakeProcess.poll.return_value = 0
         fakeProcess.wait.side_effect = blockUntilReleased
         fakeProcess.communicate.side_effect = blockUntilReleased
 
@@ -520,6 +522,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             fakes.release.set()
             self._join(threads)
 
+        self.assertEqual(len(threads), 2)
         self.assertEqual(fakes.started, 6)
         self.assertLessEqual(fakes.peak, 2)
 
@@ -533,6 +536,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             self._run(waitForResult=False, maxParallelScripts=2)
             self._join(threads)
 
+        self.assertEqual(len(threads), 2)
         self.assertEqual(fakes.started, 7)
         self.assertEqual(fakes.finished, 7)
         self.assertLessEqual(fakes.peak, 2)
@@ -547,6 +551,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             self._join(threads)
 
         self.assertEqual(finishedOnReturn, 0)
+        self.assertEqual(len(threads), 1)
         self.assertEqual(fakes.started, 5)
 
     def test_background_mode_limits_processes_to_the_module_default(self):
@@ -560,6 +565,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             fakes.release.set()
             self._join(threads)
 
+        self.assertEqual(len(threads), module.MAX_PARALLEL_SCRIPTS)
         self.assertLessEqual(fakes.peak, module.MAX_PARALLEL_SCRIPTS)
         self.assertEqual(fakes.started, scriptCount)
 
@@ -574,7 +580,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
                 launched.append("failed")
                 raise FileNotFoundError("mysql")
             launched.append("ok")
-            return mock.Mock(returncode=0)
+            return mock.Mock(returncode=0, **{"poll.return_value": 0})
 
         with mock.patch.object(module, "Popen", side_effect=failFirstLaunch):
             with self.assertLogs(self.log, level="ERROR"):
@@ -594,7 +600,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             launched.append(len(launched))
             if len(launched) == 1:
                 raise RuntimeError("unexpected")
-            return mock.Mock(returncode=0)
+            return mock.Mock(returncode=0, **{"poll.return_value": 0})
 
         with mock.patch.object(module, "Popen", side_effect=failFirstLaunch):
             with self.assertLogs(self.log, level="ERROR") as logs:
@@ -630,7 +636,7 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
 
         def failingPopen(*args, **kwargs):
             kwargs["stderr"].write(stderr)
-            return mock.Mock(returncode=3)
+            return mock.Mock(returncode=3, **{"poll.return_value": 3})
 
         with mock.patch.object(module, "Popen", side_effect=failingPopen):
             with self.assertLogs(self.log, level="ERROR") as logs:
@@ -679,6 +685,36 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
                 self._run_background()
 
         process.kill.assert_not_called()
+
+    def test_background_mode_uses_the_singular_when_one_script_is_queued(self):
+        fakes = FakeMysqlProcesses()
+        fakes.release.set()
+
+        with self._fake_mysql(fakes, 2) as threads:
+            with self.assertLogs(self.log, level="INFO") as logs:
+                self._run(waitForResult=False, maxParallelScripts=1)
+            self._join(threads)
+
+        self.assertIn("1 script queued", "\n".join(logs.output))
+        self.assertNotIn("1 scripts", "\n".join(logs.output))
+
+    def test_background_mode_logs_the_original_error_when_killing_the_process_fails(
+        self,
+    ):
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        self._write_script("a.sql")
+        process = mock.Mock(returncode=None)
+        process.poll.return_value = None
+        process.wait.side_effect = RuntimeError("interrupted")
+        process.kill.side_effect = ProcessLookupError("gone")
+
+        with mock.patch.object(module, "Popen", return_value=process):
+            with self.assertLogs(self.log, level="WARNING") as logs:
+                self._run_background()
+
+        output = "\n".join(logs.output)
+        self.assertIn("WARNING", output)
+        self.assertIn("RuntimeError: interrupted", output)
 
     def test_raises_value_error_for_an_invalid_process_limit(self):
         module = sys.modules["fundamentals.mysql.directory_script_runner"]
