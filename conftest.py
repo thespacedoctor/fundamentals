@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+from typing import Any, NamedTuple
 
 import pytest
 
@@ -25,8 +26,16 @@ def pytest_configure(config):
     config.add_cleanup(restore_home)
 
 
+class SessionSetup(NamedTuple):
+    """The settings, logger and database connection shared by the whole test session."""
+
+    settings: Any
+    log: Any
+    dbConn: Any
+
+
 @pytest.fixture(scope="session")
-def test_session():
+def session_setup():
     """
     *Set up the settings, logger and database connection once for the whole test session*
 
@@ -34,8 +43,9 @@ def test_session():
 
     **Return**
 
-    - ``settings``, ``log``, ``dbConn`` -- the settings dictionary, the logger and the test database connection
+    - ``SessionSetup`` -- a named tuple holding ``settings``, ``log`` and ``dbConn``
     """
+    # IMPORTED HERE SO THE PACKAGE LOADS AFTER pytest_configure HAS POINTED HOME AT A THROWAWAY DIRECTORY
     from fundamentals import tools
     from fundamentals.utKit import utKit
 
@@ -50,28 +60,28 @@ def test_session():
     )
     arguments, settings, log, dbConn = su.setup()
 
-    yield settings, log, dbConn
+    yield SessionSetup(settings=settings, log=log, dbConn=dbConn)
 
     if dbConn:
         dbConn.close()
 
 
 @pytest.fixture(scope="session")
-def settings(test_session):
+def settings(session_setup):
     """*The settings dictionary of the test session*"""
-    return test_session[0]
+    return session_setup.settings
 
 
 @pytest.fixture(scope="session")
-def log(test_session):
+def log(session_setup):
     """*The logger of the test session*"""
-    return test_session[1]
+    return session_setup.log
 
 
 @pytest.fixture(scope="session", name="dbConn")
-def db_conn(test_session):
+def db_conn(session_setup):
     """*The one database connection of the test session*"""
-    return test_session[2]
+    return session_setup.dbConn
 
 
 @pytest.fixture(scope="module")
@@ -80,5 +90,24 @@ def session_names(request, log, settings, dbConn):
     *Make ``log``, ``settings`` and ``dbConn`` available as module-level names in a test module*
 
     Test modules request this fixture with ``pytestmark = pytest.mark.usefixtures("session_names")``. It lets the tests in a module, including ``unittest.TestCase`` methods, keep using the plain names ``log``, ``settings`` and ``dbConn`` without any set-up at import time.
+
+    This only works under pytest, and it is transitional. A follow-up will move the modules to ``request.cls`` or fixture arguments and remove the injection.
     """
     request.module.__dict__.update(log=log, settings=settings, dbConn=dbConn)
+
+
+@pytest.fixture(autouse=True)
+def reset_db_connection(request):
+    """
+    *Undo whatever a test left on the shared database connection*
+
+    After each test in a module that uses ``session_names``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database.
+    """
+    yield
+
+    if "session_names" not in request.fixturenames:
+        return
+    dbConn = request.getfixturevalue("dbConn")
+    if dbConn:
+        dbConn.rollback()
+        dbConn.autocommit(True)

@@ -2,10 +2,11 @@ import sys
 import unittest
 from unittest import mock
 import pytest
+from fundamentals.utKit import SESSION_PLACEHOLDER
 
 pytestmark = pytest.mark.usefixtures("session_names")
 # SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
-log = dbConn = None
+log = dbConn = SESSION_PLACEHOLDER
 
 TABLE_NAME = "sweep2_dictsql_clash_table"
 INSERT_MODULE = "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"

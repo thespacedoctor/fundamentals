@@ -8,12 +8,13 @@ import yaml
 from unittest.mock import patch
 from fundamentals.download import append_now_datestamp_to_filename
 import pytest
+from fundamentals.utKit import SESSION_PLACEHOLDER
 
 STAMP = "20160316t154123"
 
 pytestmark = pytest.mark.usefixtures("session_names")
 # SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
-log = None
+log = SESSION_PLACEHOLDER
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)

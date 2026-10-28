@@ -19,6 +19,31 @@ except:
     pass
 
 
+PLACEHOLDER_MESSAGE = "run these tests under pytest; the root conftest.py injects log, settings and dbConn"
+
+
+class _SessionPlaceholder(object):
+    """
+    *Stand-in for the ``log``, ``settings`` and ``dbConn`` names of a test module*
+
+    The root ``conftest.py`` replaces it with the real objects when pytest runs the module. Any use outside pytest raises a ``RuntimeError`` instead of failing later with an unclear error.
+    """
+
+    def _fail(self, *args, **kwargs):
+        raise RuntimeError(PLACEHOLDER_MESSAGE)
+
+    __call__ = __getitem__ = __iter__ = __bool__ = _fail
+
+    def __getattr__(self, name):
+        # SPECIAL NAMES ARE PROBED BY TOOLS SUCH AS inspect AND pytest, SO THEY MUST LOOK ABSENT
+        if name.startswith("__"):
+            raise AttributeError(name)
+        raise RuntimeError(PLACEHOLDER_MESSAGE)
+
+
+SESSION_PLACEHOLDER = _SessionPlaceholder()
+
+
 class utKit(object):
     """
     *Default setup for fundamentals style unit-testing workflow (all tests base on nose module)*

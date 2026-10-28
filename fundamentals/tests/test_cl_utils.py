@@ -4,6 +4,7 @@ import unittest
 import shutil
 from fundamentals import cl_utils
 import pytest
+from fundamentals.utKit import SESSION_PLACEHOLDER
 from os.path import expanduser
 
 doc = cl_utils.__doc__
@@ -11,7 +12,7 @@ home = expanduser("~")
 
 pytestmark = pytest.mark.usefixtures("session_names")
 # SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
-log = None
+log = SESSION_PLACEHOLDER
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)

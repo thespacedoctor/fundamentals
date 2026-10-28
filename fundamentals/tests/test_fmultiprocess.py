@@ -7,10 +7,11 @@ import unittest
 import yaml
 import time
 import pytest
+from fundamentals.utKit import SESSION_PLACEHOLDER
 
 pytestmark = pytest.mark.usefixtures("session_names")
 # SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
-log = settings = None
+log = settings = SESSION_PLACEHOLDER
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
