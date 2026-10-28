@@ -1,34 +1,12 @@
 from __future__ import print_function
-import os
 import unittest
-import shutil
 import sys
 import uuid
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
 
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-
-
+@pytest.mark.usefixtures("session_attributes")
 class test_batch_insert_statement(unittest.TestCase):
     """The SQL built by the batch insert worker, with writequery mocked."""
 
@@ -49,13 +27,13 @@ class test_batch_insert_statement(unittest.TestCase):
             self.insertModule, "sharedList", [(rows or self.ROWS, 2)]
         ):
             with mock.patch.object(self.insertModule, "totalCount", 2):
-                with mock.patch.object(self.insertModule, "globalDbConn", dbConn):
+                with mock.patch.object(self.insertModule, "globalDbConn", self.dbConn):
                     with mock.patch.object(
                         self.insertModule, "writequery", writequeryMock
                     ):
                         self.insertModule._insert_single_batch_into_database(
                             batchIndex=0,
-                            log=log,
+                            log=self.log,
                             dbTableName=self.TABLE,
                             uniqueKeyList=[],
                             dateModified=False,
@@ -135,6 +113,7 @@ class test_batch_insert_statement(unittest.TestCase):
             self._build_sql(rows=rows)
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_batch_insert_round_trip(unittest.TestCase):
     """Rows with awkward table and column names go through the real test database."""
 
@@ -143,21 +122,21 @@ class test_batch_insert_round_trip(unittest.TestCase):
 
         self.tableName = "ut_dy2026_%s`_%%t" % uuid.uuid4().hex[:12]
         self.quotedTable = "`" + self.tableName.replace("`", "``") + "`"
-        self.originalAutocommit = dbConn.get_autocommit()
+        self.originalAutocommit = self.dbConn.get_autocommit()
         self.addCleanup(
             writequery,
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS %s;" % self.quotedTable,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
-        self.addCleanup(dbConn.autocommit, self.originalAutocommit)
+        self.addCleanup(self.dbConn.autocommit, self.originalAutocommit)
 
     def _insert(self, rows, replace, dateCreated):
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
 
         insert_list_of_dictionaries_into_database_tables(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictList=rows,
             dbTableName=self.tableName,
             uniqueKeyList=["select"],
@@ -170,13 +149,13 @@ class test_batch_insert_round_trip(unittest.TestCase):
     def _select(self):
         from fundamentals.mysql import readquery
 
-        dbConn.commit()
+        self.dbConn.commit()
         return readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT `select`, `we``ird`, `100%` FROM "
             + self.quotedTable
             + " ORDER BY `select`;",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def test_inserts_rows_into_awkward_names_and_skips_duplicates_when_replace_is_false(
@@ -229,7 +208,7 @@ class test_batch_insert_round_trip(unittest.TestCase):
         from fundamentals.mysql import writequery
 
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS %s;" % self.quotedTable,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )

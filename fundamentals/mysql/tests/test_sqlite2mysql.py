@@ -2,7 +2,6 @@ from __future__ import print_function
 from builtins import str
 import os
 import unittest
-import shutil
 import unittest
 import yaml
 import sys
@@ -10,25 +9,9 @@ from unittest import mock
 from fundamentals.mysql.sql_identifiers import quote_identifier
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = dbConn = None
-
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
 pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 # xt-setup-unit-testing-files-and-folders
 
@@ -38,6 +21,7 @@ pathToSqlite = pathToInputDir + "/test.sqlite"
 HEADJACK_DIRECTORY = "/tmp/headjack"
 
 
+@pytest.mark.usefixtures("session_attributes", "output_dir_attribute")
 class test_sqlite2mysql(unittest.TestCase):
 
     def test_sqlite2mysql_does_not_create_tmp_headjack_directory(self):
@@ -61,11 +45,11 @@ class test_sqlite2mysql(unittest.TestCase):
             return realMakedirs(path, *args, **kwargs)
 
         this = sqlite2mysql(
-            log=log,
-            settings=settings,
+            log=self.log,
+            settings=self.settings,
             pathToSqlite=pathToSqlite,
             tablePrefix="Marvin",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
 
@@ -89,7 +73,9 @@ class test_sqlite2mysql(unittest.TestCase):
     def _make_sqlite_file(self, tableName):
         import sqlite3
 
-        path = pathToOutputDir + "/sweep2_dictsql_%d.sqlite" % (abs(hash(tableName)),)
+        path = self.pathToOutputDir + "/sweep2_dictsql_%d.sqlite" % (
+            abs(hash(tableName)),
+        )
         if os.path.exists(path):
             os.remove(path)
         con = sqlite3.connect(path)
@@ -110,11 +96,11 @@ class test_sqlite2mysql(unittest.TestCase):
         tableName = 'it\'s a "table"'
         path = self._make_sqlite_file(tableName)
         this = sqlite2mysql(
-            log=log,
-            settings=settings,
+            log=self.log,
+            settings=self.settings,
             pathToSqlite=path,
             tablePrefix="Pre_",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
 
@@ -163,11 +149,11 @@ class test_sqlite2mysql(unittest.TestCase):
 
         path = self._make_sqlite_file("plain_table")
         this = sqlite2mysql(
-            log=log,
-            settings=settings,
+            log=self.log,
+            settings=self.settings,
             pathToSqlite=path,
             tablePrefix="Pre_",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
         fakeLite = mock.Mock(wraps=sqlite3)
@@ -193,7 +179,7 @@ class test_sqlite2mysql(unittest.TestCase):
         import fundamentals.mysql
         from fundamentals.mysql import sqlite2mysql
 
-        path = pathToOutputDir + "/sweep2_ddl_%d.sqlite" % (abs(hash(createSql)),)
+        path = self.pathToOutputDir + "/sweep2_ddl_%d.sqlite" % (abs(hash(createSql)),)
         if os.path.exists(path):
             os.remove(path)
         con = sqlite3.connect(path)
@@ -203,11 +189,11 @@ class test_sqlite2mysql(unittest.TestCase):
         con.close()
 
         this = sqlite2mysql(
-            log=log,
-            settings=settings,
+            log=self.log,
+            settings=self.settings,
             pathToSqlite=path,
             tablePrefix=tablePrefix,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         sqliteModule = sys.modules["fundamentals.mysql.sqlite2mysql"]
         with (
@@ -297,11 +283,11 @@ class test_sqlite2mysql(unittest.TestCase):
         from fundamentals.mysql import sqlite2mysql
 
         this = sqlite2mysql(
-            log=log,
-            settings=settings,
+            log=self.log,
+            settings=self.settings,
             pathToSqlite=pathToSqlite,
             tablePrefix="Marvin",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         this.convert_sqlite_to_mysql()
 
@@ -311,8 +297,8 @@ class test_sqlite2mysql(unittest.TestCase):
 
         try:
             this = sqlite2mysql(
-                log=log,
-                settings=settings,
+                log=self.log,
+                settings=self.settings,
                 pathToSqlite=pathToSqlite,
                 fakeKey="break the code",
             )

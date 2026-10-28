@@ -6,23 +6,6 @@ import unittest
 import shutil
 
 
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-
 class test_logs(unittest.TestCase):
 
     def tmp_path_for(self, name):

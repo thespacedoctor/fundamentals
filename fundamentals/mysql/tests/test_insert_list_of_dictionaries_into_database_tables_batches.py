@@ -1,33 +1,9 @@
 from __future__ import print_function
 from builtins import str
-import os
 import unittest
-import shutil
 import sys
 from unittest import mock
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-
 
 dbSettings = dbSettings = {
     "host": "127.0.0.1",
@@ -40,6 +16,7 @@ dbSettings = dbSettings = {
 BATCH_TABLE = "test_dy2025_insert_batches"
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_insert_batches(unittest.TestCase):
 
     def setUp(self):
@@ -48,17 +25,21 @@ class test_insert_batches(unittest.TestCase):
         self.insertModule = sys.modules[
             "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
         ]
-        self.originalAutocommit = dbConn.get_autocommit()
+        self.originalAutocommit = self.dbConn.get_autocommit()
         writequery(
-            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE, dbConn=dbConn
+            log=self.log,
+            sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE,
+            dbConn=self.dbConn,
         )
 
     def tearDown(self):
         from fundamentals.mysql import writequery
 
-        dbConn.autocommit(self.originalAutocommit)
+        self.dbConn.autocommit(self.originalAutocommit)
         writequery(
-            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE, dbConn=dbConn
+            log=self.log,
+            sqlQuery="DROP TABLE IF EXISTS %s;" % BATCH_TABLE,
+            dbConn=self.dbConn,
         )
 
     def _insert(self, rows, batchSize=2500):
@@ -68,23 +49,23 @@ class test_insert_batches(unittest.TestCase):
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
 
         insert_list_of_dictionaries_into_database_tables(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictList=rows,
             dbTableName=BATCH_TABLE,
             batchSize=batchSize,
             dateCreated=False,
-            **kwargs
+            **kwargs,
         )
 
     def _select(self, columns):
         from fundamentals.mysql import readquery
 
-        dbConn.commit()
+        self.dbConn.commit()
         return readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT %s FROM %s ORDER BY %s;" % (columns, BATCH_TABLE, columns),
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def _run_single_batch(self, rows, writequeryMock):
@@ -92,13 +73,13 @@ class test_insert_batches(unittest.TestCase):
         self._insert(rows[:1])
         with mock.patch.object(self.insertModule, "sharedList", [(rows[1:], 1)]):
             with mock.patch.object(self.insertModule, "totalCount", len(rows)):
-                with mock.patch.object(self.insertModule, "globalDbConn", dbConn):
+                with mock.patch.object(self.insertModule, "globalDbConn", self.dbConn):
                     with mock.patch.object(
                         self.insertModule, "writequery", writequeryMock
                     ):
                         return self.insertModule._insert_single_batch_into_database(
                             batchIndex=0,
-                            log=log,
+                            log=self.log,
                             dbTableName=BATCH_TABLE,
                             uniqueKeyList=[],
                             dateModified=False,
@@ -216,17 +197,17 @@ class test_insert_batches(unittest.TestCase):
 
     def test_restores_callers_autocommit_after_insert(self):
         # ARRANGE
-        dbConn.autocommit(True)
+        self.dbConn.autocommit(True)
 
         # ACT
         self._insert([{"col1": i} for i in range(4)])
 
         # ASSERT
-        self.assertTrue(dbConn.get_autocommit())
+        self.assertTrue(self.dbConn.get_autocommit())
 
     def test_restores_callers_autocommit_when_insert_fails(self):
         # ARRANGE
-        dbConn.autocommit(True)
+        self.dbConn.autocommit(True)
         rows = [{"col1": i} for i in range(4)]
 
         # ACT
@@ -237,7 +218,7 @@ class test_insert_batches(unittest.TestCase):
                 self._insert(rows)
 
         # ASSERT
-        self.assertTrue(dbConn.get_autocommit())
+        self.assertTrue(self.dbConn.get_autocommit())
 
     def test_raises_when_writequery_returns_an_error_message(self):
         # ARRANGE
@@ -330,8 +311,8 @@ class test_insert_batches(unittest.TestCase):
         import pymysql
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
 
-        dbConn.autocommit(True)
-        realAutocommit = dbConn.autocommit
+        self.dbConn.autocommit(True)
+        realAutocommit = self.dbConn.autocommit
 
         def autocommitFailsOnRestore(value):
             if value:
@@ -340,12 +321,12 @@ class test_insert_batches(unittest.TestCase):
 
         # ACT / ASSERT
         with mock.patch.object(
-            dbConn, "autocommit", side_effect=autocommitFailsOnRestore
+            self.dbConn, "autocommit", side_effect=autocommitFailsOnRestore
         ):
             with self.assertRaises(pymysql.err.OperationalError):
                 insert_list_of_dictionaries_into_database_tables(
-                    dbConn=dbConn,
-                    log=log,
+                    dbConn=self.dbConn,
+                    log=self.log,
                     dictList=[{"col1": i} for i in range(3)],
                     dbTableName=BATCH_TABLE,
                     dateCreated=False,
@@ -356,8 +337,8 @@ class test_insert_batches(unittest.TestCase):
         import pymysql
         from fundamentals.mysql import insert_list_of_dictionaries_into_database_tables
 
-        dbConn.autocommit(True)
-        realAutocommit = dbConn.autocommit
+        self.dbConn.autocommit(True)
+        realAutocommit = self.dbConn.autocommit
 
         def autocommitFailsOnRestore(value):
             if value:
@@ -370,12 +351,12 @@ class test_insert_batches(unittest.TestCase):
         # ACT / ASSERT
         with mock.patch.object(self.insertModule, "fmultiprocess", insertFails):
             with mock.patch.object(
-                dbConn, "autocommit", side_effect=autocommitFailsOnRestore
+                self.dbConn, "autocommit", side_effect=autocommitFailsOnRestore
             ):
                 with self.assertRaisesRegex(RuntimeError, "original insert failure"):
                     insert_list_of_dictionaries_into_database_tables(
-                        dbConn=dbConn,
-                        log=log,
+                        dbConn=self.dbConn,
+                        log=self.log,
                         dictList=[{"col1": i} for i in range(3)],
                         dbTableName=BATCH_TABLE,
                         dateCreated=False,

@@ -3,15 +3,11 @@ import unittest
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
 TABLE_NAME = "sweep2_dictsql_clash_table"
 INSERT_MODULE = "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
 
 
-def drop_clash_table():
+def drop_clash_table(log, dbConn):
     from fundamentals.mysql import writequery
 
     writequery(
@@ -95,11 +91,12 @@ class test_raise_on_duplicate_columns(unittest.TestCase):
         self.assertIsNone(raise_on_duplicate_columns(["a key", "b-key", 1]))
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_convert_dictionary_to_mysql_table_clashes(unittest.TestCase):
 
     def setUp(self):
-        drop_clash_table()
-        self.addCleanup(drop_clash_table)
+        drop_clash_table(self.log, self.dbConn)
+        self.addCleanup(drop_clash_table, self.log, self.dbConn)
 
     def test_raises_naming_both_keys_when_int_and_str_keys_clash(self):
         # ARRANGE
@@ -108,7 +105,7 @@ class test_convert_dictionary_to_mysql_table_clashes(unittest.TestCase):
         # ACT
         with self.assertRaises(ValueError) as context:
             convert_dictionary_to_mysql_table(
-                log=log,
+                log=self.log,
                 dictionary={1: "a", "1": "b"},
                 dbTableName=TABLE_NAME,
                 returnInsertOnly=True,
@@ -126,22 +123,25 @@ class test_convert_dictionary_to_mysql_table_clashes(unittest.TestCase):
         # ACT
         with self.assertRaises(ValueError) as context:
             convert_dictionary_to_mysql_table(
-                log=log,
+                log=self.log,
                 dictionary={"my key": 1, "my-key": 2, "my_key": 3},
-                dbConn=dbConn,
+                dbConn=self.dbConn,
                 dbTableName=TABLE_NAME,
             )
 
         # ASSERT
         self.assertIn("'my_key'", str(context.exception))
-        self.assertFalse(table_exists(dbConn=dbConn, log=log, dbTableName=TABLE_NAME))
+        self.assertFalse(
+            table_exists(dbConn=self.dbConn, log=self.log, dbTableName=TABLE_NAME)
+        )
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_insert_list_of_dictionaries_clashes(unittest.TestCase):
 
     def setUp(self):
-        drop_clash_table()
-        self.addCleanup(drop_clash_table)
+        drop_clash_table(self.log, self.dbConn)
+        self.addCleanup(drop_clash_table, self.log, self.dbConn)
 
     def test_raises_and_creates_no_table_when_first_dictionary_has_clashing_keys(
         self,
@@ -155,15 +155,17 @@ class test_insert_list_of_dictionaries_clashes(unittest.TestCase):
         # ACT
         with self.assertRaises(ValueError) as context:
             insert_list_of_dictionaries_into_database_tables(
-                dbConn=dbConn,
-                log=log,
+                dbConn=self.dbConn,
+                log=self.log,
                 dictList=[{1: "a", "1": "b"}],
                 dbTableName=TABLE_NAME,
             )
 
         # ASSERT
         self.assertIn("'1'", str(context.exception))
-        self.assertFalse(table_exists(dbConn=dbConn, log=log, dbTableName=TABLE_NAME))
+        self.assertFalse(
+            table_exists(dbConn=self.dbConn, log=self.log, dbTableName=TABLE_NAME)
+        )
 
     def test_raises_before_any_sql_runs_when_batch_keys_clash(self):
         # ARRANGE
@@ -175,13 +177,13 @@ class test_insert_list_of_dictionaries_clashes(unittest.TestCase):
         with (
             mock.patch.object(insertModule, "sharedList", [(rows, 2)]),
             mock.patch.object(insertModule, "totalCount", 2),
-            mock.patch.object(insertModule, "globalDbConn", dbConn),
+            mock.patch.object(insertModule, "globalDbConn", self.dbConn),
             mock.patch.object(insertModule, "writequery", writequeryMock),
         ):
             with self.assertRaises(ValueError) as context:
                 insertModule._insert_single_batch_into_database(
                     batchIndex=0,
-                    log=log,
+                    log=self.log,
                     dbTableName=TABLE_NAME,
                     uniqueKeyList=[],
                     dateModified=False,
@@ -193,7 +195,8 @@ class test_insert_list_of_dictionaries_clashes(unittest.TestCase):
 
         # ASSERT
         self.assertEqual(
-            str(context.exception), "keys 'my key' and 'my_key' both map to column 'my_key'"
+            str(context.exception),
+            "keys 'my key' and 'my_key' both map to column 'my_key'",
         )
         writequeryMock.assert_not_called()
 

@@ -2,37 +2,21 @@ from __future__ import print_function
 from builtins import str
 import os
 import unittest
-import shutil
 import unittest
 import yaml
 import pickle
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = None
-
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
 pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 pathToPickleFile = pathToInputDir + "/list-of-dictionaries.p"
 
 listOfDictionaries = pickle.load(open(pathToPickleFile, "rb"))
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_list_of_dictionaries_to_mysql(unittest.TestCase):
 
     def test_list_of_dictionaries_to_mysql_function(self):
@@ -42,7 +26,7 @@ class test_list_of_dictionaries_to_mysql(unittest.TestCase):
         )
 
         mysqlInserts = list_of_dictionaries_to_mysql_inserts(
-            log=log, datalist=listOfDictionaries, tableName="my_new_table"
+            log=self.log, datalist=listOfDictionaries, tableName="my_new_table"
         )
 
     def test_list_of_dictionaries_to_mysql_function_exception(self):
@@ -53,7 +37,7 @@ class test_list_of_dictionaries_to_mysql(unittest.TestCase):
 
         try:
             this = list_of_dictionaries_to_mysql_inserts(
-                log=log, settings=settings, fakeKey="break the code"
+                log=self.log, settings=self.settings, fakeKey="break the code"
             )
             this.get()
             assert False

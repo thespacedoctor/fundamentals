@@ -8,27 +8,6 @@ import pandas as pd
 from unittest import mock
 import pytest
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-
 
 dictList = []
 
@@ -49,6 +28,8 @@ LOAD_IN_FILE_ROWS = [
     {"col1": i, "col2": i + 10.0, "col3": i / 2.0, "col4": i * 34.0} for i in range(5)
 ]
 
+
+@pytest.mark.usefixtures("session_attributes", "output_dir_attribute")
 class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
 
     def setUp(self):
@@ -58,7 +39,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
         ]
         self.originalTempdir = tempfile.tempdir
-        self.redirectedTmp = os.path.join(pathToOutputDir, "redirected_tmp")
+        self.redirectedTmp = os.path.join(self.pathToOutputDir, "redirected_tmp")
         shutil.rmtree(self.redirectedTmp, ignore_errors=True)
         os.makedirs(self.redirectedTmp)
         tempfile.tempdir = self.redirectedTmp
@@ -66,15 +47,15 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         self.sqlStatements = []
 
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS %s;" % LOAD_IN_FILE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="""CREATE TABLE %s (col1 INT, col2 DOUBLE, col3 DOUBLE, col4 DOUBLE);"""
             % LOAD_IN_FILE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def tearDown(self):
@@ -86,9 +67,9 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             if os.path.exists(csvPath):
                 os.remove(csvPath)
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS %s;" % LOAD_IN_FILE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def _load_in_file(self, failOnStatement=None):
@@ -116,7 +97,7 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
                     ):
                         self.insertModule._add_dictlist_to_database_via_load_in_file(
                             masterListIndex=0,
-                            log=log,
+                            log=self.log,
                             dbTablename=LOAD_IN_FILE_TABLE,
                             dbSettings=dbSettings,
                         )
@@ -136,11 +117,11 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         )
         self.assertFalse(os.path.exists(csvPath))
         self.assertEqual(os.listdir(self.redirectedTmp), [])
-        dbConn.commit()
+        self.dbConn.commit()
         rows = readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT COUNT(*) AS n FROM %s;" % LOAD_IN_FILE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         self.assertEqual(rows[0]["n"], len(LOAD_IN_FILE_ROWS))
 
@@ -162,11 +143,11 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         self._load_in_file()
 
         self.assertEqual(os.listdir(quotedTmp), [])
-        dbConn.commit()
+        self.dbConn.commit()
         rows = readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT COUNT(*) AS n FROM %s;" % LOAD_IN_FILE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         self.assertEqual(rows[0]["n"], len(LOAD_IN_FILE_ROWS))
 
@@ -190,16 +171,16 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
         # THE TABLE IS CREATED HERE BECAUSE table_exists LOOKS IN EVERY SCHEMA, SO A
         # test_insert_many TABLE IN ANOTHER SCHEMA WOULD STOP IT BEING CREATED IN unit_tests
         writequery(
-            log=log, sqlQuery="DROP TABLE IF EXISTS test_insert_many;", dbConn=dbConn
+            log=self.log, sqlQuery="DROP TABLE IF EXISTS test_insert_many;", dbConn=self.dbConn
         )
         self.addCleanup(
             writequery,
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS test_insert_many;",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="""CREATE TABLE test_insert_many
                 (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
                 `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
@@ -207,12 +188,12 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
                 `updated` tinyint(4) DEFAULT '0',
                 PRIMARY KEY (`primaryId`))
                 ENGINE=Innodb AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;""",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
         insert_list_of_dictionaries_into_database_tables(
-            dbConn=dbConn,
-            log=log,
+            dbConn=self.dbConn,
+            log=self.log,
             dictList=dictList,
             dbTableName="test_insert_many",
             uniqueKeyList=["col1", "col3"],
@@ -222,16 +203,18 @@ class test_insert_list_of_dictionaries_into_database_tables(unittest.TestCase):
             dbSettings=dbSettings,
         )
 
-        dbConn.commit()
+        self.dbConn.commit()
         rows = readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT COUNT(*) AS n FROM test_insert_many;",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         self.assertEqual(rows[0]["n"], len(dictList))
 
     # x-class-to-test-named-worker-function
 
+
+@pytest.mark.usefixtures("session_attributes")
 class test_load_in_file_statements(unittest.TestCase):
     """The LOAD DATA worker run against a mocked connection that records its SQL."""
 
@@ -268,7 +251,7 @@ class test_load_in_file_statements(unittest.TestCase):
                     ):
                         self.insertModule._add_dictlist_to_database_via_load_in_file(
                             masterListIndex=0,
-                            log=log,
+                            log=self.log,
                             dbTablename=dbTablename,
                             dbSettings=dbSettings,
                             dateModified=dateModified,
@@ -411,12 +394,13 @@ class test_load_in_file_statements(unittest.TestCase):
         self._run_load([{"col1": 1}])
 
         # ASSERT
-        self.assertEqual(self.databaseMock.call_args.kwargs["log"], log)
-        self.assertTrue(all(writequeryLog is log for writequeryLog in self.writequeryLogs))
+        self.assertEqual(self.databaseMock.call_args.kwargs["log"], self.log)
+        self.assertTrue(all(writequeryLog is self.log for writequeryLog in self.writequeryLogs))
 
 REPLACE_TABLE = "sweep2_insert_replace"
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_load_in_file_duplicates(unittest.TestCase):
     """The LOAD DATA worker against the real test database."""
 
@@ -427,25 +411,25 @@ class test_load_in_file_duplicates(unittest.TestCase):
             "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"
         ]
         writequery(
-            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=dbConn
+            log=self.log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=self.dbConn
         )
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="CREATE TABLE %s (id INT PRIMARY KEY, `my_key` INT, decl DOUBLE);"
             % REPLACE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="INSERT INTO %s VALUES (1, 10, 1.5);" % REPLACE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def tearDown(self):
         from fundamentals.mysql import writequery
 
         writequery(
-            log=log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=dbConn
+            log=self.log, sqlQuery="DROP TABLE IF EXISTS %s;" % REPLACE_TABLE, dbConn=self.dbConn
         )
 
     def _load_duplicate_and_new_row(self, replace):
@@ -459,16 +443,16 @@ class test_load_in_file_duplicates(unittest.TestCase):
             with mock.patch.object(self.insertModule, "totalCount", 2):
                 self.insertModule._add_dictlist_to_database_via_load_in_file(
                     masterListIndex=0,
-                    log=log,
+                    log=self.log,
                     dbTablename=REPLACE_TABLE,
                     dbSettings=dbSettings,
                     replace=replace,
                 )
-        dbConn.commit()
+        self.dbConn.commit()
         return readquery(
-            log=log,
+            log=self.log,
             sqlQuery="SELECT id, my_key, decl FROM %s ORDER BY id;" % REPLACE_TABLE,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )
 
     def test_keeps_existing_row_and_adds_new_row_when_replace_is_false(self):
@@ -491,6 +475,8 @@ class test_load_in_file_duplicates(unittest.TestCase):
             [(1, 99, 9.5), (2, 20, 2.5)],
         )
 
+
+@pytest.mark.usefixtures("session_attributes")
 class test_dataframe_libraries_loaded_in_parent(unittest.TestCase):
     """numpy and pandas must be imported before the worker pool forks."""
 
@@ -509,8 +495,8 @@ class test_dataframe_libraries_loaded_in_parent(unittest.TestCase):
         with mock.patch.object(self.insertModule, "_import_dataframe_libraries", requireMock):
             with mock.patch.object(self.insertModule, "fmultiprocess", fmultiprocessMock):
                 self.insertModule.insert_list_of_dictionaries_into_database_tables(
-                    dbConn=dbConn,
-                    log=log,
+                    dbConn=self.dbConn,
+                    log=self.log,
                     dictList=[{"col1": i} for i in range(3)],
                     dbTableName="ut_dy2032_stats_order",
                     dbSettings=dbSettings,
@@ -524,7 +510,7 @@ class test_dataframe_libraries_loaded_in_parent(unittest.TestCase):
         from fundamentals.mysql import writequery
 
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery="DROP TABLE IF EXISTS ut_dy2032_stats_order;",
-            dbConn=dbConn,
+            dbConn=self.dbConn,
         )

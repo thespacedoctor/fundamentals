@@ -3,29 +3,11 @@ from builtins import str
 import contextlib
 import os
 import unittest
-import shutil
 import pytest
-import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = settings = dbConn = None
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
 pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 # xt-setup-unit-testing-files-and-folders
 
@@ -33,11 +15,11 @@ if not os.path.exists(pathToOutputDir):
 YAML_TABLES = ("web_articles", "podcasts", "icecream")
 
 
-def _create_yaml_tables():
+def _create_yaml_tables(log, dbConn):
     """Create the empty tables the yaml fixtures are ingested into."""
     from fundamentals.mysql import writequery
 
-    _drop_yaml_tables()
+    _drop_yaml_tables(log, dbConn)
     for table in YAML_TABLES:
         writequery(
             log=log,
@@ -53,7 +35,7 @@ def _create_yaml_tables():
         )
 
 
-def _drop_yaml_tables():
+def _drop_yaml_tables(log, dbConn):
     from fundamentals.mysql import writequery
 
     for table in YAML_TABLES:
@@ -62,7 +44,7 @@ def _drop_yaml_tables():
         )
 
 
-def _count_rows(table):
+def _count_rows(log, dbConn, table):
     from fundamentals.mysql import readquery
 
     dbConn.commit()
@@ -83,55 +65,56 @@ def _offline_url_lookup():
         yield
 
 
+@pytest.mark.usefixtures("session_attributes", "output_dir_attribute")
 class test_yaml_to_database(unittest.TestCase):
 
     def setUp(self):
-        _create_yaml_tables()
+        _create_yaml_tables(self.log, self.dbConn)
 
     def tearDown(self):
-        _drop_yaml_tables()
+        _drop_yaml_tables(self.log, self.dbConn)
 
     def test_single_yaml_to_database_function(self):
         # COPY INPUT TO OUTPUT DIR
         import shutil
 
         try:
-            shutil.rmtree(pathToOutputDir)
+            shutil.rmtree(self.pathToOutputDir)
         except:
             pass
         # COPY INPUT TO OUTPUT DIR
-        shutil.copytree(pathToInputDir, pathToOutputDir)
+        shutil.copytree(pathToInputDir, self.pathToOutputDir)
 
         from fundamentals.mysql import yaml_to_database
 
         yaml2db = yaml_to_database(
-            log=log,
-            settings=settings,
-            dbConn=dbConn,
-            pathToInputDir=pathToOutputDir + "yaml",
+            log=self.log,
+            settings=self.settings,
+            dbConn=self.dbConn,
+            pathToInputDir=self.pathToOutputDir + "yaml",
         )
         with _offline_url_lookup():
             yaml2db.add_yaml_file_content_to_database(
-                filepath=pathToOutputDir + "yaml/20161219105124.yaml"
+                filepath=self.pathToOutputDir + "yaml/20161219105124.yaml"
             )
 
-        self.assertEqual(_count_rows("web_articles"), 1)
-        self.assertEqual(_count_rows("podcasts"), 1)
+        self.assertEqual(_count_rows(self.log, self.dbConn, "web_articles"), 1)
+        self.assertEqual(_count_rows(self.log, self.dbConn, "podcasts"), 1)
 
     def test_yaml_to_database_function(self):
 
         from fundamentals.mysql import yaml_to_database
 
         yaml2db = yaml_to_database(
-            log=log,
-            settings=settings,
-            dbConn=dbConn,
-            pathToInputDir=pathToOutputDir + "/yaml",
+            log=self.log,
+            settings=self.settings,
+            dbConn=self.dbConn,
+            pathToInputDir=self.pathToOutputDir + "/yaml",
         )
         with _offline_url_lookup():
             yaml2db.ingest()
 
-        self.assertGreaterEqual(_count_rows("web_articles"), 1)
+        self.assertGreaterEqual(_count_rows(self.log, self.dbConn, "web_articles"), 1)
 
     def test_yaml_to_database_function_exception(self):
 
@@ -139,7 +122,7 @@ class test_yaml_to_database(unittest.TestCase):
 
         try:
             this = yaml_to_database(
-                log=log, settings=settings, dbConn=dbConn, fakeKey="break the code"
+                log=self.log, settings=self.settings, dbConn=self.dbConn, fakeKey="break the code"
             )
             this.get()
             assert False

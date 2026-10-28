@@ -1,33 +1,11 @@
 from __future__ import print_function
 from builtins import str
-import os
 import unittest
-import shutil
 import sys
 import warnings
 from unittest import mock
 import pymysql
 import pytest
-
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
-# SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
-moduleDirectory = os.path.dirname(__file__)
-pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 
 class FakeCursor:
@@ -96,6 +74,7 @@ class FakeConnection:
         pass
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_writequery(unittest.TestCase):
 
     def test_writequery_function(self):
@@ -104,7 +83,11 @@ class test_writequery(unittest.TestCase):
 
         sqlQuery = "CREATE TABLE  IF NOT EXISTS `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
     def test_manyvalue_insert(self):
@@ -112,16 +95,20 @@ class test_writequery(unittest.TestCase):
 
         sqlQuery = "CREATE TABLE  IF NOT EXISTS  `testing_table` (`id` INT NOT NULL, PRIMARY KEY (`id`))"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
         from fundamentals.mysql import writequery
 
         sqlQuery = """INSERT INTO testing_table (id) values (%s)"""
         writequery(
-            log=log,
+            log=self.log,
             sqlQuery=sqlQuery,
-            dbConn=dbConn,
+            dbConn=self.dbConn,
             Force=False,
             manyValueList=[
                 (1,),
@@ -145,7 +132,11 @@ class test_writequery(unittest.TestCase):
 
         sqlQuery = "DROP TABLE `testing_table`;"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=False, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=False,
+            manyValueList=False,
         )
 
     def test_writequery_error_force(self):
@@ -154,7 +145,11 @@ class test_writequery(unittest.TestCase):
 
         sqlQuery = "rubbish query;"
         writequery(
-            log=log, sqlQuery=sqlQuery, dbConn=dbConn, Force=True, manyValueList=False
+            log=self.log,
+            sqlQuery=sqlQuery,
+            dbConn=self.dbConn,
+            Force=True,
+            manyValueList=False,
         )
 
         # x-print-testpage-for-pessto-marshall-web-object
@@ -165,7 +160,7 @@ class test_writequery(unittest.TestCase):
         conn = FakeConnection(cursorError=RuntimeError("no cursor"))
 
         with self.assertRaises(RuntimeError) as ctx:
-            writequery(log=log, sqlQuery="SELECT 1", dbConn=conn)
+            writequery(log=self.log, sqlQuery="SELECT 1", dbConn=conn)
 
         self.assertEqual(str(ctx.exception), "no cursor")
 
@@ -176,7 +171,10 @@ class test_writequery(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             writequery(
-                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=False
+                log=self.log,
+                sqlQuery="SELECT 1",
+                dbConn=FakeConnection(cursor),
+                Force=False,
             )
 
     def test_closes_cursor_when_generic_error_and_not_force(self):
@@ -186,7 +184,10 @@ class test_writequery(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             writequery(
-                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=False
+                log=self.log,
+                sqlQuery="SELECT 1",
+                dbConn=FakeConnection(cursor),
+                Force=False,
             )
 
         self.assertTrue(cursor.isClosed)
@@ -197,7 +198,7 @@ class test_writequery(unittest.TestCase):
         cursor = FakeCursor(executeError=ValueError("boom"))
 
         result = writequery(
-            log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=True
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=True
         )
 
         self.assertEqual(result, -1)
@@ -210,7 +211,10 @@ class test_writequery(unittest.TestCase):
 
         with self.assertRaises(pymysql.err.ProgrammingError):
             writequery(
-                log=log, sqlQuery="rubbish", dbConn=FakeConnection(cursor), Force=False
+                log=self.log,
+                sqlQuery="rubbish",
+                dbConn=FakeConnection(cursor),
+                Force=False,
             )
 
         self.assertTrue(cursor.isClosed)
@@ -220,7 +224,7 @@ class test_writequery(unittest.TestCase):
 
         cursor = FakeCursor()
 
-        writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+        writequery(log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
 
         self.assertTrue(cursor.isClosed)
 
@@ -229,7 +233,7 @@ class test_writequery(unittest.TestCase):
 
         cursor = FakeCursor()
 
-        message = writequery(log=log, sqlQuery="", dbConn=FakeConnection(cursor))
+        message = writequery(log=self.log, sqlQuery="", dbConn=FakeConnection(cursor))
 
         self.assertEqual(message, "")
 
@@ -238,7 +242,7 @@ class test_writequery(unittest.TestCase):
 
         cursor = FakeCursor()
 
-        writequery(log=log, sqlQuery="SELECT 1,", dbConn=FakeConnection(cursor))
+        writequery(log=self.log, sqlQuery="SELECT 1,", dbConn=FakeConnection(cursor))
 
         self.assertEqual(cursor.executed, ["SELECT 1"])
 
@@ -247,7 +251,9 @@ class test_writequery(unittest.TestCase):
 
         filtersBefore = list(warnings.filters)
 
-        writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(FakeCursor()))
+        writequery(
+            log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(FakeCursor())
+        )
 
         self.assertEqual(warnings.filters, filtersBefore)
 
@@ -257,7 +263,7 @@ class test_writequery(unittest.TestCase):
         cursor = FakeCursor(closeError=RuntimeError("close failed"))
 
         with mock.patch("time.sleep") as sleep:
-            writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+            writequery(log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
 
         sleep.assert_not_called()
 
@@ -270,7 +276,10 @@ class test_writequery(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             writequery(
-                log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor), Force=False
+                log=self.log,
+                sqlQuery="SELECT 1",
+                dbConn=FakeConnection(cursor),
+                Force=False,
             )
 
     def test_makes_one_execute_and_logs_when_table_already_exists(self):
@@ -281,7 +290,7 @@ class test_writequery(unittest.TestCase):
         )
 
         message = writequery(
-            log=log, sqlQuery="CREATE TABLE t", dbConn=FakeConnection(cursor)
+            log=self.log, sqlQuery="CREATE TABLE t", dbConn=FakeConnection(cursor)
         )
 
         self.assertEqual(len(cursor.executed), 1)
@@ -295,7 +304,7 @@ class test_writequery(unittest.TestCase):
         )
 
         message = writequery(
-            log=log, sqlQuery="CREATE INDEX k", dbConn=FakeConnection(cursor)
+            log=self.log, sqlQuery="CREATE INDEX k", dbConn=FakeConnection(cursor)
         )
 
         self.assertEqual(len(cursor.executed), 1)
@@ -309,7 +318,7 @@ class test_writequery(unittest.TestCase):
 
         with mock.patch("time.sleep") as sleep:
             message = writequery(
-                log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
+                log=self.log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
             )
 
         self.assertEqual(len(cursor.executed), 3)
@@ -327,7 +336,7 @@ class test_writequery(unittest.TestCase):
 
                 with mock.patch("time.sleep"):
                     writequery(
-                        log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
+                        log=self.log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
                     )
 
                 self.assertEqual(len(cursor.executed), 2)
@@ -348,7 +357,7 @@ class test_writequery(unittest.TestCase):
                 with mock.patch("time.sleep") as sleep:
                     with self.assertRaises(pymysql.err.OperationalError) as raised:
                         writequery(
-                            log=log,
+                            log=self.log,
                             sqlQuery="INSERT INTO t VALUES (1)",
                             dbConn=FakeConnection(cursor),
                         )
@@ -363,7 +372,7 @@ class test_writequery(unittest.TestCase):
         cursor = ScriptedCursor([pymysql.err.Error("no code, no message tuple")])
 
         with self.assertRaises(pymysql.err.Error) as raised:
-            writequery(log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor))
+            writequery(log=self.log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor))
 
         self.assertEqual(raised.exception.args, ("no code, no message tuple",))
 
@@ -373,7 +382,7 @@ class test_writequery(unittest.TestCase):
         cursor = ScriptedCursor([pymysql.err.Error()])
 
         message = writequery(
-            log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor), Force=True
+            log=self.log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor), Force=True
         )
 
         self.assertIn("MySQL write command not executed", message)
@@ -388,7 +397,7 @@ class test_writequery(unittest.TestCase):
         with mock.patch("time.sleep") as sleep:
             with self.assertRaises(pymysql.err.OperationalError):
                 writequery(
-                    log=log,
+                    log=self.log,
                     sqlQuery="SELECT x",
                     dbConn=FakeConnection(cursor),
                     Force=False,
@@ -407,7 +416,7 @@ class test_writequery(unittest.TestCase):
         )
 
         message = writequery(
-            log=log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor), Force=True
+            log=self.log, sqlQuery="SELECT x", dbConn=FakeConnection(cursor), Force=True
         )
 
         self.assertEqual(len(cursor.executed), 1)
@@ -419,7 +428,7 @@ class test_writequery(unittest.TestCase):
         cursor = ScriptedCursor([pymysql.err.InternalError(1, "internal")])
 
         with self.assertRaises(pymysql.err.InternalError):
-            writequery(log=log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
+            writequery(log=self.log, sqlQuery="SELECT 1", dbConn=FakeConnection(cursor))
 
         self.assertEqual(len(cursor.executed), 1)
 
@@ -431,7 +440,9 @@ class test_writequery(unittest.TestCase):
 
         with mock.patch("time.sleep") as sleep:
             with self.assertRaises(pymysql.err.OperationalError):
-                writequery(log=log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor))
+                writequery(
+                    log=self.log, sqlQuery="UPDATE t", dbConn=FakeConnection(cursor)
+                )
 
         delays = [call.args[0] for call in sleep.call_args_list]
         self.assertEqual(len(cursor.executed), len(delays) + 1)
@@ -450,7 +461,7 @@ class test_writequery(unittest.TestCase):
         with mock.patch("time.sleep"):
             with mock.patch.object(writequeryModule, "INSERT_BATCH_SIZE", 2):
                 writequery(
-                    log=log,
+                    log=self.log,
                     sqlQuery="INSERT INTO t (id) VALUES (%s)",
                     dbConn=FakeConnection(cursor),
                     manyValueList=values,

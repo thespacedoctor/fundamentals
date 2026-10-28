@@ -2,29 +2,18 @@ from __future__ import print_function
 from builtins import str
 import os
 import unittest
-import shutil
+import pytest
 import unittest
 import yaml
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
 pathToInputDir = moduleDirectory + "/input/"
-pathToOutputDir = moduleDirectory + "/output/"
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
 
 largeFile = pathToInputDir + "/ppmxl-head.csv"
 
 
+@pytest.mark.usefixtures("output_dir_attribute")
 class test_fileChunker(unittest.TestCase):
 
     def test_fileChunker_function(self):
@@ -92,7 +81,9 @@ class test_fileChunker(unittest.TestCase):
         from fundamentals.files import fileChunker
 
         with self.assertRaises(IOError) as context:
-            fileChunker(filepath=pathToOutputDir + "/does-not-exist.csv", batchSize=10)
+            fileChunker(
+                filepath=self.pathToOutputDir + "/does-not-exist.csv", batchSize=10
+            )
 
         self.assertIsInstance(context.exception.__cause__, IOError)
 

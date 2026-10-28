@@ -11,10 +11,6 @@ import yaml
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.mysql.sql_identifiers import quote_identifier
 
-pytestmark = pytest.mark.usefixtures("session_names")
-# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
-log = dbConn = None
-
 RUN_ID = uuid.uuid4().hex[:8]
 MODULE_NAME = "fundamentals.mysql.convert_dictionary_to_mysql_table"
 # THE PACKAGE __INIT__ REBINDS THE NAME TO THE FUNCTION, HIDING THE SUBMODULE
@@ -27,7 +23,7 @@ def unique_table_name(label):
     return "dy2047_%s_%s" % (label, RUN_ID)
 
 
-def drop_table(tableName):
+def drop_table(log, dbConn, tableName):
     writequery(
         log=log,
         sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
@@ -38,7 +34,9 @@ def drop_table(tableName):
 class statement_recorder(object):
     """*run the function against the database and keep every statement it writes*"""
 
-    def __init__(self, tableName):
+    def __init__(self, log, dbConn, tableName):
+        self.log = log
+        self.dbConn = dbConn
         self.tableName = tableName
         self.statements = []
 
@@ -51,8 +49,8 @@ class statement_recorder(object):
             CONVERT_MODULE, "writequery", side_effect=record_and_write
         ):
             return convert_dictionary_to_mysql_table(
-                dbConn=dbConn,
-                log=kwargs.pop("log", log),
+                dbConn=self.dbConn,
+                log=kwargs.pop("log", self.log),
                 dictionary=dictionary,
                 dbTableName=self.tableName,
                 **kwargs,
@@ -68,6 +66,7 @@ class statement_recorder(object):
         return [s for s in self.statements if " ADD unique " in s]
 
 
+@pytest.mark.usefixtures("session_attributes")
 class column_test_case(unittest.TestCase):
     tableSuffix = "table"
 
@@ -76,12 +75,12 @@ class column_test_case(unittest.TestCase):
         self.reset_table_and_recorder()
 
     def tearDown(self):
-        drop_table(self.tableName)
+        drop_table(self.log, self.dbConn, self.tableName)
 
     def reset_table_and_recorder(self):
         """*drop the table and start a new recorder, so a sub-test begins with no table*"""
-        drop_table(self.tableName)
-        self.recorder = statement_recorder(self.tableName)
+        drop_table(self.log, self.dbConn, self.tableName)
+        self.recorder = statement_recorder(self.log, self.dbConn, self.tableName)
 
     def definition(self, value, key="col", **kwargs):
         self.recorder.run({key: value, "another": "x"}, **kwargs)
@@ -217,7 +216,7 @@ class test_table_and_index_creation(column_test_case):
     def test_does_not_add_columns_that_already_exist(self):
         # ARRANGE
         self.recorder.run({"a": "x", "b": "y"})
-        secondRun = statement_recorder(self.tableName)
+        secondRun = statement_recorder(self.log, self.dbConn, self.tableName)
 
         # ACT
         secondRun.run({"a": "x", "b": "y"})
@@ -230,7 +229,7 @@ class test_table_and_index_creation(column_test_case):
     def test_skip_checks_still_runs_create_table_without_asking_if_it_exists(self):
         # ARRANGE
         self.recorder.run({"a": "x"})
-        secondRun = statement_recorder(self.tableName)
+        secondRun = statement_recorder(self.log, self.dbConn, self.tableName)
         # ACT
         with mock.patch.object(
             CONVERT_MODULE.table_exists, "table_exists"
@@ -258,7 +257,7 @@ class test_table_and_index_creation(column_test_case):
         # ARRANGE
         dictionary = {"uni": "x", "b": "y"}
         self.recorder.run(dictionary, uniqueKeyList=["uni"])
-        secondRun = statement_recorder(self.tableName)
+        secondRun = statement_recorder(self.log, self.dbConn, self.tableName)
 
         # ACT
         secondRun.run(dictionary, uniqueKeyList=["uni"])
@@ -305,8 +304,8 @@ class test_table_and_index_creation(column_test_case):
         ):
             with self.assertRaises(Exception) as context:
                 convert_dictionary_to_mysql_table(
-                    dbConn=dbConn,
-                    log=log,
+                    dbConn=self.dbConn,
+                    log=self.log,
                     dictionary={"a": "x"},
                     dbTableName=self.tableName,
                 )
@@ -320,12 +319,13 @@ class test_table_and_index_creation(column_test_case):
         self.assertIsInstance(context.exception.__cause__, RuntimeError)
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_argument_checks(unittest.TestCase):
 
     def convert(self, **overrides):
         callKwargs = {
-            "dbConn": dbConn,
-            "log": log,
+            "dbConn": self.dbConn,
+            "log": self.log,
             "dictionary": {"a": "x"},
             "dbTableName": unique_table_name("checks"),
         }
@@ -405,11 +405,12 @@ class test_argument_checks(unittest.TestCase):
         self.assertEqual(valueTuple, ("2020-01-02",))
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_insert_values(unittest.TestCase):
 
     def convert(self, dictionary, **kwargs):
         return convert_dictionary_to_mysql_table(
-            log=log,
+            log=self.log,
             dictionary=dictionary,
             dbTableName=unique_table_name("values"),
             returnInsertOnly=True,
