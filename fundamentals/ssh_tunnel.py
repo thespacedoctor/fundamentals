@@ -10,6 +10,7 @@ Author
 """
 
 import atexit
+import logging
 import os
 import re
 import shutil
@@ -29,6 +30,8 @@ SOCKET_NAME = "mysql.sock"
 MAX_SOCKET_PATH = 103
 REMOTE_DATABASE_PORT = 3306
 MAX_PORT = 65535
+
+LOGGER = logging.getLogger(__name__)
 
 # SSH PROCESSES STARTED BY THIS MODULE, KEYED BY LOCAL SOCKET PATH
 TUNNEL_PROCESSES = {}
@@ -114,16 +117,17 @@ def close_ssh_tunnel(socketPath, log=None):
     """
     *stop the ssh process serving a tunnel started by ``setup_ssh_tunnel`` and remove its socket directory*
 
-    Does nothing if the tunnel is unknown or already closed. The socket directory is always removed. Registered cleanup runs at normal interpreter exit only, not after ``SIGKILL`` or ``os._exit``.
+    Does nothing if the tunnel is unknown or already closed: an unknown path is a no-op and nothing is deleted. The socket directory is always removed. Registered cleanup runs at normal interpreter exit only, not after ``SIGKILL`` or ``os._exit``.
 
     **Key Arguments**
 
     - ``socketPath`` -- the socket path returned by ``setup_ssh_tunnel``
-    - ``log`` -- logger, used to report cleanup problems. Default *None*
+    - ``log`` -- logger, used to report cleanup problems. Default *None*, which uses the module logger
     """
     process = TUNNEL_PROCESSES.get(socketPath)
     if process is None:
         return
+    log = log if log is not None else LOGGER
     try:
         _stop_process(process, socketPath, log)
     finally:
@@ -159,8 +163,7 @@ def _kill_process(process, socketPath, log):
         process.poll()
         return
     except TimeoutExpired:
-        if log is not None:
-            log.error(f"the ssh process for `{socketPath}` did not stop after kill")
+        log.error(f"the ssh process for `{socketPath}` did not stop after kill")
 
 
 def _close_exited_tunnels(log):
@@ -198,8 +201,7 @@ def _remove_socket_dir(socketPath, log):
     except FileNotFoundError:
         pass
     except OSError as e:
-        if log is not None:
-            log.warning(f"could not remove the tunnel socket directory: {e}")
+        log.warning(f"could not remove the tunnel socket directory: {e}")
 
 
 def _wait_for_tunnel(process, socketPath, log):
@@ -307,7 +309,10 @@ def _close_all_tunnels():
     *close every registered tunnel, registered once to run at interpreter exit*
     """
     for socketPath in list(TUNNEL_PROCESSES):
-        close_ssh_tunnel(socketPath)
+        try:
+            close_ssh_tunnel(socketPath)
+        except Exception:
+            LOGGER.exception(f"could not close the ssh tunnel at `{socketPath}`")
 
 
 def _forget_tunnels():

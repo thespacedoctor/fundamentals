@@ -129,9 +129,11 @@ class database(object):
                 dbConn.autocommit(True)
         except BaseException:
             # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
-            self._close_quietly(dbConn)
-            if unixSocket:
-                close_ssh_tunnel(unixSocket, self.log)
+            try:
+                self._close_quietly(dbConn)
+            finally:
+                if unixSocket:
+                    close_ssh_tunnel(unixSocket, self.log)
             raise
 
         self.log.debug("completed the ``connect`` method")

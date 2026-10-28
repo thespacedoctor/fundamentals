@@ -470,8 +470,10 @@ class tools(object):
             thisConn.autocommit(True)
         except BaseException:
             # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
-            self._close_quietly(thisConn)
-            close_ssh_tunnel(socketPath, self.log)
+            try:
+                self._close_quietly(thisConn)
+            finally:
+                close_ssh_tunnel(socketPath, self.log)
             raise
         self.remoteDBConn = thisConn
 

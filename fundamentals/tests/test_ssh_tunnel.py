@@ -357,6 +357,15 @@ class test_close_ssh_tunnel(unittest.TestCase):
         self.assertFalse(os.path.exists(self.socketDir))
         self.assertNotIn(self.socketPath, TUNNEL_PROCESSES)
 
+    def test_logs_to_the_module_logger_when_no_logger_is_given(self):
+        import subprocess
+        from fundamentals.ssh_tunnel import close_ssh_tunnel
+
+        self.processMock.wait.side_effect = subprocess.TimeoutExpired("ssh", 1)
+
+        with self.assertLogs("fundamentals.ssh_tunnel", level="ERROR"):
+            close_ssh_tunnel(self.socketPath)
+
     def test_reaps_the_process_with_poll_after_terminate_finds_no_process(self):
         from fundamentals.ssh_tunnel import close_ssh_tunnel
 
@@ -490,6 +499,27 @@ class test_interpreter_exit(unittest.TestCase):
         for socketPath, processMock in tunnels:
             processMock.terminate.assert_called_once()
             self.assertFalse(os.path.exists(os.path.dirname(socketPath)))
+
+    def test_close_all_tunnels_keeps_going_when_one_tunnel_fails_to_close(self):
+        from fundamentals import ssh_tunnel
+
+        first = self._register_tunnel()
+        second = self._register_tunnel()
+        failing = first[0]
+        realClose = ssh_tunnel.close_ssh_tunnel
+
+        def closeOrFail(socketPath, *args):
+            if socketPath == failing:
+                raise RuntimeError("boom")
+            return realClose(socketPath, *args)
+
+        with (
+            mock.patch.object(ssh_tunnel, "close_ssh_tunnel", side_effect=closeOrFail),
+            self.assertLogs("fundamentals.ssh_tunnel", level="ERROR"),
+        ):
+            ssh_tunnel._close_all_tunnels()
+
+        second[1].terminate.assert_called_once()
 
     def test_forget_tunnels_empties_the_registry_in_use_at_call_time(self):
         from fundamentals import ssh_tunnel
