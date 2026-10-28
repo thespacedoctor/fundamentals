@@ -1,23 +1,29 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-*Set up an ssh tunnel to a remote database host, shared by ``tools`` and ``database``*
+*Set up a private ssh tunnel to a remote database host, shared by ``tools`` and ``database``*
 
 Author
 : David Young
 """
 
+import atexit
 import re
 import socket
 import time
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 
 TUNNEL_REQUIRED_KEYS = ("remote user", "remote ip", "remote datbase host", "port")
 TUNNEL_CHECK_ATTEMPTS = 5
 TUNNEL_CHECK_DELAY = 1
 TUNNEL_CONNECT_TIMEOUT = 5
+TUNNEL_CLOSE_TIMEOUT = 5
+LOOPBACK_ADDRESS = "127.0.0.1"
 REMOTE_DATABASE_PORT = 3306
 MAX_PORT = 65535
+
+# SSH PROCESSES STARTED BY THIS MODULE, KEYED BY LOCAL PORT
+TUNNEL_PROCESSES = {}
 
 # SAFE VALUES MUST NOT START WITH A DASH (SSH WOULD READ THEM AS AN OPTION)
 SAFE_NAME_PATTERN = r"^[A-Za-z0-9_][A-Za-z0-9._-]*$"
@@ -32,57 +38,123 @@ class tunnel_error(Exception):
     """
 
 
-def setup_ssh_tunnel(tunnelParameters, log, checkHost="127.0.0.1"):
+def setup_ssh_tunnel(tunnelParameters, log):
     """
-    *set up an ssh tunnel to a remote database host, unless one is already listening*
+    *start a private ssh tunnel to a remote database host on a free local port*
+
+    Every call starts its own ssh process, listening on a free port of the loopback address. An existing listener is never reused, because a listening port cannot prove that it belongs to ssh. The process is stopped by ``close_ssh_tunnel`` or when the interpreter exits.
 
     **Key Arguments**
 
-    - ``tunnelParameters`` -- the ``tunnel`` dictionary of the database settings, with the keys ``remote user``, ``remote ip``, ``remote datbase host`` and ``port``
+    - ``tunnelParameters`` -- the ``tunnel`` dictionary of the database settings, with the keys ``remote user``, ``remote ip``, ``remote datbase host`` and ``port``. The ``port`` value is still checked, but it is not used: the local port is chosen at random
+
     - ``log`` -- logger
-    - ``checkHost`` -- the local address to check for the tunnel. Default *127.0.0.1*
 
     **Return**
 
-    - ``sshPort`` -- the local port the tunnel is listening on
+    - ``sshPort`` -- the local port the tunnel is listening on. Connect to ``127.0.0.1`` on this port
 
     **Usage**
 
     ```python
-    from fundamentals.ssh_tunnel import setup_ssh_tunnel
+    from fundamentals.ssh_tunnel import setup_ssh_tunnel, close_ssh_tunnel
     sshPort = setup_ssh_tunnel(tunnelParameters=dbSettings["tunnel"], log=log)
+    close_ssh_tunnel(sshPort)
     ```
 
-    Raises ``tunnel_error`` if the settings are invalid, ssh cannot be started or the tunnel does not connect.
+    Raises ``tunnel_error`` if the settings are invalid, ssh cannot be started, ssh exits, or the tunnel does not connect.
     """
-    remoteUser, remoteIp, remoteHost, sshPort = _validate_tunnel_parameters(
-        tunnelParameters
-    )
+    remoteUser, remoteIp, remoteHost, _ = _validate_tunnel_parameters(tunnelParameters)
 
-    if is_port_open(checkHost, sshPort, log):
-        log.debug("ssh tunnel already exists - moving on")
-        return sshPort
-
+    localPort = _find_free_port()
     argv = [
         "ssh",
-        "-fnN",
+        "-nN",
+        "-o",
+        "ExitOnForwardFailure=yes",
         f"{remoteUser}@{remoteIp}",
         "-L",
-        f"{sshPort}:{remoteHost}:{REMOTE_DATABASE_PORT}",
+        f"{LOOPBACK_ADDRESS}:{localPort}:{remoteHost}:{REMOTE_DATABASE_PORT}",
     ]
     try:
-        output = Popen(argv, close_fds=True).communicate()[0]
+        process = Popen(argv, close_fds=True)
     except OSError as e:
         raise tunnel_error(f"could not start the ssh tunnel command: {e}") from e
-    log.debug(f"output: {output}")
 
+    TUNNEL_PROCESSES[localPort] = process
+    atexit.register(close_ssh_tunnel, localPort)
+    try:
+        _wait_for_tunnel(process, localPort, log)
+    except BaseException:
+        close_ssh_tunnel(localPort)
+        raise
+    return localPort
+
+
+def close_ssh_tunnel(sshPort):
+    """
+    *stop the ssh process serving a tunnel started by ``setup_ssh_tunnel``*
+
+    Does nothing if the tunnel is unknown or already closed.
+
+    **Key Arguments**
+
+    - ``sshPort`` -- the local port returned by ``setup_ssh_tunnel``
+    """
+    process = TUNNEL_PROCESSES.pop(sshPort, None)
+    if process is None or process.poll() is not None:
+        return
+    process.terminate()
+    try:
+        process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
+    except TimeoutExpired:
+        process.kill()
+        process.wait()
+
+
+def _find_free_port():
+    """
+    *ask the operating system for a free port on the loopback address*
+
+    **Return**
+
+    - ``port`` -- a port that was free when the socket was closed
+    """
+    with socket.socket() as s:
+        s.bind((LOOPBACK_ADDRESS, 0))
+        return s.getsockname()[1]
+
+
+def _wait_for_tunnel(process, localPort, log):
+    """
+    *wait until the ssh process is alive and the local port accepts connections*
+
+    Raises ``tunnel_error`` if ssh exits or the port does not open in time.
+    """
     for attempt in range(TUNNEL_CHECK_ATTEMPTS):
-        if is_port_open(checkHost, sshPort, log):
-            return sshPort
+        # A PORT IS ONLY TRUSTED WHILE OUR OWN SSH PROCESS IS ALIVE
+        _raise_if_exited(process, log)
+        if is_port_open(LOOPBACK_ADDRESS, localPort, log):
+            _raise_if_exited(process, log)
+            return
         if attempt < TUNNEL_CHECK_ATTEMPTS - 1:
             time.sleep(TUNNEL_CHECK_DELAY)
 
-    message = f"could not set up an ssh tunnel to the remote database on port {sshPort}"
+    message = (
+        f"could not set up an ssh tunnel to the remote database on port {localPort}"
+    )
+    log.error(message)
+    raise tunnel_error(message)
+
+
+def _raise_if_exited(process, log):
+    """
+    *raise ``tunnel_error`` if the ssh process has exited*
+    """
+    exitCode = process.poll()
+    if exitCode is None:
+        return
+    message = f"the ssh tunnel process exited with code {exitCode}"
     log.error(message)
     raise tunnel_error(message)
 

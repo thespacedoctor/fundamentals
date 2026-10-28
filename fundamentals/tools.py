@@ -112,6 +112,9 @@ class tools(object):
             port: 9002
 
     # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
+    # A private ssh process is started on a random free local port for each connection, and the
+    # database connection is made through that port. `port` must still be a valid port number,
+    # but it is no longer used as the local port (an existing listener is never reused).
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
 
@@ -446,7 +449,6 @@ class tools(object):
         sshPort = setup_ssh_tunnel(
             tunnelParameters=databaseSettings["tunnel"],
             log=self.log,
-            checkHost=databaseSettings["host"],
         )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database

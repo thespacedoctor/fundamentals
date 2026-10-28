@@ -13,95 +13,140 @@ def _tunnel(**overrides):
     return {**TUNNEL, **overrides}
 
 
-class test_setup_ssh_tunnel(unittest.TestCase):
+FREE_PORT = 45678
 
+
+class test_setup_ssh_tunnel(unittest.TestCase):
     def setUp(self):
-        patcher = mock.patch("fundamentals.ssh_tunnel.time.sleep")
-        self.sleepMock = patcher.start()
-        self.addCleanup(patcher.stop)
+        from fundamentals import ssh_tunnel
+
+        patchers = {
+            "sleepMock": mock.patch("fundamentals.ssh_tunnel.time.sleep"),
+            "atexitMock": mock.patch("fundamentals.ssh_tunnel.atexit.register"),
+            "portMock": mock.patch(
+                "fundamentals.ssh_tunnel._find_free_port", return_value=FREE_PORT
+            ),
+            "popenMock": mock.patch("fundamentals.ssh_tunnel.Popen"),
+        }
+        for name, patcher in patchers.items():
+            setattr(self, name, patcher.start())
+            self.addCleanup(patcher.stop)
+        self.processMock = self.popenMock.return_value
+        self.processMock.poll.return_value = None
+        self.addCleanup(ssh_tunnel.TUNNEL_PROCESSES.clear)
         self.log = mock.MagicMock()
 
-    def test_starts_ssh_with_an_argv_list_and_no_shell(self):
+    def test_starts_ssh_on_a_free_loopback_port_with_an_argv_list_and_no_shell(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with (
-            mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock,
-            mock.patch(
-                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
-            ),
-        ):
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True):
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
-        argv = popenMock.call_args.args[0]
+        argv = self.popenMock.call_args.args[0]
         self.assertEqual(
             argv,
-            ["ssh", "-fnN", "monster@psweb.example.ac.uk", "-L", "9006:dormammu:3306"],
+            [
+                "ssh",
+                "-nN",
+                "-o",
+                "ExitOnForwardFailure=yes",
+                "monster@psweb.example.ac.uk",
+                "-L",
+                f"127.0.0.1:{FREE_PORT}:dormammu:3306",
+            ],
         )
-        self.assertIsNot(popenMock.call_args.kwargs.get("shell"), True)
-        self.assertEqual(port, 9006)
+        self.assertIsNot(self.popenMock.call_args.kwargs.get("shell"), True)
+        self.assertEqual(port, FREE_PORT)
 
-    def test_does_not_start_ssh_when_the_tunnel_already_exists(self):
+    def test_starts_its_own_ssh_even_when_the_configured_port_is_already_listening(
+        self,
+    ):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with (
-            mock.patch("fundamentals.ssh_tunnel.Popen") as popenMock,
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True),
-        ):
+        with mock.patch(
+            "fundamentals.ssh_tunnel.is_port_open", return_value=True
+        ) as checkMock:
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
-        popenMock.assert_not_called()
-        self.assertEqual(port, 9006)
+        self.popenMock.assert_called_once()
+        self.assertNotEqual(port, TUNNEL["port"])
+        self.assertNotIn(
+            TUNNEL["port"], [call.args[1] for call in checkMock.mock_calls]
+        )
+        self.assertNotIn("9006", " ".join(self.popenMock.call_args.args[0]))
 
     def test_returns_as_soon_as_the_connection_check_succeeds(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel
 
-        with (
-            mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch(
-                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
-            ) as checkMock,
-        ):
+        with mock.patch(
+            "fundamentals.ssh_tunnel.is_port_open", side_effect=[False, True]
+        ) as checkMock:
             setup_ssh_tunnel(TUNNEL, self.log)
 
         self.assertEqual(checkMock.call_count, 2)
-        self.sleepMock.assert_not_called()
+        self.sleepMock.assert_called_once()
+
+    def test_checks_the_loopback_address_for_the_private_port(self):
+        from fundamentals.ssh_tunnel import setup_ssh_tunnel
+
+        with mock.patch(
+            "fundamentals.ssh_tunnel.is_port_open", return_value=True
+        ) as checkMock:
+            setup_ssh_tunnel(TUNNEL, self.log)
+
+        checkMock.assert_called_once_with("127.0.0.1", FREE_PORT, self.log)
 
     def test_succeeds_when_only_the_last_attempt_connects(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, TUNNEL_CHECK_ATTEMPTS
 
         results = [False] * TUNNEL_CHECK_ATTEMPTS
         results[-1] = True
-        with (
-            mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch(
-                "fundamentals.ssh_tunnel.is_port_open", side_effect=[False] + results
-            ),
-        ):
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", side_effect=results):
             port = setup_ssh_tunnel(TUNNEL, self.log)
 
-        self.assertEqual(port, 9006)
+        self.assertEqual(port, FREE_PORT)
 
-    def test_raises_tunnel_error_not_system_exit_when_it_never_connects(self):
+    def test_raises_tunnel_error_and_terminates_ssh_when_it_never_connects(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
 
-        with (
-            mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
-        ):
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False):
             with self.assertRaises(tunnel_error) as context:
                 setup_ssh_tunnel(TUNNEL, self.log)
 
-        self.assertIn("9006", str(context.exception))
+        self.assertIn(str(FREE_PORT), str(context.exception))
+        self.processMock.terminate.assert_called_once()
+
+    def test_raises_tunnel_error_when_ssh_exits_even_if_the_port_is_open(self):
+        from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
+
+        self.processMock.poll.return_value = 255
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True):
+            with self.assertRaises(tunnel_error) as context:
+                setup_ssh_tunnel(TUNNEL, self.log)
+
+        self.assertIn("255", str(context.exception))
+
+    def test_raises_tunnel_error_when_ssh_exits_after_the_port_check_passes(self):
+        from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
+
+        self.processMock.poll.side_effect = [None, 255, 255]
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True):
+            with self.assertRaises(tunnel_error):
+                setup_ssh_tunnel(TUNNEL, self.log)
+
+    def test_registers_the_tunnel_for_closing_at_interpreter_exit(self):
+        from fundamentals.ssh_tunnel import setup_ssh_tunnel, close_ssh_tunnel
+
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True):
+            port = setup_ssh_tunnel(TUNNEL, self.log)
+
+        self.atexitMock.assert_called_once_with(close_ssh_tunnel, port)
 
     def test_raises_tunnel_error_when_ssh_cannot_be_started(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, tunnel_error
 
-        with (
-            mock.patch(
-                "fundamentals.ssh_tunnel.Popen", side_effect=FileNotFoundError("ssh")
-            ),
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
-        ):
+        self.popenMock.side_effect = FileNotFoundError("ssh")
+        with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False):
             with self.assertRaises(tunnel_error):
                 setup_ssh_tunnel(TUNNEL, self.log)
 
@@ -155,11 +200,77 @@ class test_setup_ssh_tunnel(unittest.TestCase):
         with mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=True):
             port = setup_ssh_tunnel(_tunnel(port="9006"), self.log)
 
-        self.assertEqual(port, 9006)
+        self.assertEqual(port, FREE_PORT)
+
+
+class test_close_ssh_tunnel(unittest.TestCase):
+    def setUp(self):
+        from fundamentals import ssh_tunnel
+
+        self.processMock = mock.MagicMock()
+        self.processMock.poll.return_value = None
+        ssh_tunnel.TUNNEL_PROCESSES[FREE_PORT] = self.processMock
+        self.addCleanup(ssh_tunnel.TUNNEL_PROCESSES.clear)
+
+    def test_terminates_the_ssh_process_and_forgets_it(self):
+        from fundamentals.ssh_tunnel import close_ssh_tunnel, TUNNEL_PROCESSES
+
+        close_ssh_tunnel(FREE_PORT)
+
+        self.processMock.terminate.assert_called_once()
+        self.processMock.wait.assert_called_once()
+        self.assertNotIn(FREE_PORT, TUNNEL_PROCESSES)
+
+    def test_kills_the_ssh_process_when_it_ignores_terminate(self):
+        import subprocess
+        from fundamentals.ssh_tunnel import close_ssh_tunnel
+
+        self.processMock.wait.side_effect = [subprocess.TimeoutExpired("ssh", 1), 0]
+
+        close_ssh_tunnel(FREE_PORT)
+
+        self.processMock.kill.assert_called_once()
+
+    def test_does_not_signal_a_process_that_has_already_exited(self):
+        from fundamentals.ssh_tunnel import close_ssh_tunnel
+
+        self.processMock.poll.return_value = 0
+
+        close_ssh_tunnel(FREE_PORT)
+
+        self.processMock.terminate.assert_not_called()
+
+    def test_does_nothing_for_an_unknown_or_already_closed_port(self):
+        from fundamentals.ssh_tunnel import close_ssh_tunnel
+
+        close_ssh_tunnel(FREE_PORT)
+        close_ssh_tunnel(FREE_PORT)
+        close_ssh_tunnel(1)
+
+        self.processMock.terminate.assert_called_once()
+
+
+class test_find_free_port(unittest.TestCase):
+    def test_binds_a_loopback_socket_to_port_zero_and_returns_the_assigned_port(self):
+        from fundamentals.ssh_tunnel import _find_free_port
+
+        with mock.patch("socket.socket") as socketMock:
+            sock = socketMock.return_value.__enter__.return_value
+            sock.getsockname.return_value = ("127.0.0.1", FREE_PORT)
+            port = _find_free_port()
+
+        sock.bind.assert_called_once_with(("127.0.0.1", 0))
+        self.assertEqual(port, FREE_PORT)
+
+    def test_returns_a_usable_port_number_from_a_real_socket(self):
+        from fundamentals.ssh_tunnel import _find_free_port
+
+        port = _find_free_port()
+
+        self.assertTrue(1 <= port <= 65535)
 
 
 class test_is_port_open(unittest.TestCase):
-
     def test_returns_true_when_the_socket_connects(self):
         from fundamentals.ssh_tunnel import is_port_open
 
