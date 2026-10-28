@@ -55,7 +55,7 @@
 * **FIXED:** `tools.ordered_load` (used by `orderedSettings=True`) works again and now uses the safe YAML loader
 * **FIXED:** `yaml_to_database` no longer crashes on an empty value
 * **FIXED:** `download._fetch` no longer imports the undeclared `eventlet` package, which made every call fail when it was not installed
-* **FIXED:** `writequery` and `convert_dictionary_to_mysql_table` no longer log data values: logs and errors show SQL with literals replaced by `?`, the key and type of a bad value instead of the value, and table and column names with control characters escaped; a failed insert no longer prints to stdout and raises `insert_error` (an `Exception` subclass); unique-key index names are capped at 64 characters with a hash suffix (DY-2050)
+* **FIXED:** `writequery`, `readquery`, `convert_dictionary_to_mysql_table` and `insert_list_of_dictionaries_into_database_tables` no longer write data values to logs or stdout: logged SQL has string, number, hex, binary and comment text replaced by `?`, MySQL error text is replaced by the error class and code (it can repeat values), a bad dictionary value is logged by key and type, and table and column names have control characters escaped; a failed insert raises `insert_error` (an `Exception` subclass) with no value text; unique-key index names over 64 characters are shortened with a 16-character hash (DY-2050)
 
 **v2.8.3 - May 21, 2026**
 

@@ -13,7 +13,7 @@ import hashlib
 MYSQL_MAX_IDENTIFIER_LENGTH = 64
 
 # HEX DIGITS OF THE NAME HASH KEPT WHEN A LONG NAME IS SHORTENED
-IDENTIFIER_HASH_LENGTH = 8
+IDENTIFIER_HASH_LENGTH = 16
 
 
 def quote_identifier(name):
@@ -127,10 +127,19 @@ def cap_identifier(name, maxLength=MYSQL_MAX_IDENTIFIER_LENGTH):
 
     **Return**
 
-    - ``cappedName`` -- the name unchanged if it fits, otherwise the start of the name, an underscore and a short hash of the whole name, ``maxLength`` characters in total. The same name always gives the same result, and long names that share a start give different results
+    - ``cappedName`` -- the name unchanged if it fits, otherwise the start of the name, an underscore and 16 hex characters of a hash of the whole name, ``maxLength`` characters in total. The same name always gives the same result, and long names that share a start give different results
+
+    Raises ``TypeError`` if the name is not a string, and ``ValueError`` if a name that is too long cannot be shortened because ``maxLength`` leaves no room for a prefix, the underscore and the hash.
     """
+    if not isinstance(name, str):
+        raise TypeError("a database identifier must be a string, not %r" % (name,))
     if len(name) <= maxLength:
         return name
-    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:IDENTIFIER_HASH_LENGTH]
     prefixLength = maxLength - IDENTIFIER_HASH_LENGTH - 1
+    if prefixLength < 1:
+        raise ValueError(
+            "maxLength %d is too small to shorten a name: it needs at least %d"
+            % (maxLength, IDENTIFIER_HASH_LENGTH + 2)
+        )
+    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:IDENTIFIER_HASH_LENGTH]
     return name[:prefixLength] + "_" + digest

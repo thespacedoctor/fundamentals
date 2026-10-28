@@ -11,7 +11,7 @@ from builtins import str
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals.mysql._log_safety import redact_sql_literals
+from fundamentals.mysql._log_safety import describe_error, redact_sql_literals
 from fundamentals.mysql._retry import run_with_retries
 
 # MYSQL ERROR CODES FOR A TABLE, INDEX OR ROW THAT ALREADY EXISTS
@@ -93,7 +93,7 @@ def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
         try:
             cursor.close()
         except Exception as e:
-            log.warning("could not close the db cursor " + str(e) + "\n")
+            log.warning("could not close the db cursor: %s\n" % (describe_error(e),))
 
     log.debug("completed the ``writequery`` function")
     return message
@@ -129,7 +129,7 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
     except pymysql.err.ProgrammingError as e:
         message = (
             "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
-            % (loggedQuery, str(e))
+            % (loggedQuery, describe_error(e))
         )
         if Force == False:
             log.error(message)
@@ -141,22 +141,22 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
         errorMessage = str(e.args[1]) if len(e.args) > 1 else ""
 
         if errorCode == TABLE_EXISTS_ERROR_CODE and "already exists" in errorMessage:
-            log.info(str(e) + "\n")
+            log.info("table already exists: %s\n" % (describe_error(e),))
         elif errorCode == DUPLICATE_ENTRY_ERROR_CODE:
             # Duplicate Key error
-            log.debug("Duplicate Key error: %s\n" % (str(e),))
+            log.debug("Duplicate Key error: %s\n" % (describe_error(e),))
             message = "duplicate key error"
         elif errorCode == DUPLICATE_KEY_NAME_ERROR_CODE:
             # Duplicate Key error
-            log.debug("index already exists: %s\n" % (str(e),))
+            log.debug("index already exists: %s\n" % (describe_error(e),))
             message = "index already exists"
         elif "Duplicate entry" in str(e):
-            log.debug("Duplicate Key error: %s\n" % (str(e),))
+            log.debug("Duplicate Key error: %s\n" % (describe_error(e),))
             message = "duplicate key error"
         else:
             message = (
                 "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
-                % (loggedQuery, str(e))
+                % (loggedQuery, describe_error(e))
             )
             if Force == False:
                 log.error(message)
@@ -165,17 +165,19 @@ def _execute_write_query(log, cursor, sqlQuery, dbConn, Force, manyValueList):
                 log.warning(message)
 
     except pymysql.Warning as e:
-        log.info(str(e))
+        log.info("MySQL warning: %s" % (describe_error(e),))
     except Exception as e:
         if "truncated" in str(e):
-            log.error("%s\n Here is the sqlquery:\n%s\n" % (str(e), loggedQuery))
+            log.error(
+                "%s\n Here is the sqlquery:\n%s\n" % (describe_error(e), loggedQuery)
+            )
         elif "Duplicate entry" in str(e):
-            log.warning("Duplicate Key error: %s\n" % (str(e),))
+            log.warning("Duplicate Key error: %s\n" % (describe_error(e),))
             message = "duplicate key error"
         else:
             log.error(
                 "MySQL write command not executed for this query: << %s >>\nThe error was: %s \n"
-                % (loggedQuery, str(e))
+                % (loggedQuery, describe_error(e))
             )
             if Force == False:
                 raise

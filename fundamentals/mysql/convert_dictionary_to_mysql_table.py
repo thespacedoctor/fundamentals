@@ -9,7 +9,7 @@ Author
 
 import six
 from fundamentals.mysql import writequery, table_exists, readquery
-from fundamentals.mysql._log_safety import escape_for_log
+from fundamentals.mysql._log_safety import describe_error, escape_for_log
 from fundamentals import times
 from fundamentals.mysql.sql_identifiers import (
     cap_identifier,
@@ -149,7 +149,7 @@ def _check_scalar_value(log, key, value):
     ):
         message = (
             'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool : %s is a %s'
-            % (key, type(value))
+            % (escape_for_log(key), type(value))
         )
         log.critical(
             "%s: in %s we have a %s" % (message, escape_for_log(key), type(value))
@@ -302,7 +302,7 @@ def _column_exists(log, dbConn, dbTableName, formattedKey):
         )
     except Exception as e:
         # WITHOUT ROWS WE CANNOT DECIDE WHETHER TO ALTER THE TABLE
-        log.error("something went wrong" + str(e) + "\n")
+        log.error("could not check for the column: " + describe_error(e) + "\n")
         raise
     return len(rows) != 0
 
@@ -333,7 +333,7 @@ def _create_column(log, dbConn, dbTableName, key, formattedKey, definition):
             + " column in the "
             + escape_for_log(dbTableName)
             + " table -- "
-            + str(e)
+            + describe_error(e)
             + "\n"
         )
         raise
@@ -424,7 +424,7 @@ def _execute_insert(log, dbConn, dbTableName, insertStatement):
             "could not add new data added to the table '"
             + escape_for_log(dbTableName)
             + "' : "
-            + str(e)
+            + describe_error(e)
             + "\n"
         )
         log.error(message)

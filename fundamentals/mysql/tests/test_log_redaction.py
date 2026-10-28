@@ -1,5 +1,6 @@
 import importlib
 import logging
+import re
 from unittest import mock
 
 import pymysql
@@ -116,15 +117,108 @@ class TestRedactSqlLiterals:
 
         assert redact_sql_literals(sql) == "SELECT `col1` FROM `t2` WHERE col3 = ?"
 
-    def test_replaces_a_literal_containing_escaped_quotes(self):
-        sql = "VALUES ('it\\'s %s', 'a''b', \"c\")" % SECRET
+    def test_keeps_unquoted_identifiers_containing_a_dollar_sign(self):
+        sql = "SELECT col$1, $tbl2 FROM db$2.t"
 
-        assert redact_sql_literals(sql) == "VALUES (?, ?, ?)"
+        assert redact_sql_literals(sql) == sql
 
-    def test_replaces_an_unterminated_literal_to_the_end(self):
+    def test_replaces_a_literal_with_doubled_quotes(self):
+        sql = "VALUES ('a''%s', \"b\"\"c\")" % SECRET
+
+        assert redact_sql_literals(sql) == "VALUES (?, ?)"
+
+    def test_replaces_a_literal_with_a_backslash_escape_that_is_not_a_quote(self):
+        sql = "VALUES ('a\\n%s', 'x')" % SECRET
+
+        assert redact_sql_literals(sql) == "VALUES (?, ?)"
+
+    def test_replaces_a_literal_with_an_escaped_backslash_before_the_closing_quote(
+        self,
+    ):
+        sql = "VALUES ('%s\\\\', 'x')" % SECRET
+
+        assert redact_sql_literals(sql) == "VALUES (?, ?)"
+
+    def test_redacts_to_the_end_when_a_backslash_escapes_a_quote(self):
+        sql = "VALUES ('it\\'s %s', 'other')" % SECRET
+
+        result = redact_sql_literals(sql)
+
+        assert SECRET not in result
+        assert "other" not in result
+        assert result == "VALUES (?"
+
+    def test_does_not_expose_a_value_after_a_backslash_when_backslash_escapes_are_off(
+        self,
+    ):
+        sql = "VALUES ('abc\\', '%s')" % SECRET
+
+        assert SECRET not in redact_sql_literals(sql)
+
+    def test_redacts_an_unterminated_literal_ending_in_a_lone_backslash(self):
+        sql = "VALUES ('%s\\" % SECRET
+
+        assert redact_sql_literals(sql) == "VALUES (?"
+
+    def test_redacts_an_unterminated_literal_to_the_end(self):
         sql = "VALUES ('%s" % SECRET
 
         assert redact_sql_literals(sql) == "VALUES (?"
+
+    @pytest.mark.parametrize(
+        "literal",
+        [
+            "X'ABCDEF'",
+            "x'ABCDEF'",
+            "0xDEADBEEF",
+            "0Xdeadbeef",
+            "b'101'",
+            "B'101'",
+            "0b101",
+            "0B101",
+            "1",
+            "3.14",
+            ".5",
+            "1e10",
+            "2.5E-3",
+        ],
+    )
+    def test_replaces_hex_binary_and_numeric_literals(self, literal):
+        assert redact_sql_literals("SELECT %s, 'x'" % literal) == "SELECT ?, ?"
+
+    def test_keeps_the_minus_sign_of_a_negative_number(self):
+        assert redact_sql_literals("SELECT -12") == "SELECT -?"
+
+    def test_replaces_an_unterminated_hex_literal_to_the_end(self):
+        assert redact_sql_literals("SELECT X'%s" % SECRET) == "SELECT ?"
+
+    @pytest.mark.parametrize(
+        "sql, expected",
+        [
+            ("SELECT 1 -- %s\nFROM t" % SECRET, "SELECT ? -- ?\nFROM t"),
+            ("SELECT 1 # %s\nFROM t" % SECRET, "SELECT ? # ?\nFROM t"),
+            ("SELECT /* %s */ 1" % SECRET, "SELECT /*?*/ ?"),
+            ("SELECT 1 /* %s" % SECRET, "SELECT ? /*?"),
+            ("SELECT 1 -- %s" % SECRET, "SELECT ? -- ?"),
+        ],
+    )
+    def test_replaces_the_body_of_a_comment(self, sql, expected):
+        assert redact_sql_literals(sql) == expected
+
+    def test_escapes_a_newline_inside_a_quoted_identifier(self):
+        sql = "SELECT * FROM `t\nFAKE LOG LINE`"
+
+        assert redact_sql_literals(sql) == "SELECT * FROM `t\\nFAKE LOG LINE`"
+
+    def test_keeps_a_doubled_backtick_inside_a_quoted_identifier(self):
+        sql = "SELECT * FROM `a``b2`"
+
+        assert redact_sql_literals(sql) == sql
+
+    def test_redacts_to_the_end_after_an_unterminated_quoted_identifier(self):
+        sql = "SELECT * FROM `abc'%s'" % SECRET
+
+        assert SECRET not in redact_sql_literals(sql)
 
     def test_leaves_the_statement_placeholders_alone(self):
         sql = "INSERT INTO `t` (`a`) VALUES (%s)"
@@ -160,6 +254,27 @@ class TestCapIdentifier:
         result = cap_identifier("start_" + "x" * 100)
 
         assert result.startswith("start_xxx")
+
+    def test_gives_different_results_for_the_names_that_collided_with_a_short_hash(
+        self,
+    ):
+        assert cap_identifier("a" * 60 + "83296") != cap_identifier("a" * 60 + "170707")
+
+    def test_ends_a_capped_name_with_sixteen_hex_characters(self):
+        result = cap_identifier("a" * 100)
+
+        assert re.fullmatch(r"a+_[0-9a-f]{16}", result)
+
+    def test_raises_type_error_for_a_name_that_is_not_a_string(self):
+        with pytest.raises(TypeError):
+            cap_identifier(5)
+
+    def test_raises_value_error_when_the_limit_is_too_small_for_a_hash(self):
+        with pytest.raises(ValueError):
+            cap_identifier("a" * 100, maxLength=17)
+
+    def test_caps_to_the_smallest_limit_that_fits_a_prefix_and_hash(self):
+        assert len(cap_identifier("a" * 100, maxLength=18)) == 18
 
 
 class TestArgumentCheckLogging:

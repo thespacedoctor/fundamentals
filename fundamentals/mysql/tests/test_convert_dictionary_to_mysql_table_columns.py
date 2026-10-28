@@ -314,7 +314,7 @@ class test_table_and_index_creation(column_test_case):
         # ASSERT
         self.assertEqual(
             str(context.exception),
-            "could not add new data added to the table '%s' : insert failed\n"
+            "could not add new data added to the table '%s' : RuntimeError\n"
             % (self.tableName,),
         )
         self.assertIsInstance(context.exception.__cause__, RuntimeError)
@@ -364,7 +364,7 @@ class test_argument_checks(unittest.TestCase):
 
     def test_raises_value_error_naming_key_and_type_for_unsupported_value(self):
         # ARRANGE / ACT / ASSERT
-        with self.assertRaisesRegex(ValueError, "a is a <class 'dict'>"):
+        with self.assertRaisesRegex(ValueError, "a is a <class 'dict'>$"):
             self.convert(dictionary={"a": {"nested": 1}})
 
     def test_raises_type_error_when_create_helper_tables_is_not_a_bool(self):

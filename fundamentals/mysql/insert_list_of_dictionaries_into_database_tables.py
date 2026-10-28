@@ -19,6 +19,7 @@ from fundamentals.mysql.sql_identifiers import (
     quote_identifier,
     raise_on_duplicate_columns,
 )
+from fundamentals.mysql._log_safety import escape_for_log
 from fundamentals.mysql.sql_inserts import build_batch_insert_command
 from fundamentals.mysql.sql_values import null_if_missing
 from builtins import str
@@ -187,9 +188,9 @@ def insert_list_of_dictionaries_into_database_tables(
             totalCount = total + 1
             ltotalCount = totalCount
 
-            print(
-                "Starting to insert %(ltotalCount)s rows into %(dbTableName)s"
-                % locals()
+            log.info(
+                "Starting to insert %s rows into %s"
+                % (ltotalCount, escape_for_log(dbTableName))
             )
 
             if dbSettings == False:
@@ -223,9 +224,9 @@ def insert_list_of_dictionaries_into_database_tables(
                 )
 
             sys.stdout.write("\x1b[1A\x1b[2K")
-            print(
-                "%(ltotalCount)s / %(ltotalCount)s rows inserted into %(dbTableName)s"
-                % locals()
+            log.info(
+                "%s / %s rows inserted into %s"
+                % (ltotalCount, ltotalCount, escape_for_log(dbTableName))
             )
     except BaseException:
         _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=True)

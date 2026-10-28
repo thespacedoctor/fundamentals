@@ -411,7 +411,7 @@ class test_writequery(unittest.TestCase):
         )
 
         self.assertEqual(len(cursor.executed), 1)
-        self.assertIn("Unknown column", message)
+        self.assertIn("OperationalError (MySQL error 1054)", message)
 
     def test_raises_after_one_execute_when_internal_error_is_not_transient(self):
         from fundamentals.mysql import writequery
