@@ -15,6 +15,8 @@ Options:
 """
 
 import os
+import subprocess
+import sys
 
 os.environ["TERM"] = "vt100"
 try:
@@ -26,13 +28,31 @@ except ImportError:
     except ImportError:
         readline = None  # or just pass — basic input() still works
 import glob
-import pickle
 from fundamentals import tools, times
-from subprocess import Popen, PIPE
 
 
 def tab_complete(text, state):
     return (glob.glob(text + "*") + [None])[state]
+
+
+def open_file(path, log):
+    """*open a file with the operating system's default application, without a shell*
+
+    **Key Arguments:**
+
+    - ``path`` -- path to the file to open
+    - ``log`` -- logger
+
+    A failure to open the file is logged as a warning and never raised. Platforms other than macOS and Windows do nothing.
+    """
+    try:
+        if sys.platform == "darwin":
+            subprocess.run(["open", path], check=False)
+        elif sys.platform == "win32":
+            os.startfile(path)
+    except OSError as e:
+        log.warning("could not open `%s`: %s" % (path, e))
+    return None
 
 
 def main(arguments=None):
@@ -79,49 +99,10 @@ def main(arguments=None):
     startTime = times.get_now_sql_datetime()
     log.info("--- STARTING TO RUN THE cl_utils.py AT %s" % (startTime,))
 
-    # set options interactively if user requests
-    if "interactiveFlag" in a and a["interactiveFlag"]:
-
-        # load previous settings
-        moduleDirectory = os.path.dirname(__file__) + "/resources"
-        pathToPickleFile = "%(moduleDirectory)s/previousSettings.p" % locals()
-        try:
-            with open(pathToPickleFile):
-                pass
-            previousSettingsExist = True
-        except:
-            previousSettingsExist = False
-        previousSettings = {}
-        if previousSettingsExist:
-            previousSettings = pickle.load(open(pathToPickleFile, "rb"))
-
-        # x-raw-input
-        # x-boolean-raw-input
-        # x-raw-input-with-default-value-from-previous-settings
-
-        # save the most recently used requests
-        pickleMeObjects = []
-        pickleMe = {}
-        theseLocals = locals()
-        for k in pickleMeObjects:
-            pickleMe[k] = theseLocals[k]
-        pickle.dump(pickleMe, open(pathToPickleFile, "wb"))
-
     if a["init"]:
         from os.path import expanduser
 
-        home = expanduser("~")
-        filepath = home + "/.config/fundamentals/fundamentals.yaml"
-        try:
-            cmd = """open %(filepath)s""" % locals()
-            p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
-        except:
-            pass
-        try:
-            cmd = """start %(filepath)s""" % locals()
-            p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
-        except:
-            pass
+        open_file(expanduser("~/.config/fundamentals/fundamentals.yaml"), log)
         return
 
     # CALL FUNCTIONS/OBJECTS

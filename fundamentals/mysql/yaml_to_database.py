@@ -25,17 +25,13 @@ Options:
 from __future__ import print_function
 
 from builtins import object
-import sys
 import os
-import yaml
 
 import re
-import glob
 import ipaddress
 import socket
 from urllib.parse import urljoin, urlparse
-import docopt
-from fundamentals import tools, times
+from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
 
 URL_REQUEST_TIMEOUT = 10
@@ -140,26 +136,8 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # unpack remaining cl arguments using `exec` to setup the variable names
-    # automatically
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, str):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToYaml = arguments["<pathToYaml>"]
+    deleteFlag = arguments["--delete"]
 
     if os.path.isfile(pathToYaml):
         from fundamentals.mysql import yaml_to_database
@@ -313,7 +291,7 @@ class yaml_to_database(object):
             dbConn=dbConn
         )
         yaml2db.add_yaml_file_content_to_database(
-            filepath=${1:"/path/to/file.yaml"},
+            filepath="/path/to/file.yaml",
             deleteFile=True
         )
         ```

@@ -41,12 +41,13 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 import time
 import collections
 import datetime
-from subprocess import Popen, PIPE, STDOUT, DEVNULL
+import tempfile
+import threading
+from subprocess import Popen, PIPE, DEVNULL
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
@@ -96,7 +97,7 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts are started together and run in parallel, and the function returns at once (a background thread waits for each script and logs any failure, but the success and failure rules are not applied; the thread stops if the program exits first), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
 
@@ -136,7 +137,7 @@ def directory_script_runner(
 
     This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
-    Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+    Finally to execute the scripts within a directory in parallel, without applying the success and failure rules (faster, but failures are only logged):
 
     ```python
     from fundamentals.mysql import directory_script_runner
@@ -204,21 +205,32 @@ def directory_script_runner(
         mysqlEnv = _mysql_environment()
         isWaiting = waitForResult == True
         isDelete = waitForResult == "delete"
+        isBackground = not (isWaiting or isDelete)
+        backgroundProcesses = []
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
             try:
                 with open(v, "rb") as scriptFile:
-                    p = Popen(
-                        mysqlCmd,
-                        stdin=scriptFile,
-                        stdout=DEVNULL,
-                        stderr=PIPE if (isWaiting or isDelete) else DEVNULL,
-                        close_fds=True,
-                        env=mysqlEnv,
-                    )
+                    # A TEMP FILE CANNOT FILL UP AND STALL A PROCESS NOBODY IS READING YET
+                    stderrSink = tempfile.TemporaryFile() if isBackground else PIPE
+                    try:
+                        p = Popen(
+                            mysqlCmd,
+                            stdin=scriptFile,
+                            stdout=DEVNULL,
+                            stderr=stderrSink,
+                            close_fds=True,
+                            env=mysqlEnv,
+                        )
+                    except BaseException:
+                        if isBackground:
+                            stderrSink.close()
+                        raise
+                    if isBackground:
+                        backgroundProcesses.append((scriptname, p, stderrSink))
+                        continue
                     # WAIT SO MYSQL HAS READ THE SCRIPT BEFORE IT IS PROCESSED
-                    if isWaiting or isDelete:
-                        stderr = p.communicate()[1]
+                    stderr = p.communicate()[1]
             except OSError as e:
                 # MISSING MYSQL BINARY OR UNREADABLE SCRIPT
                 log.error("MySQL Script `%s` could not be run: '%s'" % (scriptname, e))
@@ -255,7 +267,37 @@ def directory_script_runner(
                     log=log,
                 )
 
+        if backgroundProcesses:
+            threading.Thread(
+                target=_reap_background_processes,
+                args=(backgroundProcesses, log),
+                daemon=True,
+            ).start()
+
     log.debug("completed the ``directory_script_runner`` function")
+    return None
+
+
+def _reap_background_processes(backgroundProcesses, log):
+    """*wait for each background mysql process so none is left as a zombie, and log any failure*
+
+    Runs on a daemon thread, so the caller of ``directory_script_runner`` is not kept waiting. The stderr temp file of each process is read, then closed (which deletes it).
+
+    **Key Arguments:**
+
+    - ``backgroundProcesses`` -- list of (scriptname, Popen, stderr temp file) tuples for the running mysql processes
+    - ``log`` -- logger
+    """
+    for scriptname, p, stderrFile in backgroundProcesses:
+        with stderrFile:
+            p.wait()
+            stderrFile.seek(0)
+            stderr = stderrFile.read()
+        if p.returncode:
+            log.error(
+                "MySQL Script `%s` failed with return code %s: '%s'"
+                % (scriptname, p.returncode, stderr)
+            )
     return None
 
 
@@ -405,26 +447,11 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES
-    # AUTOMATICALLY
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, ("".__class__, "".__class__)):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToDirectory = arguments["<pathToDirectory>"]
+    loginPath = arguments["<loginPath>"]
+    databaseName = arguments["<databaseName>"]
+    successFlag = arguments["--success"]
+    failureFlag = arguments["--failure"]
 
     if successFlag and successFlag.lower() == "none":
         successFlag = None

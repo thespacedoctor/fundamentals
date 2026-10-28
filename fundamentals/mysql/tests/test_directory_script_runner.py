@@ -1,14 +1,14 @@
 from __future__ import print_function
-from builtins import str
 import os
 import logging
 import unittest
 import shutil
-import unittest
-import yaml
 import sys
 import stat
+import subprocess
 import tempfile
+import threading
+import contextlib
 from unittest import mock
 from fundamentals.utKit import utKit
 from fundamentals import tools
@@ -199,6 +199,11 @@ fi
 """
 
 
+# LONGEST A TEST WAITS FOR A REAPER THREAD, OR FOR A FAKE PROCESS THAT SHOULD NOT BE WAITED ON
+JOIN_TIMEOUT_SECONDS = 10
+BLOCK_SAFETY_SECONDS = 1
+
+
 class test_directory_script_runner_subprocess(unittest.TestCase):
     """run the loginPath branch against a fake `mysql` executable"""
 
@@ -251,6 +256,30 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
             loginPath=kwargs.pop("loginPath", "unittesting"),
             **kwargs,
         )
+
+    def _run_background(self, **kwargs):
+        """run in background mode, then wait for the reaper thread so its logging is complete"""
+        with self._recorded_threads() as threads:
+            self._run(waitForResult=False, **kwargs)
+            self._join(threads)
+
+    @contextlib.contextmanager
+    def _recorded_threads(self):
+        realThread = threading.Thread
+        threads = []
+
+        def recordThread(*args, **kwargs):
+            thread = realThread(*args, **kwargs)
+            threads.append(thread)
+            return thread
+
+        with mock.patch("threading.Thread", side_effect=recordThread):
+            yield threads
+
+    def _join(self, threads):
+        for thread in threads:
+            thread.join(timeout=JOIN_TIMEOUT_SECONDS)
+            self.assertFalse(thread.is_alive())
 
     def test_does_not_execute_shell_syntax_in_script_filename(self):
         self._write_script("a$(touch injected_marker).sql", "SELECT 42;")
@@ -345,6 +374,99 @@ class test_directory_script_runner_subprocess(unittest.TestCase):
 
         self.assertEqual(popen.call_count, 1)
         self.assertTrue(os.path.exists(os.path.join(self.scriptDir, "a.sql")))
+
+    def test_background_mode_logs_error_naming_script_and_return_code_when_mysql_fails(
+        self,
+    ):
+        scriptPath = self._write_script("broken.sql")
+
+        with mock.patch.dict(
+            os.environ, {"FAKE_EXIT": "3", "FAKE_STDERR": "ERROR 1064 syntax"}
+        ):
+            with self.assertLogs(self.log, level="ERROR") as logs:
+                self._run_background(failureRule="failed")
+
+        self.assertTrue(os.path.exists(scriptPath))
+        self.assertIn("broken.sql", "\n".join(logs.output))
+        self.assertIn("return code 3", "\n".join(logs.output))
+        self.assertIn("ERROR 1064 syntax", "\n".join(logs.output))
+
+    def test_background_mode_logs_no_error_when_mysql_succeeds(self):
+        self._write_script("ok.sql")
+
+        with self.assertNoLogs(self.log, level="ERROR"):
+            self._run_background()
+
+    def test_background_mode_reaps_every_mysql_process(self):
+        self._write_script("a.sql")
+        self._write_script("b.sql")
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        started = []
+
+        def recordPopen(*args, **kwargs):
+            process = subprocess.Popen(*args, **kwargs)
+            started.append(process)
+            return process
+
+        with mock.patch.object(module, "Popen", side_effect=recordPopen):
+            self._run_background()
+
+        self.assertEqual(len(started), 2)
+        self.assertTrue(all(process.returncode is not None for process in started))
+
+    def test_background_mode_returns_before_mysql_finishes_and_reaps_it_afterwards(self):
+        self._write_script("a.sql")
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        release = threading.Event()
+        finishedWaiting = threading.Event()
+
+        def blockUntilReleased(*args, **kwargs):
+            release.wait(timeout=BLOCK_SAFETY_SECONDS)
+            finishedWaiting.set()
+            return (b"", b"")
+
+        fakeProcess = mock.Mock(returncode=0)
+        fakeProcess.wait.side_effect = blockUntilReleased
+        fakeProcess.communicate.side_effect = blockUntilReleased
+
+        with self._recorded_threads() as threads:
+            with mock.patch.object(module, "Popen", return_value=fakeProcess):
+                self._run(waitForResult=False)
+            returnedBeforeFinish = not finishedWaiting.is_set()
+            release.set()
+            self._join(threads)
+
+        self.assertTrue(returnedBeforeFinish)
+        self.assertTrue(finishedWaiting.is_set())
+        fakeProcess.wait.assert_called_once_with()
+
+    def test_background_mode_reaps_on_a_daemon_thread(self):
+        self._write_script("a.sql")
+
+        with self._recorded_threads() as threads:
+            self._run(waitForResult=False)
+            self._join(threads)
+
+        self.assertEqual(len(threads), 1)
+        self.assertTrue(threads[0].daemon)
+
+    def test_background_mode_sends_stderr_to_a_temp_file_that_is_closed_after_reaping(
+        self,
+    ):
+        self._write_script("a.sql")
+        module = sys.modules["fundamentals.mysql.directory_script_runner"]
+        stderrTargets = []
+
+        def recordPopen(*args, **kwargs):
+            stderrTargets.append(kwargs["stderr"])
+            return subprocess.Popen(*args, **kwargs)
+
+        with mock.patch.object(module, "Popen", side_effect=recordPopen):
+            self._run_background()
+
+        self.assertEqual(len(stderrTargets), 1)
+        self.assertNotEqual(stderrTargets[0], subprocess.PIPE)
+        self.assertTrue(stderrTargets[0].closed)
 
     def test_delete_mode_logs_error_naming_script_when_mysql_fails(self):
         scriptPath = self._write_script("broken.sql")

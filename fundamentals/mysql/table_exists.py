@@ -7,12 +7,9 @@ Author
 : David Young
 """
 
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
-from fundamentals.mysql import readquery
 
 
 def table_exists(dbConn, log, dbTableName):
@@ -27,7 +24,7 @@ def table_exists(dbConn, log, dbTableName):
 
     **Return**
 
-    - ``tableExists`` -- True or False
+    - ``tableExists`` -- True or False. Only tables in the current database (schema) of the connection are counted
 
 
     **Usage**
@@ -53,14 +50,14 @@ def table_exists(dbConn, log, dbTableName):
     sqlQuery = """
         SELECT count(*)
         FROM information_schema.tables
-        WHERE table_name = '%(dbTableName)s'
-    """ % locals()
-    tableExists = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
-
-    if tableExists[0]["count(*)"] == 0:
-        tableExists = False
-    else:
-        tableExists = True
+        WHERE table_schema = DATABASE() AND table_name = %s
+    """
+    cursor = dbConn.cursor()
+    try:
+        cursor.execute(sqlQuery, (dbTableName,))
+        tableExists = cursor.fetchone()[0] > 0
+    finally:
+        cursor.close()
 
     log.debug("completed the ``table_exists`` function")
     return tableExists

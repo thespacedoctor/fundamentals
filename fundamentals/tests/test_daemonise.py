@@ -5,9 +5,7 @@ import unittest
 import shutil
 import signal
 import tempfile
-import unittest
 from unittest import mock
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -135,6 +133,40 @@ class test_daemonise_pidfile(unittest.TestCase):
 
         kill.assert_called_once_with(4242, signal.SIGTERM)
         self.assertTrue(os.path.exists(self.daemon.pidFile))
+
+    def test_status_keeps_pidfile_and_reports_running_when_kill_is_permission_denied(
+        self,
+    ):
+        with mock.patch("os.kill", side_effect=PermissionError), mock.patch(
+            "builtins.print"
+        ) as printed:
+            self.daemon.status()
+
+        self.assertTrue(os.path.exists(self.daemon.pidFile))
+        printed.assert_called_once_with(
+            "pidtest daemon is running (PID = 4242, owned by another user)."
+        )
+
+    def test_status_removes_pidfile_and_reports_not_running_when_process_is_gone(self):
+        with mock.patch("os.kill", side_effect=ProcessLookupError), mock.patch(
+            "builtins.print"
+        ) as printed:
+            self.daemon.status()
+
+        self.assertFalse(os.path.exists(self.daemon.pidFile))
+        printed.assert_called_once_with("pidtest daemon is not running.")
+
+    def test_status_keeps_pidfile_and_logs_error_when_kill_fails_with_other_os_error(
+        self,
+    ):
+        with mock.patch("os.kill", side_effect=OSError("boom")), mock.patch(
+            "builtins.print"
+        ) as printed:
+            self.daemon.status()
+
+        self.assertTrue(os.path.exists(self.daemon.pidFile))
+        self.log.error.assert_called_once()
+        self.assertNotIn("is not running", str(printed.call_args_list))
 
     def test_restart_logs_restart_method_name(self):
         with mock.patch.object(type(self.daemon), "stop"), mock.patch.object(

@@ -8,12 +8,10 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
-from fundamentals.mysql import readquery
+from fundamentals.mysql.sql_identifiers import quote_identifier
 
 
 def get_database_table_column_names(dbConn, log, dbTable):
@@ -28,7 +26,7 @@ def get_database_table_column_names(dbConn, log, dbTable):
 
     **Return**
 
-    - ``columnNames`` -- table column names
+    - ``columnNames`` -- table column names (works for empty tables), or -1 if the names could not be read
 
 
     **Usage**
@@ -47,21 +45,21 @@ def get_database_table_column_names(dbConn, log, dbTable):
     """
     log.debug("starting the ``get_database_table_column_names`` function")
 
-    sqlQuery = """SELECT * FROM %s LIMIT 1""" % (dbTable,)
-    # ############### >ACTION(S) ################
+    # LIMIT 0 RETURNS NO ROWS BUT STILL DESCRIBES THE COLUMNS (WORKS FOR EMPTY TABLES)
     try:
-        rows = readquery(
-            log=log,
-            sqlQuery=sqlQuery,
-            dbConn=dbConn,
-        )
+        sqlQuery = "SELECT * FROM %s LIMIT 0" % (quote_identifier(dbTable),)
+        cursor = dbConn.cursor()
+        try:
+            cursor.execute(sqlQuery)
+            columnNames = [column[0] for column in cursor.description]
+        finally:
+            cursor.close()
     except Exception as e:
         log.error(
             "could not find column names for dbTable %s - failed with this error: %s "
             % (dbTable, str(e))
         )
         return -1
-    columnNames = list(rows[0].keys())
 
     log.debug("completed the ``get_database_table_column_names`` function")
     return columnNames

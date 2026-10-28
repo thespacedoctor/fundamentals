@@ -4,9 +4,7 @@ import contextlib
 import os
 import unittest
 import shutil
-import unittest
 import pytest
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -46,7 +44,66 @@ if not os.path.exists(pathToOutputDir):
 # xt-setup-unit-testing-files-and-folders
 
 
+YAML_TABLES = ("web_articles", "podcasts", "icecream")
+
+
+def _create_yaml_tables():
+    """Create the empty tables the yaml fixtures are ingested into."""
+    from fundamentals.mysql import writequery
+
+    _drop_yaml_tables()
+    for table in YAML_TABLES:
+        writequery(
+            log=log,
+            sqlQuery="""CREATE TABLE `%s`
+                (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
+                `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated` tinyint(4) DEFAULT '0',
+                PRIMARY KEY (`primaryId`))
+                ENGINE=Innodb AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;"""
+            % table,
+            dbConn=dbConn,
+        )
+
+
+def _drop_yaml_tables():
+    from fundamentals.mysql import writequery
+
+    for table in YAML_TABLES:
+        writequery(
+            log=log, sqlQuery="DROP TABLE IF EXISTS `%s`;" % table, dbConn=dbConn
+        )
+
+
+def _count_rows(table):
+    from fundamentals.mysql import readquery
+
+    dbConn.commit()
+    rows = readquery(
+        log=log, sqlQuery="SELECT COUNT(*) AS n FROM `%s`;" % table, dbConn=dbConn
+    )
+    return rows[0]["n"]
+
+
+@contextlib.contextmanager
+def _offline_url_lookup():
+    """Stop the ingester making a live network request when it unshortens a url."""
+    from unittest import mock
+
+    with _patched_head(return_value=_final_response()), mock.patch(
+        "socket.getaddrinfo", side_effect=_fake_getaddrinfo({})
+    ):
+        yield
+
+
 class test_yaml_to_database(unittest.TestCase):
+
+    def setUp(self):
+        _create_yaml_tables()
+
+    def tearDown(self):
+        _drop_yaml_tables()
 
     def test_single_yaml_to_database_function(self):
         # COPY INPUT TO OUTPUT DIR
@@ -67,9 +124,13 @@ class test_yaml_to_database(unittest.TestCase):
             dbConn=dbConn,
             pathToInputDir=pathToOutputDir + "yaml",
         )
-        yaml2db.add_yaml_file_content_to_database(
-            filepath=pathToOutputDir + "yaml/20161219105124.yaml"
-        )
+        with _offline_url_lookup():
+            yaml2db.add_yaml_file_content_to_database(
+                filepath=pathToOutputDir + "yaml/20161219105124.yaml"
+            )
+
+        self.assertEqual(_count_rows("web_articles"), 1)
+        self.assertEqual(_count_rows("podcasts"), 1)
 
     def test_yaml_to_database_function(self):
 
@@ -81,7 +142,10 @@ class test_yaml_to_database(unittest.TestCase):
             dbConn=dbConn,
             pathToInputDir=pathToOutputDir + "/yaml",
         )
-        yaml2db.ingest()
+        with _offline_url_lookup():
+            yaml2db.ingest()
+
+        self.assertGreaterEqual(_count_rows("web_articles"), 1)
 
     def test_yaml_to_database_function_exception(self):
 

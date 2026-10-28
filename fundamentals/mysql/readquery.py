@@ -7,9 +7,8 @@ Author
 : David Young
 """
 
-from fundamentals import tools
+from fundamentals.mysql._retry import run_with_retries
 from builtins import str
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
@@ -87,33 +86,33 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
 
     - ``rows`` -- the rows returned by the sql query (empty if the error was ignored)
     """
-    import pymysql
-
     rows = []
-    # EXECUTE THE SQL COMMAND
-    tryAgain = True
-    tries = 1
-    while tryAgain:
-        tryAgain = False
-        try:
-            cursor.execute(sqlQuery)
-            rows = cursor.fetchall()
-        except pymysql.err.InternalError as e:
-            if tries < 61:
-                tryAgain = True
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60.")
-                tries += 1
-            else:
-                log.warning(f"MySQL error: {e}. Attempt {tries}/60 failed. ")
-                raise
-        except Exception as e:
-            sqlQuery = sqlQuery[:1000]
-            log.warning(
-                "MySQL raised an error - read command not executed.\n"
-                + str(e)
-                + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
-            )
-            if quiet == False:
-                raise e
+    try:
+        rows = run_with_retries(log, lambda: _fetch_rows(cursor, sqlQuery))
+    except Exception as e:
+        sqlQuery = sqlQuery[:1000]
+        log.warning(
+            "MySQL raised an error - read command not executed.\n"
+            + str(e)
+            + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+        )
+        if quiet == False:
+            raise
 
     return rows
+
+
+def _fetch_rows(cursor, sqlQuery):
+    """*Run the read query once and return its rows*
+
+    **Key Arguments**
+
+    - ``cursor`` -- an open db cursor
+    - ``sqlQuery`` -- the MySQL command to execute
+
+    **Return**
+
+    - ``rows`` -- the rows returned by the sql query
+    """
+    cursor.execute(sqlQuery)
+    return cursor.fetchall()

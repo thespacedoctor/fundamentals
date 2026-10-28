@@ -9,19 +9,101 @@ Author
 
 import six
 from fundamentals.mysql import writequery, table_exists, readquery
-from fundamentals import tools, times
+from fundamentals import times
+from fundamentals.mysql.sql_identifiers import (
+    normalise_column_name,
+    quote_identifier,
+    raise_on_duplicate_columns,
+)
+from fundamentals.mysql.sql_inserts import build_batch_insert_command
+from fundamentals.mysql.sql_values import null_if_missing
+from pymysql.converters import escape_item
 import collections as c
 import datetime
-import time
 import yaml
 import re
 from builtins import zip
 from builtins import str
 from builtins import range
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
+
+# CHARACTER SET USED TO ESCAPE VALUES WRITTEN INTO SQL STATEMENT STRINGS
+ESCAPE_CHARSET = "utf8mb4"
+
+
+def _sql_literal(value):
+    """*return the value as an escaped SQL literal, safe to put in a statement string*"""
+    return escape_item(value, ESCAPE_CHARSET)
+
+
+def _database_value(value):
+    """*return the value as it should be stored: missing values become NULL (None), numbers and strings are kept, anything else is stored as text*"""
+    value = null_if_missing(value)
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
+
+
+def _remove_conversion_noise(value):
+    """*remove the yaml and feedparser conversion noise from a string value*"""
+    if not isinstance(value, str):
+        return value
+    for noise in [
+        "time.struct_time",
+        "- !!python/object/new:feedparser.FeedParserDict",
+        "!!python/object/new:feedparser.FeedParserDict",
+        "dictitems:",
+        "dictitems",
+        "!!python/unicode:",
+        "!!python/unicode",
+    ]:
+        value = value.replace(noise, "")
+    return value
+
+
+def _build_literal_insert(
+    insertVerb,
+    dbTableName,
+    formattedKeyList,
+    values,
+    replace,
+    dateModified,
+    dateCreated,
+):
+    """*build an insert statement with every value escaped and written into the statement*
+
+    **Return**
+
+    - ``insertStatement`` -- the statement as a string
+    """
+    quotedKeys = [quote_identifier(k) for k in formattedKeyList]
+    literals = [_sql_literal(_remove_conversion_noise(v)) for v in values]
+    insertStatement = "%s INTO %s (%s%s) VALUES (%s%s)" % (
+        insertVerb,
+        quote_identifier(dbTableName),
+        ",".join(quotedKeys),
+        ", dateCreated" if dateCreated else "",
+        ",".join(literals),
+        ", NOW()" if dateCreated else "",
+    )
+    if not replace:
+        return insertStatement
+
+    assignments = ["%s=%s" % (k, v) for k, v in zip(quotedKeys, literals)]
+    insertStatement += " ON DUPLICATE KEY UPDATE " + ", ".join(assignments)
+    if dateModified:
+        # THE ROW IS ONLY MARKED AS UPDATED IF A COLUMN CHANGED
+        unchanged = " AND ".join(
+            "%s IS NULL" % (k,) if v == "NULL" else "%s=%s" % (k, v)
+            for k, v in zip(quotedKeys, literals)
+        )
+        insertStatement += (
+            ", updated=IF(%s, 0, 1), dateLastModified=IF(%s, dateLastModified, NOW())"
+            % (unchanged, unchanged)
+        )
+    return insertStatement
 
 
 def convert_dictionary_to_mysql_table(
@@ -101,10 +183,9 @@ def convert_dictionary_to_mysql_table(
 
         print(insertCommand, valueTuple)
 
-        # OUT: 'INSERT IGNORE INTO `testing_table`
-        # (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES
-        # (%s, %s, %s, %s, %s)', ('cool', 'super cool',
-        # '2016-06-21T12:08:59', 'burgers', 'cheese')
+        # OUT: INSERT INTO `testing_table`
+        # (`a newKey`,`and another`,`uniqueKey2`,`uniquekey1`, dateCreated) VALUES
+        # (%s, %s, %s, %s, NOW())  ('cool', 'super cool', 'burgers', 'cheese')
 
     You can also return a list of single insert statements using ``batchInserts = False``. Using ``replace = True`` will also add instructions about how to replace duplicate entries in the database table if found:
 
@@ -122,11 +203,10 @@ def convert_dictionary_to_mysql_table(
 
         print(inserts)
 
-        # OUT: INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1)
-        # VALUES ("cool" ,"super cool" ,"2016-09-14T13:12:08" ,"burgers" ,"cheese")
-        # ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super
-        # cool", dateCreated="2016-09-14T13:12:08", uniqueKey2="burgers",
-        # uniquekey1="cheese"
+        # OUT: INSERT IGNORE INTO `testing_table` (`a_newKey`,`and_another`,`uniqueKey2`,`uniquekey1`, dateCreated)
+        # VALUES ('cool','super cool','burgers','cheese', NOW())
+        # ON DUPLICATE KEY UPDATE `a_newKey`='cool', `and_another`='super cool',
+        # `uniqueKey2`='burgers', `uniquekey1`='cheese'
 
     """
 
@@ -142,6 +222,10 @@ def convert_dictionary_to_mysql_table(
         insertVerb = "INSERT"
     else:
         insertVerb = "INSERT IGNORE"
+
+    if isinstance(dictionary, dict):
+        # REFUSE KEYS THAT GIVE THE SAME COLUMN, BEFORE ANY TABLE IS CREATED
+        raise_on_duplicate_columns(dictionary.keys())
 
     if returnInsertOnly == False:
         # TEST THE ARGUMENTS
@@ -167,7 +251,6 @@ def convert_dictionary_to_mysql_table(
                 raise ValueError(message)
 
         for k, v in list(dictionary.items()):
-            # log.debug('k: %s, v: %s' % (k, v,))
             if isinstance(v, list) and len(v) != 2:
                 message = (
                     'Please make sure the list values in "dictionary" 2 items in length'
@@ -224,8 +307,9 @@ def convert_dictionary_to_mysql_table(
 
         # CREATE THE TABLE IF IT DOES NOT EXIST
         if tableExists is False:
+            quotedTable = quote_identifier(dbTableName)
             sqlQuery = """
-                CREATE TABLE IF NOT EXISTS `%(dbTableName)s`
+                CREATE TABLE IF NOT EXISTS %(quotedTable)s
                 (`primaryId` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'An internal counter',
                 `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
                 `dateLastModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
@@ -273,299 +357,181 @@ def convert_dictionary_to_mysql_table(
     odictionary = c.OrderedDict(sorted(dictionary.items(), key=lambda kv: str(kv[0])))
     for key, value in list(odictionary.items()):
         key = str(key)
-        formattedKey = key.replace(" ", "_").replace("-", "_")
-        # DEC A KEYWORD IN MYSQL - NEED TO CHANGE BEFORE INGEST
-        if formattedKey == "dec":
-            formattedKey = "decl"
-        if formattedKey == "DEC":
-            formattedKey = "DECL"
+        formattedKey = normalise_column_name(key)
 
-        formattedKeyList.extend([formattedKey])
-        if len(key) > 0:
-            # CONVERT LIST AND FEEDPARSER VALUES TO YAML (SO I CAN PASS IT AS A
-            # STRING TO MYSQL)
-            if isinstance(value, list) and (isinstance(value[0], list)):
-                value[0] = yaml.dump(value[0])
-                value[0] = str(value[0])
-            # REMOVE CHARACTERS THAT COLLIDE WITH MYSQL
-            # JOIN THE VALUES TOGETHER IN A LIST - EASIER TO GENERATE THE MYSQL
-            # COMMAND LATER
-            if isinstance(value, str):
-                value = value.replace("\\", "\\\\")
-                value = value.replace('"', '\\"')
+        # RAISES VALUEERROR FOR AN EMPTY OR OTHERWISE INVALID COLUMN NAME
+        quote_identifier(formattedKey)
+        formattedKeyList.append(formattedKey)
 
-            if isinstance(value, list) and isinstance(value[0], str):
-                myValues.extend(["%s" % value[0].strip()])
-            elif isinstance(value, list):
-                myValues.extend(["%s" % (value[0],)])
-            else:
-                myValues.extend(["%s" % (value,)])
+        # CONVERT LIST AND FEEDPARSER VALUES TO YAML (SO I CAN PASS IT AS A
+        # STRING TO MYSQL)
+        if isinstance(value, list) and (isinstance(value[0], list)):
+            value[0] = yaml.dump(value[0])
+            value[0] = str(value[0])
+        # JOIN THE VALUES TOGETHER IN A LIST - EASIER TO GENERATE THE MYSQL
+        # COMMAND LATER (ESCAPING IS DONE WHEN THE COMMAND IS BUILT)
+        if isinstance(value, list) and isinstance(value[0], str):
+            myValues.append(_database_value(value[0].strip()))
+        elif isinstance(value, list):
+            myValues.append(_database_value(value[0]))
+        else:
+            myValues.append(_database_value(value))
 
-            if returnInsertOnly == False:
-                # CHECK IF COLUMN EXISTS YET
-                colExists = (
-                    "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME='"
-                    + formattedKey
-                    + "'AND TABLE_NAME='"
-                    + dbTableName
-                    + """'"""
+        if returnInsertOnly == False:
+            # CHECK IF COLUMN EXISTS YET
+            colExists = (
+                "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME="
+                + _sql_literal(formattedKey)
+                + " AND TABLE_NAME="
+                + _sql_literal(dbTableName)
+            )
+            try:
+                rows = readquery(
+                    log=log,
+                    sqlQuery=colExists,
+                    dbConn=dbConn,
                 )
-                try:
-                    # log.debug('checking if the column '+formattedKey+' exists
-                    # in the '+dbTableName+' table')
+            except Exception as e:
+                # WITHOUT ROWS WE CANNOT DECIDE WHETHER TO ALTER THE TABLE
+                log.error("something went wrong" + str(e) + "\n")
+                raise
 
-                    rows = readquery(
-                        log=log,
-                        sqlQuery=colExists,
-                        dbConn=dbConn,
+            # IF COLUMN DOESN'T EXIT - GENERATE IT
+            if len(rows) == 0:
+                qCreateColumn = "ALTER TABLE %s ADD %s" % (
+                    quote_identifier(dbTableName),
+                    quote_identifier(formattedKey),
+                )
+                if not isinstance(value, list):
+                    value = [value]
+                if reDatetime.search(str(value[0])):
+                    qCreateColumn += " datetime DEFAULT NULL"
+                elif (
+                    formattedKey == "updated_parsed"
+                    or formattedKey == "published_parsed"
+                    or formattedKey == "feedName"
+                    or formattedKey == "title"
+                ):
+                    qCreateColumn += " varchar(100) DEFAULT NULL"
+                elif isinstance(value[0], str) and len(value[0]) < 30:
+                    qCreateColumn += " varchar(100) DEFAULT NULL"
+                elif (
+                    isinstance(value[0], str)
+                    and len(value[0]) >= 30
+                    and len(value[0]) < 80
+                ):
+                    qCreateColumn += " varchar(100) DEFAULT NULL"
+                elif isinstance(value[0], str):
+                    columnLength = 450 + len(value[0]) * 2
+                    qCreateColumn += (
+                        " varchar(" + str(columnLength) + ") DEFAULT NULL"
                     )
-                except Exception as e:
-                    # WITHOUT ROWS WE CANNOT DECIDE WHETHER TO ALTER THE TABLE
-                    log.error("something went wrong" + str(e) + "\n")
-                    raise
-
-                # IF COLUMN DOESN'T EXIT - GENERATE IT
-                if len(rows) == 0:
-                    qCreateColumn = """ALTER TABLE `%s` ADD `%s""" % (
-                        dbTableName,
-                        formattedKey,
-                    )
-                    if not isinstance(value, list):
-                        value = [value]
-                    if reDatetime.search(str(value[0])):
-                        # log.debug('Ok - a datetime string was found')
-                        qCreateColumn += "` datetime DEFAULT NULL"
-                    elif (
-                        formattedKey == "updated_parsed"
-                        or formattedKey == "published_parsed"
-                        or formattedKey == "feedName"
-                        or formattedKey == "title"
-                    ):
-                        qCreateColumn += "` varchar(100) DEFAULT NULL"
-                    elif isinstance(value[0], str) and len(value[0]) < 30:
-                        qCreateColumn += "` varchar(100) DEFAULT NULL"
-                    elif (
-                        isinstance(value[0], str)
-                        and len(value[0]) >= 30
-                        and len(value[0]) < 80
-                    ):
-                        qCreateColumn += "` varchar(100) DEFAULT NULL"
-                    elif isinstance(value[0], str):
-                        columnLength = 450 + len(value[0]) * 2
-                        qCreateColumn += (
-                            "` varchar(" + str(columnLength) + ") DEFAULT NULL"
+                elif (
+                    isinstance(value[0], int)
+                    and not isinstance(value[0], bool)
+                    and abs(value[0]) <= 9
+                ):
+                    qCreateColumn += " tinyint DEFAULT NULL"
+                elif isinstance(value[0], int) and not isinstance(value[0], bool):
+                    qCreateColumn += " int DEFAULT NULL"
+                elif (
+                    isinstance(value[0], float) or isinstance(value[0], int)
+                ) and not isinstance(value[0], bool):
+                    qCreateColumn += " double DEFAULT NULL"
+                elif isinstance(value[0], bool):
+                    qCreateColumn += " tinyint DEFAULT NULL"
+                elif isinstance(value[0], list):
+                    qCreateColumn += " varchar(1024) DEFAULT NULL"
+                else:
+                    formattedKeyList.pop()
+                    myValues.pop()
+                    qCreateColumn = None
+                if qCreateColumn:
+                    # ADD COMMENT TO GIVE THE ORGINAL KEYWORD IF formatted FOR
+                    # MYSQL
+                    if key != formattedKey:
+                        qCreateColumn += " COMMENT " + _sql_literal(
+                            "original keyword: " + key
                         )
-                    elif (
-                        isinstance(value[0], int)
-                        and not isinstance(value[0], bool)
-                        and abs(value[0]) <= 9
-                    ):
-                        qCreateColumn += "` tinyint DEFAULT NULL"
-                    elif isinstance(value[0], int) and not isinstance(value[0], bool):
-                        qCreateColumn += "` int DEFAULT NULL"
-                    elif (
-                        isinstance(value[0], float) or isinstance(value[0], int)
-                    ) and not isinstance(value[0], bool):
-                        qCreateColumn += "` double DEFAULT NULL"
-                    elif isinstance(value[0], bool):
-                        qCreateColumn += "` tinyint DEFAULT NULL"
-                    elif isinstance(value[0], list):
-                        qCreateColumn += "` varchar(1024) DEFAULT NULL"
-                    else:
-                        # log.debug('Do not know what format to add this key in
-                        # MySQL - removing from dictionary: %s, %s'
-                        # % (key, type(value[0])))
-                        formattedKeyList.pop()
-                        myValues.pop()
-                        qCreateColumn = None
-                    if qCreateColumn:
-                        # ADD COMMENT TO GIVE THE ORGINAL KEYWORD IF formatted FOR
-                        # MYSQL
-                        if key != formattedKey:
-                            qCreateColumn += (
-                                " COMMENT 'original keyword: " + key + """'"""
-                            )
-                        # CREATE THE COLUMN IF IT DOES NOT EXIST
-                        try:
-                            log.info(
-                                "creating the "
-                                + formattedKey
-                                + " column in the "
-                                + dbTableName
-                                + " table"
-                            )
-                            writequery(log=log, sqlQuery=qCreateColumn, dbConn=dbConn)
+                    # CREATE THE COLUMN IF IT DOES NOT EXIST
+                    try:
+                        log.info(
+                            "creating the "
+                            + formattedKey
+                            + " column in the "
+                            + dbTableName
+                            + " table"
+                        )
+                        writequery(log=log, sqlQuery=qCreateColumn, dbConn=dbConn)
 
-                        except Exception as e:
-                            # log.debug('qCreateColumn: %s' % (qCreateColumn,
-                            # ))
-                            log.error(
-                                "could not create the "
-                                + formattedKey
-                                + " column in the "
-                                + dbTableName
-                                + " table -- "
-                                + str(e)
-                                + "\n"
-                            )
-                            raise
+                    except Exception as e:
+                        log.error(
+                            "could not create the "
+                            + formattedKey
+                            + " column in the "
+                            + dbTableName
+                            + " table -- "
+                            + str(e)
+                            + "\n"
+                        )
+                        raise
 
     if returnInsertOnly == False:
         # GENERATE THE INDEX NAME - THEN CREATE INDEX IF IT DOES NOT YET EXIST
         if len(uniqueKeyList):
             for i in range(len(uniqueKeyList)):
-                uniqueKeyList[i] = uniqueKeyList[i].replace(" ", "_").replace("-", "_")
-                if uniqueKeyList[i] == "dec":
-                    uniqueKeyList[i] = "decl"
-                if uniqueKeyList[i] == "DEC":
-                    uniqueKeyList[i] = "DECL"
+                uniqueKeyList[i] = normalise_column_name(uniqueKeyList[i])
 
-            indexName = uniqueKeyList[0].replace(" ", "_").replace("-", "_")
+            indexName = uniqueKeyList[0]
             for i in range(len(uniqueKeyList) - 1):
                 indexName += "_" + uniqueKeyList[i + 1]
 
             indexName = indexName.lower().replace("  ", " ").replace(" ", "_")
 
             sqlQuery = (
-                """SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '"""
-                + dbTableName
-                + """' AND INDEX_NAME = '"""
-                + indexName
-                + """'"""
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "
+                + _sql_literal(dbTableName)
+                + " AND INDEX_NAME = "
+                + _sql_literal(indexName)
             )
             rows = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
 
             exists = rows[0]["COUNT(*)"]
-            # log.debug('uniqueKeyList: %s' % (uniqueKeyList,))
             if exists == 0:
-                if isinstance(uniqueKeyList, list):
-                    uniqueKeyList = ",".join(uniqueKeyList)
+                uniqueColumns = ",".join(quote_identifier(k) for k in uniqueKeyList)
 
                 addUniqueKey = (
-                    "ALTER TABLE `"
-                    + dbTableName
-                    + "` ADD unique "
-                    + indexName
-                    + """ ("""
-                    + uniqueKeyList
+                    "ALTER TABLE "
+                    + quote_identifier(dbTableName)
+                    + " ADD unique "
+                    + quote_identifier(indexName)
+                    + " ("
+                    + uniqueColumns
                     + ")"
                 )
-                # log.debug('HERE IS THE COMMAND:'+addUniqueKey)
                 writequery(log=log, sqlQuery=addUniqueKey, dbConn=dbConn)
 
     if returnInsertOnly == True and batchInserts == True:
-        myKeys = "`,`".join(formattedKeyList)
-        valueString = ("%s, " * len(myValues))[:-2]
-        insertCommand = (
-            insertVerb
-            + """ INTO `"""
-            + dbTableName
-            + """` (`"""
-            + myKeys
-            + """`, dateCreated) VALUES ("""
-            + valueString
-            + """, NOW())"""
+        insertCommand = build_batch_insert_command(
+            insertVerb, dbTableName, formattedKeyList, replace, dateCreated
         )
-        mv = []
-        mv[:] = [None if m == "None" else m for m in myValues]
-        valueTuple = tuple(mv)
+        return insertCommand, tuple(myValues)
 
-        dup = ""
-        if replace:
-            dup = " ON DUPLICATE KEY UPDATE "
-            for k, v in zip(formattedKeyList, mv):
-                dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-
-        insertCommand = insertCommand + dup
-
-        insertCommand = insertCommand.replace('\\""', '\\" "')
-        insertCommand = insertCommand.replace('""', "null")
-        insertCommand = insertCommand.replace("!!python/unicode:", "")
-        insertCommand = insertCommand.replace("!!python/unicode", "")
-        insertCommand = insertCommand.replace('"None"', "null")
-        insertCommand = insertCommand.replace('"null"', "null")
-
-        if not dateCreated:
-            insertCommand = insertCommand.replace(", dateCreated)", ")").replace(
-                ", NOW())", ")"
-            )
-
-        return insertCommand, valueTuple
-
-    # GENERATE THE INSERT COMMAND - IGNORE DUPLICATE ENTRIES
-    myKeys = "`,`".join(formattedKeyList)
-    myValues = '" ,"'.join(myValues)
-    # log.debug(myValues+" ------ PRESTRIP")
-    # REMOVE SOME CONVERSION NOISE
-    myValues = myValues.replace("time.struct_time", "")
-    myValues = myValues.replace("- !!python/object/new:feedparser.FeedParserDict", "")
-    myValues = myValues.replace("!!python/object/new:feedparser.FeedParserDict", "")
-    myValues = myValues.replace("dictitems:", "")
-    myValues = myValues.replace("dictitems", "")
-    myValues = myValues.replace("!!python/unicode:", "")
-    myValues = myValues.replace("!!python/unicode", "")
-    myValues = myValues.replace('"None"', "null")
-    myValues = myValues.replace('"null"', "null")
-    # myValues = myValues.replace('"None', 'null')
-
-    if myValues[-4:] != "null":
-        myValues += '"'
-
-    dup = ""
-    if replace:
-        dupValues = ('"' + myValues).split(" ,")
-        dupKeys = formattedKeyList
-        dup = dup + " ON DUPLICATE KEY UPDATE "
-        for k, v in zip(dupKeys, dupValues):
-            dup = """%(dup)s `%(k)s`=%(v)s,""" % locals()
-
-        if dateModified:
-            dup = """%(dup)s updated=IF(""" % locals()
-            for k, v in zip(dupKeys, dupValues):
-                if v == "null":
-                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-                else:
-                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-            dup = dup[:-5] + ", 0, 1), dateLastModified=IF("
-            for k, v in zip(dupKeys, dupValues):
-                if v == "null":
-                    dup = """%(dup)s `%(k)s` is %(v)s AND """ % locals()
-                else:
-                    dup = """%(dup)s `%(k)s`=%(v)s AND """ % locals()
-            dup = dup[:-5] + ", dateLastModified, NOW())"
-        else:
-            dup = dup[:-1]
-
-    # log.debug(myValues+" ------ POSTSTRIP")
-    addValue = (
-        insertVerb
-        + """ INTO `"""
-        + dbTableName
-        + """` (`"""
-        + myKeys
-        + """`, dateCreated) VALUES (\""""
-        + myValues
-        + """, NOW()) %(dup)s """ % locals()
+    addValue = _build_literal_insert(
+        insertVerb,
+        dbTableName,
+        formattedKeyList,
+        myValues,
+        replace,
+        dateModified,
+        dateCreated,
     )
-
-    if not dateCreated:
-        addValue = addValue.replace(", dateCreated)", ")").replace(", NOW())", ")", 1)
-
-    addValue = addValue.replace('\\""', '\\" "')
-    addValue = addValue.replace('""', "null")
-    addValue = addValue.replace("!!python/unicode:", "")
-    addValue = addValue.replace("!!python/unicode", "")
-    addValue = addValue.replace('"None"', "null")
-    addValue = addValue.replace('"null"', "null")
-    # log.debug(addValue)
 
     if returnInsertOnly == True:
         return addValue
 
     message = ""
     try:
-        # log.debug('adding new data to the %s table; query: %s' %
-        # (dbTableName, addValue))"
         writequery(log=log, sqlQuery=addValue, dbConn=dbConn)
 
     except Exception as e:

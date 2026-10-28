@@ -12,10 +12,15 @@ from __future__ import division
 from datetime import datetime
 from fundamentals.mysql.database import database
 import re
-import time
 from fundamentals.fmultiprocess import fmultiprocess
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
-from fundamentals import tools
+from fundamentals.mysql.sql_identifiers import (
+    normalise_column_name,
+    quote_identifier,
+    raise_on_duplicate_columns,
+)
+from fundamentals.mysql.sql_inserts import build_batch_insert_command
+from fundamentals.mysql.sql_values import null_if_missing
 from builtins import str
 from builtins import range
 import sys
@@ -33,16 +38,21 @@ sharedList = []
 # MESSAGES FROM writequery THAT ARE EXPECTED WHEN USING INSERT IGNORE
 BENIGN_WRITE_MESSAGES = ("", "duplicate key error")
 
+# ASSIGNMENTS ADDED TO THE ON DUPLICATE KEY UPDATE TAIL OF A BATCH INSERT
+BATCH_REPLACE_EXTRA_UPDATES = ("updated=1", "dateLastModified=NOW()")
 
-def _normalise_key(key):
-    """*return the database column name for a dictionary key*"""
-    formattedKey = str(key).replace(" ", "_").replace("-", "_")
-    # DEC IS A KEYWORD IN MYSQL - MATCHES THE RENAME IN convert_dictionary_to_mysql_table
-    if formattedKey == "dec":
-        formattedKey = "decl"
-    if formattedKey == "DEC":
-        formattedKey = "DECL"
-    return formattedKey
+
+def _map_keys_to_columns(rows):
+    """*map every key used in a list of dictionaries to its database column name*
+
+    **Return**
+
+    - ``originalKeys`` -- the sorted, de-duplicated keys of all the dictionaries
+    - ``columnNames`` -- the database column name for each key, in the same order
+    """
+    originalKeys = sorted(set().union(*(list(d.keys()) for d in rows)), key=str)
+    raise_on_duplicate_columns(originalKeys)
+    return originalKeys, [normalise_column_name(k) for k in originalKeys]
 
 
 def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
@@ -58,6 +68,15 @@ def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
         if not isErrorInFlight:
             raise
         log.warning("could not restore the autocommit setting: %s" % (e,))
+
+
+def _import_dataframe_libraries():
+    """*import numpy and pandas in the calling process, so forked workers inherit them*
+
+    Importing them for the first time inside a forked worker can abort the interpreter on macOS.
+    """
+    import numpy  # noqa: F401
+    import pandas  # noqa: F401
 
 
 def insert_list_of_dictionaries_into_database_tables(
@@ -134,27 +153,6 @@ def insert_list_of_dictionaries_into_database_tables(
         return None
 
     if len(dictList):
-        # FIND BUG IN MYSQL QUERY BY UNCOMMENTING
-        # tot = len(dictList)
-        # for index, d in enumerate(dictList):
-        #     if index > 1:
-        #         # Cursor up one line and clear line
-        #         sys.stdout.write("\x1b[1A\x1b[2K")
-
-        #     percent = (float(index) / float(tot)) * 100.
-        #     print('%(index)s/%(tot)s (%(percent)1.1f%% done)' % locals())
-
-        #     convert_dictionary_to_mysql_table(
-        #         dbConn=dbConn,
-        #         log=log,
-        #         dictionary=d,
-        #         dbTableName=dbTableName,
-        #         uniqueKeyList=uniqueKeyList,
-        #         dateModified=dateModified,
-        #         reDatetime=reDate,
-        #         replace=replace,
-        #         dateCreated=dateCreated)
-
         convert_dictionary_to_mysql_table(
             dbConn=dbConn,
             log=log,
@@ -206,9 +204,12 @@ def insert_list_of_dictionaries_into_database_tables(
                     batchSize=batchSize,
                     reDatetime=reDate,
                     dateCreated=dateCreated,
+                    # FORKED WORKERS WOULD SHARE THE CALLER'S SINGLE CONNECTION, SO RUN IN THIS PROCESS
+                    turnOffMP=True,
                 )
 
             else:
+                _import_dataframe_libraries()
                 fmultiprocess(
                     log=log,
                     function=_add_dictlist_to_database_via_load_in_file,
@@ -216,6 +217,7 @@ def insert_list_of_dictionaries_into_database_tables(
                     dbTablename=dbTableName,
                     dbSettings=dbSettings,
                     dateModified=dateModified,
+                    replace=replace,
                     turnOffMP=False,
                     progressBar=True,
                 )
@@ -335,49 +337,18 @@ def _insert_single_batch_into_database(
 
     import pymysql
 
-    if not replace:
-        insertVerb = "INSERT IGNORE"
-    else:
-        insertVerb = "INSERT IGNORE"
-
     # MAP EACH ORIGINAL KEY TO ITS COLUMN NAME; KEYS MISSING FROM A ROW BECOME NULL
-    originalKeys = sorted(set().union(*(list(d.keys()) for d in batch[0])), key=str)
-    uniKeys = [_normalise_key(k) for k in originalKeys]
+    originalKeys, uniKeys = _map_keys_to_columns(batch[0])
 
-    myKeys = "`,`".join(uniKeys)
-    vals = [
-        tuple([None if d.get(k) in ["None", None] else d[k] for k in originalKeys])
-        for d in batch[0]
-    ]
-    valueString = ("%s, " * len(vals[0]))[:-2]
-    insertCommand = (
-        insertVerb
-        + """ INTO `"""
-        + dbTableName
-        + """` (`"""
-        + myKeys
-        + """`, dateCreated) VALUES ("""
-        + valueString
-        + """, NOW())"""
+    vals = [tuple([null_if_missing(d.get(k)) for k in originalKeys]) for d in batch[0]]
+    insertCommand = build_batch_insert_command(
+        "INSERT IGNORE",
+        dbTableName,
+        uniKeys,
+        replace,
+        dateCreated,
+        extraUpdates=BATCH_REPLACE_EXTRA_UPDATES,
     )
-
-    if not dateCreated:
-        insertCommand = insertCommand.replace(", dateCreated)", ")").replace(
-            ", NOW())", ")"
-        )
-
-    dup = ""
-    if replace:
-        dup = " ON DUPLICATE KEY UPDATE "
-        for k in uniKeys:
-            dup = """%(dup)s %(k)s=values(%(k)s),""" % locals()
-        dup = """%(dup)s updated=1, dateLastModified=NOW()""" % locals()
-
-    insertCommand = insertCommand + dup
-
-    insertCommand = insertCommand.replace('\\""', '\\" "')
-    insertCommand = insertCommand.replace('""', "null")
-    insertCommand = insertCommand.replace('"None"', "null")
 
     try:
         message = writequery(
@@ -411,82 +382,83 @@ def _insert_single_batch_into_database(
 
 
 def _add_dictlist_to_database_via_load_in_file(
-    masterListIndex, dbTablename, dbSettings, dateModified=False
+    masterListIndex, log, dbTablename, dbSettings, dateModified=False, replace=False
 ):
     """*load a list of dictionaries into a database table with load data infile*
 
     **Key Arguments**
 
     - ``masterListIndex`` -- the index of the sharedList of dictionary lists to process
+    - ``log`` -- logger
     - ``dbTablename`` -- the name of the database table to add the list to
     - ``dbSettings`` -- the dictionary of database settings
-    - ``log`` -- logger
     - ``dateModified`` -- add a dateModified stamp with an updated flag to rows?
+    - ``replace`` -- update rows that already exist? If False, duplicates are skipped
 
 
     **Return**
 
     - None
 
-
-    **Usage**
-
-    .. todo::
-
-        add usage info
-        create a sublime snippet for usage
-
-    ```python
-    usage code
-    ```
-
     """
     global sharedList
 
-    from fundamentals.logs import emptyLogger
     import numpy as np
     import pandas as pd
+    import uuid
 
-    log = emptyLogger()
     log.debug("starting the ``_add_dictlist_to_database_via_load_in_file`` function")
 
     dictList = sharedList[masterListIndex][0]
+    originalKeys, columns = _map_keys_to_columns(dictList)
 
-    count = sharedList[masterListIndex][1]
-    if count > totalCount:
-        count = totalCount
-    ltotalCount = totalCount
+    now = datetime.now()
+    tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{uuid.uuid4().hex}")
+    quotedTmpTable = quote_identifier(tmpTable)
+    quotedTable = quote_identifier(dbTablename)
+
+    df = pd.DataFrame(dictList)
+    # THE SAME NULL RULE AS null_if_missing, PLUS NAN (A PANDAS NAN MEANS MISSING)
+    df.replace(["", np.nan, None], "\\N", inplace=True)
 
     # SETUP ALL DATABASE CONNECTIONS
     dbConn = database(log=log, dbSettings=dbSettings).connect()
+    try:
+        # CREATE A TEMPORY TABLE TO ADD DATA TO
+        sqlQuery = (
+            "CREATE TEMPORARY TABLE %(quotedTmpTable)s SELECT * FROM %(quotedTable)s WHERE 1=0;"
+            % locals()
+        )
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    now = datetime.now()
+        sqlQuery = "ALTER TABLE %(quotedTmpTable)s DISABLE KEYS;" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    import random
+        _load_dataframe_into_table(
+            log, dbConn, df, originalKeys, columns, tmpTable, quotedTmpTable
+        )
 
-    rand = random.randint(0, 10000)
+        updateClause = _build_update_clause(columns, dateModified) if replace else ""
+        sqlQuery = """
+INSERT IGNORE INTO %(quotedTable)s
+SELECT * FROM %(quotedTmpTable)s%(updateClause)s;""" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    tmpTable = now.strftime(f"tmp_%Y%m%dt%H%M%S%f{rand}")
+        sqlQuery = "DROP TEMPORARY TABLE %(quotedTmpTable)s;" % locals()
+        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-    # CREATE A TEMPORY TABLE TO ADD DATA TO
-    sqlQuery = (
-        """CREATE TEMPORARY TABLE %(tmpTable)s SELECT * FROM %(dbTablename)s WHERE 1=0;"""
-        % locals()
-    )
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+        dbConn.commit()
+    finally:
+        dbConn.close()
 
-    sqlQuery = """ALTER TABLE %(tmpTable)s DISABLE KEYS;""" % locals()
-    writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
+    log.debug("completed the ``_add_dictlist_to_database_via_load_in_file`` function")
+    return None
 
-    csvColumns = [k for d in dictList for k in list(d.keys())]
-    csvColumns = list(set(csvColumns))
-    csvColumnsString = ("`, `").join(csvColumns)
-    csvColumnsString = f"`{csvColumnsString}`"
-    csvColumnsString = csvColumnsString.replace("`dec`", "`decl`")
 
-    df = pd.DataFrame(dictList)
-    df.replace(["nan", "None", "", "NaN", np.nan, None], "\\N", inplace=True)
-
+def _load_dataframe_into_table(
+    log, dbConn, df, originalKeys, columns, tmpTable, quotedTmpTable
+):
+    """*write a dataframe to a scratch csv file and LOAD DATA it into the temporary table*"""
     with tempfile.TemporaryDirectory(prefix="fundamentals-load-") as tmpDir:
         csvPath = os.path.join(tmpDir, tmpTable + ".csv")
         df.to_csv(
@@ -494,7 +466,7 @@ def _add_dictlist_to_database_via_load_in_file(
             sep="|",
             index=False,
             quotechar='"',
-            columns=csvColumns,
+            columns=originalKeys,
             encoding="utf-8",
         )
 
@@ -506,36 +478,24 @@ def _add_dictlist_to_database_via_load_in_file(
                 % csvPath
             )
         sqlCsvPath = csvPath.replace("'", "''")
+        csvColumnsString = ", ".join(quote_identifier(c) for c in columns)
         sqlQuery = """LOAD DATA LOCAL INFILE '%(sqlCsvPath)s'
-INTO TABLE %(tmpTable)s
+INTO TABLE %(quotedTmpTable)s
 FIELDS TERMINATED BY '|' OPTIONALLY ENCLOSED BY '"'
 IGNORE 1 LINES
 (%(csvColumnsString)s);""" % locals()
-
         writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
 
-        updateStatement = ""
-        for i in csvColumns:
-            updateStatement += "`%(i)s` = VALUES(`%(i)s`), " % locals()
-        if dateModified:
-            updateStatement += "dateLastModified = NOW(), updated = 1"
-        else:
-            updateStatement = updateStatement[0:-2]
 
-        sqlQuery = """
-INSERT IGNORE INTO %(dbTablename)s
-SELECT * FROM %(tmpTable)s
-ON DUPLICATE KEY UPDATE %(updateStatement)s;""" % locals()
-        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-        sqlQuery = """DROP TEMPORARY TABLE %(tmpTable)s;""" % locals()
-        writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn)
-
-    dbConn.commit()
-    dbConn.close()
-
-    log.debug("completed the ``_add_dictlist_to_database_via_load_in_file`` function")
-    return None
+def _build_update_clause(columns, dateModified):
+    """*return the ON DUPLICATE KEY UPDATE clause that overwrites duplicates with the new values*"""
+    assignments = [
+        "%(c)s = VALUES(%(c)s)" % {"c": quote_identifier(column)} for column in columns
+    ]
+    if dateModified:
+        assignments.append("dateLastModified = NOW()")
+        assignments.append("updated = 1")
+    return "\nON DUPLICATE KEY UPDATE " + ", ".join(assignments)
 
 
 # use the tab-trigger below for new function

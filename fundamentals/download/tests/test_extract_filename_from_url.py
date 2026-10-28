@@ -3,8 +3,6 @@ from builtins import str
 import os
 import unittest
 import shutil
-import unittest
-import yaml
 from fundamentals.utKit import utKit
 from fundamentals import tools
 from os.path import expanduser
@@ -75,6 +73,39 @@ class test_extract_filename_from_url(unittest.TestCase):
             log=log, url="http://x.org/doc.html#section.2"
         )
         self.assertEqual(filename, "doc.html")
+
+    def test_does_not_log_the_credentials_in_the_url(self):
+        from unittest import mock
+        from fundamentals.download import extract_filename_from_url
+
+        for url in (
+            "http://alice:s3cret@x.org/files/data.pdf",
+            "alice:s3cret@x.org/files/data.pdf",
+            "http://alice:p@ss@x.org/files/data.pdf",
+        ):
+            with self.subTest(url=url):
+                testLog = mock.Mock()
+
+                filename = extract_filename_from_url(log=testLog, url=url)
+
+                logged = str(testLog.mock_calls)
+                self.assertEqual(filename, "data.pdf")
+                self.assertNotIn("s3cret", logged)
+                self.assertNotIn("alice", logged)
+                self.assertNotIn("ss@", logged)
+                self.assertIn("x.org/files/data.pdf", logged)
+
+    def test_still_logs_a_url_that_has_no_credentials_unchanged(self):
+        from unittest import mock
+        from fundamentals.download import extract_filename_from_url
+
+        testLog = mock.Mock()
+
+        extract_filename_from_url(log=testLog, url="http://x.org/a.php?email=a@b.org")
+
+        testLog.debug.assert_any_call(
+            "extracting filename from url http://x.org/a.php?email=a@b.org"
+        )
 
     def test_returns_untitled_when_url_ends_with_trailing_slash(self):
         from fundamentals.download import extract_filename_from_url

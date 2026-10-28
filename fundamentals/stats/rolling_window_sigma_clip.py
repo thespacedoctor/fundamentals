@@ -10,12 +10,9 @@ Date Created
 : January  1, 2021
 """
 
-from builtins import object
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
-from fundamentals import tools
 
 
 def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
@@ -48,7 +45,15 @@ def rolling_window_sigma_clip(log, array, clippingSigma, windowSize):
     """
     log.debug("starting the ``rolling_window_sigma_clip`` function")
 
-    from astropy.stats import sigma_clip, mad_std
+    try:
+        from astropy.stats import sigma_clip, mad_std
+    except ImportError as e:
+        message = (
+            "rolling_window_sigma_clip requires astropy, "
+            "install it with: pip install fundamentals[stats]"
+        )
+        log.error(message)
+        raise ImportError(message) from e
 
     if windowSize % 2 == 0:
         message = "windowSize must be odd, got %s" % (windowSize,)

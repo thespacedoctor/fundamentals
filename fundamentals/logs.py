@@ -10,9 +10,15 @@ Author
 from builtins import object
 import os
 import stat
-import sys
 import logging
 from logging import handlers
+
+
+DEFAULT_LEVEL = "INFO"
+CONSOLE_HANDLER_NAME = "consoleLog"
+# THE CONSOLE HANDLER THRESHOLD IS LOWERED BY THIS AMOUNT SO THAT log.print() MESSAGES
+# (INFO + 5) STILL SHOW WHEN THE CONSOLE LEVEL IS SET TO WARNING (INFO + 10)
+PRINT_LEVEL_OFFSET = 6
 
 
 def console_logger(level="WARNING"):
@@ -87,14 +93,18 @@ def setup_dryx_logging(yaml_file):
     """
     *setup dryx style python logging*
 
+    Each call applies the logging settings in ``yaml_file``, replacing the configuration from any earlier call.
+
     **Key Arguments**
 
-    - ``level`` -- the level of logging required
+    - ``yaml_file`` -- path to the yaml file holding the logging settings
 
 
     **Return**
 
-    - ``logger`` -- the console logger
+    - ``logger`` -- the configured logger
+
+    If the settings have no ``root`` section, or no root ``level``, the level defaults to ``INFO``. A level name that logging does not know raises ``ValueError``.
 
 
     **Usage**
@@ -145,80 +155,53 @@ def setup_dryx_logging(yaml_file):
     """
     import logging
     import logging.config
-    import yaml
 
-    try:
-        from StringIO import StringIO
-    except ImportError:
-        from io import StringIO
-    from os.path import expanduser
+    # ADD log.print() LEVEL (NO-OP IF IT ALREADY EXISTS)
+    addLoggingLevel("PRINT", logging.INFO + 5)
 
-    # IMPORT CUSTOM HANDLER THAT ALLOWS GROUP WRITING
-    handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
+    yamlContent = _load_logging_yaml(yaml_file)
+    _create_log_directory(yamlContent)
 
-    # GET CONTENT OF YAML FILE AND REPLACE ~ WITH HOME DIRECTORY PATH
-    with open(yaml_file) as f:
-        content = f.read()
-    home = expanduser("~")
-    content = content.replace("~/", home + "/")
-    stream = StringIO(content)
-    yamlContent = yaml.safe_load(stream)
-    stream.close()
+    rootSettings = yamlContent.setdefault("root", {})
+    rootSettings.setdefault("level", DEFAULT_LEVEL)
+    rootSettings.setdefault("handlers", [])
+    rootLevel = _resolve_level(rootSettings["level"])
+    consoleLevel = rootLevel
+    consoleHandler = yamlContent.get("handlers", {}).get("console", {})
+    if "level" in consoleHandler:
+        consoleLevel = _resolve_level(consoleHandler["level"]) - PRINT_LEVEL_OFFSET
 
-    # ADD log.print() LEVEL
-    exists = addLoggingLevel("PRINT", logging.INFO + 5)
-
-    if exists:
-        # SET THE ROOT LOGGER
-        logger = logging.getLogger(__name__)
-        return logger
-    # USE THE LOGGING SETTINGS SECTION OF THE SETTINGS DICTIONARY FILE IF THERE IS ONE
-    # OTHERWISE ASSUME THE FILE CONTAINS ONLY LOGGING SETTINGS
-    if "logging settings" in yamlContent:
-        yamlContent = yamlContent["logging settings"]
-        yamlContent["version"] = 1
-
-    if (
-        "handlers" in yamlContent
-        and "file" in yamlContent["handlers"]
-        and "filename" in yamlContent["handlers"]["file"]
-    ):
-        loggingDir = os.path.dirname(yamlContent["handlers"]["file"]["filename"])
-        # Recursively create missing directories
-        if not os.path.exists(loggingDir):
-            os.makedirs(loggingDir)
-
-    if "root" in yamlContent and "level" in yamlContent["root"]:
-        level = yamlContent["root"]["level"]
-    if (
-        "handlers" in yamlContent
-        and "console" in yamlContent["handlers"]
-        and "level" in yamlContent["handlers"]["console"]
-    ):
-        level = logging.getLevelName(yamlContent["handlers"]["console"]["level"]) - 6
-    if "formatters" in yamlContent and "console_style" in yamlContent["formatters"]:
-        format = yamlContent["formatters"]["console_style"]["format"]
-        dateFmt = yamlContent["formatters"]["console_style"]["datefmt"]
+    consoleStyle = yamlContent.get("formatters", {}).get("console_style")
+    if consoleStyle:
+        format = consoleStyle["format"]
+        dateFmt = consoleStyle["datefmt"]
     else:
         format = '%(levelname)s: "%(pathname)s", line %(lineno)d, in %(funcName)s > %(message)s'
         dateFmt = "%H:%M:%S"
 
-    addConsole = False
-    if "root" in yamlContent and "handlers" in yamlContent["root"]:
-        if "console" in yamlContent["root"]["handlers"]:
-            addConsole = True
-            yamlContent["root"]["handlers"].remove("console")
+    # THE CONSOLE HANDLER IS ADDED BELOW WITH COLOUR FORMATTING INSTEAD
+    addConsole = "console" in rootSettings["handlers"]
+    if addConsole:
+        rootSettings["handlers"].remove("console")
 
-    if len(yamlContent["root"]["handlers"]):
+    # KEEP LOGGERS THAT ALREADY EXIST SO REPEAT CALLS DO NOT SILENCE THEM
+    yamlContent.setdefault("disable_existing_loggers", False)
+
+    if len(rootSettings["handlers"]):
         logging.config.dictConfig(yamlContent)
 
-    # SET THE ROOT LOGGER
     logger = logging.getLogger(__name__)
+    logger.setLevel(rootLevel)
+
+    # DROP THE CONSOLE HANDLER FROM ANY PREVIOUS CALL SO HANDLERS ARE NOT DUPLICATED
+    for handler in logger.handlers[:]:
+        if handler.get_name() == CONSOLE_HANDLER_NAME:
+            logger.removeHandler(handler)
 
     if addConsole:
         consoleLog = logging.StreamHandler()
-        consoleLog.set_name("consoleLog")
-        consoleLog.setLevel(level)
+        consoleLog.set_name(CONSOLE_HANDLER_NAME)
+        consoleLog.setLevel(consoleLevel)
         cf = ColorFormatter()
         cf.setFormat(format, dateFmt)
         consoleLog.setFormatter(cf)
@@ -227,6 +210,73 @@ def setup_dryx_logging(yaml_file):
     logging.captureWarnings(True)
 
     return logger
+
+
+def _load_logging_yaml(yaml_file):
+    """
+    *Read the logging settings from a yaml file, expanding ``~/`` to the home directory*
+
+    **Key Arguments**
+
+    - ``yaml_file`` -- path to the yaml settings file
+
+    **Return**
+
+    - ``yamlContent`` -- the logging settings as a dictionary (the ``logging settings`` section if the file has one)
+    """
+    import yaml
+    from os.path import expanduser
+
+    with open(yaml_file) as f:
+        content = f.read()
+    content = content.replace("~/", expanduser("~") + "/")
+    yamlContent = yaml.safe_load(content)
+
+    # USE THE LOGGING SETTINGS SECTION OF THE SETTINGS DICTIONARY FILE IF THERE IS ONE
+    # OTHERWISE ASSUME THE FILE CONTAINS ONLY LOGGING SETTINGS
+    if "logging settings" in yamlContent:
+        yamlContent = yamlContent["logging settings"]
+        yamlContent["version"] = 1
+
+    return yamlContent
+
+
+def _create_log_directory(yamlContent):
+    """
+    *Create the directory of the file handler's log file if it is missing*
+
+    **Key Arguments**
+
+    - ``yamlContent`` -- the logging settings dictionary
+    """
+    fileHandler = yamlContent.get("handlers", {}).get("file", {})
+    if "filename" not in fileHandler:
+        return
+    loggingDir = os.path.dirname(fileHandler["filename"])
+    if not os.path.exists(loggingDir):
+        os.makedirs(loggingDir)
+
+
+def _resolve_level(levelName):
+    """
+    *Convert a logging level name (or number) to its numeric value*
+
+    **Key Arguments**
+
+    - ``levelName`` -- a level name such as ``WARNING``, or a level number
+
+    **Return**
+
+    - ``levelNumber`` -- the numeric level
+
+    Raises ``ValueError`` naming the value if it is not a known level.
+    """
+    if isinstance(levelName, int):
+        return levelName
+    levelNumber = logging.getLevelName(levelName)
+    if not isinstance(levelNumber, int):
+        raise ValueError(f"Unknown logging level {levelName!r}")
+    return levelNumber
 
 
 def addLoggingLevel(levelName, levelNum, methodName=None):
@@ -362,6 +412,11 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
             self.baseFilename,
             (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
         )
+
+
+# REGISTER THE HANDLER AT IMPORT SO dictConfig CAN RESOLVE
+# logging.handlers.GroupWriteRotatingFileHandler WHATEVER THE IMPORT ORDER
+handlers.GroupWriteRotatingFileHandler = GroupWriteRotatingFileHandler
 
 
 class emptyLogger(object):
