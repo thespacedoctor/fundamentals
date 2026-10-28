@@ -6,26 +6,11 @@ import shutil
 import signal
 import tempfile
 from unittest import mock
-from fundamentals.utKit import utKit
-from fundamentals import tools
-from os.path import expanduser
+import pytest
 
-home = expanduser("~")
-
-packageDirectory = utKit("").get_project_root()
-settingsFile = packageDirectory + "/test_settings.yaml"
-# settingsFile = home + \
-#     "/git_repos/_misc_/settings/fundamentals/test_settings.yaml"
-
-su = tools(
-    arguments={"settingsFile": settingsFile},
-    docString=__doc__,
-    logLevel="DEBUG",
-    options_first=False,
-    projectName=None,
-    defaultSettingsFile=False,
-)
-arguments, settings, log, dbConn = su.setup()
+pytestmark = pytest.mark.usefixtures("session_names")
+# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
+log = settings = None
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)

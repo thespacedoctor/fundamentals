@@ -5,24 +5,15 @@ import unittest
 import uuid
 from unittest import mock
 
+import pytest
 import yaml
 
-from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.mysql.sql_identifiers import quote_identifier
-from fundamentals.utKit import utKit
 
-packageDirectory = utKit("").get_project_root()
-settingsFile = packageDirectory + "/test_settings.yaml"
-su = tools(
-    arguments={"settingsFile": settingsFile},
-    docString=__doc__,
-    logLevel="DEBUG",
-    options_first=False,
-    projectName=None,
-    defaultSettingsFile=False,
-)
-arguments, settings, log, dbConn = su.setup()
+pytestmark = pytest.mark.usefixtures("session_names")
+# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
+log = dbConn = None
 
 RUN_ID = uuid.uuid4().hex[:8]
 MODULE_NAME = "fundamentals.mysql.convert_dictionary_to_mysql_table"
