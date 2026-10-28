@@ -48,7 +48,10 @@ TINYINT_MAX_SIZE = 9
 
 
 class insert_error(Exception):
-    """*raised when the insert of the dictionary into the database table fails*"""
+    """*raised when the insert of the dictionary into the database table fails*
+
+    The message holds the table name, the error class and the MySQL error code. The exception that caused it is kept as ``__cause__`` and carries the original server message, which may contain data values, so do not log it verbatim.
+    """
 
 
 def _sql_literal(value):

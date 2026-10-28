@@ -19,12 +19,11 @@ from fundamentals.mysql.sql_identifiers import (
     quote_identifier,
     raise_on_duplicate_columns,
 )
-from fundamentals.mysql._log_safety import escape_for_log
+from fundamentals.mysql._log_safety import describe_error, escape_for_log
 from fundamentals.mysql.sql_inserts import build_batch_insert_command
 from fundamentals.mysql.sql_values import null_if_missing
 from builtins import str
 from builtins import range
-import sys
 import os
 import tempfile
 
@@ -68,7 +67,9 @@ def _restore_autocommit(dbConn, originalAutocommit, log, isErrorInFlight=False):
     except pymysql.Error as e:
         if not isErrorInFlight:
             raise
-        log.warning("could not restore the autocommit setting: %s" % (e,))
+        log.warning(
+            "could not restore the autocommit setting: %s" % (describe_error(e),)
+        )
 
 
 def _import_dataframe_libraries():
@@ -223,7 +224,6 @@ def insert_list_of_dictionaries_into_database_tables(
                     progressBar=True,
                 )
 
-            sys.stdout.write("\x1b[1A\x1b[2K")
             log.info(
                 "%s / %s rows inserted into %s"
                 % (ltotalCount, ltotalCount, escape_for_log(dbTableName))
@@ -372,7 +372,10 @@ def _insert_single_batch_into_database(
         )
 
     if message not in BENIGN_WRITE_MESSAGES:
-        error = "could not insert a batch of rows into %s: %s" % (dbTableName, message)
+        error = "could not insert a batch of rows into %s: %s" % (
+            escape_for_log(dbTableName),
+            message,
+        )
         log.error(error)
         raise RuntimeError(error)
 

@@ -9,7 +9,8 @@ Author
 
 LITERAL_PLACEHOLDER = "?"
 QUOTE_CHARACTERS = "'\""
-LITERAL_PREFIXES = "xXbB"
+LITERAL_PREFIXES = ("x", "X", "b", "B")
+LITERAL_QUOTES = ("'", '"')
 LINE_ENDINGS = "\r\n"
 
 
@@ -41,12 +42,18 @@ def describe_error(error):
 
     **Return**
 
-    - ``description`` -- for example ``IntegrityError (MySQL error 1062)``, or just the class name when the first argument is not an integer error code
+    - ``description`` -- for example ``IntegrityError (MySQL error 1062)``, or just the class name unless the arguments have the pymysql shape of an integer code followed by a message string and the error is not an ``OSError`` (whose integer is an errno)
     """
     name = type(error).__name__
-    code = error.args[0] if error.args else None
-    if isinstance(code, int) and not isinstance(code, bool):
-        return "%s (MySQL error %d)" % (name, code)
+    isPymysqlShape = (
+        not isinstance(error, OSError)
+        and len(error.args) > 1
+        and isinstance(error.args[0], int)
+        and not isinstance(error.args[0], bool)
+        and isinstance(error.args[1], str)
+    )
+    if isPymysqlShape:
+        return "%s (MySQL error %d)" % (name, error.args[0])
     return name
 
 
@@ -145,9 +152,8 @@ def _scan_word(sql, index):
         return None
     end = _scan_word_end(sql, index)
     word = sql[index:end]
-    isPrefixedLiteral = word in tuple(LITERAL_PREFIXES) and sql[end : end + 1] in (
-        "'",
-        '"',
+    isPrefixedLiteral = (
+        word in LITERAL_PREFIXES and sql[end : end + 1] in LITERAL_QUOTES
     )
     if isPrefixedLiteral:
         literalEnd = _scan_quoted(sql, end)
@@ -184,11 +190,11 @@ def redact_sql_literals(sql):
 
     **Key Arguments**
 
-    - ``sql`` -- the SQL statement
+    - ``sql`` -- the SQL statement. A value that is not a string is converted with ``str`` first, because logging must never fail before the database driver does
 
     **Return**
 
-    - ``redactedSql`` -- the statement with string, number, hex, binary and comment text removed. Names, keywords and ``%s`` placeholders are kept, and control characters inside backtick-quoted names are escaped
+    - ``redactedSql`` -- the statement with string, number, hex, binary and comment text removed. Names, keywords and ``%s`` placeholders are kept, and control characters, in or outside backtick-quoted names, are escaped
 
     **Usage**
 
@@ -199,6 +205,7 @@ def redact_sql_literals(sql):
     # OUTPUT: INSERT INTO `t` (`a`) VALUES (?)
     ```
     """
+    sql = str(sql)
     pieces = []
     index = 0
     while index < len(sql):
@@ -207,7 +214,7 @@ def redact_sql_literals(sql):
             if result:
                 break
         else:
-            result = (sql[index], index + 1)
+            result = (escape_for_log(sql[index]), index + 1)
         pieces.append(result[0])
         index = result[1]
     return "".join(pieces)

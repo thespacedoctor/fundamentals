@@ -139,6 +139,22 @@ class TestDescribeError:
     def test_gives_only_the_class_name_when_there_is_no_integer_code(self):
         assert describe_error(RuntimeError("boom")) == "RuntimeError"
 
+    @pytest.mark.parametrize(
+        "error",
+        [
+            KeyError(987654321),
+            OSError(2, "No such file"),
+            RuntimeError(1062),
+            RuntimeError(True, "x"),
+            RuntimeError(1062, 5),
+            RuntimeError(),
+        ],
+    )
+    def test_gives_only_the_class_name_when_the_error_is_not_in_the_pymysql_shape(
+        self, error
+    ):
+        assert describe_error(error) == type(error).__name__
+
     def test_never_includes_the_error_message(self):
         assert SECRET not in describe_error(syntax_error())
         assert SECRET not in describe_error(generic_error())
@@ -327,6 +343,84 @@ class TestScalarValueCheck:
         assert SECRET not in str(excInfo.value) + logged_text(caplog)
 
 
+class TestGetColumnNamesErrorLogging:
+    def test_logs_the_escaped_table_name_and_no_error_text(self, testLog, caplog):
+        from fundamentals.mysql import get_database_table_column_names
+
+        connection = FakeConnection(FakeCursor(executeError=syntax_error()))
+
+        result = get_database_table_column_names(
+            dbConn=connection, log=testLog, dbTable="tbl\nFORGED\x1b[31m"
+        )
+
+        text = logged_text(caplog)
+        assert result == -1
+        assert SECRET not in text
+        assert "\nFORGED" not in text
+        assert "\x1b" not in text
+        assert "tbl\\nFORGED\\x1b[31m" in text
+        assert "ProgrammingError (MySQL error 1064)" in text
+
+
+class TestRetryLogging:
+    def test_logs_the_error_class_and_code_not_the_error_text(self, testLog, caplog):
+        from fundamentals.mysql._retry import run_with_retries
+
+        deadlock = pymysql.err.OperationalError(1213, "deadlock near '%s'" % SECRET)
+        operation = mock.Mock(side_effect=[deadlock, "rows"])
+
+        with mock.patch("time.sleep"):
+            run_with_retries(testLog, operation)
+
+        text = logged_text(caplog)
+        assert SECRET not in text
+        assert "OperationalError (MySQL error 1213)" in text
+
+
+class TestInsertListErrorLogging:
+    def test_logs_no_error_text_when_the_autocommit_restore_fails(
+        self, testLog, caplog
+    ):
+        connection = mock.Mock()
+        connection.autocommit.side_effect = syntax_error()
+
+        INSERT_MODULE._restore_autocommit(
+            connection, True, testLog, isErrorInFlight=True
+        )
+
+        text = logged_text(caplog)
+        assert SECRET not in text
+        assert "ProgrammingError (MySQL error 1064)" in text
+
+    def test_escapes_the_table_name_in_a_failed_batch_log_and_exception(
+        self, testLog, caplog
+    ):
+        with (
+            mock.patch.object(INSERT_MODULE, "sharedList", [([{"a": 1}], 1)]),
+            mock.patch.object(INSERT_MODULE, "totalCount", 1),
+            mock.patch.object(INSERT_MODULE, "globalDbConn", mock.Mock()),
+            mock.patch.object(
+                INSERT_MODULE, "writequery", return_value="insert failed"
+            ),
+        ):
+            with pytest.raises(RuntimeError) as excInfo:
+                INSERT_MODULE._insert_single_batch_into_database(
+                    batchIndex=0,
+                    log=testLog,
+                    dbTableName=BAD_TABLE_NAME,
+                    uniqueKeyList=[],
+                    dateModified=False,
+                    replace=False,
+                    batchSize=2500,
+                    reDatetime=False,
+                    dateCreated=True,
+                )
+
+        assert "\nFORGED" not in str(excInfo.value)
+        assert "\nFORGED" not in logged_text(caplog)
+        assert "tbl\\nFORGED log line" in str(excInfo.value)
+
+
 class TestInsertListProgressMessages:
     def run_insert(self, log, tableName):
         connection = mock.Mock()
@@ -345,7 +439,7 @@ class TestInsertListProgressMessages:
     def test_writes_no_table_name_to_stdout(self, testLog, capsys):
         self.run_insert(testLog, BAD_TABLE_NAME)
 
-        assert "FORGED" not in capsys.readouterr().out
+        assert capsys.readouterr().out == ""
 
     def test_logs_the_escaped_table_name(self, testLog, caplog):
         self.run_insert(testLog, BAD_TABLE_NAME)

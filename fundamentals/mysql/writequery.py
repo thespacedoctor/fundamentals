@@ -39,6 +39,8 @@ def writequery(log, sqlQuery, dbConn, Force=False, manyValueList=False):
     - ``message`` -- error/warning message
 
 
+    Logs and the returned message hold the error class and MySQL error code, not the error text. An exception that is raised still carries the original server message, which may contain data values, so do not log it verbatim.
+
     **Usage**
 
     Here's an example of how to create a table using the database connection passed to the function:

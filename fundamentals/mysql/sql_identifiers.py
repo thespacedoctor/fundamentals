@@ -138,8 +138,10 @@ def cap_identifier(name, maxLength=MYSQL_MAX_IDENTIFIER_LENGTH):
     prefixLength = maxLength - IDENTIFIER_HASH_LENGTH - 1
     if prefixLength < 1:
         raise ValueError(
-            "maxLength %d is too small to shorten a name: it needs at least %d"
-            % (maxLength, IDENTIFIER_HASH_LENGTH + 2)
+            f"maxLength {maxLength} is too small to shorten a name: "
+            f"it needs at least {IDENTIFIER_HASH_LENGTH + 2}"
         )
-    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:IDENTIFIER_HASH_LENGTH]
+    digest = hashlib.sha1(name.encode("utf-8"), usedforsecurity=False).hexdigest()[
+        :IDENTIFIER_HASH_LENGTH
+    ]
     return name[:prefixLength] + "_" + digest

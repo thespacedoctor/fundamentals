@@ -195,8 +195,8 @@ class TestRedactSqlLiterals:
     @pytest.mark.parametrize(
         "sql, expected",
         [
-            ("SELECT 1 -- %s\nFROM t" % SECRET, "SELECT ? -- ?\nFROM t"),
-            ("SELECT 1 # %s\nFROM t" % SECRET, "SELECT ? # ?\nFROM t"),
+            ("SELECT 1 -- %s\nFROM t" % SECRET, "SELECT ? -- ?\\nFROM t"),
+            ("SELECT 1 # %s\nFROM t" % SECRET, "SELECT ? # ?\\nFROM t"),
             ("SELECT /* %s */ 1" % SECRET, "SELECT /*?*/ ?"),
             ("SELECT 1 /* %s" % SECRET, "SELECT ? /*?"),
             ("SELECT 1 -- %s" % SECRET, "SELECT ? -- ?"),
@@ -219,6 +219,25 @@ class TestRedactSqlLiterals:
         sql = "SELECT * FROM `abc'%s'" % SECRET
 
         assert SECRET not in redact_sql_literals(sql)
+
+    @pytest.mark.parametrize(
+        "control", ["\r", "\n", "\x1b", "\x85", "\u2028", "\u2029"]
+    )
+    def test_escapes_control_characters_outside_quotes(self, control):
+        result = redact_sql_literals("SELECT a%sINFO forged FROM t" % control)
+
+        assert len(result.splitlines()) == 1
+        assert control not in result
+        assert "INFO forged" in result
+
+    def test_writes_a_line_break_outside_quotes_as_an_escape_sequence(self):
+        assert redact_sql_literals("SELECT a\r\nFROM t") == "SELECT a\\r\\nFROM t"
+
+    @pytest.mark.parametrize(
+        "notSql, expected", [(None, "None"), (5, "?"), (b"SELECT 1", "?")]
+    )
+    def test_accepts_input_that_is_not_a_string(self, notSql, expected):
+        assert redact_sql_literals(notSql) == expected
 
     def test_leaves_the_statement_placeholders_alone(self):
         sql = "INSERT INTO `t` (`a`) VALUES (%s)"

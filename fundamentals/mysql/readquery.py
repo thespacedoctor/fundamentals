@@ -34,6 +34,8 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     - ``rows`` -- the rows returned by the sql query
 
 
+    Logs hold the error class and MySQL error code, not the error text. An exception that is raised still carries the original server message, which may contain data values, so do not log it verbatim.
+
     **Usage**
 
     ```python
