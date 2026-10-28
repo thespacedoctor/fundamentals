@@ -39,3 +39,5 @@ build
 Gemfile.lock
 
 /docs/source/_api
+
+/.codegraph/
