@@ -55,6 +55,8 @@ from fundamentals import tools
 
 # MOST MYSQL CLIENTS RUN AT ONCE IN BACKGROUND MODE (THE SERVER REFUSES CONNECTIONS PAST ITS max_connections)
 MAX_PARALLEL_SCRIPTS = 8
+# MOST BYTES OF A SCRIPT'S STDERR (TAKEN FROM THE END) THAT ARE WRITTEN TO THE LOG
+MAX_LOGGED_STDERR_BYTES = 65536
 
 
 def directory_script_runner(
@@ -102,10 +104,10 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts run in parallel, at most ``maxParallelScripts`` at a time, and the function returns at once (background threads start each script, wait for it and log any failure, but the success and failure rules are not applied; the threads stop, and any script not yet started is never run, if the program exits first), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts run in parallel, at most ``maxParallelScripts`` at a time, and the function returns at once (background threads start each script, wait for it and log any failure, but the success and failure rules are not applied; the interpreter waits for these threads, so scripts still queued are run before the program exits), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
-    - ``maxParallelScripts`` -- the most mysql processes that run at once when ``waitForResult`` is 'False'. Must be a positive integer, otherwise a `ValueError` is raised. Default *8*
+    - ``maxParallelScripts`` -- the most mysql processes that run at once when ``waitForResult`` is 'False'. The limit applies to each call separately (every call has its own pool), not to the program as a whole. Must be a positive integer; any other value raises a `ValueError` in every mode, even when ``waitForResult`` is not 'False'. Default *8*
 
 
     **Return**
@@ -298,9 +300,9 @@ def _validate_max_parallel_scripts(maxParallelScripts):
 
 
 def _start_background_scripts(scriptPaths, mysqlCmd, mysqlEnv, maxParallelScripts, log):
-    """*run the scripts on daemon worker threads, so no more than ``maxParallelScripts`` mysql processes run at once*
+    """*run the scripts on worker threads, so no more than ``maxParallelScripts`` mysql processes run at once*
 
-    Returns as soon as the workers have started. Each worker takes the next script (oldest first), runs it and waits for it to finish before taking another, so every process is reaped and the caller is never kept waiting.
+    Returns as soon as the workers have started. Each worker takes the next script (oldest first), runs it and waits for it to finish before taking another, so every process is reaped and the caller is never kept waiting. The workers are not daemon threads, so the interpreter waits for them (and the queued scripts) before it exits.
 
     **Key Arguments:**
 
@@ -314,11 +316,17 @@ def _start_background_scripts(scriptPaths, mysqlCmd, mysqlEnv, maxParallelScript
     for scriptPath in scriptPaths:
         pendingScripts.put(scriptPath)
 
+    queuedCount = len(scriptPaths) - maxParallelScripts
+    if queuedCount > 0:
+        log.info(
+            "%s scripts queued behind the limit of %s parallel mysql processes"
+            % (queuedCount, maxParallelScripts)
+        )
+
     for _ in range(min(maxParallelScripts, len(scriptPaths))):
         threading.Thread(
             target=_run_pending_scripts,
             args=(pendingScripts, mysqlCmd, mysqlEnv, log),
-            daemon=True,
         ).start()
     return None
 
@@ -351,7 +359,7 @@ def _run_pending_scripts(pendingScripts, mysqlCmd, mysqlEnv, log):
 def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
     """*run one script through mysql, wait for the process and log a failure*
 
-    The stderr temp file is read, then closed (which deletes it). A temp file cannot fill up and stall a process nobody is reading yet.
+    The stderr temp file is read, then closed (which deletes it). A temp file cannot fill up and stall a process nobody is reading yet. Only the last ``MAX_LOGGED_STDERR_BYTES`` of stderr are logged. If waiting fails, a process that is still running is killed and reaped.
 
     **Key Arguments:**
 
@@ -369,15 +377,35 @@ def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
             close_fds=True,
             env=mysqlEnv,
         )
-        p.wait()
-        stderrFile.seek(0)
-        stderr = stderrFile.read()
+        try:
+            p.wait()
+        finally:
+            if p.poll() is None:
+                p.kill()
+                p.wait()
+        stderr = _read_stderr_tail(stderrFile)
     if p.returncode:
         log.error(
             "MySQL Script `%s` failed with return code %s: '%s'"
             % (os.path.basename(scriptPath), p.returncode, stderr)
         )
     return None
+
+
+def _read_stderr_tail(stderrFile):
+    """*return the last ``MAX_LOGGED_STDERR_BYTES`` of a stderr file as text*
+
+    **Key Arguments:**
+
+    - ``stderrFile`` -- the open stderr temp file
+
+    **Return:**
+
+    - `stderr` -- the decoded text (undecodable bytes are replaced)
+    """
+    size = stderrFile.seek(0, os.SEEK_END)
+    stderrFile.seek(max(0, size - MAX_LOGGED_STDERR_BYTES))
+    return stderrFile.read().decode("utf-8", errors="replace")
 
 
 def _mysql_environment():
