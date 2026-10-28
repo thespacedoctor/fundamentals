@@ -133,7 +133,7 @@ def reset_db_connection(request):
     """
     *Undo whatever a test left on the shared database connection*
 
-    After each test that uses ``dbConn`` or ``session_names``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database. A failed reset is logged as a warning, so it never hides the real test failure.
+    After each test that uses ``dbConn`` or ``session_attributes``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database. A failed reset is logged as a warning, so it never hides the real test failure.
     """
     dbConn = None
     if {"dbConn", "session_attributes"} & set(request.fixturenames):
