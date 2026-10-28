@@ -112,9 +112,9 @@ class tools(object):
             port: 9002
 
     # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
-    # A PRIVATE SSH PROCESS FORWARDS A UNIX SOCKET IN A NEW 0700 DIRECTORY, AND THE DATABASE
-    # CONNECTION IS MADE THROUGH THAT SOCKET. `port` MUST STILL BE A VALID PORT NUMBER, BUT IT IS
-    # NO LONGER USED: NOTHING LISTENS ON A TCP PORT, SO NO OTHER PROCESS CAN TAKE THE TUNNEL'S PLACE.
+    # A private ssh process forwards a unix socket in a new 0700 directory, and the database
+    # connection is made through that socket. `port` must still be a valid port number, but it is
+    # no longer used: nothing listens on a TCP port, so no other process can take the tunnel's place.
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
 
@@ -452,6 +452,7 @@ class tools(object):
         )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
+        thisConn = None
         try:
             thisConn = ms.connect(
                 host=databaseSettings["host"],
@@ -469,11 +470,23 @@ class tools(object):
             thisConn.autocommit(True)
         except BaseException:
             # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            self._close_quietly(thisConn)
             close_ssh_tunnel(socketPath, self.log)
             raise
         self.remoteDBConn = thisConn
 
         return None
+
+    def _close_quietly(self, connection):
+        """
+        *close a database connection, if there is one, and ignore any error from closing it*
+        """
+        if connection is None:
+            return
+        try:
+            connection.close()
+        except Exception as e:
+            self.log.debug(f"could not close the database connection: {e}")
 
     def _create_or_verify_settings(self, pathToSettings, create=False):
         """*create and/or verify a settings file at a given path*

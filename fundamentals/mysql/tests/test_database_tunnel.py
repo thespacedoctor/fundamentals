@@ -74,6 +74,49 @@ class test_database_tunnel(unittest.TestCase):
 
         closeMock.assert_called_once_with("/tmp/t/mysql.sock", log)
 
+    def _autocommit_failure_with_close(self, closeError=None):
+        from fundamentals.mysql import database
+
+        events = []
+        with (
+            mock.patch(
+                "fundamentals.mysql.database.setup_ssh_tunnel",
+                return_value="/tmp/t/mysql.sock",
+            ),
+            mock.patch(
+                "fundamentals.mysql.database.close_ssh_tunnel",
+                side_effect=lambda *args: events.append("tunnel closed"),
+            ),
+            mock.patch("pymysql.connect") as connectMock,
+        ):
+            connection = connectMock.return_value
+            connection.autocommit.side_effect = RuntimeError("boom")
+
+            def closeConnection():
+                events.append("connection closed")
+                if closeError:
+                    raise closeError
+
+            connection.close.side_effect = closeConnection
+            with self.assertRaises(RuntimeError) as context:
+                database(
+                    log=mock.MagicMock(), dbSettings=_settings(tunnel=TUNNEL)
+                ).connect()
+        return events, context.exception
+
+    def test_closes_the_connection_before_the_tunnel_when_autocommit_fails(self):
+        events, _ = self._autocommit_failure_with_close()
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+
+    def test_still_closes_the_tunnel_and_raises_the_original_error_when_close_fails(
+        self,
+    ):
+        events, error = self._autocommit_failure_with_close(OSError("gone"))
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+        self.assertEqual(str(error), "boom")
+
     def test_leaves_the_tunnel_open_when_the_connection_succeeds(self):
         with (
             mock.patch(

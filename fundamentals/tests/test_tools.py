@@ -230,6 +230,48 @@ class test_tools_tunnel(unittest.TestCase):
 
         self._assert_tunnel_closed_when_connecting_fails(failAutocommit)
 
+    def _autocommit_failure_with_close(self, closeError=None):
+        from unittest import mock
+
+        events = []
+
+        def failAutocommit(connectMock):
+            connection = connectMock.return_value
+            connection.autocommit.side_effect = RuntimeError("boom")
+
+            def closeConnection():
+                events.append("connection closed")
+                if closeError:
+                    raise closeError
+
+            connection.close.side_effect = closeConnection
+
+        with (
+            mock.patch(
+                "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
+            ),
+            mock.patch(
+                "fundamentals.tools.close_ssh_tunnel",
+                side_effect=lambda *args: events.append("tunnel closed"),
+            ),
+        ):
+            with self.assertRaises(RuntimeError) as context:
+                self._build_tools("\n" + TUNNEL_DICT_YAML, failAutocommit)
+        return events, context.exception
+
+    def test_closes_the_connection_before_the_tunnel_when_autocommit_fails(self):
+        events, _ = self._autocommit_failure_with_close()
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+
+    def test_still_closes_the_tunnel_and_raises_the_original_error_when_close_fails(
+        self,
+    ):
+        events, error = self._autocommit_failure_with_close(OSError("gone"))
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+        self.assertEqual(str(error), "boom")
+
     def test_leaves_the_tunnel_open_when_the_connection_succeeds(self):
         from unittest import mock
 

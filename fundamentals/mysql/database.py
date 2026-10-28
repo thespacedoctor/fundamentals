@@ -109,6 +109,7 @@ class database(object):
         user = dbSettings["user"]
         passwd = dbSettings["password"]
         dbName = dbSettings["db"]
+        dbConn = None
         try:
             dbConn = ms.connect(
                 host=host,
@@ -128,12 +129,24 @@ class database(object):
                 dbConn.autocommit(True)
         except BaseException:
             # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            self._close_quietly(dbConn)
             if unixSocket:
                 close_ssh_tunnel(unixSocket, self.log)
             raise
 
         self.log.debug("completed the ``connect`` method")
         return dbConn
+
+    def _close_quietly(self, connection):
+        """
+        *close a database connection, if there is one, and ignore any error from closing it*
+        """
+        if connection is None:
+            return
+        try:
+            connection.close()
+        except Exception as e:
+            self.log.debug(f"could not close the database connection: {e}")
 
     def _setup_tunnel(self, tunnelParameters):
         """

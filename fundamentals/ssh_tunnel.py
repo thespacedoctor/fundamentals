@@ -3,6 +3,8 @@
 """
 *Set up a private ssh tunnel to a remote database host, shared by ``tools`` and ``database``*
 
+The registry of running tunnels is best-effort. It is not coordinated across threads (there is no lock), so set up and close tunnels from one thread at a time.
+
 Author
 : David Young
 """
@@ -100,7 +102,6 @@ def setup_ssh_tunnel(tunnelParameters, log):
         raise tunnel_error(f"could not start the ssh tunnel command: {e}") from e
 
     TUNNEL_PROCESSES[socketPath] = process
-    atexit.register(close_ssh_tunnel, socketPath)
     try:
         _wait_for_tunnel(process, socketPath, log)
     except BaseException:
@@ -140,6 +141,8 @@ def _stop_process(process, socketPath, log):
         process.terminate()
         process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
     except ProcessLookupError:
+        # REAP THE CHILD SO IT DOES NOT STAY AS A ZOMBIE
+        process.poll()
         return
     except TimeoutExpired:
         _kill_process(process, socketPath, log)
@@ -153,10 +156,11 @@ def _kill_process(process, socketPath, log):
         process.kill()
         process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
     except ProcessLookupError:
+        process.poll()
         return
     except TimeoutExpired:
         if log is not None:
-            log.warning(f"the ssh process for `{socketPath}` did not stop after kill")
+            log.error(f"the ssh process for `{socketPath}` did not stop after kill")
 
 
 def _close_exited_tunnels(log):
@@ -298,6 +302,22 @@ def _check_value(key, tunnelParameters, pattern):
     return value
 
 
+def _close_all_tunnels():
+    """
+    *close every registered tunnel, registered once to run at interpreter exit*
+    """
+    for socketPath in list(TUNNEL_PROCESSES):
+        close_ssh_tunnel(socketPath)
+
+
+def _forget_tunnels():
+    """
+    *forget the tunnels of the parent process in a forked child, without stopping them*
+    """
+    TUNNEL_PROCESSES.clear()
+
+
+atexit.register(_close_all_tunnels)
 if hasattr(os, "register_at_fork"):
     # A FORKED CHILD MUST NOT CLOSE THE TUNNELS OF ITS PARENT
-    os.register_at_fork(after_in_child=TUNNEL_PROCESSES.clear)
+    os.register_at_fork(after_in_child=_forget_tunnels)
