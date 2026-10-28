@@ -117,7 +117,7 @@ def close_ssh_tunnel(socketPath, log=None):
     """
     *stop the ssh process serving a tunnel started by ``setup_ssh_tunnel`` and remove its socket directory*
 
-    Does nothing if the tunnel is unknown or already closed: an unknown path is a no-op and nothing is deleted. The socket directory is always removed. Registered cleanup runs at normal interpreter exit only, not after ``SIGKILL`` or ``os._exit``.
+    Does nothing if the tunnel is unknown or already closed: an unknown path is a no-op and nothing is deleted. The socket directory of a known tunnel is always removed. Registered cleanup runs at normal interpreter exit only, not after ``SIGKILL`` or ``os._exit``.
 
     **Key Arguments**
 
