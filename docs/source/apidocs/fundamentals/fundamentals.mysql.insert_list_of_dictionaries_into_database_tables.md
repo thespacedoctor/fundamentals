@@ -27,6 +27,10 @@
 :class: autosummary longtable
 :align: left
 
+* - {py:obj}`BATCH_REPLACE_EXTRA_UPDATES <fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BATCH_REPLACE_EXTRA_UPDATES>`
+  - ```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BATCH_REPLACE_EXTRA_UPDATES
+    :summary:
+    ```
 * - {py:obj}`BENIGN_WRITE_MESSAGES <fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES>`
   - ```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES
     :summary:
@@ -50,6 +54,16 @@
 ````
 
 ### API
+
+````{py:data} BATCH_REPLACE_EXTRA_UPDATES
+:canonical: fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BATCH_REPLACE_EXTRA_UPDATES
+:value: >
+   ('updated=1', 'dateLastModified=NOW()')
+
+```{autodoc2-docstring} fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BATCH_REPLACE_EXTRA_UPDATES
+```
+
+````
 
 ````{py:data} BENIGN_WRITE_MESSAGES
 :canonical: fundamentals.mysql.insert_list_of_dictionaries_into_database_tables.BENIGN_WRITE_MESSAGES

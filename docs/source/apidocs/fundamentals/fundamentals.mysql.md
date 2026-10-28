@@ -21,6 +21,8 @@ fundamentals.mysql.insert_list_of_dictionaries_into_database_tables
 fundamentals.mysql.readquery
 fundamentals.mysql.setup_database_connection
 fundamentals.mysql.sql_identifiers
+fundamentals.mysql.sql_inserts
+fundamentals.mysql.sql_values
 fundamentals.mysql.sqlite2mysql
 fundamentals.mysql.table_exists
 fundamentals.mysql.writequery
