@@ -19,7 +19,7 @@ except ImportError:
         import pyreadline3 as readline
     except ImportError:
         readline = None  # or just pass — basic input() still works
-from fundamentals.ssh_tunnel import setup_ssh_tunnel
+from fundamentals.ssh_tunnel import close_ssh_tunnel, setup_ssh_tunnel
 
 
 class database(object):
@@ -109,22 +109,28 @@ class database(object):
         user = dbSettings["user"]
         passwd = dbSettings["password"]
         dbName = dbSettings["db"]
-        dbConn = ms.connect(
-            host=host,
-            user=user,
-            passwd=passwd,
-            db=dbName,
-            port=port,
-            unix_socket=unixSocket,
-            use_unicode=True,
-            charset="utf8mb4",
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000,
-            max_allowed_packet=51200000,
-        )
-        if self.autocommit:
-            dbConn.autocommit(True)
+        try:
+            dbConn = ms.connect(
+                host=host,
+                user=user,
+                passwd=passwd,
+                db=dbName,
+                port=port,
+                unix_socket=unixSocket,
+                use_unicode=True,
+                charset="utf8mb4",
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=36000,
+                max_allowed_packet=51200000,
+            )
+            if self.autocommit:
+                dbConn.autocommit(True)
+        except BaseException:
+            # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            if unixSocket:
+                close_ssh_tunnel(unixSocket, self.log)
+            raise
 
         self.log.debug("completed the ``connect`` method")
         return dbConn

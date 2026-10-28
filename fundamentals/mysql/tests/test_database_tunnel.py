@@ -41,6 +41,51 @@ class test_database_tunnel(unittest.TestCase):
         )
         self.assertFalse(connectMock.call_args.kwargs["port"])
 
+    def _connect_with_failure(self, configureConnect):
+        from fundamentals.mysql import database
+
+        with (
+            mock.patch(
+                "fundamentals.mysql.database.setup_ssh_tunnel",
+                return_value="/tmp/t/mysql.sock",
+            ),
+            mock.patch("fundamentals.mysql.database.close_ssh_tunnel") as closeMock,
+            mock.patch("pymysql.connect") as connectMock,
+        ):
+            configureConnect(connectMock)
+            log = mock.MagicMock()
+            with self.assertRaises(RuntimeError):
+                database(log=log, dbSettings=_settings(tunnel=TUNNEL)).connect()
+        return closeMock, log
+
+    def test_closes_the_tunnel_when_the_database_connection_fails(self):
+        def failToConnect(connectMock):
+            connectMock.side_effect = RuntimeError("refused")
+
+        closeMock, log = self._connect_with_failure(failToConnect)
+
+        closeMock.assert_called_once_with("/tmp/t/mysql.sock", log)
+
+    def test_closes_the_tunnel_when_setting_autocommit_fails(self):
+        def failAutocommit(connectMock):
+            connectMock.return_value.autocommit.side_effect = RuntimeError("boom")
+
+        closeMock, log = self._connect_with_failure(failAutocommit)
+
+        closeMock.assert_called_once_with("/tmp/t/mysql.sock", log)
+
+    def test_leaves_the_tunnel_open_when_the_connection_succeeds(self):
+        with (
+            mock.patch(
+                "fundamentals.mysql.database.setup_ssh_tunnel",
+                return_value="/tmp/t/mysql.sock",
+            ),
+            mock.patch("fundamentals.mysql.database.close_ssh_tunnel") as closeMock,
+        ):
+            _connect(_settings(tunnel=TUNNEL))
+
+        closeMock.assert_not_called()
+
     def test_does_not_use_a_unix_socket_without_a_tunnel(self):
         connectMock = _connect(_settings(port=3307))
 

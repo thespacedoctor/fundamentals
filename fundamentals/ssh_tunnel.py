@@ -48,7 +48,7 @@ def setup_ssh_tunnel(tunnelParameters, log):
     """
     *start a private ssh tunnel to a remote database host, listening on a unix socket*
 
-    Every call starts its own ssh process, forwarding a unix socket inside a new directory that only the current user can open. No other process can take the place of the tunnel, because nobody else can create a file in that directory. The process is stopped by ``close_ssh_tunnel`` or when the interpreter exits.
+    Every call starts its own ssh process, forwarding a unix socket inside a new directory that only the current user can open. No other process can take the place of the tunnel, because nobody else can create a file in that directory. Tunnels whose ssh process has already exited are closed first. The process is stopped by ``close_ssh_tunnel`` or when the interpreter exits normally. The exit cleanup does not run if the interpreter is killed (for example by ``SIGKILL``) or ends with ``os._exit``, and the library installs no signal handlers.
 
     **Key Arguments**
 
@@ -70,6 +70,7 @@ def setup_ssh_tunnel(tunnelParameters, log):
 
     Raises ``tunnel_error`` if the settings are invalid, ssh cannot be started, ssh exits, or the tunnel does not connect.
     """
+    _close_exited_tunnels(log)
     remoteUser, remoteIp, remoteHost, _ = _validate_tunnel_parameters(tunnelParameters)
 
     socketPath = _make_socket_path()
@@ -78,6 +79,13 @@ def setup_ssh_tunnel(tunnelParameters, log):
         "-nN",
         "-o",
         "ExitOnForwardFailure=yes",
+        # KEEP THE PROCESS IN THE FOREGROUND AND OFF ANY SHARED CONNECTION, WHATEVER THE USER'S SSH CONFIG SAYS
+        "-o",
+        "ForkAfterAuthentication=no",
+        "-o",
+        "ControlMaster=no",
+        "-o",
+        "ControlPath=none",
         f"{remoteUser}@{remoteIp}",
         "-L",
         f"{socketPath}:{remoteHost}:{REMOTE_DATABASE_PORT}",
@@ -102,24 +110,59 @@ def close_ssh_tunnel(socketPath, log=None):
     """
     *stop the ssh process serving a tunnel started by ``setup_ssh_tunnel`` and remove its socket directory*
 
-    Does nothing if the tunnel is unknown or already closed.
+    Does nothing if the tunnel is unknown or already closed. The socket directory is always removed. Registered cleanup runs at normal interpreter exit only, not after ``SIGKILL`` or ``os._exit``.
 
     **Key Arguments**
 
     - ``socketPath`` -- the socket path returned by ``setup_ssh_tunnel``
-    - ``log`` -- logger, used to report a socket directory that could not be removed. Default *None*
+    - ``log`` -- logger, used to report cleanup problems. Default *None*
     """
-    process = TUNNEL_PROCESSES.pop(socketPath, None)
+    process = TUNNEL_PROCESSES.get(socketPath)
     if process is None:
         return
-    if process.poll() is None:
+    try:
+        _stop_process(process, socketPath, log)
+    finally:
+        TUNNEL_PROCESSES.pop(socketPath, None)
+        _remove_socket_dir(socketPath, log)
+
+
+def _stop_process(process, socketPath, log):
+    """
+    *terminate an ssh process, killing it if it does not stop in time*
+    """
+    if process.poll() is not None:
+        return
+    try:
         process.terminate()
-        try:
-            process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
-        except TimeoutExpired:
-            process.kill()
-            process.wait()
-    _remove_socket_dir(socketPath, log)
+        process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
+    except ProcessLookupError:
+        return
+    except TimeoutExpired:
+        _kill_process(process, socketPath, log)
+
+
+def _kill_process(process, socketPath, log):
+    """
+    *kill an ssh process that ignored terminate and wait a limited time for it to go*
+    """
+    try:
+        process.kill()
+        process.wait(timeout=TUNNEL_CLOSE_TIMEOUT)
+    except ProcessLookupError:
+        return
+    except TimeoutExpired:
+        if log is not None:
+            log.warning(f"the ssh process for `{socketPath}` did not stop after kill")
+
+
+def _close_exited_tunnels(log):
+    """
+    *close every registered tunnel whose ssh process has exited*
+    """
+    for socketPath, process in list(TUNNEL_PROCESSES.items()):
+        if process.poll() is not None:
+            close_ssh_tunnel(socketPath, log)
 
 
 def _make_socket_path():
@@ -250,3 +293,8 @@ def _check_value(key, tunnelParameters, pattern):
     if not isinstance(value, str) or not pattern.fullmatch(value):
         raise tunnel_error(f"the tunnel `{key}` setting is not valid: {value!r}")
     return value
+
+
+if hasattr(os, "register_at_fork"):
+    # A FORKED CHILD MUST NOT CLOSE THE TUNNELS OF ITS PARENT
+    os.register_at_fork(after_in_child=TUNNEL_PROCESSES.clear)

@@ -72,6 +72,12 @@ class test_setup_ssh_tunnel(unittest.TestCase):
                 "-nN",
                 "-o",
                 "ExitOnForwardFailure=yes",
+                "-o",
+                "ForkAfterAuthentication=no",
+                "-o",
+                "ControlMaster=no",
+                "-o",
+                "ControlPath=none",
                 "monster@psweb.example.ac.uk",
                 "-L",
                 f"{socketPath}:dormammu:3306",
@@ -158,6 +164,36 @@ class test_setup_ssh_tunnel(unittest.TestCase):
         with mock.patch(SOCKET_CHECK, return_value=True):
             with self.assertRaises(tunnel_error):
                 setup_ssh_tunnel(TUNNEL, self.log)
+
+    def test_closes_registered_tunnels_whose_ssh_process_has_exited(self):
+        from fundamentals import ssh_tunnel
+
+        deadDir = tempfile.mkdtemp(prefix="fundamentals-tunnel-")
+        self.addCleanup(shutil.rmtree, deadDir, True)
+        deadPath = os.path.join(deadDir, "mysql.sock")
+        deadProcess = mock.MagicMock()
+        deadProcess.poll.return_value = 1
+        ssh_tunnel.TUNNEL_PROCESSES[deadPath] = deadProcess
+
+        with mock.patch(SOCKET_CHECK, return_value=True):
+            livePath = ssh_tunnel.setup_ssh_tunnel(TUNNEL, self.log)
+
+        self.assertNotIn(deadPath, ssh_tunnel.TUNNEL_PROCESSES)
+        self.assertFalse(os.path.exists(deadDir))
+        self.assertIn(livePath, ssh_tunnel.TUNNEL_PROCESSES)
+
+    def test_leaves_registered_tunnels_whose_ssh_process_is_alive(self):
+        from fundamentals import ssh_tunnel
+
+        aliveProcess = mock.MagicMock()
+        aliveProcess.poll.return_value = None
+        ssh_tunnel.TUNNEL_PROCESSES["/alive/mysql.sock"] = aliveProcess
+
+        with mock.patch(SOCKET_CHECK, return_value=True):
+            ssh_tunnel.setup_ssh_tunnel(TUNNEL, self.log)
+
+        self.assertIn("/alive/mysql.sock", ssh_tunnel.TUNNEL_PROCESSES)
+        aliveProcess.terminate.assert_not_called()
 
     def test_registers_the_tunnel_for_closing_at_interpreter_exit(self):
         from fundamentals.ssh_tunnel import setup_ssh_tunnel, close_ssh_tunnel
@@ -271,8 +307,10 @@ class test_close_ssh_tunnel(unittest.TestCase):
 
         close_ssh_tunnel(self.socketPath)
 
+        from fundamentals.ssh_tunnel import TUNNEL_CLOSE_TIMEOUT
+
         self.processMock.terminate.assert_called_once()
-        self.processMock.wait.assert_called_once()
+        self.processMock.wait.assert_called_once_with(timeout=TUNNEL_CLOSE_TIMEOUT)
         self.assertNotIn(self.socketPath, TUNNEL_PROCESSES)
 
     def test_removes_the_socket_directory(self):
@@ -284,13 +322,53 @@ class test_close_ssh_tunnel(unittest.TestCase):
 
     def test_kills_the_ssh_process_when_it_ignores_terminate(self):
         import subprocess
-        from fundamentals.ssh_tunnel import close_ssh_tunnel
+        from fundamentals.ssh_tunnel import close_ssh_tunnel, TUNNEL_CLOSE_TIMEOUT
 
         self.processMock.wait.side_effect = [subprocess.TimeoutExpired("ssh", 1), 0]
 
         close_ssh_tunnel(self.socketPath)
 
         self.processMock.kill.assert_called_once()
+        self.assertEqual(
+            self.processMock.wait.call_args_list,
+            [mock.call(timeout=TUNNEL_CLOSE_TIMEOUT)] * 2,
+        )
+
+    def test_still_removes_the_directory_when_the_killed_process_cannot_be_reaped(
+        self,
+    ):
+        import subprocess
+        from fundamentals.ssh_tunnel import close_ssh_tunnel, TUNNEL_PROCESSES
+
+        self.processMock.wait.side_effect = subprocess.TimeoutExpired("ssh", 1)
+        log = mock.MagicMock()
+
+        close_ssh_tunnel(self.socketPath, log)
+
+        self.assertFalse(os.path.exists(self.socketDir))
+        self.assertNotIn(self.socketPath, TUNNEL_PROCESSES)
+        log.warning.assert_called()
+
+    def test_still_removes_the_directory_when_the_process_has_vanished(self):
+        from fundamentals.ssh_tunnel import close_ssh_tunnel, TUNNEL_PROCESSES
+
+        self.processMock.terminate.side_effect = ProcessLookupError()
+
+        close_ssh_tunnel(self.socketPath)
+
+        self.assertFalse(os.path.exists(self.socketDir))
+        self.assertNotIn(self.socketPath, TUNNEL_PROCESSES)
+
+    def test_still_removes_the_directory_when_kill_finds_no_process(self):
+        import subprocess
+        from fundamentals.ssh_tunnel import close_ssh_tunnel
+
+        self.processMock.wait.side_effect = subprocess.TimeoutExpired("ssh", 1)
+        self.processMock.kill.side_effect = ProcessLookupError()
+
+        close_ssh_tunnel(self.socketPath)
+
+        self.assertFalse(os.path.exists(self.socketDir))
 
     def test_does_not_signal_a_process_that_has_already_exited(self):
         from fundamentals.ssh_tunnel import close_ssh_tunnel
@@ -364,3 +442,89 @@ class test_is_unix_socket_open(unittest.TestCase):
             [call[0] for call in sock.method_calls[:2]], ["settimeout", "connect"]
         )
         sock.settimeout.assert_called_once_with(TUNNEL_CONNECT_TIMEOUT)
+
+
+@unittest.skipUnless(hasattr(os, "fork"), "needs os.fork")
+class test_fork_safety(unittest.TestCase):
+    def test_a_forked_child_does_not_close_the_tunnels_of_its_parent(self):
+        from fundamentals import ssh_tunnel
+
+        socketDir = tempfile.mkdtemp(prefix="fundamentals-tunnel-")
+        self.addCleanup(shutil.rmtree, socketDir, True)
+        socketPath = os.path.join(socketDir, "mysql.sock")
+        processMock = mock.MagicMock()
+        processMock.poll.return_value = None
+        ssh_tunnel.TUNNEL_PROCESSES[socketPath] = processMock
+        self.addCleanup(ssh_tunnel.TUNNEL_PROCESSES.clear)
+
+        pid = os.fork()
+        if pid == 0:
+            exitCode = 1
+            try:
+                ssh_tunnel.close_ssh_tunnel(socketPath)
+                exitCode = 0 if not processMock.terminate.called else 2
+            finally:
+                os._exit(exitCode)
+        _, status = os.waitpid(pid, 0)
+
+        self.assertEqual(os.waitstatus_to_exitcode(status), 0)
+        self.assertIn(socketPath, ssh_tunnel.TUNNEL_PROCESSES)
+        self.assertTrue(os.path.isdir(socketDir))
+        processMock.terminate.assert_not_called()
+
+
+STUB_SSH = """#!{python}
+import os, signal, socket, sys, time
+args = sys.argv[1:]
+forward = args[args.index("-L") + 1]
+socketPath = forward.rsplit(":", 2)[0]
+server = socket.socket(socket.AF_UNIX)
+server.bind(socketPath)
+server.listen(5)
+time.sleep(60)
+"""
+
+
+@unittest.skipUnless(os.name == "posix", "needs a POSIX system")
+class test_tunnel_with_a_real_process(unittest.TestCase):
+    def setUp(self):
+        import sys
+        from fundamentals import ssh_tunnel
+
+        binDir = tempfile.mkdtemp(prefix="fundamentals-stub-")
+        self.addCleanup(shutil.rmtree, binDir, True)
+        stubPath = os.path.join(binDir, "ssh")
+        with open(stubPath, "w") as stream:
+            stream.write(STUB_SSH.format(python=sys.executable))
+        os.chmod(stubPath, 0o755)
+        patchers = [
+            mock.patch.dict(
+                os.environ, {"PATH": binDir + os.pathsep + os.environ["PATH"]}
+            ),
+            mock.patch("fundamentals.ssh_tunnel.atexit.register"),
+        ]
+        for patcher in patchers:
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.addCleanup(self._close_all_tunnels, ssh_tunnel)
+
+    @staticmethod
+    def _close_all_tunnels(ssh_tunnel):
+        for socketPath in list(ssh_tunnel.TUNNEL_PROCESSES):
+            ssh_tunnel.close_ssh_tunnel(socketPath)
+
+    def test_opens_a_connectable_socket_and_close_removes_process_and_directory(self):
+        import socket
+        from fundamentals import ssh_tunnel
+
+        socketPath = ssh_tunnel.setup_ssh_tunnel(TUNNEL, mock.MagicMock())
+        process = ssh_tunnel.TUNNEL_PROCESSES[socketPath]
+
+        with socket.socket(socket.AF_UNIX) as client:
+            client.connect(socketPath)
+        self.assertIsNone(process.poll())
+
+        ssh_tunnel.close_ssh_tunnel(socketPath)
+
+        self.assertIsNotNone(process.poll())
+        self.assertFalse(os.path.exists(os.path.dirname(socketPath)))

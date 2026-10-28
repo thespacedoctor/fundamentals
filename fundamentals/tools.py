@@ -22,7 +22,7 @@ from collections import OrderedDict
 import logging
 import shutil
 from . import logs as dl
-from .ssh_tunnel import setup_ssh_tunnel
+from .ssh_tunnel import close_ssh_tunnel, setup_ssh_tunnel
 from docopt import docopt
 
 from os.path import expanduser
@@ -112,9 +112,9 @@ class tools(object):
             port: 9002
 
     # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
-    # A private ssh process forwards a unix socket in a new 0700 directory, and the database
-    # connection is made through that socket. `port` must still be a valid port number, but it is
-    # no longer used: nothing listens on a TCP port, so no other process can take the tunnel's place.
+    # A PRIVATE SSH PROCESS FORWARDS A UNIX SOCKET IN A NEW 0700 DIRECTORY, AND THE DATABASE
+    # CONNECTION IS MADE THROUGH THAT SOCKET. `port` MUST STILL BE A VALID PORT NUMBER, BUT IT IS
+    # NO LONGER USED: NOTHING LISTENS ON A TCP PORT, SO NO OTHER PROCESS CAN TAKE THE TUNNEL'S PLACE.
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
 
@@ -452,20 +452,25 @@ class tools(object):
         )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
-        thisConn = ms.connect(
-            host=databaseSettings["host"],
-            user=databaseSettings["user"],
-            passwd=databaseSettings["password"],
-            db=databaseSettings["db"],
-            unix_socket=socketPath,
-            use_unicode=True,
-            charset="utf8",
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000,
-            max_allowed_packet=51200000,
-        )
-        thisConn.autocommit(True)
+        try:
+            thisConn = ms.connect(
+                host=databaseSettings["host"],
+                user=databaseSettings["user"],
+                passwd=databaseSettings["password"],
+                db=databaseSettings["db"],
+                unix_socket=socketPath,
+                use_unicode=True,
+                charset="utf8",
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=36000,
+                max_allowed_packet=51200000,
+            )
+            thisConn.autocommit(True)
+        except BaseException:
+            # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            close_ssh_tunnel(socketPath, self.log)
+            raise
         self.remoteDBConn = thisConn
 
         return None
