@@ -323,10 +323,8 @@ def _create_column(log, dbConn, dbTableName, key, formattedKey, definition):
         raise
 
 
-def _add_column_if_missing(
-    log, dbConn, dbTableName, key, formattedKey, value, reDatetime
-):
-    """*add the column to the table if it does not exist yet*
+def _ensure_column(log, dbConn, dbTableName, key, formattedKey, value, reDatetime):
+    """*add the column to the table (``ALTER TABLE``) if it does not exist yet*
 
     **Return**
 
@@ -341,8 +339,8 @@ def _add_column_if_missing(
     return True
 
 
-def _collect_columns(log, dbConn, dbTableName, rows, reDatetime, addColumns):
-    """*return the column names and the values to insert for the rows, adding any missing columns to the table if ``addColumns``*
+def _prepare_columns(log, dbConn, dbTableName, rows, reDatetime, addColumns):
+    """*return the column names and the values to insert for the rows, and ``ALTER`` the table to add any missing columns if ``addColumns``*
 
     **Return**
 
@@ -359,10 +357,12 @@ def _collect_columns(log, dbConn, dbTableName, rows, reDatetime, addColumns):
         quote_identifier(formattedKey)
 
         value = _yaml_first_item(value)
-        if addColumns and not _add_column_if_missing(
-            log, dbConn, dbTableName, key, formattedKey, value, reDatetime
-        ):
-            continue
+        if addColumns:
+            isStorable = _ensure_column(
+                log, dbConn, dbTableName, key, formattedKey, value, reDatetime
+            )
+            if not isStorable:
+                continue
         formattedKeyList.append(formattedKey)
         myValues.append(_row_value(value))
     return formattedKeyList, myValues
@@ -533,7 +533,7 @@ def convert_dictionary_to_mysql_table(
         insertVerb = "INSERT IGNORE"
 
     if isinstance(dictionary, dict):
-        # REFUSE KEYS THAT GIVE THE SAME COLUMN, BEFORE ANY TABLE IS CREATED
+        # REFUSE CLASHING KEYS BEFORE ANY TABLE IS CREATED (NON-DICTS ARE REJECTED LATER BY THE ARGUMENT CHECKS)
         raise_on_duplicate_columns(dictionary.keys())
 
     if returnInsertOnly == False:
@@ -543,7 +543,7 @@ def convert_dictionary_to_mysql_table(
     # ITERATE THROUGH THE DICTIONARY AND GENERATE THE TABLE COLUMN WITH THE
     # NAME OF THE KEY, IF IT DOES NOT EXIST
     rows = _prepare_rows(dictionary, dateModified, replace)
-    formattedKeyList, myValues = _collect_columns(
+    formattedKeyList, myValues = _prepare_columns(
         log, dbConn, dbTableName, rows, reDatetime, returnInsertOnly == False
     )
 
