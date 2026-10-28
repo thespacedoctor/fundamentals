@@ -3,11 +3,14 @@
 
 **Unreleased**
 
+* **ENHANCEMENT:** `directory_script_runner` background mode (`waitForResult=False`) runs at most `maxParallelScripts` mysql scripts at once (default 8, per call) and still returns at once; scripts queued behind the limit always run, so the program waits for them before it exits, and mysql error output in the log is capped to its last 64 KB (DY-2046)
 * **REFACTOR:** the SQL helpers (`sql_identifiers`, `sql_values`, `sql_inserts`) and the MySQL retry loop are now shared modules, and unused imports are removed
+* **REFACTOR:** `convert_dictionary_to_mysql_table` is split into small private functions, one for each step (argument checks, table creation, column types, unique keys, insert), with no change in behaviour except that a `uniqueKeyList` that is not a list is now ignored when `returnInsertOnly=True` (DY-2047)
 * **DOCS:** the Sphinx build has no warnings or errors: stale autosummary pages are removed, broken docstring code blocks are fixed, the API pages are regenerated, and the examples show the nested tunnel settings (DY-1598)
 * **FIXED:** `exec()` on command-line arguments is removed from `tools` and from the `sqlite2mysql`, `mysqlSucker` and `yaml2db` commands, so the commands work again and an argument with a backslash or quote no longer crashes or runs code (DY-2004)
 * **FIXED:** `tools` always gets a logger, falling back to a console logger, and reads the settings file and the logger config from the same argument key (DY-2005)
 * **FIXED:** SSH tunnels use one shared helper and one settings layout, `database settings: tunnel:` with remote user, ip, host and port; `ssh` starts without a shell, the settings values are validated, the connection check stops as soon as it connects and each check times out after 5 s; a failure raises `tunnel_error` instead of exiting with status 0; the old top-level `ssh tunnel` key is no longer read (DY-2006)
+* **FIXED:** the ssh tunnel no longer trusts whatever is already listening on the local port: each run starts its own ssh process, forwards to a unix socket in a private temporary folder, and connects through that socket; `setup_ssh_tunnel` now returns the socket path (pass it to `pymysql.connect(unix_socket=...)`), the `checkHost` argument is removed, the `port` tunnel setting is still accepted but no longer used, and the tunnel is closed if the database connection fails, at normal exit, and is never closed by a forked child (DY-2044)
 * **FIXED:** `tools` closes the settings files it opens, and a failure to create the default settings file logs the path and raises `OSError` (DY-2007)
 * **FIXED:** `setup_dryx_logging` applies the YAML on every call, defaults to INFO when there is no root level, and raises `ValueError` for an unknown level (DY-2008)
 * **FIXED:** dead pickle and shell code is removed from the CLI template; `fundamentals init` still opens the settings file, without a shell (DY-2010)

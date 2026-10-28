@@ -22,7 +22,7 @@ from collections import OrderedDict
 import logging
 import shutil
 from . import logs as dl
-from .ssh_tunnel import setup_ssh_tunnel
+from .ssh_tunnel import close_ssh_tunnel, setup_ssh_tunnel
 from docopt import docopt
 
 from os.path import expanduser
@@ -112,6 +112,9 @@ class tools(object):
             port: 9002
 
     # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
+    # A private ssh process forwards a unix socket in a new 0700 directory, and the database
+    # connection is made through that socket. `port` must still be a valid port number, but it is
+    # no longer used: nothing listens on a TCP port, so no other process can take the tunnel's place.
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
 
@@ -443,30 +446,49 @@ class tools(object):
         import pymysql as ms
 
         databaseSettings = self.settings["database settings"]
-        sshPort = setup_ssh_tunnel(
+        socketPath = setup_ssh_tunnel(
             tunnelParameters=databaseSettings["tunnel"],
             log=self.log,
-            checkHost=databaseSettings["host"],
         )
 
         # SETUP A DATABASE CONNECTION FOR THE remote database
-        thisConn = ms.connect(
-            host=databaseSettings["host"],
-            user=databaseSettings["user"],
-            passwd=databaseSettings["password"],
-            db=databaseSettings["db"],
-            port=sshPort,
-            use_unicode=True,
-            charset="utf8",
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000,
-            max_allowed_packet=51200000,
-        )
-        thisConn.autocommit(True)
+        thisConn = None
+        try:
+            thisConn = ms.connect(
+                host=databaseSettings["host"],
+                user=databaseSettings["user"],
+                passwd=databaseSettings["password"],
+                db=databaseSettings["db"],
+                unix_socket=socketPath,
+                use_unicode=True,
+                charset="utf8",
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=36000,
+                max_allowed_packet=51200000,
+            )
+            thisConn.autocommit(True)
+        except BaseException:
+            # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            try:
+                self._close_quietly(thisConn)
+            finally:
+                close_ssh_tunnel(socketPath, self.log)
+            raise
         self.remoteDBConn = thisConn
 
         return None
+
+    def _close_quietly(self, connection):
+        """
+        *close a database connection, if there is one, and ignore any error from closing it*
+        """
+        if connection is None:
+            return
+        try:
+            connection.close()
+        except Exception as e:
+            self.log.debug(f"could not close the database connection: {e}")
 
     def _create_or_verify_settings(self, pathToSettings, create=False):
         """*create and/or verify a settings file at a given path*
