@@ -183,7 +183,7 @@ TUNNEL_DICT_YAML = """
 
 class test_tools_tunnel(unittest.TestCase):
 
-    def _build_tools(self, tunnelValue):
+    def _build_tools(self, tunnelValue, configureConnect=None):
         import os
         import tempfile
         from unittest import mock
@@ -194,6 +194,8 @@ class test_tools_tunnel(unittest.TestCase):
             with open(settingsFile, "w") as stream:
                 stream.write(TUNNEL_YAML % tunnelValue)
             with mock.patch("pymysql.connect") as connectMock:
+                if configureConnect:
+                    configureConnect(connectMock)
                 su = tools(
                     arguments={"settingsFile": settingsFile},
                     docString="",
@@ -201,16 +203,101 @@ class test_tools_tunnel(unittest.TestCase):
                 )
         return su, connectMock
 
-    def test_connects_through_the_nested_tunnel_port(self):
+    def _assert_tunnel_closed_when_connecting_fails(self, configureConnect):
+        from unittest import mock
+
+        with (
+            mock.patch(
+                "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
+            ),
+            mock.patch("fundamentals.tools.close_ssh_tunnel") as closeMock,
+        ):
+            with self.assertRaises(RuntimeError):
+                self._build_tools("\n" + TUNNEL_DICT_YAML, configureConnect)
+
+        closeMock.assert_called_once()
+        self.assertEqual(closeMock.call_args.args[0], "/tmp/t/mysql.sock")
+
+    def test_closes_the_tunnel_when_the_database_connection_fails(self):
+        def failToConnect(connectMock):
+            connectMock.side_effect = RuntimeError("refused")
+
+        self._assert_tunnel_closed_when_connecting_fails(failToConnect)
+
+    def test_closes_the_tunnel_when_setting_autocommit_fails(self):
+        def failAutocommit(connectMock):
+            connectMock.return_value.autocommit.side_effect = RuntimeError("boom")
+
+        self._assert_tunnel_closed_when_connecting_fails(failAutocommit)
+
+    def _autocommit_failure_with_close(self, closeError=None):
+        from unittest import mock
+
+        events = []
+
+        def failAutocommit(connectMock):
+            connection = connectMock.return_value
+            connection.autocommit.side_effect = RuntimeError("boom")
+
+            def closeConnection():
+                events.append("connection closed")
+                if closeError:
+                    raise closeError
+
+            connection.close.side_effect = closeConnection
+
+        with (
+            mock.patch(
+                "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
+            ),
+            mock.patch(
+                "fundamentals.tools.close_ssh_tunnel",
+                side_effect=lambda *args: events.append("tunnel closed"),
+            ),
+        ):
+            with self.assertRaises(RuntimeError) as context:
+                self._build_tools("\n" + TUNNEL_DICT_YAML, failAutocommit)
+        return events, context.exception
+
+    def test_closes_the_connection_before_the_tunnel_when_autocommit_fails(self):
+        events, _ = self._autocommit_failure_with_close()
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+
+    def test_still_closes_the_tunnel_and_raises_the_original_error_when_close_fails(
+        self,
+    ):
+        events, error = self._autocommit_failure_with_close(OSError("gone"))
+
+        self.assertEqual(events, ["connection closed", "tunnel closed"])
+        self.assertEqual(str(error), "boom")
+
+    def test_leaves_the_tunnel_open_when_the_connection_succeeds(self):
+        from unittest import mock
+
+        with (
+            mock.patch(
+                "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
+            ),
+            mock.patch("fundamentals.tools.close_ssh_tunnel") as closeMock,
+        ):
+            self._build_tools("\n" + TUNNEL_DICT_YAML)
+
+        closeMock.assert_not_called()
+
+    def test_connects_through_the_tunnel_unix_socket(self):
         from unittest import mock
 
         with mock.patch(
-            "fundamentals.tools.setup_ssh_tunnel", return_value=9006
+            "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
         ) as tunnelMock:
             su, connectMock = self._build_tools("\n" + TUNNEL_DICT_YAML)
 
         self.assertEqual(tunnelMock.call_args.kwargs["tunnelParameters"]["port"], 9006)
-        self.assertEqual(connectMock.call_args.kwargs["port"], 9006)
+        self.assertEqual(
+            connectMock.call_args.kwargs["unix_socket"], "/tmp/t/mysql.sock"
+        )
+        self.assertNotIn("port", connectMock.call_args.kwargs)
         self.assertIs(su.setup()[3], connectMock.return_value)
 
     def test_does_not_start_a_tunnel_when_tunnel_is_false(self):
@@ -234,7 +321,7 @@ class test_tools_tunnel(unittest.TestCase):
 
         with (
             mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+            mock.patch("fundamentals.ssh_tunnel.is_unix_socket_open", return_value=False),
             mock.patch("fundamentals.ssh_tunnel.time.sleep"),
         ):
             with self.assertRaises(tunnel_error):

@@ -19,7 +19,7 @@ except ImportError:
         import pyreadline3 as readline
     except ImportError:
         readline = None  # or just pass — basic input() still works
-from fundamentals.ssh_tunnel import setup_ssh_tunnel
+from fundamentals.ssh_tunnel import close_ssh_tunnel, setup_ssh_tunnel
 
 
 class database(object):
@@ -98,8 +98,9 @@ class database(object):
         dbSettings = self.dbSettings
 
         port = False
+        unixSocket = None
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
-            port = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
+            unixSocket = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
         elif "port" in dbSettings and dbSettings["port"]:
             port = int(dbSettings["port"])
 
@@ -108,28 +109,50 @@ class database(object):
         user = dbSettings["user"]
         passwd = dbSettings["password"]
         dbName = dbSettings["db"]
-        dbConn = ms.connect(
-            host=host,
-            user=user,
-            passwd=passwd,
-            db=dbName,
-            port=port,
-            use_unicode=True,
-            charset="utf8mb4",
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000,
-            max_allowed_packet=51200000,
-        )
-        if self.autocommit:
-            dbConn.autocommit(True)
+        dbConn = None
+        try:
+            dbConn = ms.connect(
+                host=host,
+                user=user,
+                passwd=passwd,
+                db=dbName,
+                port=port,
+                unix_socket=unixSocket,
+                use_unicode=True,
+                charset="utf8mb4",
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=36000,
+                max_allowed_packet=51200000,
+            )
+            if self.autocommit:
+                dbConn.autocommit(True)
+        except BaseException:
+            # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            try:
+                self._close_quietly(dbConn)
+            finally:
+                if unixSocket:
+                    close_ssh_tunnel(unixSocket, self.log)
+            raise
 
         self.log.debug("completed the ``connect`` method")
         return dbConn
 
+    def _close_quietly(self, connection):
+        """
+        *close a database connection, if there is one, and ignore any error from closing it*
+        """
+        if connection is None:
+            return
+        try:
+            connection.close()
+        except Exception as e:
+            self.log.debug(f"could not close the database connection: {e}")
+
     def _setup_tunnel(self, tunnelParameters):
         """
-        *Setup a ssh tunnel for a database connection to port through*
+        *Setup a private ssh tunnel for a database connection to go through*
 
         **Key Arguments**
 
@@ -138,15 +161,15 @@ class database(object):
 
         **Return**
 
-        - ``sshPort`` -- the port the ssh tunnel is connected via
+        - ``socketPath`` -- the unix socket the ssh tunnel is listening on
 
         Raises ``fundamentals.ssh_tunnel.tunnel_error`` if the tunnel settings are invalid or the tunnel cannot be set up.
         """
         self.log.debug("starting the ``_setup_tunnel`` method")
 
-        sshPort = setup_ssh_tunnel(tunnelParameters=tunnelParameters, log=self.log)
+        socketPath = setup_ssh_tunnel(tunnelParameters=tunnelParameters, log=self.log)
 
         self.log.debug("completed the ``_setup_tunnel`` method")
-        return sshPort
+        return socketPath
 
     # xt-class-method
