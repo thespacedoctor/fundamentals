@@ -15,8 +15,12 @@
 :class: autosummary longtable
 :align: left
 
-* - {py:obj}`is_port_open <fundamentals.ssh_tunnel.is_port_open>`
-  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.is_port_open
+* - {py:obj}`close_ssh_tunnel <fundamentals.ssh_tunnel.close_ssh_tunnel>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.close_ssh_tunnel
+    :summary:
+    ```
+* - {py:obj}`is_unix_socket_open <fundamentals.ssh_tunnel.is_unix_socket_open>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.is_unix_socket_open
     :summary:
     ```
 * - {py:obj}`setup_ssh_tunnel <fundamentals.ssh_tunnel.setup_ssh_tunnel>`
@@ -31,8 +35,16 @@
 :class: autosummary longtable
 :align: left
 
+* - {py:obj}`LOGGER <fundamentals.ssh_tunnel.LOGGER>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.LOGGER
+    :summary:
+    ```
 * - {py:obj}`MAX_PORT <fundamentals.ssh_tunnel.MAX_PORT>`
   - ```{autodoc2-docstring} fundamentals.ssh_tunnel.MAX_PORT
+    :summary:
+    ```
+* - {py:obj}`MAX_SOCKET_PATH <fundamentals.ssh_tunnel.MAX_SOCKET_PATH>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.MAX_SOCKET_PATH
     :summary:
     ```
 * - {py:obj}`REMOTE_DATABASE_PORT <fundamentals.ssh_tunnel.REMOTE_DATABASE_PORT>`
@@ -47,8 +59,20 @@
   - ```{autodoc2-docstring} fundamentals.ssh_tunnel.SAFE_HOST
     :summary:
     ```
+* - {py:obj}`SAFE_NAME_PATTERN <fundamentals.ssh_tunnel.SAFE_NAME_PATTERN>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.SAFE_NAME_PATTERN
+    :summary:
+    ```
 * - {py:obj}`SAFE_USER <fundamentals.ssh_tunnel.SAFE_USER>`
   - ```{autodoc2-docstring} fundamentals.ssh_tunnel.SAFE_USER
+    :summary:
+    ```
+* - {py:obj}`SOCKET_DIR_PREFIX <fundamentals.ssh_tunnel.SOCKET_DIR_PREFIX>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.SOCKET_DIR_PREFIX
+    :summary:
+    ```
+* - {py:obj}`SOCKET_NAME <fundamentals.ssh_tunnel.SOCKET_NAME>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.SOCKET_NAME
     :summary:
     ```
 * - {py:obj}`TUNNEL_CHECK_ATTEMPTS <fundamentals.ssh_tunnel.TUNNEL_CHECK_ATTEMPTS>`
@@ -59,8 +83,16 @@
   - ```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_CHECK_DELAY
     :summary:
     ```
+* - {py:obj}`TUNNEL_CLOSE_TIMEOUT <fundamentals.ssh_tunnel.TUNNEL_CLOSE_TIMEOUT>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_CLOSE_TIMEOUT
+    :summary:
+    ```
 * - {py:obj}`TUNNEL_CONNECT_TIMEOUT <fundamentals.ssh_tunnel.TUNNEL_CONNECT_TIMEOUT>`
   - ```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_CONNECT_TIMEOUT
+    :summary:
+    ```
+* - {py:obj}`TUNNEL_PROCESSES <fundamentals.ssh_tunnel.TUNNEL_PROCESSES>`
+  - ```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_PROCESSES
     :summary:
     ```
 * - {py:obj}`TUNNEL_REQUIRED_KEYS <fundamentals.ssh_tunnel.TUNNEL_REQUIRED_KEYS>`
@@ -71,12 +103,32 @@
 
 ### API
 
+````{py:data} LOGGER
+:canonical: fundamentals.ssh_tunnel.LOGGER
+:value: >
+   'getLogger(...)'
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.LOGGER
+```
+
+````
+
 ````{py:data} MAX_PORT
 :canonical: fundamentals.ssh_tunnel.MAX_PORT
 :value: >
    65535
 
 ```{autodoc2-docstring} fundamentals.ssh_tunnel.MAX_PORT
+```
+
+````
+
+````{py:data} MAX_SOCKET_PATH
+:canonical: fundamentals.ssh_tunnel.MAX_SOCKET_PATH
+:value: >
+   103
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.MAX_SOCKET_PATH
 ```
 
 ````
@@ -111,12 +163,42 @@
 
 ````
 
+````{py:data} SAFE_NAME_PATTERN
+:canonical: fundamentals.ssh_tunnel.SAFE_NAME_PATTERN
+:value: >
+   '^[A-Za-z0-9_][A-Za-z0-9._-]*$'
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.SAFE_NAME_PATTERN
+```
+
+````
+
 ````{py:data} SAFE_USER
 :canonical: fundamentals.ssh_tunnel.SAFE_USER
 :value: >
    'compile(...)'
 
 ```{autodoc2-docstring} fundamentals.ssh_tunnel.SAFE_USER
+```
+
+````
+
+````{py:data} SOCKET_DIR_PREFIX
+:canonical: fundamentals.ssh_tunnel.SOCKET_DIR_PREFIX
+:value: >
+   'fundamentals-tunnel-'
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.SOCKET_DIR_PREFIX
+```
+
+````
+
+````{py:data} SOCKET_NAME
+:canonical: fundamentals.ssh_tunnel.SOCKET_NAME
+:value: >
+   'mysql.sock'
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.SOCKET_NAME
 ```
 
 ````
@@ -141,12 +223,32 @@
 
 ````
 
+````{py:data} TUNNEL_CLOSE_TIMEOUT
+:canonical: fundamentals.ssh_tunnel.TUNNEL_CLOSE_TIMEOUT
+:value: >
+   5
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_CLOSE_TIMEOUT
+```
+
+````
+
 ````{py:data} TUNNEL_CONNECT_TIMEOUT
 :canonical: fundamentals.ssh_tunnel.TUNNEL_CONNECT_TIMEOUT
 :value: >
    5
 
 ```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_CONNECT_TIMEOUT
+```
+
+````
+
+````{py:data} TUNNEL_PROCESSES
+:canonical: fundamentals.ssh_tunnel.TUNNEL_PROCESSES
+:value: >
+   None
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.TUNNEL_PROCESSES
 ```
 
 ````
@@ -161,14 +263,21 @@
 
 ````
 
-````{py:function} is_port_open(address, port, log)
-:canonical: fundamentals.ssh_tunnel.is_port_open
+````{py:function} close_ssh_tunnel(socketPath, log=None)
+:canonical: fundamentals.ssh_tunnel.close_ssh_tunnel
 
-```{autodoc2-docstring} fundamentals.ssh_tunnel.is_port_open
+```{autodoc2-docstring} fundamentals.ssh_tunnel.close_ssh_tunnel
 ```
 ````
 
-````{py:function} setup_ssh_tunnel(tunnelParameters, log, checkHost='127.0.0.1')
+````{py:function} is_unix_socket_open(socketPath, log)
+:canonical: fundamentals.ssh_tunnel.is_unix_socket_open
+
+```{autodoc2-docstring} fundamentals.ssh_tunnel.is_unix_socket_open
+```
+````
+
+````{py:function} setup_ssh_tunnel(tunnelParameters, log)
 :canonical: fundamentals.ssh_tunnel.setup_ssh_tunnel
 
 ```{autodoc2-docstring} fundamentals.ssh_tunnel.setup_ssh_tunnel

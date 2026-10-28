@@ -27,6 +27,10 @@ orphan: true
   - ```{autodoc2-docstring} fundamentals.mysql._retry.next_retry_delay
     :summary:
     ```
+* - {py:obj}`run_with_retries <fundamentals.mysql._retry.run_with_retries>`
+  - ```{autodoc2-docstring} fundamentals.mysql._retry.run_with_retries
+    :summary:
+    ```
 ````
 
 ### Data
@@ -162,5 +166,12 @@ orphan: true
 :canonical: fundamentals.mysql._retry.next_retry_delay
 
 ```{autodoc2-docstring} fundamentals.mysql._retry.next_retry_delay
+```
+````
+
+````{py:function} run_with_retries(log, operation)
+:canonical: fundamentals.mysql._retry.run_with_retries
+
+```{autodoc2-docstring} fundamentals.mysql._retry.run_with_retries
 ```
 ````
