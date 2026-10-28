@@ -384,8 +384,7 @@ def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
         try:
             p.wait()
         finally:
-            if p.poll() is None:
-                _kill_and_reap(p, os.path.basename(scriptPath), log)
+            _kill_and_reap(p, os.path.basename(scriptPath), log)
         stderr = _read_stderr_tail(stderrFile)
     if p.returncode:
         log.error(
@@ -396,24 +395,30 @@ def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
 
 
 def _kill_and_reap(p, scriptname, log):
-    """*kill a mysql process and wait for it, logging (not raising) any OS error*
+    """*kill a mysql process that is still running and wait for it*
 
-    Used while another exception is in flight, so an error here must not replace it.
+    Used while another exception is in flight, so only OS errors from ``poll``, ``kill`` and ``wait`` are swallowed (each is logged as a warning), and they never replace the original exception. ``wait`` still runs after a failed ``kill``.
 
     **Key Arguments:**
 
-    - ``p`` -- the running Popen process
+    - ``p`` -- the Popen process
     - ``scriptname`` -- name of the script the process is running, for the log
     - ``log`` -- logger
     """
     try:
-        p.kill()
-        p.wait()
+        if p.poll() is not None:
+            return None
     except OSError as e:
-        log.warning(
-            "MySQL Script `%s` process could not be killed and reaped: '%s'"
-            % (scriptname, e)
-        )
+        log.warning("MySQL Script `%s` process poll failed: '%s'" % (scriptname, e))
+        return None
+
+    for stepName, step in (("kill", p.kill), ("wait", p.wait)):
+        try:
+            step()
+        except OSError as e:
+            log.warning(
+                "MySQL Script `%s` process %s failed: '%s'" % (scriptname, stepName, e)
+            )
     return None
 
 
