@@ -533,7 +533,8 @@ def convert_dictionary_to_mysql_table(
         insertVerb = "INSERT IGNORE"
 
     if isinstance(dictionary, dict):
-        # REFUSE CLASHING KEYS BEFORE ANY TABLE IS CREATED (NON-DICTS ARE REJECTED LATER BY THE ARGUMENT CHECKS)
+        # REFUSE CLASHING KEYS BEFORE ANY TABLE IS CREATED (NON-DICTS ARE
+        # REJECTED LATER BY THE ARGUMENT CHECKS)
         raise_on_duplicate_columns(dictionary.keys())
 
     if returnInsertOnly == False:

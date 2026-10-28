@@ -1,6 +1,6 @@
 import datetime
+import importlib
 import re
-import sys
 import unittest
 import uuid
 from unittest import mock
@@ -26,7 +26,8 @@ arguments, settings, log, dbConn = su.setup()
 
 RUN_ID = uuid.uuid4().hex[:8]
 MODULE_NAME = "fundamentals.mysql.convert_dictionary_to_mysql_table"
-CONVERT_MODULE = sys.modules[MODULE_NAME]
+# THE PACKAGE __INIT__ REBINDS THE NAME TO THE FUNCTION, HIDING THE SUBMODULE
+CONVERT_MODULE = importlib.import_module(MODULE_NAME)
 ADD_COLUMN_PATTERN = re.compile(r"^ALTER TABLE `[^`]*` ADD `([^`]*)` (.*)$", re.DOTALL)
 
 
@@ -331,14 +332,14 @@ class test_table_and_index_creation(column_test_case):
 class test_argument_checks(unittest.TestCase):
 
     def convert(self, **overrides):
-        arguments = {
+        callKwargs = {
             "dbConn": dbConn,
             "log": log,
             "dictionary": {"a": "x"},
             "dbTableName": unique_table_name("checks"),
         }
-        arguments.update(overrides)
-        return convert_dictionary_to_mysql_table(**arguments)
+        callKwargs.update(overrides)
+        return convert_dictionary_to_mysql_table(**callKwargs)
 
     def test_raises_type_error_without_a_database_connection(self):
         # ARRANGE / ACT / ASSERT
