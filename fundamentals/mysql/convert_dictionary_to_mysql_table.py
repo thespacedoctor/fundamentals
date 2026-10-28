@@ -9,8 +9,10 @@ Author
 
 import six
 from fundamentals.mysql import writequery, table_exists, readquery
+from fundamentals.mysql._log_safety import escape_for_log
 from fundamentals import times
 from fundamentals.mysql.sql_identifiers import (
+    cap_identifier,
     normalise_column_name,
     quote_identifier,
     raise_on_duplicate_columns,
@@ -43,6 +45,10 @@ LONG_STRING_BASE_WIDTH = 450
 
 # INTEGERS UP TO THIS SIZE (EITHER SIGN) GET A TINYINT COLUMN
 TINYINT_MAX_SIZE = 9
+
+
+class insert_error(Exception):
+    """*raised when the insert of the dictionary into the database table fails*"""
 
 
 def _sql_literal(value):
@@ -122,11 +128,15 @@ def _check_list_value(log, key, value):
     """*raise a ValueError if a ``[value, comment]`` list is not a pair or its value has an unsuitable type*"""
     if len(value) != 2:
         message = 'Please make sure the list values in "dictionary" 2 items in length'
-        log.critical("%s: in %s we have a %s (%s)" % (message, key, value, type(value)))
+        log.critical(
+            "%s: in %s we have a %s" % (message, escape_for_log(key), type(value))
+        )
         raise ValueError(message)
     if not (isinstance(value[0], ALLOWED_VALUE_TYPES) or value[0] == None):
         message = 'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool'
-        log.critical("%s: in %s we have a %s (%s)" % (message, key, value, type(value)))
+        log.critical(
+            "%s: in %s we have a %s" % (message, escape_for_log(key), type(value[0]))
+        )
         raise ValueError(message)
 
 
@@ -141,7 +151,9 @@ def _check_scalar_value(log, key, value):
             'Please make sure values in "dictionary" are of an appropriate value to add to the database, must be str, float, int or bool : %s is a %s'
             % (key, type(value))
         )
-        log.critical("%s: in %s we have a %s (%s)" % (message, key, value, type(value)))
+        log.critical(
+            "%s: in %s we have a %s" % (message, escape_for_log(key), type(value))
+        )
         raise ValueError(message)
 
 
@@ -306,16 +318,20 @@ def _create_column(log, dbConn, dbTableName, key, formattedKey, definition):
         qCreateColumn += " COMMENT " + _sql_literal("original keyword: " + key)
     try:
         log.info(
-            "creating the " + formattedKey + " column in the " + dbTableName + " table"
+            "creating the "
+            + escape_for_log(formattedKey)
+            + " column in the "
+            + escape_for_log(dbTableName)
+            + " table"
         )
         writequery(log=log, sqlQuery=qCreateColumn, dbConn=dbConn)
 
     except Exception as e:
         log.error(
             "could not create the "
-            + formattedKey
+            + escape_for_log(formattedKey)
             + " column in the "
-            + dbTableName
+            + escape_for_log(dbTableName)
             + " table -- "
             + str(e)
             + "\n"
@@ -373,6 +389,7 @@ def _add_unique_key(log, dbConn, dbTableName, uniqueKeyList):
     uniqueColumns = [normalise_column_name(k) for k in uniqueKeyList]
     indexName = "_".join(uniqueColumns)
     indexName = indexName.lower().replace("  ", " ").replace(" ", "_")
+    indexName = cap_identifier(indexName)
 
     sqlQuery = (
         "SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "
@@ -398,21 +415,20 @@ def _add_unique_key(log, dbConn, dbTableName, uniqueKeyList):
 
 
 def _execute_insert(log, dbConn, dbTableName, insertStatement):
-    """*run the insert statement, logging and re-raising any failure with the table name added to the message*"""
+    """*run the insert statement, logging any failure and raising ``insert_error`` with the table name added to the message*"""
     try:
         writequery(log=log, sqlQuery=insertStatement, dbConn=dbConn)
 
     except Exception as e:
         message = (
             "could not add new data added to the table '"
-            + dbTableName
+            + escape_for_log(dbTableName)
             + "' : "
             + str(e)
             + "\n"
         )
         log.error(message)
-        print(message)
-        raise Exception(message) from e
+        raise insert_error(message) from e
 
 
 def convert_dictionary_to_mysql_table(

@@ -7,6 +7,14 @@ Author
 : David Young
 """
 
+import hashlib
+
+# LONGEST NAME, IN CHARACTERS, MYSQL ACCEPTS FOR A COLUMN OR INDEX
+MYSQL_MAX_IDENTIFIER_LENGTH = 64
+
+# HEX DIGITS OF THE NAME HASH KEPT WHEN A LONG NAME IS SHORTENED
+IDENTIFIER_HASH_LENGTH = 8
+
 
 def quote_identifier(name):
     """*Return a MySQL identifier wrapped in backticks, ready to put in a SQL statement*
@@ -107,3 +115,22 @@ def raise_on_duplicate_columns(keys):
         )
     if messages:
         raise ValueError("; ".join(messages))
+
+
+def cap_identifier(name, maxLength=MYSQL_MAX_IDENTIFIER_LENGTH):
+    """*Return the name shortened to fit the MySQL identifier length limit*
+
+    **Key Arguments**
+
+    - ``name`` -- the identifier, for example an index name
+    - ``maxLength`` -- the longest length allowed, in characters
+
+    **Return**
+
+    - ``cappedName`` -- the name unchanged if it fits, otherwise the start of the name, an underscore and a short hash of the whole name, ``maxLength`` characters in total. The same name always gives the same result, and long names that share a start give different results
+    """
+    if len(name) <= maxLength:
+        return name
+    digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:IDENTIFIER_HASH_LENGTH]
+    prefixLength = maxLength - IDENTIFIER_HASH_LENGTH - 1
+    return name[:prefixLength] + "_" + digest
