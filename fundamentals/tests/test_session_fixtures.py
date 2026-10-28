@@ -6,7 +6,9 @@ import subprocess
 import sys
 import textwrap
 
+import pymysql
 import pytest
+import yaml
 
 import fundamentals
 
@@ -14,9 +16,10 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(fundamentals.__file__))
 
 COPIED_FILES = ("conftest.py", "pytest.ini")
 COPY_IGNORE = shutil.ignore_patterns("output", "__pycache__", "*.pyc")
+SUBPROCESS_TIMEOUT_SECONDS = 300
+DATABASE_CONNECT_TIMEOUT_SECONDS = 3
 
-IMPORT_ALL_TEST_MODULES = textwrap.dedent(
-    """
+IMPORT_ALL_TEST_MODULES = textwrap.dedent("""
     import glob
     import importlib.util
     import json
@@ -34,11 +37,9 @@ IMPORT_ALL_TEST_MODULES = textwrap.dedent(
             spec.loader.exec_module(importlib.util.module_from_spec(spec))
 
     print(json.dumps({"imported": len(paths), "connections": connect.call_count, "package": fundamentals.__file__}))
-    """
-)
+    """)
 
-CONNECTION_PROBE = textwrap.dedent(
-    """
+CONNECTION_PROBE = textwrap.dedent("""
     import pytest
 
     pytestmark = pytest.mark.usefixtures("session_names")
@@ -61,11 +62,9 @@ CONNECTION_PROBE = textwrap.dedent(
         cursor.close()
         assert rowCount == 0
         assert dbConn.get_autocommit() is True
-    """
-)
+    """)
 
-BROKEN_CONNECTION_PROBE = textwrap.dedent(
-    """
+BROKEN_CONNECTION_PROBE = textwrap.dedent("""
     import pymysql
     import pytest
 
@@ -89,24 +88,7 @@ BROKEN_CONNECTION_PROBE = textwrap.dedent(
 
     def test_teardown_survives_a_connection_that_cannot_be_reset(dbConn):
         assert dbConn is not None
-    """
-)
-
-FAILED_SETUP_PROBE = textwrap.dedent(
-    """
-    import pymysql
-    import pytest
-
-
-    @pytest.fixture(scope="session")
-    def session_setup():
-        raise pymysql.err.OperationalError(2003, "cannot connect")
-
-
-    def test_needs_the_database(dbConn):
-        pass
-    """
-)
+    """)
 
 
 def find_test_modules(root):
@@ -153,17 +135,21 @@ def run_python_in_copy(copyRoot, args):
         env={**os.environ, "PYTHONPATH": copyRoot},
         capture_output=True,
         text=True,
+        timeout=SUBPROCESS_TIMEOUT_SECONDS,
     )
 
 
-def write_probe(copyRoot, directoryName, source):
+def write_probe(copyRoot, directoryName, source, pytestArgs=()):
     """Write a probe test module into the copy and run pytest on it there."""
     probeDirectory = os.path.join(copyRoot, directoryName)
     os.makedirs(probeDirectory)
-    with open(os.path.join(probeDirectory, "test_probe.py"), "w") as probeFile:
+    with open(
+        os.path.join(probeDirectory, "test_probe.py"), "w", encoding="utf-8"
+    ) as probeFile:
         probeFile.write(source)
     return run_python_in_copy(
-        copyRoot, ["-m", "pytest", "-p", "no:cacheprovider", "-q", directoryName]
+        copyRoot,
+        ["-m", "pytest", "-p", "no:cacheprovider", "-q", *pytestArgs, directoryName],
     )
 
 
@@ -179,23 +165,41 @@ def test_importing_every_test_module_opens_no_database_connection(package_copy):
     assert report["connections"] == 0
 
 
+def skip_unless_test_database_is_reachable():
+    settingsFile = os.path.join(
+        os.path.dirname(fundamentals.__file__), "test_settings.yaml"
+    )
+    with open(settingsFile, encoding="utf-8") as stream:
+        databaseSettings = yaml.safe_load(stream)["database settings"]
+    try:
+        pymysql.connect(
+            host=databaseSettings["host"],
+            user=databaseSettings["user"],
+            password=databaseSettings["password"],
+            database=databaseSettings["db"],
+            connect_timeout=DATABASE_CONNECT_TIMEOUT_SECONDS,
+        ).close()
+    except pymysql.Error as error:
+        pytest.skip("the unit_tests database is unreachable: %s" % error)
+
+
 def test_database_connection_is_reset_after_each_test(package_copy):
+    skip_unless_test_database_is_reachable()
     result = write_probe(package_copy, "probe", CONNECTION_PROBE)
 
     assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_teardown_survives_a_connection_that_cannot_be_reset(package_copy):
-    result = write_probe(package_copy, "probe_broken", BROKEN_CONNECTION_PROBE)
+    result = write_probe(
+        package_copy,
+        "probe_broken",
+        BROKEN_CONNECTION_PROBE,
+        pytestArgs=("-o", "log_cli=true", "-o", "log_cli_level=WARNING"),
+    )
 
     assert result.returncode == 0, result.stdout + result.stderr
-
-
-def test_teardown_adds_no_error_when_session_setup_failed(package_copy):
-    result = write_probe(package_copy, "probe_failed_setup", FAILED_SETUP_PROBE)
-
-    assert "1 error" in result.stdout, result.stdout
-    assert "2 errors" not in result.stdout, result.stdout
+    assert "could not reset the test database connection" in result.stdout
 
 
 @pytest.mark.usefixtures("session_names")

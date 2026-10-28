@@ -107,15 +107,11 @@ def reset_db_connection(request):
     """
     dbConn = None
     if {"dbConn", "session_names"} & set(request.fixturenames):
-        try:
-            dbConn = request.getfixturevalue("dbConn")
-        except Exception:
-            # SESSION SETUP FAILED, SO THE TEST REPORTS THAT ERROR ITSELF
-            dbConn = None
+        dbConn = request.getfixturevalue("dbConn")
 
     yield
 
-    if not (dbConn and dbConn.open):
+    if not dbConn or not dbConn.open:
         return
     try:
         dbConn.rollback()
