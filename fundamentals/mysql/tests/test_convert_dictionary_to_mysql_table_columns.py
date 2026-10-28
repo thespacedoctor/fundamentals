@@ -2,11 +2,13 @@ import datetime
 import re
 import sys
 import unittest
+import uuid
 from unittest import mock
 
 import yaml
 
 from fundamentals import tools
+from fundamentals.mysql import convert_dictionary_to_mysql_table, writequery
 from fundamentals.mysql.sql_identifiers import quote_identifier
 from fundamentals.utKit import utKit
 
@@ -22,14 +24,18 @@ su = tools(
 )
 arguments, settings, log, dbConn = su.setup()
 
-TABLE_PREFIX = "dy2047_"
+RUN_ID = uuid.uuid4().hex[:8]
 MODULE_NAME = "fundamentals.mysql.convert_dictionary_to_mysql_table"
+CONVERT_MODULE = sys.modules[MODULE_NAME]
 ADD_COLUMN_PATTERN = re.compile(r"^ALTER TABLE `[^`]*` ADD `([^`]*)` (.*)$", re.DOTALL)
 
 
-def drop_table(tableName):
-    from fundamentals.mysql import writequery
+def unique_table_name(label):
+    """*return a table name for the label that no other test run on the shared database will use*"""
+    return "dy2047_%s_%s" % (label, RUN_ID)
 
+
+def drop_table(tableName):
     writequery(
         log=log,
         sqlQuery="DROP TABLE IF EXISTS " + quote_identifier(tableName),
@@ -45,16 +51,14 @@ class statement_recorder(object):
         self.statements = []
 
     def run(self, dictionary, **kwargs):
-        from fundamentals.mysql import writequery
-
-        module = sys.modules[MODULE_NAME]
-
-        def recordAndWrite(log, sqlQuery, dbConn, **writeKwargs):
+        def record_and_write(log, sqlQuery, dbConn, **writeKwargs):
             self.statements.append(sqlQuery)
             return writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, **writeKwargs)
 
-        with mock.patch.object(module, "writequery", side_effect=recordAndWrite):
-            return module.convert_dictionary_to_mysql_table(
+        with mock.patch.object(
+            CONVERT_MODULE, "writequery", side_effect=record_and_write
+        ):
+            return convert_dictionary_to_mysql_table(
                 dbConn=dbConn,
                 log=kwargs.pop("log", log),
                 dictionary=dictionary,
@@ -62,12 +66,13 @@ class statement_recorder(object):
                 **kwargs,
             )
 
-    def columnDefinitions(self):
+    def column_definitions(self):
         """*return the definition of every column added, keyed by column name*"""
         matches = [ADD_COLUMN_PATTERN.match(s.strip()) for s in self.statements]
         return {m.group(1): m.group(2) for m in matches if m}
 
-    def uniqueKeyStatements(self):
+    def unique_key_statements(self):
+        """*return every statement that added a unique index to the table*"""
         return [s for s in self.statements if " ADD unique " in s]
 
 
@@ -75,16 +80,20 @@ class column_test_case(unittest.TestCase):
     tableSuffix = "table"
 
     def setUp(self):
-        self.tableName = TABLE_PREFIX + self.tableSuffix
-        drop_table(self.tableName)
-        self.recorder = statement_recorder(self.tableName)
+        self.tableName = unique_table_name(self.tableSuffix)
+        self.reset_table_and_recorder()
 
     def tearDown(self):
         drop_table(self.tableName)
 
+    def reset_table_and_recorder(self):
+        """*drop the table and start a new recorder, so a sub-test begins with no table*"""
+        drop_table(self.tableName)
+        self.recorder = statement_recorder(self.tableName)
+
     def definition(self, value, key="col", **kwargs):
         self.recorder.run({key: value, "another": "x"}, **kwargs)
-        return self.recorder.columnDefinitions()[key]
+        return self.recorder.column_definitions()[key]
 
 
 class test_column_types(column_test_case):
@@ -114,8 +123,7 @@ class test_column_types(column_test_case):
         # ACT / ASSERT
         for key in ["updated_parsed", "published_parsed", "feedName", "title"]:
             with self.subTest(key=key):
-                self.recorder = statement_recorder(self.tableName)
-                drop_table(self.tableName)
+                self.reset_table_and_recorder()
                 self.assertEqual(
                     self.definition(longText, key=key), "varchar(100) DEFAULT NULL"
                 )
@@ -124,8 +132,7 @@ class test_column_types(column_test_case):
         # ARRANGE / ACT / ASSERT
         for length in [1, 29, 30, 79]:
             with self.subTest(length=length):
-                self.recorder = statement_recorder(self.tableName)
-                drop_table(self.tableName)
+                self.reset_table_and_recorder()
                 self.assertEqual(
                     self.definition("x" * length), "varchar(100) DEFAULT NULL"
                 )
@@ -134,8 +141,7 @@ class test_column_types(column_test_case):
         # ARRANGE / ACT / ASSERT
         for length in [80, 200]:
             with self.subTest(length=length):
-                self.recorder = statement_recorder(self.tableName)
-                drop_table(self.tableName)
+                self.reset_table_and_recorder()
                 self.assertEqual(
                     self.definition("x" * length),
                     "varchar(%d) DEFAULT NULL" % (450 + length * 2,),
@@ -145,16 +151,14 @@ class test_column_types(column_test_case):
         # ARRANGE / ACT / ASSERT
         for number in [0, 9, -9]:
             with self.subTest(number=number):
-                self.recorder = statement_recorder(self.tableName)
-                drop_table(self.tableName)
+                self.reset_table_and_recorder()
                 self.assertEqual(self.definition(number), "tinyint DEFAULT NULL")
 
     def test_integers_over_nine_in_size_are_int(self):
         # ARRANGE / ACT / ASSERT
         for number in [10, -10, 100000]:
             with self.subTest(number=number):
-                self.recorder = statement_recorder(self.tableName)
-                drop_table(self.tableName)
+                self.reset_table_and_recorder()
                 self.assertEqual(self.definition(number), "int DEFAULT NULL")
 
     def test_float_is_double(self):
@@ -186,7 +190,7 @@ class test_column_types(column_test_case):
         self.recorder.run(dictionary)
 
         # ASSERT
-        self.assertNotIn("stamp", self.recorder.columnDefinitions())
+        self.assertNotIn("stamp", self.recorder.column_definitions())
         self.assertNotIn("`stamp`", self.recorder.statements[-1])
         self.assertIn("`another`", self.recorder.statements[-1])
 
@@ -196,7 +200,7 @@ class test_column_types(column_test_case):
 
         # ASSERT
         self.assertEqual(
-            self.recorder.columnDefinitions()["a_key_name"],
+            self.recorder.column_definitions()["a_key_name"],
             "varchar(100) DEFAULT NULL COMMENT 'original keyword: a key-name'",
         )
 
@@ -227,7 +231,7 @@ class test_table_and_index_creation(column_test_case):
         secondRun.run({"a": "x", "b": "y"})
 
         # ASSERT
-        self.assertEqual(secondRun.columnDefinitions(), {})
+        self.assertEqual(secondRun.column_definitions(), {})
         self.assertEqual(len(secondRun.statements), 1)
         self.assertTrue(secondRun.statements[0].startswith("INSERT INTO"))
 
@@ -235,10 +239,10 @@ class test_table_and_index_creation(column_test_case):
         # ARRANGE
         self.recorder.run({"a": "x"})
         secondRun = statement_recorder(self.tableName)
-        module = sys.modules[MODULE_NAME]
-
         # ACT
-        with mock.patch.object(module.table_exists, "table_exists") as tableExists:
+        with mock.patch.object(
+            CONVERT_MODULE.table_exists, "table_exists"
+        ) as tableExists:
             secondRun.run({"a": "x"}, skipChecks=True)
 
         # ASSERT
@@ -254,7 +258,7 @@ class test_table_and_index_creation(column_test_case):
 
         # ASSERT
         self.assertEqual(
-            self.recorder.uniqueKeyStatements(),
+            self.recorder.unique_key_statements(),
             ["ALTER TABLE `%s` ADD unique `a_key_b` (`A_key`,`b`)" % (self.tableName,)],
         )
 
@@ -268,14 +272,14 @@ class test_table_and_index_creation(column_test_case):
         secondRun.run(dictionary, uniqueKeyList=["uni"])
 
         # ASSERT
-        self.assertEqual(secondRun.uniqueKeyStatements(), [])
+        self.assertEqual(secondRun.unique_key_statements(), [])
 
     def test_adds_no_unique_key_without_a_unique_key_list(self):
         # ARRANGE / ACT
         self.recorder.run({"a": "x"})
 
         # ASSERT
-        self.assertEqual(self.recorder.uniqueKeyStatements(), [])
+        self.assertEqual(self.recorder.unique_key_statements(), [])
 
     def test_returns_none_pair_after_writing_to_the_database(self):
         # ARRANGE / ACT
@@ -298,19 +302,17 @@ class test_table_and_index_creation(column_test_case):
 
     def test_raises_with_table_name_when_insert_fails(self):
         # ARRANGE
-        from fundamentals.mysql import writequery
-
-        module = sys.modules[MODULE_NAME]
-
-        def failOnInsert(log, sqlQuery, dbConn, **kwargs):
+        def fail_on_insert(log, sqlQuery, dbConn, **kwargs):
             if sqlQuery.startswith("INSERT"):
                 raise RuntimeError("insert failed")
             return writequery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, **kwargs)
 
         # ACT
-        with mock.patch.object(module, "writequery", side_effect=failOnInsert):
+        with mock.patch.object(
+            CONVERT_MODULE, "writequery", side_effect=fail_on_insert
+        ):
             with self.assertRaises(Exception) as context:
-                module.convert_dictionary_to_mysql_table(
+                convert_dictionary_to_mysql_table(
                     dbConn=dbConn,
                     log=log,
                     dictionary={"a": "x"},
@@ -329,13 +331,11 @@ class test_table_and_index_creation(column_test_case):
 class test_argument_checks(unittest.TestCase):
 
     def convert(self, **overrides):
-        from fundamentals.mysql import convert_dictionary_to_mysql_table
-
         arguments = {
             "dbConn": dbConn,
             "log": log,
             "dictionary": {"a": "x"},
-            "dbTableName": TABLE_PREFIX + "checks",
+            "dbTableName": unique_table_name("checks"),
         }
         arguments.update(overrides)
         return convert_dictionary_to_mysql_table(**arguments)
@@ -395,14 +395,19 @@ class test_argument_checks(unittest.TestCase):
             "Please use a valid MySQL DB connection."
         )
 
+    def test_ignores_a_non_iterable_unique_key_list_when_returning_inserts(self):
+        # ARRANGE / ACT
+        _, valueTuple = self.convert(uniqueKeyList=5, returnInsertOnly=True)
+
+        # ASSERT
+        self.assertEqual(valueTuple, ("x",))
+
     def test_accepts_a_list_value_starting_with_none_or_a_date(self):
         # ARRANGE
         dictionary = {"a": [None, "comment"], "b": [datetime.date(2020, 1, 2), "c"]}
 
         # ACT
-        insertCommand, valueTuple = self.convert(
-            dictionary=dictionary, returnInsertOnly=True
-        )
+        _, valueTuple = self.convert(dictionary=dictionary, returnInsertOnly=True)
 
         # ASSERT
         self.assertEqual(valueTuple, ("2020-01-02",))
@@ -411,12 +416,10 @@ class test_argument_checks(unittest.TestCase):
 class test_insert_values(unittest.TestCase):
 
     def convert(self, dictionary, **kwargs):
-        from fundamentals.mysql import convert_dictionary_to_mysql_table
-
         return convert_dictionary_to_mysql_table(
             log=log,
             dictionary=dictionary,
-            dbTableName=TABLE_PREFIX + "values",
+            dbTableName=unique_table_name("values"),
             returnInsertOnly=True,
             **kwargs,
         )
@@ -426,18 +429,18 @@ class test_insert_values(unittest.TestCase):
         dictionary = {"a": [["x", "y"], "a comment"]}
 
         # ACT
-        insertCommand, valueTuple = self.convert(dictionary)
+        _, valueTuple = self.convert(dictionary)
 
         # ASSERT
         self.assertEqual(valueTuple, (yaml.dump(["x", "y"]).strip(),))
 
     def test_date_modified_adds_columns_with_updated_zero_when_inserting(self):
         # ARRANGE
-        module = sys.modules[MODULE_NAME]
-
         # ACT
         with mock.patch.object(
-            module.times, "get_now_sql_datetime", return_value="2020-01-02T03:04:05"
+            CONVERT_MODULE.times,
+            "get_now_sql_datetime",
+            return_value="2020-01-02T03:04:05",
         ):
             insertCommand, valueTuple = self.convert({"a": "x"}, dateModified=True)
 
@@ -447,11 +450,11 @@ class test_insert_values(unittest.TestCase):
 
     def test_date_modified_sets_updated_one_when_replacing(self):
         # ARRANGE
-        module = sys.modules[MODULE_NAME]
-
         # ACT
         with mock.patch.object(
-            module.times, "get_now_sql_datetime", return_value="2020-01-02T03:04:05"
+            CONVERT_MODULE.times,
+            "get_now_sql_datetime",
+            return_value="2020-01-02T03:04:05",
         ):
             insertCommand, valueTuple = self.convert(
                 {"a": "x"}, dateModified=True, replace=True
@@ -463,7 +466,7 @@ class test_insert_values(unittest.TestCase):
 
     def test_only_the_first_item_of_a_list_value_is_stripped_of_whitespace(self):
         # ARRANGE / ACT
-        insertCommand, valueTuple = self.convert({"a": "  x  ", "b": ["  y ", "c"]})
+        _, valueTuple = self.convert({"a": "  x  ", "b": ["  y ", "c"]})
 
         # ASSERT
         self.assertEqual(valueTuple, ("  x  ", "y"))
