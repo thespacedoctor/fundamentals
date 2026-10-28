@@ -73,6 +73,8 @@ class test_setup_ssh_tunnel(unittest.TestCase):
                 "-o",
                 "ExitOnForwardFailure=yes",
                 "-o",
+                "IgnoreUnknown=ForkAfterAuthentication",
+                "-o",
                 "ForkAfterAuthentication=no",
                 "-o",
                 "ControlMaster=no",

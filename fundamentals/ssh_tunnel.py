@@ -80,6 +80,9 @@ def setup_ssh_tunnel(tunnelParameters, log):
         "-o",
         "ExitOnForwardFailure=yes",
         # KEEP THE PROCESS IN THE FOREGROUND AND OFF ANY SHARED CONNECTION, WHATEVER THE USER'S SSH CONFIG SAYS
+        # OPENSSH BEFORE 8.7 DOES NOT KNOW ForkAfterAuthentication AND WOULD EXIT WITHOUT IgnoreUnknown
+        "-o",
+        "IgnoreUnknown=ForkAfterAuthentication",
         "-o",
         "ForkAfterAuthentication=no",
         "-o",
