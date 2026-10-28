@@ -1,20 +1,11 @@
 import sys
 import unittest
 from unittest import mock
-from fundamentals.utKit import utKit
-from fundamentals import tools
+import pytest
 
-packageDirectory = utKit("").get_project_root()
-settingsFile = packageDirectory + "/test_settings.yaml"
-su = tools(
-    arguments={"settingsFile": settingsFile},
-    docString=__doc__,
-    logLevel="DEBUG",
-    options_first=False,
-    projectName=None,
-    defaultSettingsFile=False,
-)
-arguments, settings, log, dbConn = su.setup()
+pytestmark = pytest.mark.usefixtures("session_names")
+# SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
+log = dbConn = None
 
 TABLE_NAME = "sweep2_dictsql_clash_table"
 INSERT_MODULE = "fundamentals.mysql.insert_list_of_dictionaries_into_database_tables"

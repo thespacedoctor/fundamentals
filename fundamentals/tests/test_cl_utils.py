@@ -2,26 +2,16 @@ from __future__ import print_function
 import os
 import unittest
 import shutil
-from fundamentals.utKit import utKit
-from fundamentals import tools
-from os.path import expanduser
 from fundamentals import cl_utils
+import pytest
+from os.path import expanduser
 
 doc = cl_utils.__doc__
 home = expanduser("~")
 
-packageDirectory = utKit("").get_project_root()
-settingsFile = packageDirectory + "/test_settings.yaml"
-
-su = tools(
-    arguments={"settingsFile": settingsFile},
-    docString=__doc__,
-    logLevel="DEBUG",
-    options_first=False,
-    projectName=None,
-    defaultSettingsFile=False,
-)
-arguments, settings, log, dbConn = su.setup()
+pytestmark = pytest.mark.usefixtures("session_names")
+# SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
+log = None
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)
