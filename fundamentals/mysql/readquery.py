@@ -7,11 +7,15 @@ Author
 : David Young
 """
 
+from fundamentals.mysql._log_safety import describe_error, redact_sql_literals
 from fundamentals.mysql._retry import run_with_retries
 from builtins import str
 import os
 
 os.environ["TERM"] = "vt100"
+
+# LONGEST QUERY, IN CHARACTERS, WRITTEN TO THE LOG WHEN A READ FAILS
+MAX_LOGGED_QUERY_LENGTH = 1000
 
 
 def readquery(sqlQuery, dbConn, log, quiet=False):
@@ -30,6 +34,8 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     - ``rows`` -- the rows returned by the sql query
 
 
+    Logs hold the error class and MySQL error code, not the error text. An exception that is raised still carries the original server message, which may contain data values, so do not log it verbatim.
+
     **Usage**
 
     ```python
@@ -47,14 +53,15 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
     import pymysql
     import warnings
 
-    log.debug("\nSQLQUERY: %(sqlQuery)s}\n" % locals())
+    log.debug("\nSQLQUERY: %s\n" % (redact_sql_literals(sqlQuery),))
 
     try:
         cursor = dbConn.cursor(pymysql.cursors.DictCursor)
         # cursor = dbConn.SScursor(pymysql.cursors.SSDictCursor)
     except Exception as e:
-        log.error("could not create the database cursor: %s" % (e,))
-        raise IOError("could not create the database cursor: %s" % (e,))
+        message = "could not create the database cursor: %s" % (describe_error(e),)
+        log.error(message)
+        raise IOError(message)
 
     try:
         # SCOPE THE WARNINGS-AS-ERRORS FILTER TO THIS CALL ONLY
@@ -66,7 +73,7 @@ def readquery(sqlQuery, dbConn, log, quiet=False):
         try:
             cursor.close()
         except Exception as e:
-            log.warning("could not close the db cursor " + str(e) + "\n")
+            log.warning("could not close the db cursor: %s\n" % (describe_error(e),))
 
     log.debug("completed the ``readquery`` function")
     return rows
@@ -90,11 +97,10 @@ def _execute_read_query(log, cursor, sqlQuery, quiet):
     try:
         rows = run_with_retries(log, lambda: _fetch_rows(cursor, sqlQuery))
     except Exception as e:
-        sqlQuery = sqlQuery[:1000]
+        loggedQuery = redact_sql_literals(sqlQuery)[:MAX_LOGGED_QUERY_LENGTH]
         log.warning(
-            "MySQL raised an error - read command not executed.\n"
-            + str(e)
-            + "\nHere is the sqlQuery\n\t%(sqlQuery)s" % locals()
+            "MySQL raised an error - read command not executed.\n%s\nHere is the sqlQuery\n\t%s"
+            % (describe_error(e), loggedQuery)
         )
         if quiet == False:
             raise

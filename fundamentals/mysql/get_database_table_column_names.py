@@ -11,6 +11,7 @@ from builtins import str
 import os
 
 os.environ["TERM"] = "vt100"
+from fundamentals.mysql._log_safety import describe_error, escape_for_log
 from fundamentals.mysql.sql_identifiers import quote_identifier
 
 
@@ -57,7 +58,7 @@ def get_database_table_column_names(dbConn, log, dbTable):
     except Exception as e:
         log.error(
             "could not find column names for dbTable %s - failed with this error: %s "
-            % (dbTable, str(e))
+            % (escape_for_log(dbTable), describe_error(e))
         )
         return -1
 

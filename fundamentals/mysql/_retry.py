@@ -11,6 +11,8 @@ import time
 
 import pymysql
 
+from fundamentals.mysql._log_safety import describe_error
+
 # MYSQL ERROR CODES THAT CLEAR THEMSELVES, SO THE SAME QUERY IS WORTH SENDING AGAIN
 # 2006 (SERVER GONE AWAY) AND 2013 (LOST CONNECTION) ARE LEFT OUT ON PURPOSE: PYMYSQL CLOSES
 # ITS SOCKET WHEN THEY HAPPEN, SO A RETRY ON THE SAME CONNECTION CANNOT WORK, AND A WRITE
@@ -104,7 +106,7 @@ def run_with_retries(log, operation):
             if delay is None:
                 raise
             log.warning(
-                f"Transient MySQL error: {e}. Retrying in {delay}s (attempt {attempt} failed)."
+                f"Transient MySQL error: {describe_error(e)}. Retrying in {delay}s (attempt {attempt} failed)."
             )
             time.sleep(delay)
             attempt += 1
