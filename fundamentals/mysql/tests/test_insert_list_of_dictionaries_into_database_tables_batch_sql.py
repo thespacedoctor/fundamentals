@@ -6,11 +6,10 @@ import sys
 import uuid
 from unittest import mock
 import pytest
-from fundamentals.utKit import SESSION_PLACEHOLDER
 
 pytestmark = pytest.mark.usefixtures("session_names")
-# SET FOR THE MODULE BY THE session_names FIXTURE IN THE ROOT conftest.py
-log = dbConn = SESSION_PLACEHOLDER
+# INJECTED BY THE session_names FIXTURE IN THE ROOT conftest.py (PYTEST ONLY)
+log = dbConn = None
 
 # SETUP PATHS TO COMMON DIRECTORIES FOR TEST DATA
 moduleDirectory = os.path.dirname(__file__)

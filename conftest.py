@@ -1,8 +1,10 @@
+import logging
 import os
 import shutil
 import tempfile
 from typing import Any, NamedTuple
 
+import pymysql
 import pytest
 
 
@@ -101,13 +103,24 @@ def reset_db_connection(request):
     """
     *Undo whatever a test left on the shared database connection*
 
-    After each test in a module that uses ``session_names``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database.
+    After each test that uses ``dbConn`` or ``session_names``, roll back any open transaction and switch autocommit back on, so one test cannot change how the next one sees the database. A failed reset is logged as a warning, so it never hides the real test failure.
     """
+    dbConn = None
+    if {"dbConn", "session_names"} & set(request.fixturenames):
+        try:
+            dbConn = request.getfixturevalue("dbConn")
+        except Exception:
+            # SESSION SETUP FAILED, SO THE TEST REPORTS THAT ERROR ITSELF
+            dbConn = None
+
     yield
 
-    if "session_names" not in request.fixturenames:
+    if not (dbConn and dbConn.open):
         return
-    dbConn = request.getfixturevalue("dbConn")
-    if dbConn:
+    try:
         dbConn.rollback()
         dbConn.autocommit(True)
+    except pymysql.Error as error:
+        logging.getLogger(__name__).warning(
+            "could not reset the test database connection: %s", error
+        )
