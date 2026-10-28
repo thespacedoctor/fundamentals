@@ -28,15 +28,24 @@ def _connect(dbSettings):
 
 
 class test_database_tunnel(unittest.TestCase):
-
-    def test_connects_through_the_tunnel_port(self):
+    def test_connects_through_the_tunnel_unix_socket(self):
         with mock.patch(
-            "fundamentals.mysql.database.setup_ssh_tunnel", return_value=9006
+            "fundamentals.mysql.database.setup_ssh_tunnel",
+            return_value="/tmp/t/mysql.sock",
         ) as tunnelMock:
             connectMock = _connect(_settings(tunnel=TUNNEL))
 
         self.assertEqual(tunnelMock.call_args.kwargs["tunnelParameters"], TUNNEL)
-        self.assertEqual(connectMock.call_args.kwargs["port"], 9006)
+        self.assertEqual(
+            connectMock.call_args.kwargs["unix_socket"], "/tmp/t/mysql.sock"
+        )
+        self.assertFalse(connectMock.call_args.kwargs["port"])
+
+    def test_does_not_use_a_unix_socket_without_a_tunnel(self):
+        connectMock = _connect(_settings(port=3307))
+
+        self.assertIsNone(connectMock.call_args.kwargs["unix_socket"])
+        self.assertEqual(connectMock.call_args.kwargs["port"], 3307)
 
     def test_does_not_start_a_tunnel_when_tunnel_is_false(self):
         with mock.patch("fundamentals.mysql.database.setup_ssh_tunnel") as tunnelMock:
@@ -62,7 +71,9 @@ class test_database_tunnel(unittest.TestCase):
 
         with (
             mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+            mock.patch(
+                "fundamentals.ssh_tunnel.is_unix_socket_open", return_value=False
+            ),
             mock.patch("fundamentals.ssh_tunnel.time.sleep"),
         ):
             with self.assertRaises(tunnel_error):

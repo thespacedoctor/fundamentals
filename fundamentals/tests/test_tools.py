@@ -201,16 +201,19 @@ class test_tools_tunnel(unittest.TestCase):
                 )
         return su, connectMock
 
-    def test_connects_through_the_nested_tunnel_port(self):
+    def test_connects_through_the_tunnel_unix_socket(self):
         from unittest import mock
 
         with mock.patch(
-            "fundamentals.tools.setup_ssh_tunnel", return_value=9006
+            "fundamentals.tools.setup_ssh_tunnel", return_value="/tmp/t/mysql.sock"
         ) as tunnelMock:
             su, connectMock = self._build_tools("\n" + TUNNEL_DICT_YAML)
 
         self.assertEqual(tunnelMock.call_args.kwargs["tunnelParameters"]["port"], 9006)
-        self.assertEqual(connectMock.call_args.kwargs["port"], 9006)
+        self.assertEqual(
+            connectMock.call_args.kwargs["unix_socket"], "/tmp/t/mysql.sock"
+        )
+        self.assertNotIn("port", connectMock.call_args.kwargs)
         self.assertIs(su.setup()[3], connectMock.return_value)
 
     def test_does_not_start_a_tunnel_when_tunnel_is_false(self):
@@ -234,7 +237,7 @@ class test_tools_tunnel(unittest.TestCase):
 
         with (
             mock.patch("fundamentals.ssh_tunnel.Popen"),
-            mock.patch("fundamentals.ssh_tunnel.is_port_open", return_value=False),
+            mock.patch("fundamentals.ssh_tunnel.is_unix_socket_open", return_value=False),
             mock.patch("fundamentals.ssh_tunnel.time.sleep"),
         ):
             with self.assertRaises(tunnel_error):

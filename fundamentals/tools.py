@@ -112,9 +112,9 @@ class tools(object):
             port: 9002
 
     # SSH TUNNEL - set `tunnel: false` (or leave the key out) if no tunnel is required
-    # A private ssh process is started on a random free local port for each connection, and the
-    # database connection is made through that port. `port` must still be a valid port number,
-    # but it is no longer used as the local port (an existing listener is never reused).
+    # A private ssh process forwards a unix socket in a new 0700 directory, and the database
+    # connection is made through that socket. `port` must still be a valid port number, but it is
+    # no longer used: nothing listens on a TCP port, so no other process can take the tunnel's place.
     # Note only one tunnel is setup - may need to change this to 2 tunnels in the future if
     # code, static catalogue database and transient database are all on seperate machines.
 
@@ -446,7 +446,7 @@ class tools(object):
         import pymysql as ms
 
         databaseSettings = self.settings["database settings"]
-        sshPort = setup_ssh_tunnel(
+        socketPath = setup_ssh_tunnel(
             tunnelParameters=databaseSettings["tunnel"],
             log=self.log,
         )
@@ -457,7 +457,7 @@ class tools(object):
             user=databaseSettings["user"],
             passwd=databaseSettings["password"],
             db=databaseSettings["db"],
-            port=sshPort,
+            unix_socket=socketPath,
             use_unicode=True,
             charset="utf8",
             local_infile=1,

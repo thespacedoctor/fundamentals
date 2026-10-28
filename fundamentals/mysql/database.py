@@ -98,8 +98,9 @@ class database(object):
         dbSettings = self.dbSettings
 
         port = False
+        unixSocket = None
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
-            port = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
+            unixSocket = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
         elif "port" in dbSettings and dbSettings["port"]:
             port = int(dbSettings["port"])
 
@@ -114,6 +115,7 @@ class database(object):
             passwd=passwd,
             db=dbName,
             port=port,
+            unix_socket=unixSocket,
             use_unicode=True,
             charset="utf8mb4",
             local_infile=1,
@@ -129,7 +131,7 @@ class database(object):
 
     def _setup_tunnel(self, tunnelParameters):
         """
-        *Setup a ssh tunnel for a database connection to port through*
+        *Setup a private ssh tunnel for a database connection to go through*
 
         **Key Arguments**
 
@@ -138,15 +140,15 @@ class database(object):
 
         **Return**
 
-        - ``sshPort`` -- the port the ssh tunnel is connected via
+        - ``socketPath`` -- the unix socket the ssh tunnel is listening on
 
         Raises ``fundamentals.ssh_tunnel.tunnel_error`` if the tunnel settings are invalid or the tunnel cannot be set up.
         """
         self.log.debug("starting the ``_setup_tunnel`` method")
 
-        sshPort = setup_ssh_tunnel(tunnelParameters=tunnelParameters, log=self.log)
+        socketPath = setup_ssh_tunnel(tunnelParameters=tunnelParameters, log=self.log)
 
         self.log.debug("completed the ``_setup_tunnel`` method")
-        return sshPort
+        return socketPath
 
     # xt-class-method
