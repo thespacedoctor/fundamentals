@@ -45,10 +45,13 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version-file: pyproject.toml
+          python-version: "3.12"
           architecture: x64
-          check-latest: true
           cache: pip
+
+      - name: Allow LOAD DATA LOCAL INFILE on the server
+        run: |
+          mysql -h 127.0.0.1 -uroot -prootpass -e "SET GLOBAL local_infile=1"
 
       - name: Install package and test dependencies (stats extra holds astropy)
         run: python -m pip install -e ".[tests,stats]"
