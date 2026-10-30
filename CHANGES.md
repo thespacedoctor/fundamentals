@@ -1,5 +1,7 @@
 # Release Notes
 
+* **ENHANCEMENT:** fundamentals now requires Python 3.12 or later, to match the conda-forge package; the Read the Docs build also uses Python 3.12
+
 ## v3.0.0 - October 30, 2026
 
 * **ENHANCEMENT:** `directory_script_runner` background mode (`waitForResult=False`) runs at most `maxParallelScripts` mysql scripts at once (default 8, per call) and still returns at once; scripts queued behind the limit always run, so the program waits for them before it exits, and mysql error output in the log is capped to its last 64 KB (DY-2046)

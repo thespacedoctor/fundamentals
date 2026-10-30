@@ -3,7 +3,7 @@
 The easiest way to install fundamentals is to use `pip` (here we show the install inside of a conda environment):
 
 ``` bash
-conda create -n fundamentals python=3.7 pip
+conda create -n fundamentals python=3.12 pip
 conda activate fundamentals
 pip install fundamentals
 ```

@@ -10,7 +10,7 @@ authors = [
     {name = "David Young", email= "david.young.rse@gmail.com"},
 ]
 keywords = ['logging, database']
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 classifiers = [
