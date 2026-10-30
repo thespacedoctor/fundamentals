@@ -8,7 +8,6 @@ Author
 """
 
 from builtins import object
-import sys
 import os
 
 os.environ["TERM"] = "vt100"
@@ -20,12 +19,7 @@ except ImportError:
         import pyreadline3 as readline
     except ImportError:
         readline = None  # or just pass — basic input() still works
-import glob
-import pickle
-import time
-from subprocess import Popen, PIPE, STDOUT
-from docopt import docopt
-from fundamentals.mysql import readquery
+from fundamentals.ssh_tunnel import close_ssh_tunnel, setup_ssh_tunnel
 
 
 class database(object):
@@ -104,8 +98,9 @@ class database(object):
         dbSettings = self.dbSettings
 
         port = False
+        unixSocket = None
         if "tunnel" in dbSettings and dbSettings["tunnel"]:
-            port = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
+            unixSocket = self._setup_tunnel(tunnelParameters=dbSettings["tunnel"])
         elif "port" in dbSettings and dbSettings["port"]:
             port = int(dbSettings["port"])
 
@@ -114,28 +109,50 @@ class database(object):
         user = dbSettings["user"]
         passwd = dbSettings["password"]
         dbName = dbSettings["db"]
-        dbConn = ms.connect(
-            host=host,
-            user=user,
-            passwd=passwd,
-            db=dbName,
-            port=port,
-            use_unicode=True,
-            charset="utf8mb4",
-            local_infile=1,
-            client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
-            connect_timeout=36000,
-            max_allowed_packet=51200000,
-        )
-        if self.autocommit:
-            dbConn.autocommit(True)
+        dbConn = None
+        try:
+            dbConn = ms.connect(
+                host=host,
+                user=user,
+                passwd=passwd,
+                db=dbName,
+                port=port,
+                unix_socket=unixSocket,
+                use_unicode=True,
+                charset="utf8mb4",
+                local_infile=1,
+                client_flag=ms.constants.CLIENT.MULTI_STATEMENTS,
+                connect_timeout=36000,
+                max_allowed_packet=51200000,
+            )
+            if self.autocommit:
+                dbConn.autocommit(True)
+        except BaseException:
+            # DO NOT LEAVE THE SSH PROCESS RUNNING WITHOUT A CONNECTION
+            try:
+                self._close_quietly(dbConn)
+            finally:
+                if unixSocket:
+                    close_ssh_tunnel(unixSocket, self.log)
+            raise
 
         self.log.debug("completed the ``connect`` method")
         return dbConn
 
+    def _close_quietly(self, connection):
+        """
+        *close a database connection, if there is one, and ignore any error from closing it*
+        """
+        if connection is None:
+            return
+        try:
+            connection.close()
+        except Exception as e:
+            self.log.debug(f"could not close the database connection: {e}")
+
     def _setup_tunnel(self, tunnelParameters):
         """
-        *Setup a ssh tunnel for a database connection to port through*
+        *Setup a private ssh tunnel for a database connection to go through*
 
         **Key Arguments**
 
@@ -144,65 +161,15 @@ class database(object):
 
         **Return**
 
-        - ``sshPort`` -- the port the ssh tunnel is connected via
+        - ``socketPath`` -- the unix socket the ssh tunnel is listening on
 
+        Raises ``fundamentals.ssh_tunnel.tunnel_error`` if the tunnel settings are invalid or the tunnel cannot be set up.
         """
         self.log.debug("starting the ``_setup_tunnel`` method")
 
-        # TEST TUNNEL DOES NOT ALREADY EXIST
-        sshPort = tunnelParameters["port"]
-        connected = self._checkServer("127.0.0.1", sshPort)
-        if connected:
-            self.log.debug("ssh tunnel already exists - moving on")
-        else:
-            # GRAB TUNNEL SETTINGS FROM SETTINGS FILE
-            ru = tunnelParameters["remote user"]
-            rip = tunnelParameters["remote ip"]
-            rh = tunnelParameters["remote datbase host"]
+        socketPath = setup_ssh_tunnel(tunnelParameters=tunnelParameters, log=self.log)
 
-            cmd = "ssh -fnN %(ru)s@%(rip)s -L %(sshPort)s:%(rh)s:3306" % locals()
-            p = Popen(cmd, shell=True, close_fds=True)
-            output = p.communicate()[0]
-            self.log.debug("output: %(output)s" % locals())
-
-            # TEST CONNECTION - QUIT AFTER SO MANY TRIES
-            connected = False
-            count = 0
-            while not connected:
-                connected = self._checkServer("127.0.0.1", sshPort)
-                time.sleep(1)
-                count += 1
-                if count == 5:
-                    self.log.error(
-                        "cound not setup tunnel to remote datbase" % locals()
-                    )
-                    sys.exit(0)
-        return sshPort
-
-    def _checkServer(self, address, port):
-        """*Check that the TCP Port we've decided to use for tunnelling is available*"""
-        self.log.debug("starting the ``_checkServer`` method")
-
-        # CREATE A TCP SOCKET
-        import socket
-
-        s = socket.socket()
-        self.log.debug(
-            """Attempting to connect to `%(address)s` on port `%(port)s`""" % locals()
-        )
-        try:
-            s.connect((address, port))
-            self.log.debug(
-                """Connected to `%(address)s` on port `%(port)s`""" % locals()
-            )
-            return True
-        except socket.error as e:
-            self.log.warning(
-                """Connection to `%(address)s` on port `%(port)s` failed - try again: %(e)s"""
-                % locals()
-            )
-            return False
-
-        return None
+        self.log.debug("completed the ``_setup_tunnel`` method")
+        return socketPath
 
     # xt-class-method

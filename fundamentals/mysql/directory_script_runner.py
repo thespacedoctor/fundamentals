@@ -41,15 +41,22 @@ Author
 """
 
 from builtins import str
-import sys
 import os
 import time
 import collections
 import datetime
-from subprocess import Popen, PIPE, STDOUT
+import tempfile
+import queue
+import threading
+from subprocess import Popen, PIPE, DEVNULL
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
+
+# MOST MYSQL CLIENTS RUN AT ONCE IN BACKGROUND MODE (THE SERVER REFUSES CONNECTIONS PAST ITS max_connections)
+MAX_PARALLEL_SCRIPTS = 8
+# MOST BYTES OF A SCRIPT'S STDERR (TAKEN FROM THE END) THAT ARE WRITTEN TO THE LOG
+MAX_LOGGED_STDERR_BYTES = 65536
 
 
 def directory_script_runner(
@@ -62,6 +69,7 @@ def directory_script_runner(
     loginPath=False,
     databaseName=False,
     force=True,
+    maxParallelScripts=MAX_PARALLEL_SCRIPTS,
 ):
     """A function to run all mysql scripts in a given directory (in a modified date order, oldest first) and then act on the script files in accordance with the succcess or failure of their execution
 
@@ -96,9 +104,10 @@ def directory_script_runner(
     - ``force`` -- force the script to run, skipping over lines with errors, Default *True*
     - ``loginPath`` -- the local-path as set with `mysql_config_editor`
     - ``dbConn`` -- the database connection
-    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL script will run in background (do not wait for completion), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
+    - ``waitForResult`` -- wait for the mysql script to finish execution? If 'False' the MySQL scripts run in parallel, at most ``maxParallelScripts`` at a time, and the function returns at once (background threads start each script, wait for it and log any failure, but the success and failure rules are not applied; the interpreter waits for these threads, so program exit blocks until every queued script has finished, and a mysql process that hangs blocks the exit; there is no timeout), or if 'delete' the script will run then delete regardless of success status. Default *True*. [True|False|delete]
     - ``successRule`` -- what to do if script succeeds. Default *None* [None|delete|subFolderName]
     - ``failureRule`` -- what to do if script fails. Default *None* [None|delete|subFolderName]
+    - ``maxParallelScripts`` -- the most mysql processes that run at once when ``waitForResult`` is 'False'. The limit applies to each call separately (every call has its own pool), not to the program as a whole. Must be a positive integer; any other value raises a `ValueError` in every mode, even when ``waitForResult`` is not 'False'. Default *8*
 
 
     **Return**
@@ -136,7 +145,7 @@ def directory_script_runner(
 
     This creates a folder at `/path/to/mysql_scripts/failed` and moves the failed scripts into that folder.
 
-    Finally to execute the scripts within a directory but not wait for the results to return (much fast but you lose error checking in the MySQL scripts):
+    Finally to execute the scripts within a directory in parallel (here four at a time), without applying the success and failure rules (faster, but failures are only logged):
 
     ```python
     from fundamentals.mysql import directory_script_runner
@@ -145,14 +154,17 @@ def directory_script_runner(
         pathToScriptDirectory="/path/to/mysql_scripts",
         databaseName="imports",
         loginPath="myLoginDetails",
-        waitForResults=False
+        waitForResult=False,
+        maxParallelScripts=4
     )
     ```
 
-    Setting ``waitForResults`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
+    Setting ``waitForResult`` = 'delete' will trash the script once it has run (or failed ... be very careful!)
 
     """
     log.debug("starting the ``directory_script_runner`` function")
+
+    _validate_max_parallel_scripts(maxParallelScripts)
 
     # COMPILE A DICTIONARY OF SCRIPTS / MODIFIED TIMES
     scriptList = {}
@@ -170,10 +182,7 @@ def directory_script_runner(
     scriptList = collections.OrderedDict(sorted(scriptList.items()))
 
     # FORCE MYSQL SCRIPT?
-    if force:
-        force = "--force"
-    else:
-        force = ""
+    forceArgs = ["--force"] if force else []
 
     if dbConn:
         for k, v in list(scriptList.items()):
@@ -196,30 +205,67 @@ def directory_script_runner(
                 log=log,
             )
     else:
+        # "--" ENDS OPTION PARSING SO A DATABASE NAME CANNOT BE READ AS A MYSQL OPTION
+        mysqlCmd = [
+            "mysql",
+            "--login-path=%s" % (loginPath,),
+            *forceArgs,
+            "--",
+            databaseName,
+        ]
+        mysqlEnv = _mysql_environment()
+        isWaiting = waitForResult == True
+        isDelete = waitForResult == "delete"
+        if not (isWaiting or isDelete):
+            _start_background_scripts(
+                scriptPaths=list(scriptList.values()),
+                mysqlCmd=mysqlCmd,
+                mysqlEnv=mysqlEnv,
+                maxParallelScripts=maxParallelScripts,
+                log=log,
+            )
+            log.debug("completed the ``directory_script_runner`` function")
+            return None
+
         for k, v in list(scriptList.items()):
             scriptname = os.path.basename(v)
-            if waitForResult == True:
-                cmd = (
-                    """mysql --login-path=%(loginPath)s %(force)s %(databaseName)s < "%(v)s" """
-                    % locals()
-                )
-                p = Popen(
-                    cmd,
-                    stdout=PIPE,
-                    stderr=PIPE,
-                    close_fds=True,
-                    env={
-                        "PATH": os.getenv("PATH")
-                        + ":/usr/local/bin:/usr/bin:/usr/bin:/usr/local/mysql/bin",
-                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
-                    },
-                    shell=True,
-                )
-                stdout, stderr = p.communicate()
+            try:
+                with open(v, "rb") as scriptFile:
+                    p = Popen(
+                        mysqlCmd,
+                        stdin=scriptFile,
+                        stdout=DEVNULL,
+                        stderr=PIPE,
+                        close_fds=True,
+                        env=mysqlEnv,
+                    )
+                    # WAIT SO MYSQL HAS READ THE SCRIPT BEFORE IT IS PROCESSED
+                    stderr = p.communicate()[1]
+            except OSError as e:
+                # MISSING MYSQL BINARY OR UNREADABLE SCRIPT
+                log.error("MySQL Script `%s` could not be run: '%s'" % (scriptname, e))
+                if isWaiting:
+                    _process_script_file(
+                        pathToScriptDirectory=pathToScriptDirectory,
+                        scriptname=scriptname,
+                        rule=failureRule,
+                        log=log,
+                    )
+                continue
 
-                if len(stderr):
+            if isDelete:
+                if p.returncode:
                     log.error(
-                        "MySQL Script `%(scriptname)s` Failed: '%(stderr)s'" % locals()
+                        "MySQL Script `%s` failed with return code %s and was deleted: '%s'"
+                        % (scriptname, p.returncode, stderr)
+                    )
+                os.remove(v)
+            elif isWaiting:
+                # A NON-ZERO RETURN CODE IS A FAILURE EVEN WHEN STDERR IS EMPTY
+                if p.returncode or len(stderr):
+                    log.error(
+                        "MySQL Script `%s` Failed with return code %s: '%s'"
+                        % (scriptname, p.returncode, stderr)
                     )
                     rule = failureRule
                 else:
@@ -230,32 +276,181 @@ def directory_script_runner(
                     rule=rule,
                     log=log,
                 )
-            else:
-                if waitForResult == "delete":
-                    cmd = (
-                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 & rm "%(v)s" """
-                        % locals()
-                    )
-                else:
-                    cmd = (
-                        """mysql --login-path=%(loginPath)s %(force)s  %(databaseName)s < "%(v)s" > /dev/null 2>&1 """
-                        % locals()
-                    )
-                p = Popen(
-                    cmd,
-                    close_fds=True,
-                    env={
-                        "PATH": os.getenv("PATH") + ":/usr/local/bin:/usr/bin:",
-                        "MYSQL_TEST_LOGIN_FILE": os.getenv("HOME") + "/.mylogin.cnf",
-                    },
-                    shell=True,
-                    stdin=None,
-                    stdout=None,
-                    stderr=None,
-                )
 
     log.debug("completed the ``directory_script_runner`` function")
     return None
+
+
+def _validate_max_parallel_scripts(maxParallelScripts):
+    """*raise a ValueError unless the process limit is a positive integer*
+
+    **Key Arguments:**
+
+    - ``maxParallelScripts`` -- the value to check
+    """
+    isInteger = isinstance(maxParallelScripts, int) and not isinstance(
+        maxParallelScripts, bool
+    )
+    if not isInteger or maxParallelScripts < 1:
+        raise ValueError(
+            "maxParallelScripts must be a positive integer, got %r"
+            % (maxParallelScripts,)
+        )
+    return None
+
+
+def _start_background_scripts(scriptPaths, mysqlCmd, mysqlEnv, maxParallelScripts, log):
+    """*run the scripts on worker threads, so no more than ``maxParallelScripts`` mysql processes run at once*
+
+    Returns as soon as the workers have started. Each worker takes the next script (oldest first), runs it and waits for it to finish before taking another, so every process is reaped and the caller is never kept waiting. The workers are not daemon threads, so program exit blocks until every queued script has finished. A mysql process that hangs therefore blocks the exit, and there is no timeout.
+
+    **Key Arguments:**
+
+    - ``scriptPaths`` -- the paths of the scripts to run, in the order to start them
+    - ``mysqlCmd`` -- the mysql command (list of arguments)
+    - ``mysqlEnv`` -- the environment to give the mysql processes
+    - ``maxParallelScripts`` -- the most mysql processes to run at once
+    - ``log`` -- logger
+    """
+    pendingScripts = queue.SimpleQueue()
+    for scriptPath in scriptPaths:
+        pendingScripts.put(scriptPath)
+
+    queuedCount = len(scriptPaths) - maxParallelScripts
+    if queuedCount > 0:
+        log.info(
+            "%s %s queued behind the limit of %s parallel mysql scripts"
+            % (
+                queuedCount,
+                "script" if queuedCount == 1 else "scripts",
+                maxParallelScripts,
+            )
+        )
+
+    for _ in range(min(maxParallelScripts, len(scriptPaths))):
+        threading.Thread(
+            target=_run_pending_scripts,
+            args=(pendingScripts, mysqlCmd, mysqlEnv, log),
+        ).start()
+    return None
+
+
+def _run_pending_scripts(pendingScripts, mysqlCmd, mysqlEnv, log):
+    """*run queued scripts one after another until none are left*
+
+    **Key Arguments:**
+
+    - ``pendingScripts`` -- queue of script paths shared by the workers
+    - ``mysqlCmd`` -- the mysql command (list of arguments)
+    - ``mysqlEnv`` -- the environment to give the mysql processes
+    - ``log`` -- logger
+    """
+    while True:
+        try:
+            scriptPath = pendingScripts.get_nowait()
+        except queue.Empty:
+            return None
+        scriptname = os.path.basename(scriptPath)
+        try:
+            _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log)
+        except OSError as e:
+            # MISSING MYSQL BINARY OR UNREADABLE SCRIPT
+            log.error("MySQL Script `%s` could not be run: '%s'" % (scriptname, e))
+        except Exception:
+            log.exception("MySQL Script `%s` could not be run" % (scriptname,))
+
+
+def _run_background_script(scriptPath, mysqlCmd, mysqlEnv, log):
+    """*run one script through mysql, wait for the process and log a failure*
+
+    The stderr temp file is read, then closed (which deletes it). A temp file cannot fill up and stall a process nobody is reading yet. Only the last ``MAX_LOGGED_STDERR_BYTES`` of stderr are logged. If waiting fails, a process that is still running is killed and reaped.
+
+    **Key Arguments:**
+
+    - ``scriptPath`` -- path to the sql script
+    - ``mysqlCmd`` -- the mysql command (list of arguments)
+    - ``mysqlEnv`` -- the environment to give the mysql process
+    - ``log`` -- logger
+    """
+    with open(scriptPath, "rb") as scriptFile, tempfile.TemporaryFile() as stderrFile:
+        p = Popen(
+            mysqlCmd,
+            stdin=scriptFile,
+            stdout=DEVNULL,
+            stderr=stderrFile,
+            close_fds=True,
+            env=mysqlEnv,
+        )
+        try:
+            p.wait()
+        finally:
+            _kill_and_reap(p, os.path.basename(scriptPath), log)
+        stderr = _read_stderr_tail(stderrFile)
+    if p.returncode:
+        log.error(
+            "MySQL Script `%s` failed with return code %s: '%s'"
+            % (os.path.basename(scriptPath), p.returncode, stderr)
+        )
+    return None
+
+
+def _kill_and_reap(p, scriptname, log):
+    """*kill a mysql process that is still running and wait for it*
+
+    Used while another exception is in flight, so only OS errors from ``poll``, ``kill`` and ``wait`` are swallowed (each is logged as a warning), and they never replace the original exception. ``wait`` still runs after a failed ``kill``.
+
+    **Key Arguments:**
+
+    - ``p`` -- the Popen process
+    - ``scriptname`` -- name of the script the process is running, for the log
+    - ``log`` -- logger
+    """
+    try:
+        if p.poll() is not None:
+            return None
+    except OSError as e:
+        log.warning("MySQL Script `%s` process poll failed: '%s'" % (scriptname, e))
+        return None
+
+    for stepName, step in (("kill", p.kill), ("wait", p.wait)):
+        try:
+            step()
+        except OSError as e:
+            log.warning(
+                "MySQL Script `%s` process %s failed: '%s'" % (scriptname, stepName, e)
+            )
+    return None
+
+
+def _read_stderr_tail(stderrFile):
+    """*return the last ``MAX_LOGGED_STDERR_BYTES`` of a stderr file as text*
+
+    **Key Arguments:**
+
+    - ``stderrFile`` -- the open stderr temp file
+
+    **Return:**
+
+    - `stderr` -- the decoded text (undecodable bytes are replaced)
+    """
+    size = stderrFile.seek(0, os.SEEK_END)
+    stderrFile.seek(max(0, size - MAX_LOGGED_STDERR_BYTES))
+    return stderrFile.read().decode("utf-8", errors="replace")
+
+
+def _mysql_environment():
+    """*return a copy of the current environment extended with the paths the mysql client needs*
+
+    **Return:**
+
+    - `env` -- the environment dictionary to pass to the mysql subprocess
+    """
+    env = os.environ.copy()
+    extraPaths = "/usr/local/bin:/usr/bin:/usr/local/mysql/bin"
+    currentPath = env.get("PATH")
+    env["PATH"] = currentPath + ":" + extraPaths if currentPath else extraPaths
+    env["MYSQL_TEST_LOGIN_FILE"] = os.path.join(os.path.expanduser("~"), ".mylogin.cnf")
+    return env
 
 
 def execute_mysql_script(pathToScript, dbConn, log):
@@ -298,13 +493,12 @@ def execute_mysql_script(pathToScript, dbConn, log):
     pathToReadFile = pathToScript
     try:
         log.debug("attempting to open the file %s" % (pathToReadFile,))
-        readFile = codecs.open(pathToReadFile, encoding="utf-8", mode="r")
-        thisData = readFile.read()
-        readFile.close()
+        with codecs.open(pathToReadFile, encoding="utf-8", mode="r") as readFile:
+            thisData = readFile.read()
     except IOError as e:
         message = "could not open the file %s" % (pathToReadFile,)
         log.critical(message)
-        raise IOError(message)
+        raise IOError(message) from e
 
     thisData = thisData.replace(";;", ";").replace("DELIMITER ;", "")
 
@@ -390,26 +584,11 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # UNPACK REMAINING CL ARGUMENTS USING `EXEC` TO SETUP THE VARIABLE NAMES
-    # AUTOMATICALLY
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, ("".__class__, "".__class__)):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToDirectory = arguments["<pathToDirectory>"]
+    loginPath = arguments["<loginPath>"]
+    databaseName = arguments["<databaseName>"]
+    successFlag = arguments["--success"]
+    failureFlag = arguments["--failure"]
 
     if successFlag and successFlag.lower() == "none":
         successFlag = None

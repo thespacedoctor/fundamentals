@@ -48,7 +48,7 @@ def list_of_dictionaries_to_mysql_inserts(log, datalist, tableName):
 
     this output the following:
 
-    ```plain
+    ```text
     INSERT INTO `testing_table` (a_newKey,and_another,dateCreated,uniqueKey2,uniquekey1) VALUES ("cool" ,"super cool" ,"2016-09-14T13:17:26" ,"burgers" ,"cheese")  ON DUPLICATE KEY UPDATE  a_newKey="cool", and_another="super cool", dateCreated="2016-09-14T13:17:26", uniqueKey2="burgers", uniquekey1="cheese" ;
     ...
     ...

@@ -1,51 +1,16 @@
 from __future__ import print_function
 from builtins import str
-import os
 import unittest
-import shutil
 import unittest
 import yaml
-from fundamentals.utKit import utKit
-from fundamentals import tools
-from os.path import expanduser
-
-home = expanduser("~")
-
-packageDirectory = utKit("").get_project_root()
-settingsFile = packageDirectory + "/test_settings.yaml"
-# settingsFile = home + "/.config/soxspipe.recipes/soxspipe.recipes.yaml"
-su = tools(
-    arguments={"settingsFile": settingsFile},
-    docString=__doc__,
-    logLevel="DEBUG",
-    options_first=False,
-    projectName=None,
-    defaultSettingsFile=False,
-)
-arguments, settings, log, dbConn = su.setup()
-
-# SETUP AND TEARDOWN FIXTURE FUNCTIONS FOR THE ENTIRE MODULE
-moduleDirectory = os.path.dirname(__file__)
-utKit = utKit(moduleDirectory)
-log, dbConn, pathToInputDir, pathToOutputDir = utKit.setupModule()
-utKit.tearDownModule()
-
-try:
-    shutil.rmtree(pathToOutputDir)
-except:
-    pass
-# COPY INPUT TO OUTPUT DIR
-shutil.copytree(pathToInputDir, pathToOutputDir)
-
-# Recursively create missing directories
-if not os.path.exists(pathToOutputDir):
-    os.makedirs(pathToOutputDir)
-
-dbSettings = settings["database settings"]["atlasMovers"]
-dbSettings2 = settings["database settings"]["unit_tests"]
+import pytest
 
 
+@pytest.mark.usefixtures("session_attributes")
 class test_database(unittest.TestCase):
+
+    def setUp(self):
+        self.dbSettings = self.settings["database settings"]["unit_tests"]
 
     # def test_tunnel(self):
 
@@ -64,7 +29,7 @@ class test_database(unittest.TestCase):
 
         from fundamentals.mysql import database
 
-        db = database(log=log, dbSettings=dbSettings2).connect()
+        db = database(log=self.log, dbSettings=self.dbSettings).connect()
 
         return
 
@@ -73,14 +38,14 @@ class test_database(unittest.TestCase):
         # SETUP ALL DATABASE CONNECTIONS
         from fundamentals.mysql import database
 
-        dbConn = database(log=log, dbSettings=dbSettings2).connect()
+        dbConn = database(log=self.log, dbSettings=self.dbSettings).connect()
 
         from fundamentals.mysql import readquery
 
         sqlQuery = """
             SELECT VERSION();
         """ % locals()
-        rows = readquery(log=log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
+        rows = readquery(log=self.log, sqlQuery=sqlQuery, dbConn=dbConn, quiet=False)
         # print(rows)
 
     def test_database_function_exception(self):
@@ -88,7 +53,9 @@ class test_database(unittest.TestCase):
         from fundamentals.mysql import database
 
         try:
-            this = database(log=log, dbSettings=dbSettings2, fakeKey="break the code")
+            this = database(
+                log=self.log, dbSettings=self.dbSettings, fakeKey="break the code"
+            )
             this.get()
             assert False
         except Exception as e:

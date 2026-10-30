@@ -35,27 +35,26 @@ def _fetch(
     """
     import logging as log
     import socket
-    from eventlet import Timeout
-    import urllib
-    import sys
+    import urllib.request
 
     # TRY AND DOWNLOAD X TIMES BEFORE QUITING
     tries = 10
-    count = 1
+    count = 0
     downloaded = False
+    body = None
     while count < tries and downloaded == False:
         try:
             log.debug("downloading " + url.get_full_url())
             body = urllib.request.urlopen(url).read()
             downloaded = True
-        except socket.timeout as e:
+        except socket.timeout:
             print("timeout on URL, trying again")
             count += 1
         except Exception as e:
             if "[Errno 60]" in str(e):
                 log.warning("timeout on URL, trying again" % locals())
                 count += 1
-            if "Error 502" in str(e):
+            elif "Error 502" in str(e):
                 log.warning("proxy error on URL, trying again" % locals())
                 count += 1
             else:
@@ -65,5 +64,12 @@ def _fetch(
                 url = None
                 body = None
                 downloaded = True
+
+    # ALL TRIES USED UP WITHOUT A SUCCESSFUL DOWNLOAD
+    if not downloaded:
+        log.warning(
+            "could not download " + url.get_full_url() + " : retries exhausted\n"
+        )
+        url = None
 
     return url, body

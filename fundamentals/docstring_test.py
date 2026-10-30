@@ -6,7 +6,7 @@ Check the API output here: file:///Users/Dave/git_repos/_templates_/python-packa
 
 
 def docsting_test(self):
-    """
+    r"""
     *the database object for sherlock, setting up ssh tunnels and various database connections*
 
     The returned dictionary of database connections contain the following databases:

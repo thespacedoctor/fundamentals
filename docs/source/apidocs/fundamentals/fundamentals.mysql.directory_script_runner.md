@@ -29,9 +29,45 @@
     ```
 ````
 
+### Data
+
+````{list-table}
+:class: autosummary longtable
+:align: left
+
+* - {py:obj}`MAX_LOGGED_STDERR_BYTES <fundamentals.mysql.directory_script_runner.MAX_LOGGED_STDERR_BYTES>`
+  - ```{autodoc2-docstring} fundamentals.mysql.directory_script_runner.MAX_LOGGED_STDERR_BYTES
+    :summary:
+    ```
+* - {py:obj}`MAX_PARALLEL_SCRIPTS <fundamentals.mysql.directory_script_runner.MAX_PARALLEL_SCRIPTS>`
+  - ```{autodoc2-docstring} fundamentals.mysql.directory_script_runner.MAX_PARALLEL_SCRIPTS
+    :summary:
+    ```
+````
+
 ### API
 
-````{py:function} directory_script_runner(log, pathToScriptDirectory, dbConn=False, waitForResult=True, successRule=None, failureRule=None, loginPath=False, databaseName=False, force=True)
+````{py:data} MAX_LOGGED_STDERR_BYTES
+:canonical: fundamentals.mysql.directory_script_runner.MAX_LOGGED_STDERR_BYTES
+:value: >
+   65536
+
+```{autodoc2-docstring} fundamentals.mysql.directory_script_runner.MAX_LOGGED_STDERR_BYTES
+```
+
+````
+
+````{py:data} MAX_PARALLEL_SCRIPTS
+:canonical: fundamentals.mysql.directory_script_runner.MAX_PARALLEL_SCRIPTS
+:value: >
+   8
+
+```{autodoc2-docstring} fundamentals.mysql.directory_script_runner.MAX_PARALLEL_SCRIPTS
+```
+
+````
+
+````{py:function} directory_script_runner(log, pathToScriptDirectory, dbConn=False, waitForResult=True, successRule=None, failureRule=None, loginPath=False, databaseName=False, force=True, maxParallelScripts=MAX_PARALLEL_SCRIPTS)
 :canonical: fundamentals.mysql.directory_script_runner.directory_script_runner
 
 ```{autodoc2-docstring} fundamentals.mysql.directory_script_runner.directory_script_runner

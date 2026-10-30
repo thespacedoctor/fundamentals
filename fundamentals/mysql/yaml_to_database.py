@@ -25,15 +25,100 @@ Options:
 from __future__ import print_function
 
 from builtins import object
-import sys
 import os
-import yaml
 
 import re
-import glob
-import docopt
-from fundamentals import tools, times
+import ipaddress
+import socket
+from urllib.parse import urljoin, urlparse
+from fundamentals import tools
 from fundamentals.mysql import convert_dictionary_to_mysql_table
+
+URL_REQUEST_TIMEOUT = 10
+URL_SCHEMES_ALLOWED = ("http", "https")
+MAX_REDIRECT_HOPS = 5
+REDIRECT_STATUS_CODES = (301, 302, 303, 307, 308)
+
+
+def _is_public_address(address):
+    """
+    *return True only if the IP address string is a publicly routable address*
+    """
+    ip = ipaddress.ip_address(address.split("%")[0])
+    # UNWRAP IPV4-MAPPED IPV6 ADDRESSES (E.G. ::ffff:127.0.0.1)
+    if ip.version == 6 and ip.ipv4_mapped is not None:
+        ip = ip.ipv4_mapped
+    return not (
+        ip.is_loopback
+        or ip.is_link_local
+        or ip.is_private
+        or ip.is_multicast
+        or ip.is_reserved
+        or ip.is_unspecified
+        or not ip.is_global
+    )
+
+
+def _url_rejection_reason(url):
+    """
+    *return why a URL must not be requested, or None if it is safe to request*
+
+    **Residual risk:** the hostname is resolved here and again when ``requests`` connects. The check and the connection resolve separately, so a DNS server that changes its answer between the two lookups (DNS rebinding) can still direct the request to a non-public address. This is a known and accepted limit. The resolved address is not pinned.
+    """
+    parsed = urlparse(url)
+    if parsed.scheme.lower() not in URL_SCHEMES_ALLOWED:
+        return "scheme other than http/https"
+    if parsed.username is not None or parsed.password is not None:
+        return "credentials in url"
+    if not parsed.hostname:
+        return "missing hostname"
+    # THE IDNA FORMS USED BY getaddrinfo AND requests CAN DIFFER FOR NON-ASCII HOSTNAMES
+    if not parsed.hostname.isascii():
+        return "non-ascii hostname"
+    port = parsed.port or (443 if parsed.scheme.lower() == "https" else 80)
+    for info in socket.getaddrinfo(parsed.hostname, port):
+        if not _is_public_address(info[4][0]):
+            return "host resolves to a non-public address"
+    return None
+
+
+def unshorten_url(url, log):
+    """
+    *follow redirects by hand and return the final URL, or the original URL if the lookup is unsafe or fails*
+
+    **Key Arguments**
+
+    - ``url`` -- the url to unshorten
+    - ``log`` -- logger
+
+    Every hop (including the first) must pass ``_url_rejection_reason`` before it is requested. At most ``MAX_REDIRECT_HOPS`` redirects are followed.
+    """
+    import requests
+
+    currentUrl = url
+    try:
+        # IGNORE PROXY ENVIRONMENT VARIABLES SO THE LOCAL ADDRESS CHECK CANNOT BE BYPASSED
+        with requests.Session() as session:
+            session.trust_env = False
+            for _ in range(MAX_REDIRECT_HOPS + 1):
+                reason = _url_rejection_reason(currentUrl)
+                if reason:
+                    log.warning("not unshortening url (%s): %s" % (reason, currentUrl))
+                    return url
+                r = session.head(
+                    currentUrl, allow_redirects=False, timeout=URL_REQUEST_TIMEOUT
+                )
+                location = r.headers.get("Location")
+                if r.status_code not in REDIRECT_STATUS_CODES or not location:
+                    return currentUrl
+                currentUrl = urljoin(currentUrl, location)
+    except (requests.RequestException, socket.gaierror, ValueError) as e:
+        # VALUEERROR: MALFORMED URL REJECTED BY urlparse
+        log.warning("could not unshorten url %s: %s" % (url, e))
+        return url
+
+    log.warning("not unshortening url (too many redirects): %s" % (url,))
+    return url
 
 
 def main(arguments=None):
@@ -51,26 +136,8 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # unpack remaining cl arguments using `exec` to setup the variable names
-    # automatically
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, str):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToYaml = arguments["<pathToYaml>"]
+    deleteFlag = arguments["--delete"]
 
     if os.path.isfile(pathToYaml):
         from fundamentals.mysql import yaml_to_database
@@ -224,7 +291,7 @@ class yaml_to_database(object):
             dbConn=dbConn
         )
         yaml2db.add_yaml_file_content_to_database(
-            filepath=${1:"/path/to/file.yaml"},
+            filepath="/path/to/file.yaml",
             deleteFile=True
         )
         ```
@@ -233,21 +300,15 @@ class yaml_to_database(object):
         self.log.debug("completed the ````add_yaml_file_content_to_database`` method")
 
         import codecs
-        import requests
-        import requests.packages.urllib3
-
-        requests.packages.urllib3.disable_warnings()
 
         try:
             self.log.debug("attempting to open the file %s" % (filepath,))
-            readFile = codecs.open(filepath, encoding="utf-8", mode="r")
-            thisData = readFile.read()
-            readFile.close()
+            with codecs.open(filepath, encoding="utf-8", mode="r") as readFile:
+                thisData = readFile.read()
         except IOError as e:
             message = "could not open the file %s" % (filepath,)
             self.log.critical(message)
-            raise IOError(message)
-        readFile.close()
+            raise IOError(message) from e
 
         matchObject = re.finditer(
             r"(^|\n)(?P<key>[^\:]*)\:\s(?P<value>.*?)(\n|$)",
@@ -257,12 +318,9 @@ class yaml_to_database(object):
 
         yamlContent = {}
         for match in matchObject:
-            if match.group("value")[0] == '"' and match.group("value")[-1] == '"':
-                v = match.group("value")[1:-1]
-            elif match.group("value")[0] == "'" and match.group("value")[-1] == "'":
-                v = match.group("value")[1:-1]
-            else:
-                v = match.group("value")
+            v = match.group("value")
+            if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                v = v[1:-1]
             yamlContent[match.group("key")] = v
 
         if "table" not in yamlContent:
@@ -278,12 +336,9 @@ class yaml_to_database(object):
         dbTables = []
         dbTables[:] = [d.strip() for d in dbTablesTmp]
 
-        # UNSHORTEN URL
-        try:
-            r = requests.head(yamlContent["url"], allow_redirects=True)
-            yamlContent["url"] = r.url
-        except:
-            pass
+        # UNSHORTEN URL (REDIRECTS ARE NEEDED TO FIND THE FINAL URL)
+        if "url" in yamlContent:
+            yamlContent["url"] = unshorten_url(yamlContent["url"], self.log)
 
         yamlContent["original_yaml_path"] = filepath
 

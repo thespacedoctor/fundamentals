@@ -47,7 +47,37 @@
     ```
 ````
 
+### Data
+
+````{list-table}
+:class: autosummary longtable
+:align: left
+
+* - {py:obj}`CONSOLE_HANDLER_NAME <fundamentals.logs.CONSOLE_HANDLER_NAME>`
+  - ```{autodoc2-docstring} fundamentals.logs.CONSOLE_HANDLER_NAME
+    :summary:
+    ```
+* - {py:obj}`DEFAULT_LEVEL <fundamentals.logs.DEFAULT_LEVEL>`
+  - ```{autodoc2-docstring} fundamentals.logs.DEFAULT_LEVEL
+    :summary:
+    ```
+* - {py:obj}`PRINT_LEVEL_OFFSET <fundamentals.logs.PRINT_LEVEL_OFFSET>`
+  - ```{autodoc2-docstring} fundamentals.logs.PRINT_LEVEL_OFFSET
+    :summary:
+    ```
+````
+
 ### API
+
+````{py:data} CONSOLE_HANDLER_NAME
+:canonical: fundamentals.logs.CONSOLE_HANDLER_NAME
+:value: >
+   'consoleLog'
+
+```{autodoc2-docstring} fundamentals.logs.CONSOLE_HANDLER_NAME
+```
+
+````
 
 `````{py:class} ColorFormatter(fmt=None, datefmt=None, style='%', validate=True, *, defaults=None)
 :canonical: fundamentals.logs.ColorFormatter
@@ -75,13 +105,8 @@ Bases: {py:obj}`logging.Formatter`
 
 ````
 
-````{py:attribute} format
+````{py:method} format(record)
 :canonical: fundamentals.logs.ColorFormatter.format
-:value: >
-   '%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)'
-
-```{autodoc2-docstring} fundamentals.logs.ColorFormatter.format
-```
 
 ````
 
@@ -119,6 +144,16 @@ Bases: {py:obj}`logging.Formatter`
 ````
 
 `````
+
+````{py:data} DEFAULT_LEVEL
+:canonical: fundamentals.logs.DEFAULT_LEVEL
+:value: >
+   'INFO'
+
+```{autodoc2-docstring} fundamentals.logs.DEFAULT_LEVEL
+```
+
+````
 
 `````{py:class} GroupWriteRotatingFileHandler(filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False, errors=None)
 :canonical: fundamentals.logs.GroupWriteRotatingFileHandler
@@ -284,6 +319,16 @@ Bases: {py:obj}`logging.handlers.RotatingFileHandler`
 
 `````
 
+````{py:data} PRINT_LEVEL_OFFSET
+:canonical: fundamentals.logs.PRINT_LEVEL_OFFSET
+:value: >
+   6
+
+```{autodoc2-docstring} fundamentals.logs.PRINT_LEVEL_OFFSET
+```
+
+````
+
 ````{py:function} addLoggingLevel(levelName, levelNum, methodName=None)
 :canonical: fundamentals.logs.addLoggingLevel
 
@@ -306,7 +351,7 @@ Bases: {py:obj}`object`
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger
 ```
 
-````{py:method} critical(argu)
+````{py:method} critical(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.critical
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.critical
@@ -314,7 +359,7 @@ Bases: {py:obj}`object`
 
 ````
 
-````{py:method} debug(argu)
+````{py:method} debug(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.debug
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.debug
@@ -322,7 +367,7 @@ Bases: {py:obj}`object`
 
 ````
 
-````{py:method} error(argu)
+````{py:method} error(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.error
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.error
@@ -330,7 +375,7 @@ Bases: {py:obj}`object`
 
 ````
 
-````{py:method} info(argu)
+````{py:method} info(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.info
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.info
@@ -338,7 +383,7 @@ Bases: {py:obj}`object`
 
 ````
 
-````{py:method} print(argu)
+````{py:method} print(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.print
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.print
@@ -346,7 +391,7 @@ Bases: {py:obj}`object`
 
 ````
 
-````{py:method} warning(argu)
+````{py:method} warning(*args, **kwargs)
 :canonical: fundamentals.logs.emptyLogger.warning
 
 ```{autodoc2-docstring} fundamentals.logs.emptyLogger.warning

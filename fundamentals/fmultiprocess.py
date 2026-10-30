@@ -12,6 +12,30 @@ import os
 os.environ["TERM"] = "vt100"
 
 
+def _shut_down_pool(pool, isMapComplete):
+    """Close the pool after a complete map and terminate it after any other exit.
+
+    An interrupt during the clean ``close`` and ``join`` also ends in ``terminate`` and ``join``.
+
+    Accepted residual risks: a ``KeyboardInterrupt`` while ``Pool`` is being constructed, or a
+    second Ctrl-C during this teardown, can still leave workers running.
+
+    This runs in a ``finally`` block. If the teardown itself raises while a task error or
+    timeout is in flight, the new error replaces the original, which survives only as its
+    ``__context__``.
+    """
+    try:
+        if isMapComplete:
+            pool.close()
+        else:
+            pool.terminate()
+        pool.join()
+    except BaseException:
+        pool.terminate()
+        pool.join()
+        raise
+
+
 def fmultiprocess(
     log,
     function,
@@ -65,11 +89,8 @@ def fmultiprocess(
 
     logFound = "log" in inspect.signature(function).parameters
 
-    global theseBatches
-
     if turnOffMP == False:
-        import psutil
-        from multiprocess import cpu_count, Pool
+        from multiprocess import Pool
 
         from ctypes import c_int32
 
@@ -86,14 +107,6 @@ def fmultiprocess(
                 counter_lock = l
                 import logging
 
-                streamHandlers = [
-                    h for h in log.handlers if not isinstance(h, logging.FileHandler)
-                ]
-                streamHandlersLevel = [
-                    h.level
-                    for h in log.handlers
-                    if not isinstance(h, logging.FileHandler)
-                ]
                 [
                     h.setLevel(logging.WARNING)
                     for h in log.handlers
@@ -113,11 +126,6 @@ def fmultiprocess(
         # COUNTER AND LOCK FOR PROGRESS BAR
         c = mp.Value(c_int32)
         l = mp.Lock()
-
-        if poolSize:
-            p = Pool(processes=poolSize, initializer=startFunc, initargs=(log, l, c))
-        else:
-            p = Pool(initializer=startFunc, initargs=(log, l, c))
 
         cpuCount = psutil.cpu_count()
         chunksize = max(1, (len(inputArray) + 1) // (cpuCount * 3))
@@ -145,37 +153,50 @@ def fmultiprocess(
             timeout = 60 * 60
         start_time = time.time()
 
-        futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
-        if progressBar:
-            import tqdm
+        # ANY EXIT OTHER THAN A CLEAN MAP (A RAISING TASK, A TIMEOUT, CTRL-C) MUST
+        # TERMINATE THE POOL, OR ITS WORKERS OUTLIVE THE CALL AND HANG THE INTERPRETER AT EXIT
+        p = None
+        isMapComplete = False
+        try:
+            if poolSize:
+                p = Pool(
+                    processes=poolSize, initializer=startFunc, initargs=(log, l, c)
+                )
+            else:
+                p = Pool(initializer=startFunc, initargs=(log, l, c))
 
-            with tqdm.tqdm(total=len(inputArray)) as pbar:
-                while not futureArray.ready():
-                    current_time = time.time()
-                    if current_time > start_time + timeout:
-                        raise TimeoutError(
-                            f"The timeout limit of {timeout}s has been reached"
-                        )
+            futureArray = p.map_async(thisFunction, inputArray, chunksize=chunksize)
+            if progressBar:
+                import tqdm
+
+                with tqdm.tqdm(total=len(inputArray)) as pbar:
+                    while not futureArray.ready():
+                        current_time = time.time()
+                        if current_time > start_time + timeout:
+                            raise TimeoutError(
+                                f"The timeout limit of {timeout}s has been reached"
+                            )
+                        if c.value != 0:
+                            with l:
+                                increment = c.value
+                                c.value = 0
+                            pbar.update(n=increment)
+                        time.sleep(0.5)
                     if c.value != 0:
                         with l:
                             increment = c.value
                             c.value = 0
                         pbar.update(n=increment)
-                    time.sleep(0.5)
-                if c.value != 0:
-                    with l:
-                        increment = c.value
-                        c.value = 0
-                    pbar.update(n=increment)
 
-        try:
-            resultArray = futureArray.get(timeout=timeout)
-        except Exception as e:
-            log.error(f"Multiprocessing error: {e}")
-            raise
-
-        p.close()
-        p.join()
+            try:
+                resultArray = futureArray.get(timeout=timeout)
+            except Exception as e:
+                log.error(f"Multiprocessing error: {e}")
+                raise
+            isMapComplete = True
+        finally:
+            if p is not None:
+                _shut_down_pool(p, isMapComplete)
 
     else:
         resultArray = []

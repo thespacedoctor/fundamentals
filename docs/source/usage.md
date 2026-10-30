@@ -6,7 +6,7 @@
     
     Usage:
         fundamentals init
-        fundamentals [-s <pathToSettingsFile>]  
+        fundamentals [-s <pathToSettingsFile>]
     
     Options:
         init                                   setup the fundamentals settings file for the first time

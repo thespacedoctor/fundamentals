@@ -20,13 +20,82 @@ Options:
 from builtins import object
 import sys
 import os
+import re
 import sqlite3 as lite
 
 os.environ["TERM"] = "vt100"
 from fundamentals import tools
 from fundamentals.mysql import writequery
+from fundamentals.mysql.sql_identifiers import quote_identifier
 
 from datetime import datetime, date, time
+
+# THE START OF A SQLITE CREATE TABLE STATEMENT, UP TO AND INCLUDING THE TABLE NAME
+CREATE_TABLE_HEADER_REGEX = re.compile(
+    r"\A\s*CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?"
+    r'(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|\[[^\]]+\]|\w+)',
+    re.IGNORECASE,
+)
+
+
+# TOKENS OF A SQLITE STATEMENT: STRING LITERALS AND COMMENTS ARE KEPT AS THEY ARE, DOUBLE-QUOTED NAMES ARE CONVERTED
+SQLITE_TOKEN_REGEX = re.compile(
+    r"('(?:[^']|'')*'|--[^\n]*|/\*.*?\*/)" r'|"((?:[^"]|"")*)"',
+    re.DOTALL,
+)
+
+
+def quote_sqlite_identifiers(sqliteSql):
+    """*Return the sqlite SQL with each double-quoted name changed to a MySQL backtick-quoted name*
+
+    String literals and comments are left as they are, so a double quote inside a default value is not changed.
+
+    **Key Arguments**
+
+    - ``sqliteSql`` -- the sqlite SQL text
+    """
+
+    def convert(match):
+        if match.group(1) is not None:
+            return match.group(1)
+        return quote_identifier(match.group(2).replace('""', '"'))
+
+    return SQLITE_TOKEN_REGEX.sub(convert, sqliteSql)
+
+
+# AN IDENTIFIER ONCE THE DOUBLE QUOTES HAVE BEEN CHANGED TO BACKTICKS, OR A BARE WORD
+IDENTIFIER_PATTERN = r"(?:`(?:[^`]|``)+`|\w+)"
+# THE CLAUSES THAT CAN FOLLOW A REFERENCES CLAUSE
+REFERENCES_PATTERN = (
+    r"REFERENCES\s+" + IDENTIFIER_PATTERN + r"\s*(?:\([^)]*\))?"
+    r"(?:\s+ON\s+(?:UPDATE|DELETE)\s+(?:SET\s+NULL|SET\s+DEFAULT|NO\s+ACTION|CASCADE|RESTRICT)"
+    r"|\s+MATCH\s+\w+"
+    r"|\s+(?:NOT\s+)?DEFERRABLE(?:\s+INITIALLY\s+(?:DEFERRED|IMMEDIATE))?)*"
+)
+# A TABLE-LEVEL CONSTRAINT, WITH THE COMMA THAT SEPARATES IT FROM THE DEFINITION BEFORE IT
+TABLE_FOREIGN_KEY_REGEX = re.compile(
+    r",\s*(?:CONSTRAINT\s+" + IDENTIFIER_PATTERN + r"\s+)?"
+    r"FOREIGN\s+KEY\s*\([^)]*\)\s*" + REFERENCES_PATTERN,
+    re.IGNORECASE,
+)
+COLUMN_REFERENCES_REGEX = re.compile(r"\s+" + REFERENCES_PATTERN, re.IGNORECASE)
+
+
+def remove_foreign_keys(createBody):
+    """*Return the body of a CREATE TABLE statement without its foreign key constraints*
+
+    The MySQL copy is a plain mirror of the data, so it does not keep foreign keys. A MySQL foreign key needs the parent table to exist first, an index on the referenced columns, and key columns of the same type and length. A copy of sqlite ``TEXT`` columns meets none of these.
+
+    **Key Arguments**
+
+    - ``createBody`` -- the CREATE TABLE statement after the table name, with names quoted with backticks
+
+    **Return**
+
+    - ``createBody`` -- the text without column-level ``REFERENCES`` clauses and without table-level ``FOREIGN KEY`` constraints
+    """
+    createBody = TABLE_FOREIGN_KEY_REGEX.sub("", createBody)
+    return COLUMN_REFERENCES_REGEX.sub("", createBody)
 
 
 def main(arguments=None):
@@ -44,26 +113,8 @@ def main(arguments=None):
     )
     arguments, settings, log, dbConn = su.setup()
 
-    # unpack remaining cl arguments using `exec` to setup the variable names
-    # automatically
-    for arg, val in list(arguments.items()):
-        if arg[0] == "-":
-            varname = arg.replace("-", "") + "Flag"
-        else:
-            varname = arg.replace("<", "").replace(">", "")
-        if isinstance(val, str):
-            exec(varname + " = '%s'" % (val,))
-        else:
-            exec(varname + " = %s" % (val,))
-        if arg == "--dbConn":
-            dbConn = val
-        log.debug(
-            "%s = %s"
-            % (
-                varname,
-                val,
-            )
-        )
+    pathToSqliteDB = arguments["<pathToSqliteDB>"]
+    tablePrefix = arguments["<tablePrefix>"]
 
     from fundamentals.mysql import sqlite2mysql
 
@@ -86,10 +137,10 @@ class sqlite2mysql(object):
     **Key Arguments**
 
     - ``log`` -- logger
-    - ``settings`` -- the settings dictionary
+    - ``settings`` -- the settings dictionary. Optional; when it holds a ``database settings`` entry, that is passed on so the bulk insert can open one connection per process. Default *False*
     - ``pathToSqlite`` -- path to the sqlite database to transfer into the MySQL database
     - ``tablePrefix`` -- a prefix to add to all the tablename when converting to mysql. Default *""*
-    - ``dbConn`` -- mysql database connection
+    - ``dbConn`` -- mysql database connection. **Required**: a ``ValueError`` is raised if it is missing
 
 
     **Usage**
@@ -108,7 +159,8 @@ class sqlite2mysql(object):
         log=log,
         settings=settings,
         pathToSqlite="/path/to/sqlite.db",
-        tablePrefix="external"
+        tablePrefix="external",
+        dbConn=dbConn
     )
     converter.convert_sqlite_to_mysql()
     ```
@@ -117,7 +169,11 @@ class sqlite2mysql(object):
 
     # Initialisation
 
-    def __init__(self, log, pathToSqlite, tablePrefix="", settings=False, dbConn=False):
+    def __init__(self, log, pathToSqlite, tablePrefix="", settings=False, dbConn=None):
+        if dbConn is None or dbConn is False:
+            raise ValueError(
+                "sqlite2mysql requires a database connection: pass dbConn=<connection>"
+            )
         self.log = log
         log.debug("instansiating a new 'sqlite2mysql' object")
         self.settings = settings
@@ -139,14 +195,31 @@ class sqlite2mysql(object):
 
         See class docstring for usage
         """
-        from fundamentals.renderer import list_of_dictionaries
-        from fundamentals.mysql import directory_script_runner
-
         self.log.debug("starting the ``convert_sqlite_to_mysql`` method")
 
         con = lite.connect(self.pathToSqlite)
-        con.row_factory = lite.Row
-        cur = con.cursor()
+        try:
+            con.row_factory = lite.Row
+            cur = con.cursor()
+            try:
+                self._copy_tables(cur)
+            finally:
+                cur.close()
+        finally:
+            con.close()
+
+        self.log.debug("completed the ``convert_sqlite_to_mysql`` method")
+        return None
+
+    def _copy_tables(self, cur):
+        """*copy every table read through the sqlite cursor into the mysql database*
+
+        **Key Arguments**
+
+        - ``cur`` -- an open sqlite cursor (closed by the caller)
+        """
+        from fundamentals.renderer import list_of_dictionaries
+        from fundamentals.mysql import directory_script_runner
 
         # GET ALL TABLE NAMES
         cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -161,11 +234,22 @@ class sqlite2mysql(object):
 
             # CREATE TABLE collection_books (folder_id, fingerprint, primary key(folder_id, fingerprint));
             # GENEREATE THE MYSQL CREATE STATEMENTS FOR EACH TABLE
-            cur.execute(
-                "SELECT sql FROM sqlite_master WHERE name = '%(table)s';" % locals()
-            )
+            cur.execute("SELECT sql FROM sqlite_master WHERE name = ?;", (table,))
             createStatement = cur.fetchone()
-            createStatement = createStatement[0].replace('"', "`") + ";"
+            createStatement = createStatement[0]
+            headerMatch = CREATE_TABLE_HEADER_REGEX.match(createStatement)
+            if headerMatch is None:
+                raise ValueError(
+                    "cannot find the table name in the sqlite statement: %s"
+                    % (createStatement,)
+                )
+            # THE BODY IS CONVERTED ON ITS OWN SO THE QUOTED TABLE NAME IS NEVER REWRITTEN
+            createStatement = (
+                remove_foreign_keys(
+                    quote_sqlite_identifiers(createStatement[headerMatch.end() :])
+                )
+                + ";"
+            )
             if "DEFAULT" not in createStatement:
                 if "primary key(" in createStatement:
                     tmp = createStatement.split("primary key(")
@@ -184,14 +268,6 @@ class sqlite2mysql(object):
             createStatement = createStatement.replace("DEFAULT 'f'", "DEFAULT '0'")
             createStatement = createStatement.replace(",'t'", ",'1'")
             createStatement = createStatement.replace(",'f'", ",'0'")
-            if "CREATE TABLE `" in createStatement:
-                createStatement = createStatement.replace(
-                    "CREATE TABLE `", "CREATE TABLE IF NOT EXISTS `" + self.tablePrefix
-                )
-            else:
-                createStatement = createStatement.replace(
-                    "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS " + self.tablePrefix
-                )
             if ", primary key(" in createStatement:
                 createStatement = createStatement.replace(
                     ", primary key(",
@@ -238,8 +314,15 @@ primary key(""",
                     "`dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,\n", ""
                 )
 
+            createStatement = (
+                "CREATE TABLE IF NOT EXISTS "
+                + quote_identifier(self.tablePrefix + table)
+                + createStatement
+            )
+
             # GRAB THE DATA TO ADD TO THE MYSQL DATABASE TABLES
-            cur.execute("SELECT * from '%(table)s';" % locals())
+            quotedTable = '"' + table.replace('"', '""') + '"'
+            cur.execute("SELECT * FROM %s;" % (quotedTable,))
             rows = cur.fetchall()
 
             allRows = []
@@ -251,10 +334,6 @@ primary key(""",
                     dateCreated = False
                 allRows.append(thisDict)
 
-            # RECURSIVELY CREATE MISSING DIRECTORIES
-            if not os.path.exists("/tmp/headjack/"):
-                os.makedirs("/tmp/headjack/")
-
             writequery(
                 log=self.log,
                 sqlQuery=createStatement,
@@ -265,7 +344,10 @@ primary key(""",
                 insert_list_of_dictionaries_into_database_tables,
             )
 
-            # USE dbSettings TO ACTIVATE MULTIPROCESSING
+            # USE dbSettings TO ACTIVATE MULTIPROCESSING, IF SETTINGS WERE GIVEN
+            insertKwargs = {}
+            if self.settings and "database settings" in self.settings:
+                insertKwargs["dbSettings"] = self.settings["database settings"]
             insert_list_of_dictionaries_into_database_tables(
                 dbConn=self.dbConn,
                 log=self.log,
@@ -276,34 +358,8 @@ primary key(""",
                 dateCreated=dateCreated,
                 batchSize=10000,
                 replace=True,
-                dbSettings=self.settings["database settings"],
+                **insertKwargs,
             )
-
-            # # DUMP THE DATA INTO A MYSQL DATABASE
-            # dataSet = list_of_dictionaries(
-            #     log=self.log,
-            #     listOfDictionaries=allRows
-            # )
-            # originalList = dataSet.list
-            # now = datetime.now()
-            # now = now.strftime("%Y%m%dt%H%M%S%f.sql")
-            # mysqlData = dataSet.mysql(
-            # tableName=self.tablePrefix + table, filepath="/tmp/headjack/" +
-            # now, createStatement=createStatement)
-
-            # directory_script_runner(
-            #     log=self.log,
-            #     pathToScriptDirectory="/tmp/headjack/",
-            #     databaseName=self.settings["database settings"]["db"],
-            #     loginPath=self.settings["database settings"]["loginPath"],
-            #     successRule="delete",
-            #     failureRule="failed"
-            # )
-
-        con.close()
-
-        self.log.debug("completed the ``convert_sqlite_to_mysql`` method")
-        return None
 
     # use the tab-trigger below for new method
     # xt-class-method

@@ -31,42 +31,43 @@
 :class: autosummary longtable
 :align: left
 
-* - {py:obj}`gtimeout <fundamentals.download.multiobject_download.gtimeout>`
-  - ```{autodoc2-docstring} fundamentals.download.multiobject_download.gtimeout
+* - {py:obj}`CHUNK_SIZE <fundamentals.download.multiobject_download.CHUNK_SIZE>`
+  - ```{autodoc2-docstring} fundamentals.download.multiobject_download.CHUNK_SIZE
     :summary:
     ```
-* - {py:obj}`llog <fundamentals.download.multiobject_download.llog>`
-  - ```{autodoc2-docstring} fundamentals.download.multiobject_download.llog
+* - {py:obj}`MAX_TRIES <fundamentals.download.multiobject_download.MAX_TRIES>`
+  - ```{autodoc2-docstring} fundamentals.download.multiobject_download.MAX_TRIES
     :summary:
     ```
 ````
 
 ### API
 
+````{py:data} CHUNK_SIZE
+:canonical: fundamentals.download.multiobject_download.CHUNK_SIZE
+:value: >
+   65536
+
+```{autodoc2-docstring} fundamentals.download.multiobject_download.CHUNK_SIZE
+```
+
+````
+
+````{py:data} MAX_TRIES
+:canonical: fundamentals.download.multiobject_download.MAX_TRIES
+:value: >
+   5
+
+```{autodoc2-docstring} fundamentals.download.multiobject_download.MAX_TRIES
+```
+
+````
+
 ````{py:function} fetch_url(entry)
 :canonical: fundamentals.download.multiobject_download.fetch_url
 
 ```{autodoc2-docstring} fundamentals.download.multiobject_download.fetch_url
 ```
-````
-
-````{py:data} gtimeout
-:canonical: fundamentals.download.multiobject_download.gtimeout
-:value: >
-   10.0
-
-```{autodoc2-docstring} fundamentals.download.multiobject_download.gtimeout
-```
-
-````
-
-````{py:data} llog
-:canonical: fundamentals.download.multiobject_download.llog
-:value: <Multiline-String>
-
-```{autodoc2-docstring} fundamentals.download.multiobject_download.llog
-```
-
 ````
 
 ````{py:function} multiobject_download(urlList, downloadDirectory, log, timeStamp=True, timeout=180, concurrentDownloads=10, resetFilename=False, credentials=False, longTime=False, indexFilenames=False)

@@ -31,17 +31,21 @@ class fileChunker(object):
 
     To setup your logger, settings and database connections, please use the ``fundamentals`` package (see tutorial here https://fundamentals.readthedocs.io/en/master/initialisation.html).
 
-    To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following:
+    To initiate a fileChunker iterator and then process the file in batches of 100000 lines, use the following (the file is closed when the ``with`` block exits):
 
     ```python
     from fundamentals.files import fileChunker
-    fc = fileChunker(
+    with fileChunker(
         filepath="/path/to/large/file.csv",
         batchSize=100000
-    )
-    for i in fc:
-        print len(i)
+    ) as fc:
+        for i in fc:
+            print(len(i))
     ```
+
+    The file is also closed once the iterator is exhausted, or when ``fc.close()`` is called.
+
+    After the file closes, by exhaustion or by ``close()``, iteration stops.
 
     """
 
@@ -53,18 +57,31 @@ class fileChunker(object):
             self.readFile = codecs.open(self.filepath, encoding="utf-8", mode="r")
         except IOError as e:
             message = "could not open the file %s" % (self.filepath,)
-            raise IOError(message)
+            raise IOError(message) from e
 
     def __iter__(self):
         return self
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def close(self):
+        """*close the underlying file; safe to call more than once*"""
+        self.readFile.close()
+
     def __next__(self):
+        if self.readFile.closed:
+            raise StopIteration
         batch = []
-        for lines in range(self.batchSize):
-            l = self.readFile.readline()
-            if len(l):
-                batch.append(l)
+        for _ in range(self.batchSize):
+            line = self.readFile.readline()
+            if len(line):
+                batch.append(line)
         if len(batch) == 0:
+            self.close()
             raise StopIteration
 
         return batch
