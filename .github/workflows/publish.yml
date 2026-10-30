@@ -1,28 +1,98 @@
 name: Publish to PyPI
 
+# RUNS WHEN A RELEASE PULL REQUEST MERGES INTO main. IT TAGS THE MERGE COMMIT, BUILDS FROM THE TAG,
+# PUBLISHES TO PYPI (TRUSTED PUBLISHING) AND CREATES THE GITHUB RELEASE. IF THE GITHUB RELEASE FOR THE
+# VERSION ALREADY EXISTS IT DOES NOTHING. TO RESUME A RELEASE THAT FAILED PART WAY, RUN THIS WORKFLOW BY
+# HAND ON main (`gh workflow run publish.yml --ref main`).
 on:
   push:
-    tags:
-      - "v*"  # Triggers on tags like v0.1.0, v1.2.3
+    branches:
+      - main
+  workflow_dispatch:
 
-# PyPI publishing not yet supported in reusable workflows, see https://github.com/pypa/gh-action-pypi-publish/issues/166
-# jobs:
-#   call-workflow:
-#     uses: thespacedoctor/reusable-workflows/.github/workflows/publish.yml@main
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
+permissions:
+  contents: read
+
+env:
+  VERSION_FILE: fundamentals/__version__.py
 
 jobs:
-  build:
-    name: Publish release to PyPI
+  check:
+    name: Check release
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      release_exists: ${{ steps.meta.outputs.release_exists }}
     steps:
-      - name: Act Workaround # https://github.com/nektos/act/issues/973
-        if: ${{ env.ACT }}
-        run: curl -fsSL https://deb.nodesource.com/setup_22.x | bash && apt install -y nodejs
+      - uses: actions/checkout@v4
+
+      - name: Validate version and changelog heading
+        id: meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          VERSION=$(sed -nE "s/^__version__ = ['\"]([^'\"]+)['\"]$/\1/p" "$VERSION_FILE")
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?$ ]]; then
+            echo "::error::$VERSION_FILE holds '$VERSION'; expected X.Y.Z or X.Y.Z{a,b,rc}N"
+            exit 1
+          fi
+          HEADING=$(grep -m1 '^## v' CHANGES.md || true)
+          case "$HEADING" in
+            "## v$VERSION "*) ;;
+            *)
+              echo "::error::first '## v' heading in CHANGES.md is '$HEADING'; expected '## v$VERSION - <date>'"
+              exit 1
+              ;;
+          esac
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            RELEASE_EXISTS=true
+          else
+            RELEASE_EXISTS=false
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "release_exists=$RELEASE_EXISTS" >> "$GITHUB_OUTPUT"
+          echo "Version $VERSION, GitHub release exists: $RELEASE_EXISTS"
+
+  build:
+    name: Tag and build
+    needs: check
+    if: needs.check.outputs.release_exists != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # REQUIRED TO PUSH THE TAG
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      TAG: ${{ needs.check.outputs.tag }}
+    steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
+
+      - name: Tag the merge commit (unless the tag exists)
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; building from it."
+            git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG" "$GITHUB_SHA"
+            git push origin "refs/tags/$TAG"
+          fi
+
+      - name: Check out the tag
+        run: git checkout --detach "refs/tags/$TAG"
+
       - uses: actions/setup-python@v5
         with:
           python-version-file: pyproject.toml
@@ -33,7 +103,17 @@ jobs:
         run: pip install build
 
       - name: Build package
-        run: python -m build 
+        run: python -m build
+
+      - name: Check the built version matches the tag
+        run: |
+          set -euo pipefail
+          ls dist/
+          ESCAPED=${VERSION//./\\.}
+          ls dist/ | grep -E "^fundamentals-${ESCAPED}(\.tar\.gz|-)" >/dev/null || {
+            echo "::error::dist/ holds no file for version $VERSION (a .dev version means the tag was not checked out)"
+            exit 1
+          }
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -42,20 +122,23 @@ jobs:
           path: dist/
 
   publish:
-    name: Publish to PyPI
-    needs: build
+    name: Publish to PyPI and GitHub
+    needs: [check, build]
     runs-on: ubuntu-latest
     environment: release
     permissions:
-      contents: write
-      pull-requests: write
-      id-token: write  # Required for OIDC trusted publishing
-
+      contents: write  # REQUIRED TO CREATE THE GITHUB RELEASE
+      id-token: write  # REQUIRED FOR OIDC TRUSTED PUBLISHING
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      TAG: ${{ needs.check.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 0
+          ref: ${{ needs.check.outputs.tag }}
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -67,18 +150,15 @@ jobs:
         with:
           skip-existing: true
 
-      - name: Get tag message
-        id: tag_message
+      - name: Extract this version's CHANGES.md block
         run: |
-          TAG_MSG=$(git tag -l --format='%(contents)' ${{ github.ref_name }})
-          echo "message<<EOF" >> $GITHUB_OUTPUT
-          echo "$TAG_MSG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          awk -v heading="## v$VERSION " 'index($0, heading) == 1 { found = 1; next } /^## v/ { if (found) exit } found' CHANGES.md > notes.md
+          test -s notes.md || { echo "::error::no CHANGES.md block found for $VERSION"; exit 1; }
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*  # attach the .whl and .tar.gz to the release
-          body: ${{ steps.tag_message.outputs.message }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub release
+        run: |
+          set -euo pipefail
+          PRERELEASE=""
+          if [[ "$VERSION" =~ (a|b|rc)[0-9]+$ ]]; then PRERELEASE="--prerelease"; fi
+          gh release create "$TAG" dist/* --title "$TAG" --notes-file notes.md --verify-tag $PRERELEASE

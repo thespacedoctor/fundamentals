@@ -85,6 +85,7 @@ class test_tag(unittest.TestCase):
         self.assertEqual(self._list_tree(self.redirectedTmp), [])
         self.assertEqual(self._new_stray_plists(), set())
 
+    @pytest.mark.skipif(sys.platform != "darwin", reason="needs the macOS xattr command")
     def test_tag_handles_shell_characters_in_tempdir_path(self):
 
         from fundamentals.files.tag import tag
