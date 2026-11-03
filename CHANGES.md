@@ -2,6 +2,10 @@
 
 * **ENHANCEMENT:** fundamentals now requires Python 3.12 or later, to match the conda-forge package; the Read the Docs build also uses Python 3.12
 
+## v3.0.1 - November 3, 2026
+
+* **FIXED:** `GroupWriteRotatingFileHandler` no longer loses the record that triggers a rollover when the handler is set up with `delay=True` (as soxspipe does): the rollover sets the file mode only when the new log file exists, and the file is created group-writable on the next write (DY-2088)
+
 ## v3.0.0 - October 30, 2026
 
 * **ENHANCEMENT:** `directory_script_runner` background mode (`waitForResult=False`) runs at most `maxParallelScripts` mysql scripts at once (default 8, per call) and still returns at once; scripts queued behind the limit always run, so the program waits for them before it exits, and mysql error output in the log is capped to its last 64 KB (DY-2046)
