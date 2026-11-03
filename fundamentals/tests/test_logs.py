@@ -53,6 +53,37 @@ class test_logs(unittest.TestCase):
         finally:
             handler.close()
 
+    def test_group_write_handler_keeps_every_record_across_rollovers_when_delayed(self):
+        from fundamentals.logs import GroupWriteRotatingFileHandler
+
+        logDir = self.tmp_path_for("delayed")
+        handler = GroupWriteRotatingFileHandler(
+            logDir + "/delayed.log", maxBytes=200, backupCount=50, delay=True
+        )
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        handler.handleError = lambda record: self.fail(
+            "rollover raised while writing a record"
+        )
+        log = logging.getLogger(self.id())
+        previousLevel, previousPropagate = log.level, log.propagate
+        log.propagate = False
+        log.setLevel(logging.INFO)
+        log.addHandler(handler)
+        try:
+            for lineNumber in range(100):
+                log.info("line %03d %s", lineNumber, "x" * 40)
+        finally:
+            log.removeHandler(handler)
+            handler.close()
+            log.setLevel(previousLevel)
+            log.propagate = previousPropagate
+
+        lines = []
+        for name in os.listdir(logDir):
+            with open(os.path.join(logDir, name)) as logFile:
+                lines.extend(logFile.read().splitlines())
+        self.assertEqual(len(lines), 100)
+
     def test_group_write_handler_creates_log_group_writable_not_world_writable(self):
         import stat
         from fundamentals.logs import GroupWriteRotatingFileHandler

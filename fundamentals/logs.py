@@ -407,11 +407,16 @@ class GroupWriteRotatingFileHandler(handlers.RotatingFileHandler):
         handlers.RotatingFileHandler.doRollover(self)
 
         # ADD GROUP READ/WRITE AND WORLD READ; NEVER WORLD WRITE
-        currMode = os.stat(self.baseFilename).st_mode
-        os.chmod(
-            self.baseFilename,
-            (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
-        )
+        try:
+            currMode = os.stat(self.baseFilename).st_mode
+            os.chmod(
+                self.baseFilename,
+                (currMode | stat.S_IWGRP | stat.S_IRGRP | stat.S_IROTH) & ~stat.S_IWOTH,
+            )
+        except FileNotFoundError:
+            # WITH delay=True THE NEW FILE IS ONLY CREATED BY _open ON THE
+            # NEXT WRITE, AND _open ALREADY GIVES IT GROUP WRITE
+            return
 
 
 # REGISTER THE HANDLER AT IMPORT SO dictConfig CAN RESOLVE
