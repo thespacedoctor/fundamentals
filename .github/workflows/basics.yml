@@ -1,6 +1,13 @@
 name: Basic Python Checks
 
-on: [push, pull_request]
+# A CHANGE THAT TOUCHES ONLY CHANGES.md SKIPS THIS WORKFLOW
+on:
+  push:
+    paths-ignore:
+      - "CHANGES.md"
+  pull_request:
+    paths-ignore:
+      - "CHANGES.md"
 
 jobs:
   call-workflow:
