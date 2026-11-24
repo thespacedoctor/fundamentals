@@ -1,6 +1,10 @@
 name: Integration Tests
 
-on: [pull_request]
+# A CHANGE THAT TOUCHES ONLY CHANGES.md SKIPS THIS WORKFLOW
+on:
+  pull_request:
+    paths-ignore:
+      - "CHANGES.md"
 
 jobs:
   call-workflow:

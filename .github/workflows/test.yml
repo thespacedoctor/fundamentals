@@ -2,14 +2,20 @@ name: Tests
 
 # RUNS THE TEST SUITE ON EVERY PULL REQUEST INTO main OR develop AND ON EVERY PUSH TO develop.
 # REQUIRE THE "tests" CHECK ON main SO RELEASE PULL REQUESTS AUTO-MERGE ONLY WHEN IT PASSES.
+# A CHANGE THAT TOUCHES ONLY CHANGES.md SKIPS THIS WORKFLOW. IF "tests" IS MADE A REQUIRED CHECK,
+# A SKIPPED WORKFLOW LEAVES IT PENDING: SWITCH TO A JOB-LEVEL SKIP (SEE soxspipe's tests.yml) FIRST
 on:
   pull_request:
     branches:
       - main
       - develop
+    paths-ignore:
+      - "CHANGES.md"
   push:
     branches:
       - develop
+    paths-ignore:
+      - "CHANGES.md"
 
 permissions:
   contents: read

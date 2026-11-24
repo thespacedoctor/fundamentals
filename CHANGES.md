@@ -1,6 +1,7 @@
 # Release Notes
 
 * **ENHANCEMENT:** fundamentals now requires Python 3.12 or later, to match the conda-forge package; the Read the Docs build also uses Python 3.12
+* **ENHANCEMENT:** CI skips the test and check workflows when a change touches only `CHANGES.md`.
 
 ## v3.0.1 - November 3, 2026
 
