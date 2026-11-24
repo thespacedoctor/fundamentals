@@ -7,10 +7,15 @@ Author
 : David Young
 """
 
+import pymysql
+
 from fundamentals.mysql.sql_identifiers import (
     quote_identifier,
     quote_identifier_for_format,
 )
+
+# FIRST PYMYSQL RELEASE THAT FORMATS THE ON DUPLICATE KEY UPDATE TAIL OF A BATCHED INSERT (AN EARLIER ONE SENDS IT AS IT IS)
+PYMYSQL_FORMATS_BATCH_TAIL_FROM = (1, 2, 4)
 
 
 def build_batch_insert_command(
@@ -19,7 +24,7 @@ def build_batch_insert_command(
     """*Build an insert command with ``%s`` placeholders, to be run with ``executemany``*
 
     Every identifier is quoted, and ``%`` inside an identifier is doubled because pymysql formats the command afterwards.
-    The exception is the ``ON DUPLICATE KEY UPDATE`` tail when the values are only placeholders: pymysql then batches the rows and sends that tail as it is, so ``%`` stays single.
+    The exception is the ``ON DUPLICATE KEY UPDATE`` tail when the values are only placeholders and the installed pymysql is older than 1.2.4: pymysql then batches the rows and sends that tail as it is, so ``%`` stays single. From pymysql 1.2.4 it formats that tail too, so ``%`` is doubled there as well.
 
     **Key Arguments**
 
@@ -45,9 +50,12 @@ def build_batch_insert_command(
         ", NOW()" if dateCreated else "",
     )
     if replace:
-        # PYMYSQL ONLY FORMATS THE TAIL WHEN IT CANNOT BATCH THE ROWS (NOW() IN THE VALUES)
+        # PYMYSQL BEFORE 1.2.4 ONLY FORMATS THE TAIL WHEN IT CANNOT BATCH THE ROWS (NOW() IN THE VALUES)
         tailColumns = quotedColumns
-        if not dateCreated:
+        if (
+            not dateCreated
+            and tuple(pymysql.VERSION[:3]) < PYMYSQL_FORMATS_BATCH_TAIL_FROM
+        ):
             tailColumns = [quote_identifier(c) for c in columns]
         assignments = ["%s=VALUES(%s)" % (c, c) for c in tailColumns]
         assignments += list(extraUpdates)

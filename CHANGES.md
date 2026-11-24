@@ -2,6 +2,7 @@
 
 * **ENHANCEMENT:** fundamentals now requires Python 3.12 or later, to match the conda-forge package; the Read the Docs build also uses Python 3.12
 * **ENHANCEMENT:** CI skips the test and check workflows when a change touches only `CHANGES.md`.
+* **FIXED:** a batched insert with `replace=True` into a column whose name holds `%` no longer fails with pymysql 1.2.4 or later, which formats the `ON DUPLICATE KEY UPDATE` tail that earlier releases sent as it was.
 
 ## v3.0.1 - November 3, 2026
 

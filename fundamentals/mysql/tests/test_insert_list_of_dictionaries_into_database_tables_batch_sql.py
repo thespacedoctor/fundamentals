@@ -69,20 +69,33 @@ class test_batch_insert_statement(unittest.TestCase):
             sqlQuery,
         )
 
-    def test_keeps_percent_signs_single_in_the_update_tail_when_pymysql_batches_the_rows(
+    def test_escapes_percent_signs_in_the_update_tail_only_when_pymysql_formats_it(
         self,
     ):
-        # ACT
-        sqlQuery = self._build_sql(replace=True, dateCreated=False)["sqlQuery"]
+        # ARRANGE: PYMYSQL BEFORE 1.2.4 SENDS THE TAIL OF A BATCHED INSERT UNFORMATTED
+        from unittest import mock
 
-        # ASSERT
-        self.assertEqual(
-            sqlQuery,
-            "INSERT IGNORE INTO `ba``d%%table` (`100%%`,`select`,`we``ird`)"
-            " VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `100%`=VALUES(`100%`),"
-            " `select`=VALUES(`select`), `we``ird`=VALUES(`we``ird`),"
-            " updated=1, dateLastModified=NOW()",
-        )
+        import pymysql
+
+        for pymysqlVersion, tailPercent in (
+            ((1, 2, 3, "final"), "%"),
+            ((1, 2, 4, "final"), "%%"),
+        ):
+            with (
+                self.subTest(pymysqlVersion=pymysqlVersion),
+                mock.patch.object(pymysql, "VERSION", pymysqlVersion),
+            ):
+                # ACT
+                sqlQuery = self._build_sql(replace=True, dateCreated=False)["sqlQuery"]
+
+                # ASSERT
+                self.assertEqual(
+                    sqlQuery,
+                    "INSERT IGNORE INTO `ba``d%%table` (`100%%`,`select`,`we``ird`)"
+                    " VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE `100{p}`=VALUES(`100{p}`),"
+                    " `select`=VALUES(`select`), `we``ird`=VALUES(`we``ird`),"
+                    " updated=1, dateLastModified=NOW()".format(p=tailPercent),
+                )
 
     def test_leaves_identifiers_untouched_when_they_contain_double_quotes(self):
         # ARRANGE
