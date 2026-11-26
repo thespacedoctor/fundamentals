@@ -2,6 +2,7 @@
 
 * **ENHANCEMENT:** fundamentals now requires Python 3.12 or later, to match the conda-forge package; the Read the Docs build also uses Python 3.12
 * **ENHANCEMENT:** CI skips the test and check workflows when a change touches only `CHANGES.md`.
+* **ENHANCEMENT:** CI also skips the test job when a push to a pull request only moved its base, meaning a merge from or rebase onto the base branch that leaves the pull request's own code diff unchanged, and the run on the previous head passed; the decision comes from the shared `change-scope` workflow in `thespacedoctor/reusable-workflows`.
 * **FIXED:** a batched insert with `replace=True` into a column whose name holds `%` no longer fails with pymysql 1.2.4 or later, which formats the `ON DUPLICATE KEY UPDATE` tail that earlier releases sent as it was.
 
 ## v3.0.1 - November 3, 2026
