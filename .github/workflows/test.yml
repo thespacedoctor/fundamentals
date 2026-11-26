@@ -2,20 +2,19 @@ name: Tests
 
 # RUNS THE TEST SUITE ON EVERY PULL REQUEST INTO main OR develop AND ON EVERY PUSH TO develop.
 # REQUIRE THE "tests" CHECK ON main SO RELEASE PULL REQUESTS AUTO-MERGE ONLY WHEN IT PASSES.
-# A CHANGE THAT TOUCHES ONLY CHANGES.md SKIPS THIS WORKFLOW. IF "tests" IS MADE A REQUIRED CHECK,
-# A SKIPPED WORKFLOW LEAVES IT PENDING: SWITCH TO A JOB-LEVEL SKIP (SEE soxspipe's tests.yml) FIRST
+# A CHANGE THAT TOUCHES ONLY CHANGES.md, OR A PUSH TO A PULL REQUEST THAT ONLY MOVED ITS BASE
+# (A MERGE FROM, OR REBASE ONTO, THE BASE BRANCH THAT LEFT THE PULL REQUEST'S OWN CODE UNCHANGED,
+# AFTER A PASSING RUN), SKIPS THE TEST JOB. THE DECISION IS THE SHARED change-scope WORKFLOW IN
+# thespacedoctor/reusable-workflows. A JOB SKIPPED BY `if` PASSES A REQUIRED CHECK, UNLIKE A
+# WORKFLOW SKIPPED BY `paths-ignore`, WHICH LEAVES IT PENDING
 on:
   pull_request:
     branches:
       - main
       - develop
-    paths-ignore:
-      - "CHANGES.md"
   push:
     branches:
       - develop
-    paths-ignore:
-      - "CHANGES.md"
 
 permissions:
   contents: read
@@ -25,7 +24,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    permissions:
+      contents: read
+      actions: read
+    uses: thespacedoctor/reusable-workflows/.github/workflows/change-scope.yml@main
+
   tests:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.code != 'false') }}
     name: tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
